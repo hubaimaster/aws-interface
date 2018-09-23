@@ -58,7 +58,7 @@ class AwsResource(Resource):
         return True
 
     def create_item(self, table_name, item):
-        table = self.session.resource('dynamo', self.region).Table(table_name)
+        table = self.session.resource('dynamodb', self.region).Table(table_name)
         response = table.put_item(
             Item=item
         )

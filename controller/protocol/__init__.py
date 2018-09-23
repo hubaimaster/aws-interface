@@ -1,6 +1,6 @@
 
 class Config:
-    table_prefix = 'AWSInterface-'
+    table_prefix = 'aws-interface-'
 
 
 class Msg:
@@ -46,3 +46,4 @@ class Resource(dict):
 
     def create_item(self, table_name, item_json):
         raise NotImplementedError()
+
