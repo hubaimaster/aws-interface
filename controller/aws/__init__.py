@@ -19,8 +19,8 @@ class AwsRequest(Request):
         return self['passport']
 
 
+# <-- Imp -->
 class AwsResource(Resource):
-
     def __init__(self, aws_request):
         self.request = aws_request
         self.session = boto3.Session(
@@ -34,7 +34,7 @@ class AwsResource(Resource):
         response = self.dynamo.create_table(
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'id',
+                    'AttributeName': Con,
                     'AttributeType': 'S'
                 },
             ],
