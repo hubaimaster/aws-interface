@@ -1,10 +1,8 @@
 # API Definition
 ## Describe the request and response format of the API defined in the controller.protocol.API
 
-## API functions
-
 ### create_backend_service(request)
-##### Request:
+#### Request:
 ```javascript
 {
     passport: {
@@ -17,7 +15,7 @@
 }
 ```
 
-##### Return:
+#### Return:
 ```javascript
 {
     passport: {
