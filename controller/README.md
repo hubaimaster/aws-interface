@@ -1,7 +1,7 @@
 # API Definition
-## Describe the request and response format of the API defined in the controller.protocol.API
+### Describe the request and response format of the API defined in the controller.protocol.API
 
-### create_backend_service(request)
+## create_backend_service(request)
 #### Request:
 ```javascript
 {
