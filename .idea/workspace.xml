@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3d524cbd-74d7-4047-82c1-e6861bf77dc8" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/api/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/controller/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/aws/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/controller/aws/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/view/template/main/landing.html" beforeDir="false" afterPath="$PROJECT_DIR$/view/template/main/landing.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,8 +16,8 @@
       <file leaf-file-name="__init__.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/controller/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1680">
-              <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
+            <state relative-caret-position="240">
+              <caret line="16" column="48" lean-forward="true" selection-start-line="16" selection-start-column="48" selection-end-line="16" selection-end-column="48" />
             </state>
           </provider>
         </entry>
@@ -225,8 +223,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/controller/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1680">
-          <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
+        <state relative-caret-position="240">
+          <caret line="16" column="48" lean-forward="true" selection-start-line="16" selection-start-column="48" selection-end-line="16" selection-end-column="48" />
         </state>
       </provider>
     </entry>
