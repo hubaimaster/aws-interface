@@ -34,7 +34,7 @@ class AwsResource(Resource):
         response = self.dynamo.create_table(
             AttributeDefinitions=[
                 {
-                    'AttributeName': Con,
+                    'AttributeName': 'id',
                     'AttributeType': 'S'
                 },
             ],

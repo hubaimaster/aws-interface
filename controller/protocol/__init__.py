@@ -47,3 +47,6 @@ class Resource(dict):
     def create_item(self, table_name, item_json):
         raise NotImplementedError()
 
+    def get_table_list(self, prefix):
+        raise NotImplementedError()
+

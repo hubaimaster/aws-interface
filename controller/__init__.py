@@ -8,14 +8,15 @@ class API:
     # <-- apps -->
     def create_backend_service(self, request):
         resource = self.resource_cls(request)
-        table_name = request.get_param('table_name')
+        service_name = request.get_param('service_name')
 
-        resource.create_table(Config.table_prefix + table_name)
+        resource.create_table(Config.table_prefix + service_name)
         return Response(Msg.success)
 
 
     def get_backend_service_list(self, request):
         resource = self.resource_cls(request)
+        table_list = resource.get_table_list()
         raise NotImplementedError()
 
 
