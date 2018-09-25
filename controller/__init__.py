@@ -21,7 +21,7 @@ class API:
 
 
     # <-- detail -->
-    def get_backend_service_info(self, request):
+    def get_backend_service(self, request):
         resource = self.resource_cls(request)
         raise NotImplementedError() #Return Member, Model..
 
