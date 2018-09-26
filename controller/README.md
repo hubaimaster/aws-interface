@@ -1,5 +1,5 @@
 # Function Definition
-### Describe the request and response format of the API defined in the controller.protocol.API
+### Describe the request and response format of the API defined in the controller.api.API
 
 #Each function is defined in the following format
 
