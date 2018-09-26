@@ -38,7 +38,7 @@ $ python run.py 80
 **aws-interface 접속**
 * 위의 과정을 거쳐 로컬 컴퓨터 브라우저 주소창에 localhost 를 입력하여 
 aws-interface 를 사용할 수 있게 되었습니다!
-* 아까 기록해둔 access key와 secret key를 이용하여 로그인할 수 있습니다.
+* 이전 단계에서 기록 해놓은 Access Key와 Secret Key를 이용하여 로그인할 수 있습니다.
 
 ## Contribution 가이드라인
 
