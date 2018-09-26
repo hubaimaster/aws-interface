@@ -1,9 +1,10 @@
 import boto3
 from controller.protocol.resource import Resource
-
+from controller.config import Variable
 
 # <-- Imp -->
 class AwsResource(Resource):
+
     def __init__(self, aws_request):
         self.request = aws_request
         self.session = boto3.Session(
@@ -13,7 +14,8 @@ class AwsResource(Resource):
         self.region = aws_request.get_passport()['region']
         self.dynamo = self.session.client('dynamodb', self.region)
 
-    def create_table(self, table_name):
+    def create_table(self, service_name):
+        table_name = Variable.table_prefix + service_name
         response = self.dynamo.create_table(
             AttributeDefinitions=[
                 {
@@ -40,7 +42,8 @@ class AwsResource(Resource):
         print('response:', response)
         return True
 
-    def create_item(self, table_name, item):
+    def create_item(self, service_name, item):
+        table_name = Variable.table_prefix + service_name
         table = self.session.resource('dynamodb', self.region).Table(table_name)
         response = table.put_item(
             Item=item
@@ -48,7 +51,8 @@ class AwsResource(Resource):
         print('response:', response)
         return True
 
-    def create_table_index(self, table_name, index_name, hash_key, sort_key, hash_type='S', sort_type='N'):
+    def create_table_index(self, service_name, index_name, hash_key, sort_key, hash_type='S', sort_type='N'):
+        table_name = Variable.table_prefix + service_name
         response = self.dynamo.update_table(
             AttributeDefinitions=[
                 {
@@ -91,3 +95,14 @@ class AwsResource(Resource):
         print('response:', response)
         return True
 
+    def get_table_list(self):
+        pass
+
+    def get_table(self, service_name):
+        pass
+
+    def set_table_value(self, service_name, key, value):
+        pass
+
+    def get_table_value(self, service_name, key):
+        pass

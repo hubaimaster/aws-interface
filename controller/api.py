@@ -1,5 +1,6 @@
 from controller.config import Message
 from controller.config import Variable as Config
+from controller.config import Key
 
 
 class Response(dict):
@@ -24,15 +25,11 @@ class API:
     def __init__(self, resource_cls):
         self.resource_cls = resource_cls
 
-    def __table_name__(self, service_name):
-        return Config.table_prefix + service_name
-
     # <-- apps -->
     def create_backend_service(self, request):
         resource = self.resource_cls(request)
         service_name = request.get_param('service_name')
-
-        resource.create_table(self.__table_name__(service_name))
+        resource.create_table(service_name)
         return Response(Message.success)
 
     def get_backend_service_list(self, request):
@@ -52,13 +49,19 @@ class API:
         resource = self.resource_cls(request)
         service_name = request.get_param('service_name')
         enabled = resource.get_param('enabled')
-        resource.set_table_value(service_name)
-        raise NotImplementedError()
+        if enabled == 'false' or enabled == 'False' or enabled == 0:
+            enabled = False
+        else:
+            enabled = True
+        resource.set_table_value(service_name, Key.user_table_enabled, enabled)
+        return Response(Message.success)
 
 
     # <-- app-member -->
     def create_user_table(self, request):
         resource = self.resource_cls(request)
+        service_name = request.get_param('service_name')
+        resource.create_table_index(service_name, 'user')
         raise NotImplementedError()
 
 
