@@ -22,7 +22,7 @@
 
 **종속성 라이브러리 설치**
 * 다음은 콘솔창에서 AWSInterface 가 의존하고 있는 라이브러리를 설치하는 방법입니다. 
-* 명령을 실행하기전 requirements.txt 파일이 있는 AWSInterface 루트 폴더로 이동해주세요. ```cd AWSInterface```
+* 명령을 실행하기전 requirements.txt 파일이 있는 AWSInterface 루트 폴더로 이동해주세요. ```cd aws-interface```
 ```shell
 $ pip install -r requirements.txt
 ```
