@@ -56,13 +56,19 @@ class API:
         resource.set_table_value(service_name, Key.user_table_enabled, enabled)
         return Response(Message.success)
 
+    def get_backend_service_sdk(self, request):
+        resource = self.resource_cls(request)
+        service_name = request.get_param('service_name')
+        platform = request.get_param('platform')
+        raise NotImplementedError()
+
 
     # <-- app-member -->
     def create_user_table(self, request):
         resource = self.resource_cls(request)
         service_name = request.get_param('service_name')
         resource.create_table_index(service_name, 'user')
-        raise NotImplementedError()
+        raise Response(Message.success)
 
 
     def create_user_property(self, request):

@@ -129,6 +129,33 @@
 
 
 
+## get_backend_service_sdk
+> Generate and return Backend service SDK .zip file 
+#### Request
+```javascript
+{
+    passport: dict,
+    params: {
+        service_name: string,
+        platform: string,
+    },
+}
+```
+
+#### Response
+```javascript
+{
+    message: {
+        code: string, 
+        text: string,
+    }, data: {
+        file: binary,
+    },
+}
+```
+
+
+
 ## create_user_table
 > Create user table (Private) 
 #### Request
