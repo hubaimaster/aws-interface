@@ -239,60 +239,6 @@
 ```
 
 
-## create_user
-> Create user 
-#### Request
-```javascript
-{
-    passport: dict,
-    params: {
-        service_name: string,
-    },
-}
-```
-
-#### Response
-```javascript
-{
-    message: {
-        code: string, 
-        text: string,
-    }, data: {
-        item: {
-            id: string,
-            creationDate: int,
-        }
-    },
-}
-```
-
-
-## delete_user
-> Delete user by user_id
-#### Request
-```javascript
-{
-    passport: dict,
-    params: {
-        service_name: string,
-        id: string,
-    },
-}
-```
-
-#### Response
-```javascript
-{
-    message: {
-        code: string, 
-        text: string,
-    }, data: {
-        
-    },
-}
-```
-
-
 
 ## delete_user_group
 > Delete user group by group_name
@@ -385,42 +331,6 @@
 ```
 
 
-
-## get_user_list
-> Get list of user
-#### Request
-```javascript
-{
-    passport: dict,
-    params: {
-        service_name: string,
-        reversed: bool,
-        limit: int,
-        page: int,
-    },
-}
-```
-
-#### Response
-```javascript
-{
-    message: {
-        code: string, 
-        text: string,
-    }, data: {
-        items: [
-            {
-                id: string,
-                creationDate: string,
-                ...
-            },
-        ]
-    },
-}
-```
-
-
-
 ## create_model_table
 > Create model table such as post, comment, ...
 #### Request
@@ -445,37 +355,6 @@
     },
 }
 ```
-
-
-
-## create_model
-> Create model item
-#### Request
-```javascript
-{
-    passport: dict,
-    params: {
-        service_name: string,
-        model_table_name: string,
-    },
-}
-```
-
-#### Response
-```javascript
-{
-    message: {
-        code: string, 
-        text: string,
-    }, data: {
-        item: {
-            id: string,
-            creationDate: int,
-        }
-    },
-}
-```
-
 
 
 ## get_model_property_list
@@ -536,65 +415,6 @@
                 name: string,
             }
         ]
-    },
-}
-```
-
-
-
-## get_model_list
-> Get list of model item
-#### Request
-```javascript
-{
-    passport: dict,
-    params: {
-        service_name: string,
-        model_table_name: string,
-    },
-}
-```
-
-#### Response
-```javascript
-{
-    message: {
-        code: string, 
-        text: string,
-    }, data: {
-        items: [
-            {
-                id: string,
-                creationDate: int,
-                ...
-            }, ..
-        ]
-    },
-}
-```
-
-
-## delete_model
-> Delete model item by id
-#### Request
-```javascript
-{
-    passport: dict,
-    params: {
-        service_name: string,
-        id: string,
-    },
-}
-```
-
-#### Response
-```javascript
-{
-    message: {
-        code: string, 
-        text: string,
-    }, data: {
-    
     },
 }
 ```

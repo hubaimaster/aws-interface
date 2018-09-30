@@ -95,6 +95,9 @@ class AwsResource(Resource):
         print('response:', response)
         return True
 
+    def delete_table_index(self, service_name, index_name):
+        pass
+
     def get_table_list(self):
         pass
 
