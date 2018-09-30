@@ -1,6 +1,7 @@
 import boto3
 from controller.protocol.resource import Resource
 from controller.config import Variable
+import json
 
 # <-- Imp -->
 class AwsResource(Resource):
@@ -42,70 +43,91 @@ class AwsResource(Resource):
         print('response:', response)
         return True
 
-    def create_item(self, service_name, item):
-        table_name = Variable.table_prefix + service_name
-        table = self.session.resource('dynamodb', self.region).Table(table_name)
-        response = table.put_item(
-            Item=item
-        )
-        print('response:', response)
-        return True
-
     def create_table_index(self, service_name, index_name, hash_key, sort_key, hash_type='S', sort_type='N'):
         table_name = Variable.table_prefix + service_name
-        response = self.dynamo.update_table(
-            AttributeDefinitions=[
-                {
-                    'AttributeName': hash_key,
-                    'AttributeType': hash_type
-                }, {
-                    'AttributeName': sort_key,
-                    'AttributeType': sort_type
-                }
-            ],
-            TableName=table_name,
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            },
-            GlobalSecondaryIndexUpdates=[
-                {
-                    'Create': {
-                        'IndexName': index_name,
-                        'KeySchema': [
-                            {
-                                'AttributeName': hash_key,
-                                'KeyType': 'HASH'
-                            }, {
-                                'AttributeName': sort_key,
-                                'KeyType': 'RANGE'
-                            },
-                        ],
-                        'Projection': {
-                            'ProjectionType': 'ALL'
-                        },
-                        'ProvisionedThroughput': {
-                            'ReadCapacityUnits': 1,
-                            'WriteCapacityUnits': 1
-                        }
-                    }
-                },
+        table = self.session.resource('dynamodb', self.region).Table(table_name)
+        attr_def = [
+                {'AttributeName': hash_key, 'AttributeType': hash_type},
+                {'AttributeName': sort_key, 'AttributeType': sort_type}
             ]
-        )
+        index = [
+            {
+                'Create': {
+                    'IndexName': index_name,
+                    'KeySchema': [
+                        {
+                            'AttributeName': hash_key,
+                            'KeyType': 'HASH'
+                        }, {
+                            'AttributeName': sort_key,
+                            'KeyType': 'RANGE'
+                        }
+                    ],
+                    'Projection': {
+                        'ProjectionType': 'ALL',
+                    },
+                    'ProvisionedThroughput': {
+                        'ReadCapacityUnits': 1,
+                        'WriteCapacityUnits': 1
+                    }
+                }
+            },
+        ]
+        response = table.update(AttributeDefinitions=attr_def, GlobalSecondaryIndexUpdates=index)
         print('response:', response)
         return True
 
     def delete_table_index(self, service_name, index_name):
-        pass
+        table_name = Variable.table_prefix + service_name
+        table = self.session.resource('dynamodb', self.region).Table(table_name)
+        index = [{
+            'Delete': {
+                'IndexName': index_name
+            }
+        }]
+        response = table.update(GlobalSecondaryIndexUpdates=index)
+        print('response:', response)
+        return True
 
     def get_table_list(self):
-        pass
+        client = self.session.client('dynamodb', self.region)
+        t_list = client.list_tables(Limit=200)
+        t_name_list = t_list['TableNames']
+        return t_name_list
 
     def get_table(self, service_name):
-        pass
+        table_name = Variable.table_prefix + service_name
+        table = self.session.resource('dynamodb', self.region).Table(table_name)
+
+        raise NotImplementedError()
 
     def set_table_value(self, service_name, key, value):
-        pass
+        table_name = Variable.table_prefix + service_name
+        table = self.session.resource('dynamodb', self.region).Table(table_name)
+        value = json.dumps(value)
+        response = table.put_item(
+            Item={
+                'id': {
+                    'S': 'TABLE-VALUE-' + key,
+                },
+                'creationDate': {
+                    'N': 0
+                },
+                'value': {
+                    'S': value
+                }
+            }
+        )
+        print('response:', response)
 
     def get_table_value(self, service_name, key):
-        pass
+        table_name = Variable.table_prefix + service_name
+        table = self.session.resource('dynamodb', self.region).Table(table_name)
+        item = table.get_item(
+            Key={
+                'id': 'TABLE-VALUE-' + key
+            }
+        )['Item']
+        value = item['value']
+        value = json.loads(value)
+        return value

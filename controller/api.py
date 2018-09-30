@@ -29,6 +29,10 @@ class API:
     def create_backend_service(self, request):
         resource = self.resource_cls(request)
         service_name = request.get_param('service_name')
+
+        resource.set_table_value(service_name, 'member_enabled', True)
+        resource.set_table_value(service_name, 'model_enabled', True)
+
         resource.create_table(service_name)
         return Response(Message.success)
 
@@ -42,8 +46,14 @@ class API:
     def get_backend_service(self, request):
         resource = self.resource_cls(request)
         service_name = resource.get_param('service_name')
-        table = resource.get_table(service_name)
-        return Response(Message.success, {'item': table})
+        name = service_name
+        member_enabled = resource.get_table_value(service_name, 'member_enabled')
+        model_enabled = resource.get_table_value(service_name, 'model_enabled')
+        return Response(Message.success, {'item': {
+            'name': name,
+            'member_enabled': member_enabled,
+            'model_enabled': model_enabled,
+        }})
 
     def set_user_table_enabled(self, request):
         resource = self.resource_cls(request)
