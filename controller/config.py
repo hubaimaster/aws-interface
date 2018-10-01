@@ -1,7 +1,8 @@
 
 class Variable:
-    table_prefix = 'resource-interface-'
-    model_table = 'model-table-'
+    table_prefix = 'aws-interface-'
+    index_prefix = 'aws-interface-index-'
+    model_table = 'aws-interface-model-'
 
 
 class Key:
@@ -10,7 +11,9 @@ class Key:
     user_group_list = 'user_group_list'
     model_property_list = 'model_property_list'
 
+    modelPartition = 'modelPartition'
     creationDate = 'creationDate'
+    tableValue = 'tableValue'
 
 
 class Message:

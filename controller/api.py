@@ -1,6 +1,6 @@
 from controller.config import Message
-from controller.config import Variable as Config
 from controller.config import Key
+from time import sleep
 
 
 class Response(dict):
@@ -21,19 +21,44 @@ class Response(dict):
         return self['message']
 
 
+class Executor:
+    def __init__(self, delay=7, limit=3):
+        self.delay = delay
+        self.limit = limit
+
+    def run(self, func, *params):
+        for i in range(self.limit):
+            sleep(self.delay)
+            try:
+                func(*params)
+                print('Executing success!')
+                break
+            except Exception as ex:
+                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                message = template.format(type(ex).__name__, ex.args)
+                print(message, 'on count', i)
+                if type(ex).__name__ != 'ResourceInUseException':
+                    break
+                else:
+                    continue
+
+
 class API:
     def __init__(self, resource_cls):
         self.resource_cls = resource_cls
+        self.executor = Executor()
 
     # <-- apps -->
     def create_backend_service(self, request):
         resource = self.resource_cls(request)
         service_name = request.get_param('service_name')
 
+        self.executor.run(resource.create_table, service_name)
+        self.executor.run(resource.create_table_index, service_name, Key.modelPartition, Key.creationDate)
+
         resource.set_table_value(service_name, 'member_enabled', True)
         resource.set_table_value(service_name, 'model_enabled', True)
 
-        resource.create_table(service_name)
         return Response(Message.success)
 
     def get_backend_service_list(self, request):
@@ -41,7 +66,7 @@ class API:
         table_list = resource.get_table_list()
         return Response(Message.success, {'items': table_list})
 
-
+    #TODO
     # <-- detail -->
     def get_backend_service(self, request):
         resource = self.resource_cls(request)
@@ -71,14 +96,6 @@ class API:
         service_name = request.get_param('service_name')
         platform = request.get_param('platform')
         raise NotImplementedError()
-
-
-    # <-- app-member -->
-    def create_user_table(self, request):
-        resource = self.resource_cls(request)
-        service_name = request.get_param('service_name')
-        resource.create_table_index(service_name, 'user')
-        return Response(Message.success)
 
 
     def create_user_property(self, request):
@@ -149,9 +166,10 @@ class API:
         resource = self.resource_cls(request)
         service_name = request.get_param('service_name')
         name = request.get_param('name')
-        hash_key = Config.model_table + name
-        sort_key = Key.creationDate
-        resource.create_table_index(service_name, name, hash_key, sort_key)
+        m_list = resource.get_table_value(service_name, 'model_list')
+        if m_list is None: m_list = []
+        m_list.append(name)
+        resource.set_table_value(service_name, 'model_list', m_list)
         return Response(Message.success)
 
 
@@ -183,14 +201,16 @@ if __name__ == '__main__':
     from controller.aws.aws_resource import AwsResource
     from controller.aws.aws_request import AwsRequest
 
-    ACCESSKEY = 'AKIAITLSY742M3WP5HRA'
-    SECRETKEY = 'c+L1O5g7HZDcYYs2VchKVxT+Emkxp3yVAOyC'
-    REGION = 'ap-northeast-2'
-
-    request = AwsRequest(ACCESSKEY, SECRETKEY, REGION, {'table_name': 'test_table',
-                                                            'index_name': 'test_index',
-                                                            'hash_key': 'part',
-                                                            'sort_key': 'creationDate'})
+    access_key = 'AKIAITLSY742M3WP5HRA'
+    secret_key = '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'
+    region = 'ap-northeast-2'
 
     api = API(AwsResource)
-    api.create_backend_service(request)
+    r = api.create_backend_service(AwsRequest(access_key, secret_key, region,
+                                          {'service_name': 'DataBank'}))
+    print(r)
+
+    r = api.get_backend_service_list(AwsRequest(access_key, secret_key, region,
+                                          {}))
+    print(r)
+

@@ -1,7 +1,9 @@
 import boto3
 from controller.protocol.resource import Resource
-from controller.config import Variable
+from controller.config import Variable, Key
+from decimal import Decimal
 import json
+
 
 # <-- Imp -->
 class AwsResource(Resource):
@@ -43,8 +45,9 @@ class AwsResource(Resource):
         print('response:', response)
         return True
 
-    def create_table_index(self, service_name, index_name, hash_key, sort_key, hash_type='S', sort_type='N'):
+    def create_table_index(self, service_name, hash_key, sort_key, hash_type='S', sort_type='N'):
         table_name = Variable.table_prefix + service_name
+        index_name = Variable.index_prefix + hash_key + '-' + sort_key
         table = self.session.resource('dynamodb', self.region).Table(table_name)
         attr_def = [
                 {'AttributeName': hash_key, 'AttributeType': hash_type},
@@ -91,7 +94,7 @@ class AwsResource(Resource):
 
     def get_table_list(self):
         client = self.session.client('dynamodb', self.region)
-        t_list = client.list_tables(Limit=200)
+        t_list = client.list_tables(Limit=100)
         t_name_list = t_list['TableNames']
         return t_name_list
 
@@ -107,15 +110,10 @@ class AwsResource(Resource):
         value = json.dumps(value)
         response = table.put_item(
             Item={
-                'id': {
-                    'S': 'TABLE-VALUE-' + key,
-                },
-                'creationDate': {
-                    'N': 0
-                },
-                'value': {
-                    'S': value
-                }
+                'id': 'TABLE-VALUE-' + key,
+                'modelPartition': Key.tableValue,
+                'creationDate': Decimal(0),
+                'value': str(value),
             }
         )
         print('response:', response)
@@ -131,3 +129,7 @@ class AwsResource(Resource):
         value = item['value']
         value = json.loads(value)
         return value
+
+    def deploy_table(self, service_name):
+        table_name = Variable.table_prefix + service_name
+        return

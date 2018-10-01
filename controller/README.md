@@ -58,12 +58,7 @@
         text: string,
     }, data: {
         items: [
-            {
-                id: string,
-                name: string,
-                member_enabled: Bool,
-                model_enabled: Bool,
-            }, ...
+            string, ...
         ]
     },
 }
@@ -150,32 +145,6 @@
         text: string,
     }, data: {
         file: binary,
-    },
-}
-```
-
-
-
-## create_user_table
-> Create user table (Private) 
-#### Request
-```javascript
-{
-    passport: dict,
-    params: {
-        service_name: string
-    },
-}
-```
-
-#### Response
-```javascript
-{
-    message: {
-        code: string, 
-        text: string,
-    }, data: {
-        
     },
 }
 ```
@@ -411,9 +380,7 @@
         text: string,
     }, data: {
         items: [
-            {
-                name: string,
-            }
+            string, ...
         ]
     },
 }
