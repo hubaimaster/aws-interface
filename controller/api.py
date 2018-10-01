@@ -202,7 +202,7 @@ if __name__ == '__main__':
     from controller.aws.aws_request import AwsRequest
 
     access_key = 'AKIAITLSY742M3WP5HRA'
-    secret_key = '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'
+    secret_key = 'c++Emkxp3yVAOyC'
     region = 'ap-northeast-2'
 
     api = API(AwsResource)
