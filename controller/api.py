@@ -1,5 +1,5 @@
 from controller.config import Message
-from controller.config import Key
+from controller.config import Enum
 from time import sleep
 
 
@@ -54,7 +54,7 @@ class API:
         service_name = request.get_param('service_name')
 
         self.executor.run(resource.create_table, service_name)
-        self.executor.run(resource.create_table_index, service_name, Key.modelPartition, Key.creationDate)
+        self.executor.run(resource.create_table_index, service_name, Enum.modelPartition, Enum.creationDate)
 
         resource.set_table_value(service_name, 'member_enabled', True)
         resource.set_table_value(service_name, 'model_enabled', True)
@@ -88,7 +88,7 @@ class API:
             enabled = False
         else:
             enabled = True
-        resource.set_table_value(service_name, Key.user_table_enabled, enabled)
+        resource.set_table_value(service_name, Enum.user_table_enabled, enabled)
         return Response(Message.success)
 
     def get_backend_service_sdk(self, request):
@@ -105,7 +105,7 @@ class API:
         data_type = request.get_param('data_type')
         read_group_name = request.get_param('read_group_name')
         write_group_name = request.get_param('write_group_name')
-        p_list = resource.get_table_value(service_name, Key.user_property_list)
+        p_list = resource.get_table_value(service_name, Enum.user_property_list)
         p = {
             'name': name,
             'data_type': data_type,
@@ -113,7 +113,7 @@ class API:
             'write_group_name': write_group_name,
         }
         p_list.append(p)
-        resource.set_table_value(service_name, Key.user_property_list, p_list)
+        resource.set_table_value(service_name, Enum.user_property_list, p_list)
         return Response(Message.success)
 
 
@@ -122,7 +122,7 @@ class API:
         service_name = request.get_param('service_name')
         name = request.get_param('name')
         desc = request.get_param('desc')
-        g_list = resource.get_table_value(service_name, Key.user_group_list)
+        g_list = resource.get_table_value(service_name, Enum.user_group_list)
         for g in g_list:
             if g['name'] == name:
                 g_list.remove(g)
@@ -131,7 +131,7 @@ class API:
             'desc': desc,
         }
         g_list.append(g)
-        resource.set_table_value(service_name, Key.user_group_list, g_list)
+        resource.set_table_value(service_name, Enum.user_group_list, g_list)
         return Response(Message.success)
 
 
@@ -139,25 +139,25 @@ class API:
         resource = self.resource_cls(request)
         service_name = request.get_param('service_name')
         name = request.get_param('name')
-        g_list = resource.get_table_value(service_name, Key.user_group_list)
+        g_list = resource.get_table_value(service_name, Enum.user_group_list)
         for g in g_list:
             if g['name'] == name:
                 g_list.remove(g)
-        resource.set_table_value(service_name, Key.user_group_list, g_list)
+        resource.set_table_value(service_name, Enum.user_group_list, g_list)
         return Response(Message.success)
 
 
     def get_user_group_list(self, request):
         resource = self.resource_cls(request)
         service_name = request.get_param('service_name')
-        g_list = resource.get_table_value(service_name, Key.user_group_list)
+        g_list = resource.get_table_value(service_name, Enum.user_group_list)
         return Response(Message.success, {'items': g_list})
 
 
     def get_user_property_list(self, request):
         resource = self.resource_cls(request)
         service_name = request.get_param('service_name')
-        p_list = resource.get_table_value(service_name, Key.user_property_list)
+        p_list = resource.get_table_value(service_name, Enum.user_property_list)
         return Response(Message.success, {'items': p_list})
 
 
@@ -177,7 +177,7 @@ class API:
         resource = self.resource_cls(request)
         service_name = resource.get_param('service_name')
         model_table_name = resource.get_param('model_table_name')
-        ref_key = Key.model_property_list + '_' + model_table_name
+        ref_key = Enum.model_property_list + '_' + model_table_name
         p_list = resource.get_table_value(service_name, ref_key)
         return Response(Message.success, {'items': p_list})
 
@@ -195,22 +195,3 @@ class API:
         name = resource.get_param('name')
         resource.delete_table_index(service_name, name)
         return Response(Message.success)
-
-
-if __name__ == '__main__':
-    from controller.aws.aws_resource import AwsResource
-    from controller.aws.aws_request import AwsRequest
-
-    access_key = 'AKIAITLSY742M3WP5HRA'
-    secret_key = 'c++Emkxp3yVAOyC'
-    region = 'ap-northeast-2'
-
-    api = API(AwsResource)
-    r = api.create_backend_service(AwsRequest(access_key, secret_key, region,
-                                          {'service_name': 'DataBank'}))
-    print(r)
-
-    r = api.get_backend_service_list(AwsRequest(access_key, secret_key, region,
-                                          {}))
-    print(r)
-

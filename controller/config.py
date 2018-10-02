@@ -5,7 +5,7 @@ class Variable:
     model_table = 'aws-interface-model-'
 
 
-class Key:
+class Enum:
     user_table_enabled = 'user_table_enabled'
     user_property_list = 'user_property_list'
     user_group_list = 'user_group_list'

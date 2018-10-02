@@ -1,6 +1,6 @@
 import boto3
 from controller.protocol.resource import Resource
-from controller.config import Variable, Key
+from controller.config import Variable, Enum
 from decimal import Decimal
 import json
 
@@ -111,7 +111,7 @@ class AwsResource(Resource):
         response = table.put_item(
             Item={
                 'id': 'TABLE-VALUE-' + key,
-                'modelPartition': Key.tableValue,
+                'modelPartition': Enum.tableValue,
                 'creationDate': Decimal(0),
                 'value': str(value),
             }
