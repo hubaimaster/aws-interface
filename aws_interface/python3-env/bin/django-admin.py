@@ -1,4 +1,4 @@
-#!/Users/changhwankim/Desktop/aws_interface/python3-env/bin/python
+#!/Users/kchdully/Desktop/aws-interface/aws_interface/python3-env/bin/python
 from django.core import management
 
 if __name__ == "__main__":
