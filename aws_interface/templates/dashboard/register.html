@@ -94,13 +94,14 @@
               <div class="text-center text-muted mb-4">
                 <small>AWS IAM Access key 를 입력하여 가입하기</small>
               </div>
-              <form role="form">
+
+              <form role="form" method="post">{% csrf_token %}
                 <div class="form-group">
                   <div class="input-group input-group-alternative mb-3">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-active-40"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Access key" type="text">
+                    <input name="access_key" class="form-control" placeholder="Access key" type="text">
                   </div>
                 </div>
                   <div class="form-group">
@@ -108,7 +109,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-key-25"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Secret key" type="password">
+                    <input name="secret_key" class="form-control" placeholder="Secret key" type="password">
                   </div>
                 </div>
                 <div class="form-group">
@@ -116,7 +117,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Email" type="email">
+                    <input name="email" class="form-control" placeholder="Email" type="email">
                   </div>
                 </div>
                 <div class="form-group">
@@ -124,11 +125,11 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Password" type="password">
+                    <input name="password" class="form-control" placeholder="Password" type="password">
                   </div>
                 </div>
                 <div class="text-center">
-                  <button type="button" class="btn btn-primary mt-4">가입하기</button>
+                  <button type="submit" class="btn btn-primary mt-4">가입하기</button>
                 </div>
               </form>
             </div>
@@ -155,6 +156,15 @@
   <script src="{% static "assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js" %}"></script>
   <!-- Argon JS -->
   <script src="{% static "assets/js/argon.js" %}"></script>
+
+  <script type="text/javascript">
+     $(function(){
+       {% if alert %}
+          alert('{{alert}}');
+       {% endif %}
+     });
+  </script>
+
 </body>
 
 </html>
