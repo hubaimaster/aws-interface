@@ -3,11 +3,17 @@
 import pyaes
 import base64
 import hashlib
+import os
 
 
-class AESCipher(object):
+class Salt:
+    @classmethod
+    def get_salt(cls, size):
+        return os.urandom(size).hex()
+
+
+class AESCipher:
     def __init__(self, key):
-        key = Hash.sha3_512(key)
         self.key = hashlib.sha256(key.encode()).digest()
 
     def encrypt(self, message):
@@ -32,7 +38,7 @@ class AESCipher(object):
 class Hash:
     @classmethod
     def sha3_512(cls, plain):
-        plain = plain.encode('utf-8')
+        plain = plain.encode()
         hash = hashlib.sha3_512(plain)
         hash = str(hash.hexdigest())
         return hash
@@ -45,3 +51,5 @@ if __name__ == '__main__':
     print('enc:', enc)
     dec = aes.decrypt(enc)
     print('dec:', dec)
+    salt = Salt.get_salt(32)
+    print('salt:', salt)

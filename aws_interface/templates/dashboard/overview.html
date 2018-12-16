@@ -594,6 +594,16 @@
   <script src="{%  static 'assets/vendor/chart.js/dist/Chart.extension.js' %}"></script>
   <!-- Argon JS -->
   <script src="{%  static 'assets/js/argon.js' %}"></script>
+
+
+  <script type="text/javascript">
+     $(function(){
+       {% if alert %}
+          alert('{{alert}}');
+       {% endif %}
+     });
+  </script>
+
 </body>
 
 </html>
