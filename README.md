@@ -36,4 +36,4 @@ $ pip install -r requirements.txt
 
 **버그리포팅과 피드백을 받기 위해 [깃허브 이슈](https://github.com/hubaimaster/AWSInterface/issues)를 사용하고 있습니다.**
 * 클라이언트 SDK 자동 생성 언어 확장 관련 Contribution 환영합니다.
-* AWSInterface 프로젝트는 MIT 라이센스를 따릅니다.
+* AWSInterface 프로젝트는 Apache 2.0 라이센스를 따릅니다.
