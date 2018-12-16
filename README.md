@@ -22,7 +22,7 @@ AWS Interface 에서 제공하는 추상서비스 목록. (2018.12.15)
 
 **요구사항**
 * AWS Interface 를 이용하기위해선 AWS 계정에 접속할 수 있는 관리자권한이 필요합니다. 계정이 없다면 [AWS 계정 만들기](https://aws.amazon.com/ko/premiumsupport/knowledge-center/create-and-activate-aws-account/)를 참조하세요.
-[IAM 사용자 생성](https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/id_users_create.html) 후 IAM User의 Access Key 와 Secret Access Key 를 기록해둡니다. [AWS 명령줄 인터페이스](https://docs.aws.amazon.com/ko_kr/cli/latest/userguide/cli-chap-welcome.html)를 설치하고 다음과 같이 Access Key와 Secret Access Key 를 설정하여 사용자의 컴퓨터가 AWS 계정의 접근 권한을 획득합니다.
+[IAM 사용자 생성](https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/id_users_create.html) 후 IAM User의 Access Key 와 Secret Access Key 를 기록해둡니다.
 
 
 **종속성 라이브러리 설치**
