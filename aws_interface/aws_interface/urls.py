@@ -14,23 +14,35 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 
-import dashboard.views
+from dashboard.views.index import Index
+
+from dashboard.views.login import Login
+from dashboard.views.register import Register
+from dashboard.views.apps import Apps
+from dashboard.views.logout import Logout
+
+from dashboard.views.overview import Overview
+from dashboard.views.auth import Auth
+from dashboard.views.database import Database
+from dashboard.views.storage import Storage
+from dashboard.views.logic import Logic
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', dashboard.views.index, name='index'),
-    path('account/', dashboard.views.overview, name='account'),
-    path('auth/', dashboard.views.overview, name='auth'),
-    path('database/', dashboard.views.overview, name='database'),
-    path('storage/', dashboard.views.overview, name='storage'),
-    path('logic/', dashboard.views.overview, name='logic'),
-    path('logout/', dashboard.views.overview, name='logout'),
-    path('login/', dashboard.views.login, name='login'),
-    path('apps/', dashboard.views.apps, name='apps'),
-    path('register/', dashboard.views.register, name='register'),
-    path('support/', dashboard.views.overview, name='support'),
-    path('overview/', dashboard.views.overview, name='overview'),
+    path('', Index.as_view(), name='index'),
+
+    path('login/', Login.as_view(), name='login'),
+    path('register/', Register.as_view(), name='register'),
+    path('apps/', Apps.as_view(), name='apps'),
+    path('logout/', Logout.as_view(), name='logout'),
+
+    path('overview/', Overview.as_view(), name='overview'),
+    path('auth/', Auth.as_view(), name='auth'),
+    path('database/', Database.as_view(), name='database'),
+    path('storage/', Storage.as_view(), name='storage'),
+    path('logic/', Logic.as_view(), name='logic'),
+
 ]
