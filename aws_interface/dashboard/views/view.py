@@ -19,3 +19,9 @@ class DashboardView:
     @classmethod
     def set_login(cls, request, is_login):
         request.session['is_login'] = is_login
+
+    @classmethod
+    def get_context(cls, request):
+        context = dict()
+        cls.pop_alert(request, context)
+        return context

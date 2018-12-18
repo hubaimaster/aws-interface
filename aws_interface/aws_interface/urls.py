@@ -22,6 +22,7 @@ from dashboard.views.login import Login
 from dashboard.views.register import Register
 from dashboard.views.apps import Apps
 from dashboard.views.logout import Logout
+from dashboard.views.account import Account
 
 from dashboard.views.overview import Overview
 from dashboard.views.auth import Auth
@@ -38,6 +39,7 @@ urlpatterns = [
     path('register/', Register.as_view(), name='register'),
     path('apps/', Apps.as_view(), name='apps'),
     path('logout/', Logout.as_view(), name='logout'),
+    path('account/', Account.as_view(), name='account'),
 
     path('overview/', Overview.as_view(), name='overview'),
     path('auth/', Auth.as_view(), name='auth'),

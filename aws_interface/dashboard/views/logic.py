@@ -6,6 +6,6 @@ from django.views.generic import View
 class Logic(View, DashboardView):
 
     def get(self, request):
-        context = {}
+        context = self.get_context(request)
         return render(request, 'dashboard/logic.html', context=context)
 

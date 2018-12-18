@@ -7,6 +7,6 @@ from django.views.generic import View
 class Storage(View, DashboardView):
 
     def get(self, request):
-        context = {}
+        context = self.get_context(request)
         return render(request, 'dashboard/storage.html', context=context)
 

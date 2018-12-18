@@ -3,9 +3,9 @@ from django.shortcuts import render, HttpResponse
 from django.views.generic import View
 
 
-class Auth(View, DashboardView):
+class Account(View, DashboardView):
 
     def get(self, request):
         context = self.get_context(request)
-        return render(request, 'dashboard/auth.html', context=context)
+        return render(request, 'dashboard/apps.html', context=context)
 

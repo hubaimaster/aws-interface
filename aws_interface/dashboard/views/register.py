@@ -7,8 +7,7 @@ from django.views.generic import View
 class Register(View, DashboardView):
 
     def get(self, request):
-        context = dict()
-        context['alert'] = self.pop_alert(request)
+        context = self.get_context(request)
         return render(request, 'dashboard/register.html', context=context)
 
     def post(self, request):

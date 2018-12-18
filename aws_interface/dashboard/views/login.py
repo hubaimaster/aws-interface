@@ -10,12 +10,12 @@ class Login(View, DashboardView):
         if self.is_login(request):
             return redirect('index')
         else:
-            context = {}
+            context = self.get_context(request)
             return render(request, 'dashboard/login.html', context=context)
 
     def post(self, request):
-        email = request.session['email']
-        password = request.session['password']
+        email = request.POST['email']
+        password = request.POST['password']
         user = User.objects.filter(email=email).first()
 
         if user is None:
@@ -23,6 +23,7 @@ class Login(View, DashboardView):
             return redirect('login')
         else:
             salt = user.salt
+            print('salt:', salt)
             password_hash = User.get_password_hash(password, salt)
             if user.password_hash == password_hash:
                 self.set_login(request, True)

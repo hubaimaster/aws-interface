@@ -18,7 +18,7 @@ class User(models.Model):
         from dashboard.security.crypto import AESCipher, Hash, Salt
         salt = Salt.get_salt(32)
         aes = AESCipher(password + salt)
-        password_hash = Hash.sha3_512(password + salt)
+        password_hash = cls.get_password_hash(password + salt)
         c_aws_access_key = aes.encrypt(aws_access_key)
         c_aws_secret_key = aes.encrypt(aws_secret_key)
 
@@ -29,3 +29,9 @@ class User(models.Model):
         user.c_aws_secret_key = c_aws_secret_key
         user.salt = salt
         return user.save()
+
+    @classmethod
+    def get_password_hash(cls, password, salt):
+        from dashboard.security.crypto import Hash
+        password_hash = Hash.sha3_512(password + salt)
+        return password_hash

@@ -6,6 +6,6 @@ from django.views.generic import View
 class Index(View, DashboardView):
     def get(self, request):
         if self.is_login(request):
-            return redirect('overview')
+            return redirect('apps')
         else:
             return redirect('login')
