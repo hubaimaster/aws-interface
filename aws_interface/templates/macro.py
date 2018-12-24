@@ -36,6 +36,6 @@ if __name__ == '__main__':
                         print(line)
             new_html += line
         f.close()
-        f = open(html_name + '.new.html', 'w+')
+        f = open(html_name + '.tpl.html', 'w+')
         f.write(new_html)
         f.close()
