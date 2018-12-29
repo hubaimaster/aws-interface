@@ -76,6 +76,16 @@ AWS 인터페이스를 이용하기 위해서는 AWS 계정에 접속할 수 있
 - [AWS 계정 생성]((https://aws.amazon.com/ko/premiumsupport/knowledge-center/create-and-activate-aws-account/))
 - [IAM 계정 생성](https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/id_users_create.html)
 
+## 빠른 실행
+다음 명령어를 이용해서 로컬 대시보드 서버를 호스팅하여 테스트해보실 수 있습니다.
+```
+# activate virtual environment
+cd aws_interface
+python3 manage.py migrate
+python3 manage.py runserver
+# open 127.0.0.1:8000 on your browser
+```
+
 ## Contribution 가이드라인
 
 버그 리포팅과 피드백을 받기 위해 [깃허브 이슈](https://github.com/hubaimaster/AWSInterface/issues)를 사용하고 있습니다.
