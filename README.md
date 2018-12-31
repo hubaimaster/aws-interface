@@ -25,8 +25,8 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 ### Backend (백엔드)
 실제 뒷단에서 사용하는 IaaS 서비스를 말합니다. 현재는 AWS 백엔드만 제공하지만 향후에는 Google Cloud Platform, Naver Cloud Platform, 테스트용 Local Deployment 등을 추가적으로 지원할 예정입니다.
 
-### Adapter (어댑터)
-레시피를 기반으로 자동으로 구성된 백엔드를 클라이언트 앱에서 접근하기 위한 SDK를 어댑터라 부릅니다. 어댑터는 Python, Swift, Java 등 다양한 플랫폼에서 지원하는 언어로 자동 생성됩니다.
+### Client SDK
+레시피를 기반으로 자동으로 구성된 백엔드를 클라이언트 앱에서 접근하기 위한 SDK를 말합니다. SDK는 Python, Swift, Java 등 다양한 플랫폼에서 지원하는 언어로 자동 생성됩니다.
 
 ### AWS 상세 구현
 대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이때 어댑터는 API Gateway와 http 방식으로 통신을 하게 됩니다.
@@ -73,7 +73,7 @@ Ubuntu 16.04에서 apt로 받을 수 있는 기본 Python3 버전은 3.5입니�
 AWS 인터페이스를 이용하기 위해서는 AWS 계정에 접속할 수 있는 관리자 권한이 필요합니다. 대시보드에 접근하기 위해서는 AWS 계정 내에서 관리자 권한을 가진 IAM User의 Access Key와 Secret Access Key를 입력해야 합니다.
 
 #### 참고
-- [AWS 계정 생성]((https://aws.amazon.com/ko/premiumsupport/knowledge-center/create-and-activate-aws-account/))
+- [AWS 계정 생성](https://aws.amazon.com/ko/premiumsupport/knowledge-center/create-and-activate-aws-account/)
 - [IAM 계정 생성](https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/id_users_create.html)
 
 ## 빠른 실행
