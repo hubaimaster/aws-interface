@@ -1,4 +1,4 @@
-
+import core.util
 
 class DashboardView:
 
@@ -17,8 +17,9 @@ class DashboardView:
         return request.session.get('is_login', False)
 
     @classmethod
-    def set_login(cls, request, is_login):
+    def set_login(cls, request, is_login, boto3_session=None):
         request.session['is_login'] = is_login
+        request.session['boto3_session'] = boto3_session
 
     @classmethod
     def get_context(cls, request):

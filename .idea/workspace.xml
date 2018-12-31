@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3d524cbd-74d7-4047-82c1-e6861bf77dc8" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/aws_interface/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/aws_interface/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/aws_interface/awsi/layer1.py" beforeDir="false" afterPath="$PROJECT_DIR$/aws_interface/awsi/layer1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/aws_interface/awsi/layer2.py" beforeDir="false" afterPath="$PROJECT_DIR$/aws_interface/awsi/layer2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/aws_interface/dashboard/views/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/aws_interface/dashboard/views/apps.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/aws_interface/templates/dashboard/apps.html" beforeDir="false" afterPath="$PROJECT_DIR$/aws_interface/templates/dashboard/apps.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/aws_interface/templates/macro.py" beforeDir="false" afterPath="$PROJECT_DIR$/aws_interface/templates/macro.py" afterDir="false" />
-    </list>
+    <list default="true" id="3d524cbd-74d7-4047-82c1-e6861bf77dc8" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,9 +25,10 @@
     <session id="-55848920">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="1" />
+          <entry key="project.closed" value="2" />
           <entry key="project.open.time.12" value="1" />
-          <entry key="project.opened" value="1" />
+          <entry key="project.open.time.72" value="1" />
+          <entry key="project.opened" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
@@ -50,12 +43,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="1" />
+          <entry key="py" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="1" />
+          <entry key="Python" value="2" />
         </counts>
       </usages-collector>
     </session>
@@ -91,13 +84,18 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/aws_interface/templates/dashboard/login.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="20" selection-start-line="9" selection-start-column="20" selection-end-line="9" selection-end-column="20" />
+            <state relative-caret-position="660">
+              <caret line="44" column="31" lean-forward="true" selection-start-line="44" selection-start-column="31" selection-end-line="44" selection-end-column="31" />
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/aws_interface/awsi/api.py">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -231,11 +229,10 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="334" />
+  <component name="ProjectFrameBounds">
     <option name="y" value="23" />
-    <option name="width" value="2016" />
-    <option name="height" value="1182" />
+    <option name="width" value="2560" />
+    <option name="height" value="1331" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -260,6 +257,12 @@
               <item name="aws-interface" type="462c0819:PsiDirectoryNode" />
               <item name="aws_interface" type="462c0819:PsiDirectoryNode" />
               <item name="aws_interface" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="aws-interface" type="b2602c69:ProjectViewProjectNode" />
+              <item name="aws-interface" type="462c0819:PsiDirectoryNode" />
+              <item name="aws_interface" type="462c0819:PsiDirectoryNode" />
+              <item name="awsi" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="aws-interface" type="b2602c69:ProjectViewProjectNode" />
@@ -371,8 +374,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="2560" height="1331" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14694202" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14813344" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -439,10 +443,33 @@
     <entry file="file://$PROJECT_DIR$/controller/aws/aws_resource.py" />
     <entry file="file://$PROJECT_DIR$/controller/aws/aws_request.py" />
     <entry file="file://$PROJECT_DIR$/aws_interface/dashboard/views.py" />
+    <entry file="file://$PROJECT_DIR$/aws_interface/dashboard/apps.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/aws_interface/dashboard/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/aws_interface/templates/dashboard/apps.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="13" column="16" selection-start-line="13" selection-start-column="16" selection-end-line="13" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/aws_interface/templates/macro.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="38" column="34" selection-start-line="38" selection-start-column="34" selection-end-line="38" selection-end-column="34" />
         </state>
       </provider>
     </entry>
@@ -460,35 +487,15 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/aws_interface/templates/macro.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="38" column="34" selection-start-line="38" selection-start-column="34" selection-end-line="38" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/aws_interface/dashboard/apps.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/aws_interface/dashboard/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#0#34#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/aws_interface/templates/dashboard/login.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="20" selection-start-line="9" selection-start-column="20" selection-end-line="9" selection-end-column="20" />
+        <state relative-caret-position="660">
+          <caret line="44" column="31" lean-forward="true" selection-start-line="44" selection-start-column="31" selection-end-line="44" selection-end-column="31" />
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/aws_interface/awsi/api.py">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
   </component>
 </project>

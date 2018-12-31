@@ -20,12 +20,3 @@ class Saver:
     def save(self, abstract_service):
         json_string = json.dumps(abstract_service)
 
-
-class AbstractService(dict):
-    #Load service config from aws service
-    def __init__(self, user_id):
-        raise NotImplementedError()
-
-    #Save service config to aws service
-    def save(self):
-        raise NotImplementedError()
