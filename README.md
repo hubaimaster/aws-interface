@@ -36,6 +36,9 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 ### ServiceController Class
 레시피에 명시된 바에 따라 Backend (뒷단의 IaaS 서비스)를 조작하는 컨트롤러입니다. 예컨대, AuthSauce가 담긴 Recipe를 ServiceController (이하 sc)에서 apply시키면, AWS DynamoDB 상에서 관련 테이블이 만들어지고 그것을 조작할 수 있는 Lambda 함수와 API Gateway 설정이 만들어집니다. Client SDK 또한 sc에서 생성됩니다. 관리자로서 서비스를 관리하는 기능 또한 sc에서 제공됩니다. 예컨대 Auth 소스가 들어간 서비스의 경우, sc를 통해 현재 접속한 사용자를 확인하는 등의 기능이 제공됩니다.
 
+### Django
+장고 웹 인터페이스 단에서는 위의 core 클래스들을 import해서 필요한 함수를 호출하는 방식으로 구현됩니다.
+
 ### AWS 상세 구현
 대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이때 어댑터는 API Gateway와 http 방식으로 통신을 하게 됩니다.
 
