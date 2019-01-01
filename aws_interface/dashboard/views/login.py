@@ -30,9 +30,8 @@ class Login(View, DashboardView):
                 aes = crypto.AESCipher(password + user.salt)
                 access_key = aes.decrypt(user.c_aws_access_key)
                 secret_key = aes.decrypt(user.c_aws_secret_key)
-                boto3_session = service.get_boto3_session(access_key, secret_key)
-                self.set_login(request, True, boto3_session)
+                self.set_login(request, True, access_key, secret_key)
                 return redirect('index')
             else:
-                self.add_alert('비밀번호가 틀렸습니다')
+                self.add_alert(request, '비밀번호가 틀렸습니다')
                 return redirect('index')

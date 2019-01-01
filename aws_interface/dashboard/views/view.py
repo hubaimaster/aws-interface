@@ -17,9 +17,10 @@ class DashboardView:
         return request.session.get('is_login', False)
 
     @classmethod
-    def set_login(cls, request, is_login, boto3_session=None):
+    def set_login(cls, request, is_login, access_key=None, secret_key=None):
         request.session['is_login'] = is_login
-        request.session['boto3_session'] = boto3_session
+        request.session['access_key'] = access_key
+        request.session['secret_key'] = secret_key
 
     @classmethod
     def get_context(cls, request):
