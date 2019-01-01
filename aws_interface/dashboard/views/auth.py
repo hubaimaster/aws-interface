@@ -9,4 +9,3 @@ class Auth(View, DashboardView):
         context = self.get_context(request)
         return render(request, 'dashboard/auth.html', context=context)
 
-    

@@ -36,7 +36,7 @@ class AuthRecipeController(RecipeController):
         if 'groups' not in self.recipe:
             self.recipe['groups'] = []
         if group_name in self.recipe['groups']:
-            error = 'Group already exists'
+            error = '이미 그룹이 존재합니다'
         self.recipe['groups'].append(group_name)
         self.save_recipe_to_aws()
         self.apply_recipe_to_aws()
