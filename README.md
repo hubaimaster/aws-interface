@@ -6,7 +6,7 @@
 
 AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe)라는 추상적인 개념으로 DB를 구성할 수 있도록 합니다. 레시피를 작성하면 실제 백엔드를 담당하는 AWS 등의 IaaS 서비스가 자동으로 구성되고 이와 손쉽게 통신할 수 있는 플랫폼별 SDK가 만들어집니다. DB를 관리할 수 있는 대시보드 또한 AWS 인터페이스에서 제공됩니다.
 
-## 서비스 구성
+## 서비스 구성 (사용자 입장)
 
 ### Recipe (레시피)
 서비스하고자 하는 앱의 백엔드 및 DB 단에 들어갈 요소를 설정하는 단위입니다.
@@ -28,6 +28,14 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 ### Client SDK
 레시피를 기반으로 자동으로 구성된 백엔드를 클라이언트 앱에서 접근하기 위한 SDK를 말합니다. SDK는 Python, Swift, Java 등 다양한 플랫폼에서 지원하는 언어로 자동 생성됩니다.
 
+## 서비스 설계 (개발자 입장)
+
+### Recipe, Sauce Abstract Class
+상술한 바와 같이 Sauce는 서비스에서 제공할 추상화된 기능을 말합니다. 기능에 따라 소스 추상 클래스를 상속한 AuthSauce, DatabaseSauce 등이 구현됩니다. Recipe는 이러한 소스를 담고 있는 컨테이너 클래스로, 특정 서비스의 백엔드/DB 구조를 담는 객체라고 볼 수 있습니다.
+
+### ServiceController Class
+레시피에 명시된 바에 따라 Backend (뒷단의 IaaS 서비스)를 조작하는 컨트롤러입니다. 예컨대, AuthSauce가 담긴 Recipe를 ServiceController (이하 sc)에서 apply시키면, AWS DynamoDB 상에서 관련 테이블이 만들어지고 그것을 조작할 수 있는 Lambda 함수와 API Gateway 설정이 만들어집니다. Client SDK 또한 sc에서 생성됩니다. 관리자로서 서비스를 관리하는 기능 또한 sc에서 제공됩니다. 예컨대 Auth 소스가 들어간 서비스의 경우, sc를 통해 현재 접속한 사용자를 확인하는 등의 기능이 제공됩니다.
+
 ### AWS 상세 구현
 대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이때 어댑터는 API Gateway와 http 방식으로 통신을 하게 됩니다.
 
@@ -40,7 +48,6 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 5. (AWS 인터페이스) 작성된 Lambda 함수를 외부에서 이용할 수 있게 API Gateway로 배포합니다.
 6. (AWS 인터페이스) API Gateway에 배포한 API에 접근할 수 있는 SDK를 Java, Python, Swift 등으로 자동 생성합니다.
 7. (사용자) 자동 생성된 SDK를 클라이언트 앱에서 불러와서 AWS 리소스와 통신합니다.
-
 
 ## 환경 설정
 
