@@ -9,10 +9,7 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 ## 서비스 구성 (사용자 입장)
 
 ### Recipe (레시피)
-서비스하고자 하는 앱의 백엔드 및 DB 단에 들어갈 요소를 설정하는 단위입니다.
-
-### Sauce (소스)
-레시피를 구성하는 요소로, 서비스에서 제공할 추상화된 기능을 말합니다. 초기에는 4가지 소스를 지원할 예정입니다.
+서비스하고자 하는 앱의 백엔드 및 DB 단에 들어갈 요소를 설정하는 단위입니다. 서비스에 추가할 추상화된 기능이라고 생각할 수 있습니다. 초기에는 4가지 레시피를 지원할 예정입니다.
 
 - Auth: 로그인 및 사용자 인증
 - Database: 각종 데이터
@@ -30,11 +27,11 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 
 ## 서비스 설계 (개발자 입장)
 
-### Recipe, Sauce Abstract Class
-상술한 바와 같이 Sauce는 서비스에서 제공할 추상화된 기능을 말합니다. 기능에 따라 소스 추상 클래스를 상속한 AuthSauce, DatabaseSauce 등이 구현됩니다. Recipe는 이러한 소스를 담고 있는 컨테이너 클래스로, 특정 서비스의 백엔드/DB 구조를 담는 객체라고 볼 수 있습니다.
+### Recipe Abstract Class
+상술한 바와 같이 Recipe는 서비스에서 제공할 추상화된 기능을 말합니다. 기능에 따라 소스 추상 클래스를 상속한 AuthRecipe, DatabaseRecipe 등이 구현됩니다. Recipe 클래스는 이러한 기능들을 구성하는 설정을 담은 dictionary 역할을 하는 것으로 생각할 수 있습니다. 예컨대 로그인 및 사용자 관리를 담당하는 AuthRecipe에서는 사용자 그룹, 비밀번호 규칙 등을 설정할 수 있습니다.
 
-### ServiceController Class
-레시피에 명시된 바에 따라 Backend (뒷단의 IaaS 서비스)를 조작하는 컨트롤러입니다. 예컨대, AuthSauce가 담긴 Recipe를 ServiceController (이하 sc)에서 apply시키면, AWS DynamoDB 상에서 관련 테이블이 만들어지고 그것을 조작할 수 있는 Lambda 함수와 API Gateway 설정이 만들어집니다. Client SDK 또한 sc에서 생성됩니다. 관리자로서 서비스를 관리하는 기능 또한 sc에서 제공됩니다. 예컨대 Auth 소스가 들어간 서비스의 경우, sc를 통해 현재 접속한 사용자를 확인하는 등의 기능이 제공됩니다.
+### ServiceController Abstract Class
+레시피에 명시된 바에 따라 Backend (뒷단의 IaaS 서비스)를 조작하는 컨트롤러입니다. 예컨대, AuthSauce가 담긴 Recipe를 ServiceController (이하 SC)에서 apply시키면, AWS DynamoDB 상에서 관련 테이블이 만들어지고 그것을 조작할 수 있는 Lambda 함수와 API Gateway 설정이 만들어집니다. Client SDK 생성 및 관리자 기능 또한 SC에서 제공됩니다. 예컨대 AuthSC에서는 현재 접속한 사용자를 확인하는 등의 기능이 제공됩니다. SC도 Recipe와 마찬가지로 AuthSC, DatabaseSC 등으로 상속되어 구현됩니다.
 
 ### Django
 장고 웹 인터페이스 단에서는 위의 core 클래스들을 import해서 필요한 함수를 호출하는 방식으로 구현됩니다.
@@ -42,10 +39,10 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 ### AWS 상세 구현
 대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이때 어댑터는 API Gateway와 http 방식으로 통신을 하게 됩니다.
 
-예를 들어, 아래는 Auth 소스가 들어간 레시피가 실제 구현되는 과정입니다.
+예를 들어, 아래는 Auth 레시피가 실제 구현되는 과정입니다.
 
 1. (사용자) AWS IAM 인증 정보를 AWS 인터페이스에 등록합니다.
-2. (사용자) 레시피에 Auth 소스를 추가하고 레시피를 deploy합니다.
+2. (사용자) Auth 레시피를 구성하고 deploy합니다.
 3. (AWS 인터페이스) DynamoDB에서 단일 테이블을 만들고 그 안에 사용자 모델을 빌드합니다. 
 4. (AWS 인터페이스) 모델들을 읽고 쓸 수 있는 Lambda 함수를 작성합니다.
 5. (AWS 인터페이스) 작성된 Lambda 함수를 외부에서 이용할 수 있게 API Gateway로 배포합니다.
