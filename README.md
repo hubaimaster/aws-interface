@@ -17,7 +17,7 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 - Email: 이메일 알림
 
 ### Dashboard (대시보드)
-레시피를 구성하고, DB를 관리할 수 있는 웹 인터페이스를 대시보드라고 부릅니다. aws-interface.com에서  IAM 정보를 입력해서 계정을 만들거나 로컬에서 호스팅된 대시보드에 IAM 정보를 등록한 후에 이용 가능합니다. 웹 인터페이스는 Django 프레임워크를 기반으로 합니다.
+레시피를 구성하고, DB를 관리할 수 있는 웹 인터페이스를 대시보드라고 부릅니다. [aws-interface.com](http://aws-interface.com) 에서  IAM 정보를 입력해서 계정을 만들거나 로컬에서 호스팅된 대시보드에 IAM 정보를 등록한 후에 이용 가능합니다. 웹 인터페이스는 Django 프레임워크를 기반으로 합니다.
 
 ### Backend (백엔드)
 실제 뒷단에서 사용하는 IaaS 서비스를 말합니다. 현재는 AWS 백엔드만 제공하지만 향후에는 Google Cloud Platform, Naver Cloud Platform, 테스트용 Local Deployment 등을 추가적으로 지원할 예정입니다.
