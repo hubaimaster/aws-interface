@@ -37,7 +37,7 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 장고 웹 인터페이스 단에서는 위의 core 클래스들을 import해서 필요한 함수를 호출하는 방식으로 구현됩니다.
 
 ### AWS 상세 구현
-대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이때 어댑터는 API Gateway와 http 방식으로 통신을 하게 됩니다.
+대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이어 자동으로 생성된 SDK 는 API Gateway와 http 방식으로 통신을 하게 됩니다.
 
 예를 들어, 아래는 Auth 레시피가 실제 구현되는 과정입니다.
 
