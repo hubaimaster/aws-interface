@@ -1,7 +1,7 @@
 import core.util
 
-class DashboardView:
 
+class DashboardView:
     @classmethod
     def pop_alert(cls, request, context):
         alert = request.session.get('alert', None)

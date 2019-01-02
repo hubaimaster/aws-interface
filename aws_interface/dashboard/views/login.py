@@ -9,7 +9,7 @@ import core.util as service
 class Login(View, DashboardView):
     def get(self, request):
         if self.is_login(request):
-            return redirect('index')
+            return redirect('apps')
         else:
             context = self.get_context(request)
             return render(request, 'dashboard/login.html', context=context)
@@ -24,7 +24,6 @@ class Login(View, DashboardView):
             return redirect('login')
         else:
             salt = user.salt
-            print('salt:', salt)
             password_hash = User.get_password_hash(password, salt)
             if user.password_hash == password_hash:
                 aes = crypto.AESCipher(password + user.salt)
