@@ -125,24 +125,29 @@
     <!-- Page content -->
     <div class="container mt--8 pb-5">
       <div class="row justify-content-left">
+          {% for app in apps %}
 
+                  <div class="col-lg-4 col-md-6">
+                      <div class="card bg-secondary shadow border-0">
+                          <div class="card-body px-lg-4 py-lg-4">
+                              <a href="{% url 'overview' app.id %}">
+                              <form role="form">
+                                  <div class="form-group mb-5">
+                          <div class="input-group">
+                            <h1>{{ app.name }}</h1>
+                          </div>
+                            <h5 class="text-gray">{{ app.id }}</h5>
+                        </div>
+                          <h5 class="text-gray">{{ app.creation_date }}</h5>
+                      </form>
+                                  </a>
+                    </div>
 
-          <div class="col-lg-4 col-md-6">
-              <div class="card bg-secondary shadow border-0">
-                  <div class="card-body px-lg-4 py-lg-4">
-                      <form role="form">
-                          <div class="form-group mb-5">
-                  <div class="input-group">
-                    <h1>타이틀</h1>
                   </div>
-                    <h2 class="text-gray">아이디</h2>
-                </div>
-                  <h5 class="text-gray">Application detail</h5>
-              </form>
-            </div>
-          </div>
-          </br>
-          </div>
+                  </br>
+                  </div>
+
+          {% endfor %}
 
 
       </div>

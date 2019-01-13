@@ -16,19 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from dashboard.views.index import Index
-
-from dashboard.views.login import Login
-from dashboard.views.register import Register
-from dashboard.views.apps import Apps
-from dashboard.views.logout import Logout
-from dashboard.views.account import Account
-
-from dashboard.views.overview import Overview
-from dashboard.views.auth import Auth
-from dashboard.views.database import Database
-from dashboard.views.storage import Storage
-from dashboard.views.logic import Logic
+from dashboard.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -41,10 +29,9 @@ urlpatterns = [
     path('logout/', Logout.as_view(), name='logout'),
     path('account/', Account.as_view(), name='account'),
 
-    path('overview/', Overview.as_view(), name='overview'),
-    path('auth/', Auth.as_view(), name='auth'),
-    path('database/', Database.as_view(), name='database'),
-    path('storage/', Storage.as_view(), name='storage'),
-    path('logic/', Logic.as_view(), name='logic'),
-
+    path('overview/<app_id>', Overview.as_view(), name='overview'),
+    path('bill/<app_id>', Bill.as_view(), name='bill'),
+    path('auth/<app_id>', Auth.as_view(), name='auth'),
+    path('database/<app_id>', Database.as_view(), name='database'),
+    path('storage/<app_id>', Storage.as_view(), name='storage'),
 ]
