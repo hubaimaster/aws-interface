@@ -9,7 +9,8 @@ class RecipeController:
         self.common_init()
 
     def common_init(self):
-        raise NotImplementedError()
+        #  init object here
+        return
 
     def to_json(self):
         return json.dumps(self.data)

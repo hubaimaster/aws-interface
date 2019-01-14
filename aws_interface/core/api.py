@@ -58,7 +58,7 @@ class AuthAPI(API):
     def get_user(self, user_id):
         raise NotImplementedError()
 
-    def search_user_ids(self, query): # query ex : 'kim' in col('name') and 21 is col('age')
+    def search_user_ids(self, query):  # query ex : 'kim' in col('name') and 21 is col('age')
         raise NotImplementedError()
 
 

@@ -19,7 +19,8 @@ class ServiceController:
         self.common_init()
 
     def common_init(self):
-        raise NotImplementedError()
+        #  init object here .. assign bundle, recipe, boto3 session
+        return
 
     def apply(self):
         raise NotImplementedError()
