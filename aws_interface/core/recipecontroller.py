@@ -5,7 +5,6 @@ import uuid
 class RecipeController:
     def __init__(self):
         self.data = dict()
-        self.__set_recipe_id(str(uuid.uuid4()))
         self.common_init()
 
     def common_init(self):
@@ -18,60 +17,72 @@ class RecipeController:
     def load_json_string(self, json_string):
         self.data = json.loads(json_string)
 
-    def get_recipe_id(self):
-        return self.data.get('recipe_id', None)
-
-    def __set_recipe_id(self, recipe_id):
-        self.data['recipe_id'] = recipe_id
-
     def get_recipe_type(self):
         return self.data.get('recipe_type', None)
 
-    def __set_recipe_type(self, recipe_type):
-        self.data['recipe_type'] = recipe_type
+
+class BillRecipeController(RecipeController):
+    def common_init(self):
+        self.data['recipe_type'] = 'bill'
 
 
 class AuthRecipeController(RecipeController):
     def common_init(self):
-        self.__set_recipe_type('auth')
+        self.data['recipe_type'] = 'auth'
+        # put system default groups
+        self.default_groups = {
+            'admin': '모든 읽기/쓰기 권한을 가지고 있습니다.',
+            'owner': '자신이 작성한 데이터에 대해 모든 권한을 가지고 있습니다.',
+            'user': '일반 사용자 그룹입니다.'
+        }
+        for name in self.default_groups:
+            description = self.default_groups[name]
+            self.put_user_group(name, description)
 
-    def put_user_group(self, group_name):
-        restricts = ['admin', 'owner']
-        if group_name in restricts:
-            return False
+    def put_user_group(self, name, description):
         if 'user_groups' not in self.data:
-            self.data['user_groups'] = []
-        self.data['user_groups'].append(group_name)
-        self.data['user_groups'] = list(set(self.data['user_groups']))
+            self.data['user_groups'] = {}
+        self.data['user_groups'][name] = description
         return True
 
     def get_user_groups(self):
-        user_groups = self.data.get('user_groups', [])
+        user_groups = self.data.get('user_groups', self.default_groups)
+        user_groups = [{
+            'name': name,
+            'description': user_groups[name]
+        } for name in user_groups]
         return user_groups
 
-    def put_user_column(self, column_name, value_type, read_groups, write_groups):
-        if 'user_columns' not in self.data:
-            self.data['user_columns'] = {}
-        self.data['user_columns'][column_name] = {
-            'value_type': value_type,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
+    def delete_user_group(self, name):
+        if name in self.default_groups:
+            return False
+        if 'user_groups' not in self.data:
+            self.data['user_groups'] = {}
+        self.data['user_groups'].pop(name)
+        return True
+
+    def set_email_login(self, enabled, default_group_name):
+        if 'login_method' not in self.data:
+            self.data['login_method'] = {}
+        self.data['login_method']['email_login'] = {
+            'enabled': enabled,
+            'default_group_name': default_group_name,
         }
         return True
 
-    def get_user_columns(self):
-        user_columns = self.data.get('user_columns', {})
-        return user_columns
-
-    def get_user_column(self, column_name):
-        columns = self.get_user_columns()
-        column = columns.get(column_name, None)
-        return column
+    def set_guest_login(self, enabled, default_group_name):
+        if 'login_method' not in self.data:
+            self.data['login_method'] = {}
+        self.data['login_method']['guest_login'] = {
+            'enabled': enabled,
+            'default_group_name': default_group_name,
+        }
+        return True
 
 
 class DatabaseRecipeController(RecipeController):
     def common_init(self):
-        self.__set_recipe_type('database')
+        self.data['recipe_type'] = 'database'
 
     def put_table(self, table_name):
         if 'tables' not in self.data:

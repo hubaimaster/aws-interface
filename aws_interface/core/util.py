@@ -1,8 +1,10 @@
-import json
 import boto3
+from datetime import date
 
 
-def get_boto3_session(access_key, secret_key):
+def get_boto3_session(bundle):
+    access_key = bundle['access_key']
+    secret_key = bundle['secret_key']
     session = boto3.Session(
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
@@ -10,13 +12,12 @@ def get_boto3_session(access_key, secret_key):
     return session
 
 
-class Saver:
-    def __init__(self, boto3_session):
-        self.s3 = boto3_session.client('s3')
+def get_current_date():
+    today = date.today()
+    return today
 
-    def __upload__(self, local_file_path, bucket, obj):
-        self.s3.upload_file(local_file_path, bucket, obj)
 
-    def save(self, abstract_service):
-        json_string = json.dumps(abstract_service)
-
+def get_current_month_date():
+    today = date.today()
+    datem = date(today.year, today.month, 1)
+    return datem

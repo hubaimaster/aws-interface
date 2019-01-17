@@ -24,9 +24,8 @@ class Util:
         return request.session.get('is_login', False)
 
     @classmethod
-    def set_login(cls, request, is_login, user_id=None, bundle={}):
+    def set_login(cls, request, is_login, bundle={}):
         request.session['is_login'] = is_login
-        request.session['user_id'] = user_id
         request.session['bundle'] = bundle
 
     @classmethod
@@ -42,6 +41,26 @@ class Util:
         context = dict()
         cls.__pop_alert(request, context)
         return context
+
+    @classmethod
+    def get_api(cls, api_class, recipe_type, request, app_id):
+        recipe = Recipe.objects.filter(app_id=app_id, recipe_type=recipe_type).first()
+        if recipe:
+            recipe_json_string = recipe.json_string
+        else:
+            recipe_json_string = None
+        api = api_class(Util.get_bundle(request), app_id, recipe_json_string)
+        return api
+
+    @classmethod
+    def save_recipe(cls, recipe_controller, app_id):
+        recipe_obj = Recipe.objects.filter(app_id=app_id, recipe_type=recipe_controller.get_recipe_type()).first()
+        if recipe_obj is None:
+            recipe_obj = Recipe()
+        recipe_obj.app_id = app_id
+        recipe_obj.json_string = recipe_controller.to_json()
+        recipe_obj.recipe_type = recipe_controller.get_recipe_type()
+        recipe_obj.save()
 
 
 class Index(View):
@@ -155,6 +174,10 @@ class Bill(View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
+        api = Util.get_api(BillAPI, 'bill', request, app_id)
+        context['cost'] = api.get_current_cost()
+        context['usages'] = api.get_current_usage_costs()
+
         return render(request, 'dashboard/app/bill.html', context=context)
 
 
@@ -162,12 +185,27 @@ class Auth(View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-
-        recipe = Recipe.objects.filter(app_id=app_id, recipe_type='auth').first()
-        if recipe:
-            api = AuthAPI(Util.get_bundle(request), recipe.json_string)
-
+        api = Util.get_api(AuthAPI, 'auth', request, app_id)
+        context['user_groups'] = api.get_user_groups()
         return render(request, 'dashboard/app/auth.html', context=context)
+
+    def post(self, request, app_id):
+        context = Util.get_context(request)
+        context['app_id'] = app_id
+        api = Util.get_api(AuthAPI, 'auth', request, app_id)
+        cmd = request.POST['cmd']
+        if cmd == 'delete':
+            name = request.POST['group_name']
+            succeed = api.delete_user_group(name)
+            if not succeed:
+                Util.add_alert(request, '시스템 그룹은 삭제할 수 없습니다.')
+        elif cmd == 'put':
+            name = request.POST['group_name']
+            description = request.POST['group_description']
+            api.put_user_group(name, description)
+
+        Util.save_recipe(api.get_recipe_controller(), app_id)
+        return redirect(request.path_info)  # Redirect back
 
 
 class Database(View):

@@ -18,24 +18,24 @@
     <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
       <div class="container-fluid">
         <div class="header-body">
+            <!-- Alert -->
+            <div class="alert alert-default" role="alert">
+                <strong>AWS</strong> 에서 사용한 <strong>모든 리소스</strong> 항목에 대한 요금입니다.
+            </div>
           <!-- Card stats -->
           <div class="row">
-            <div class="col-xl-12 col-lg-6">
+            <div class="col-xl-12 col-lg-12">
               <div class="card card-stats mb-4 mb-xl-0">
                 <div class="card-body">
                   <div class="row">
                     <div class="col">
                       <h5 class="card-title text-uppercase text-muted mb-0">이번달 사용 요금</h5>
-                      <span class="h2 font-weight-bold mb-0">350,897$</span>
+                      <span class="h2 font-weight-bold mb-0">{{ cost.Amount|floatformat }} {{ cost.Unit }}</span>
                     </div>
                     <div class="col-auto">
-                        <a href="" class="btn btn-sm btn-primary">AWS 에서 확인</a>
+                        <a target="_blank" href="https://console.aws.amazon.com/billing" class="btn btn-sm btn-primary">AWS 에서 확인</a>
                     </div>
                   </div>
-                  <p class="mt-3 mb-0 text-muted text-sm">
-                      <span class="text-nowrap">저번달 보다</span>
-                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                  </p>
                 </div>
               </div>
             </div>
@@ -45,93 +45,13 @@
     </div>
     <!-- Page content -->
     <div class="container-fluid mt--7">
-      <div class="row mt-2">
-        <div class="col-xl-6 mb-5 mb-xl-0">
+      <div class="row mt-1">
+        <div class="col-xl-12">
           <div class="card shadow">
             <div class="card-header border-0">
               <div class="row align-items-center">
                 <div class="col">
-                  <h3 class="mb-0">월간 사용 요금</h3>
-                </div>
-              </div>
-            </div>
-            <div class="table-responsive">
-              <!-- Projects table -->
-              <table class="table align-items-center table-flush">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">날짜</th>
-                    <th scope="col">금액</th>
-                    <th scope="col">전월대비</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">
-                      /argon/
-                    </th>
-                    <td>
-                      4,569
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-up text-success mr-3"></i> 46,53%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/index.html
-                    </th>
-                    <td>
-                      3,985
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-down text-warning mr-3"></i> 46,53%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/charts.html
-                    </th>
-                    <td>
-                      3,513
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-down text-warning mr-3"></i> 36,49%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/tables.html
-                    </th>
-                    <td>
-                      2,050
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-up text-success mr-3"></i> 50,87%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      /argon/profile.html
-                    </th>
-                    <td>
-                      1,795
-                    </td>
-                    <td>
-                      <i class="fas fa-arrow-down text-danger mr-3"></i> 46,53%
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-6">
-          <div class="card shadow">
-            <div class="card-header border-0">
-              <div class="row align-items-center">
-                <div class="col">
-                  <h3 class="mb-0">요금 내역</h3>
+                  <h3 class="mb-0">이번달 요금 내역</h3>
                 </div>
               </div>
             </div>
@@ -142,100 +62,19 @@
                   <tr>
                     <th scope="col">항목</th>
                     <th scope="col">금액</th>
-                    <th scope="col">비율</th>
                   </tr>
                 </thead>
                 <tbody>
+                  {% for usage in usages %}
                   <tr>
                     <th scope="row">
-                      Facebook
+                      {{ usage.Service }}
                     </th>
                     <td>
-                      1,480
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">60%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
-                          </div>
-                        </div>
-                      </div>
+                      {{ usage.Cost.Amount|floatformat }} {{ usage.Cost.Unit }}
                     </td>
                   </tr>
-                  <tr>
-                    <th scope="row">
-                      Facebook
-                    </th>
-                    <td>
-                      5,480
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">70%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width: 70%;"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      Google
-                    </th>
-                    <td>
-                      4,807
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">80%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-primary" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%;"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      Instagram
-                    </th>
-                    <td>
-                      3,678
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">75%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      twitter
-                    </th>
-                    <td>
-                      2,645
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <span class="mr-2">30%</span>
-                        <div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-warning" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: 30%;"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div>
