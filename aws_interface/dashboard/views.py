@@ -62,6 +62,14 @@ class Util:
         recipe_obj.recipe_type = recipe_controller.get_recipe_type()
         recipe_obj.save()
 
+    @classmethod
+    def set_cache(cls, request, key, value):
+        request.session[key] = value
+
+    @classmethod
+    def get_cache(cls, request, key):
+        return request.session.get(key, None)
+
 
 class Index(View):
     def get(self, request):
@@ -172,12 +180,16 @@ class Overview(View):
 
 class Bill(View):
     def get(self, request, app_id):
+        cache_key = 'bill-context-' + app_id
+        context = Util.get_cache(request, cache_key)
+        if context:
+            return render(request, 'dashboard/app/bill.html', context=context)
         context = Util.get_context(request)
         context['app_id'] = app_id
         api = Util.get_api(BillAPI, 'bill', request, app_id)
         context['cost'] = api.get_current_cost()
         context['usages'] = api.get_current_usage_costs()
-
+        Util.set_cache(request, cache_key, context)
         return render(request, 'dashboard/app/bill.html', context=context)
 
 

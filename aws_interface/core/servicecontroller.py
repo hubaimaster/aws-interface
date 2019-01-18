@@ -45,7 +45,8 @@ class BillServiceController(ServiceController):
         blendedCost = total.get('BlendedCost', {})
         amount = blendedCost.get('Amount', -1)
         unit = blendedCost.get('Unit', None)
-        return {'Amount': amount, 'Unit': unit}
+        result = {'Amount': amount, 'Unit': unit}
+        return result
 
     def get_usage_costs(self, start, end):
         response = self.cost_explorer.get_cost_and_usage(
