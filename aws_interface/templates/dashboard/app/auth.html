@@ -1,0 +1,319 @@
+{% extends 'dashboard/app/base.html' %}
+{% load staticfiles%}
+{% block content %}
+
+<div class="main-content">
+    <!-- Top navbar -->
+    <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+      <div class="container-fluid">
+        <!-- Brand -->
+        <a class="h4 mb-0 text-white text-uppercase  d-lg-inline-block"></a>
+        <!-- User -->
+        <ul id="nav-user" class="navbar-nav align-items-center d-none d-md-flex">
+
+        </ul>
+      </div>
+    </nav>
+    <!-- Header -->
+    <div class="header bg-gradient-primary pb-7 pt-5 pt-md-8">
+      <div class="container-fluid">
+        <div class="header-body">
+
+            <div class="alert alert-primary" role="alert">
+                <strong>AWS DynamoDB, AWS Lambda</strong>  를 사용합니다.
+            </div>
+
+
+          <!-- Card stats -->
+          <div class="row">
+            <div class="col-xl-6 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">총 회원 수</h5>
+                      <span class="h2 font-weight-bold mb-0">350,897 명</span>
+                    </div>
+                    <div class="col-auto">
+                      <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                        <i class="fas fa-user-friends"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+              <div class="col-xl-6 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">접속 중인 회원 수</h5>
+                      <span class="h2 font-weight-bold mb-0">1,897 명</span>
+                    </div>
+                    <div class="col-auto">
+                        <a target="_blank" href="" class="btn btn-sm btn-primary">자세히 보기</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <div class="row mt-4">
+        <div class="col-xl-12 mb-5 mb-xl-0">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">회원 그룹</h3>
+                </div>
+                <div class="col text-right">
+                  <a data-toggle="modal" data-target="#modal-put-group" class="btn btn-sm btn-primary">
+                      <span class="btn-inner--text" style="color: white;">그룹 생성</span>
+                  </a>
+                </div>
+                  <div class="modal fade" id="modal-put-group" tabindex="-1" role="dialog" aria-labelledby="modal-put-group" aria-hidden="true">
+                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title" id="modal-title-default">그룹 생성</h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        </div>
+                        <form method="post">{% csrf_token %}
+                            <input name="cmd" value="put" hidden>
+                            <div class="modal-body">
+                                <div class="pl-lg-12">
+                                  <div class="row">
+                                    <div class="col-lg-12">
+                                      <div class="form-group">
+                                        <label class="form-control-label" for="input-username">이름</label>
+                                        <input name="group_name" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 이름">
+                                      </div>
+                                        <div class="form-group">
+                                        <label class="form-control-label" for="input-username">설명</label>
+                                        <input name="group_description" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 설명">
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              <p>
+                                  확인 버튼을 클릭하여 회원 그룹을 생성합니다.
+                              </p>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                              <button type="submit" class="btn btn-primary">확인</button>
+                            </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+              </div>
+            </div>
+            <div class="table-responsive">
+              <!-- Projects table -->
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">이름</th>
+                    <th scope="col">설명</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for group in user_groups %}
+                  <tr>
+                    <th scope="row">
+                      {{ group.name }}
+                    </th>
+                    <td>
+                      {{ group.description }}
+                    </td>
+                    <td>
+                      <div class="col text-right">
+                          <form role="form" method="post">{% csrf_token %}
+                              <input name="cmd" value="delete" hidden>
+                              <input name="group_name" value="{{ group.name }}" hidden>
+                            <button type="submit" class="btn btn-sm btn-danger">제거</button>
+                          </form>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-xl-12 mb-5 mb-xl-0">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">로그인 방법</h3>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <!-- Projects table -->
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">방법</th>
+                    <th scope="col">설명</th>
+                    <th scope="col">기본 그룹</th>
+                    <th scope="col">사용</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">
+                      이메일/비밀번호 로그인
+                    </th>
+                    <td>
+                        <a href="">awsi.auth.emailLogin</a> 메소드를 이용하여 로그인합니다
+                    </td>
+                    <td>
+                        <select class="form-control">
+                          <option value="user" selected>user</option>
+                        </select>
+                    </td>
+                    <td>
+                        <label class="custom-toggle">
+                          <input type="checkbox" checked>
+                          <span class="custom-toggle-slider rounded-circle"></span>
+                        </label>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      익명 로그인
+                    </th>
+                    <td>
+                      <a href="">awsi.auth.guestLogin</a> 메소드를 이용하여 로그인합니다
+                    </td>
+                    <td>
+                        <select class="form-control">
+                          <option value="user" selected>user</option>
+                        </select>
+                    </td>
+                    <td>
+                        <label class="custom-toggle">
+                          <input type="checkbox">
+                          <span class="custom-toggle-slider rounded-circle"></span>
+                        </label>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+          <div class="col-xl-12">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">가입된 회원</h3>
+                </div>
+                <div class="col text-right">
+                  <a href="#!" class="btn btn-sm btn-primary">회원 생성</a>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <!-- Projects table -->
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">createDate</th>
+                    <th scope="col">email</th>
+                    <th scope="col">name</th>
+                    <th scope="col">group</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">
+                      dgsejs5621-2sdf3dsw3-sseds4-vghtt5
+                    </th>
+                    <td>
+                      2019-01-15 05:00:01
+                    </td>
+                    <td>
+                      kchdully@naver.com
+                    </td>
+                    <td>
+                      김창환
+                    </td>
+                    <td>
+                      user
+                    </td>
+                    <td>
+                      <div class="col text-right">
+                        <a href="#!" class="btn btn-sm btn-danger">제거</a>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      dgsejs5621-2sdf3dsw3-sseds4-vghtt5
+                    </th>
+                    <td>
+                      2019-01-15 05:00:01
+                    </td>
+                    <td>
+                      kchdully@naver.com
+                    </td>
+                    <td>
+                      김창환
+                    </td>
+                    <td>
+                      user
+                    </td>
+                    <td>
+                      <div class="col text-right">
+                        <a href="#!" class="btn btn-sm btn-danger">제거</a>
+                      </div>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="row align-items-center justify-content-xl-between">
+          <div class="col-xl-6">
+            <div class="copyright text-center text-xl-left text-muted">
+              &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+{% endblock %}

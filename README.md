@@ -1,3 +1,5 @@
+![Language](https://img.shields.io/badge/Language-Python3.6-blue.svg)
+
 # AWS-Interface
 
 **AWS 인터페이스** 는 Amazon Web Services (AWS)에서 제공하는 IAM, DynamoDB, Lambda, API Gateway 등의 서비스를 추상화하여 손쉽게 사용할 수 있게 해주는 인터페이스입니다.
@@ -11,13 +13,13 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 ### Recipe (레시피)
 서비스하고자 하는 앱의 백엔드 및 DB 단에 들어갈 요소를 설정하는 단위입니다. 서비스에 추가할 추상화된 기능이라고 생각할 수 있습니다. 초기에는 4가지 레시피를 지원할 예정입니다.
 
+- Bill: 백엔드 요금 사용 내역 확인
 - Auth: 로그인 및 사용자 인증
 - Database: 각종 데이터
-- Push: 앱 및 웹 푸시 알림
-- Email: 이메일 알림
+- Storage: 파일 저장 및 배포
 
 ### Dashboard (대시보드)
-레시피를 구성하고, DB를 관리할 수 있는 웹 인터페이스를 대시보드라고 부릅니다. aws-interface.com에서  IAM 정보를 입력해서 계정을 만들거나 로컬에서 호스팅된 대시보드에 IAM 정보를 등록한 후에 이용 가능합니다. 웹 인터페이스는 Django 프레임워크를 기반으로 합니다.
+레시피를 구성하고, DB를 관리할 수 있는 웹 인터페이스를 대시보드라고 부릅니다. [aws-interface.com](http://aws-interface.com) 에서  IAM 정보를 입력해서 계정을 만들거나 로컬에서 호스팅된 대시보드에 IAM 정보를 등록한 후에 이용 가능합니다. 웹 인터페이스는 Django 프레임워크를 기반으로 합니다.
 
 ### Backend (백엔드)
 실제 뒷단에서 사용하는 IaaS 서비스를 말합니다. 현재는 AWS 백엔드만 제공하지만 향후에는 Google Cloud Platform, Naver Cloud Platform, 테스트용 Local Deployment 등을 추가적으로 지원할 예정입니다.
@@ -37,7 +39,7 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 장고 웹 인터페이스 단에서는 위의 core 클래스들을 import해서 필요한 함수를 호출하는 방식으로 구현됩니다.
 
 ### AWS 상세 구현
-대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이때 어댑터는 API Gateway와 http 방식으로 통신을 하게 됩니다.
+대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이어 자동으로 생성된 SDK 는 API Gateway와 http 방식으로 통신을 하게 됩니다.
 
 예를 들어, 아래는 Auth 레시피가 실제 구현되는 과정입니다.
 

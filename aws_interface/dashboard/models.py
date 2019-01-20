@@ -88,3 +88,19 @@ class User(AbstractUser):
     def get_aws_secret_key(self, raw_password):
         assert (self.check_password(raw_password))
         return self.decrypt(raw_password, self.c_aws_secret_key)
+
+
+class App(models.Model):
+    id = models.CharField(max_length=255, primary_key=True, default=uuid.uuid4, editable=False)
+    creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
+    user_id = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=False, unique=True)
+
+
+class Recipe(models.Model):
+    id = models.CharField(max_length=255, primary_key=True, default=uuid.uuid4, editable=False)
+    creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
+    recipe_id = models.CharField(max_length=255)
+    recipe_type = models.CharField(max_length=255)
+    app_id = models.CharField(max_length=255)
+    json_string = models.TextField()
