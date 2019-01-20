@@ -30,6 +30,7 @@ from dashboard.views.database import Database
 from dashboard.views.storage import Storage
 from dashboard.views.logic import Logic
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 

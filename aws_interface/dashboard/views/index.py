@@ -5,5 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class Index(LoginRequiredMixin, View, DashboardView):
+    redirect_field_name = 'next'
+
     def get(self, request):
         return redirect('apps')

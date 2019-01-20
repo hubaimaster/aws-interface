@@ -25,7 +25,7 @@ SECRET_KEY = ')o_-=e6rti-w@q(9ngcqgjya%h@x@%*be0lx(-f_e0)!j%p@=*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -72,8 +72,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wsgi.application'
 
-LOGIN_URL = 'login/'
-LOGIN_REDIRECT_URL = 'login/'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/apps/'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -88,6 +88,8 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
+
+AUTH_USER_MODEL = 'dashboard.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
