@@ -1,4 +1,7 @@
 ![Language](https://img.shields.io/badge/Language-Python3.6-blue.svg)
+![Language](https://img.shields.io/badge/NaverFest-Finalist-brightgreen.svg)
+
+**[Naver D2 Fest 결승 진출!! 끼요오오옷ㅅㅅ](https://github.com/D2CampusFest/6th)**
 
 # AWS-Interface
 
