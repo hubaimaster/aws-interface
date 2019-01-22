@@ -88,12 +88,12 @@ class Index(LoginRequiredMixin, View):
 class Account(View):
     def get(self, request):
         context = Util.get_context(request)
-        return render(request, 'dashboard/apps.html', context=context)
+        return render(request, 'dashboard/account.html', context=context)
 
 
 class Register(View):
     def get(self, request):
-        context = self.get_context(request)
+        context = Util.get_context(request)
         return render(request, 'dashboard/register.html', context=context)
 
     def post(self, request):

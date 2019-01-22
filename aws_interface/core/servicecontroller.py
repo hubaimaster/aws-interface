@@ -79,7 +79,6 @@ class AuthServiceController(ServiceController):
     def common_init(self):
         boto3_session = get_boto3_session(self.bundle)
         self.dynamodb = boto3_session.client('dynamodb')
-
         self.__create_table()
 
     def __create_table(self):
@@ -94,7 +93,7 @@ class AuthServiceController(ServiceController):
                         'AttributeName': 'createDate',
                         'AttributeType': 'N'
                     }, {
-                        'AttributeName': 'group',
+                        'AttributeName': 'partition',
                         'AttributeType': 'S'
                     },
                 ],
@@ -107,10 +106,10 @@ class AuthServiceController(ServiceController):
                 ],
                 GlobalSecondaryIndexes=[
                     {
-                        'IndexName': 'group-createDate-index',
+                        'IndexName': 'partition-createDate-index',
                         'KeySchema': [
                             {
-                                'AttributeName': 'group',
+                                'AttributeName': 'partition',
                                 'KeyType': 'HASH'
                             }, {
                                 'AttributeName': 'createDate',
@@ -135,10 +134,43 @@ class AuthServiceController(ServiceController):
             return False
         return True
 
-    def apply(self, recipe):
+    def _insert_item_to_table(self, partition, item):
+        table_name = 'auth-' + self.app_id
+        self.dynamodb.put_item(
+            TableName='string',
+            Item={
+                'string': {
+                    'S': 'string',
+                    'N': 'string',
+                    'B': b'bytes',
+                    'SS': [
+                        'string',
+                    ],
+                    'NS': [
+                        'string',
+                    ],
+                    'BS': [
+                        b'bytes',
+                    ],
+                    'M': {
+                        'string': {'... recursive ...'}
+                    },
+                    'L': [
+                        {'... recursive ...'},
+                    ],
+                    'NULL': True | False,
+                    'BOOL': True | False
+                }
+            },
+        )
+
+    def apply(self, recipe_controller):
         return
 
-    def generate_sdk(self, recipe):
+    def _apply_user_group(self, recipe_controller):
+        user_groups = recipe_controller.get_user_groups()
+
+    def generate_sdk(self, recipe_controller):
         return
 
     def get_user_count(self):

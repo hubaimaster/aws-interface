@@ -30,6 +30,9 @@ class AuthRecipeController(RecipeController):
     def common_init(self):
         self.data['recipe_type'] = 'auth'
         # put system default groups
+        self._init_user_group()
+
+    def _init_user_group(self):
         self.default_groups = {
             'admin': '모든 읽기/쓰기 권한을 가지고 있습니다.',
             'owner': '자신이 작성한 데이터에 대해 모든 권한을 가지고 있습니다.',
