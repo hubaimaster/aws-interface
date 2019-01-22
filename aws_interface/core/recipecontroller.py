@@ -20,6 +20,17 @@ class RecipeController:
     def get_recipe_type(self):
         return self.data.get('recipe_type', None)
 
+    def add_api(self, name, description, code_path):
+        if 'apis' not in self.data:
+            self.data['apis'] = {}
+        self['apis'][name] = {
+            'name': name,
+            'description': description,
+            'code': ''
+        }
+        raise NotImplementedError()
+
+
 
 class BillRecipeController(RecipeController):
     def common_init(self):
