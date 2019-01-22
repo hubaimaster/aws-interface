@@ -1,4 +1,7 @@
 ![Language](https://img.shields.io/badge/Language-Python3.6-blue.svg)
+![Language](https://img.shields.io/badge/NaverFest-Finalist-brightgreen.svg)
+
+**[Naver D2 Fest 결승 진출!! 끼요오오옷ㅅㅅ](https://github.com/D2CampusFest/6th)**
 
 # AWS-Interface
 
@@ -29,8 +32,8 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 
 ## 서비스 설계 (개발자 입장)
 
-### Recipe Abstract Class
-상술한 바와 같이 Recipe는 서비스에서 제공할 추상화된 기능을 말합니다. 기능에 따라 소스 추상 클래스를 상속한 AuthRecipe, DatabaseRecipe 등이 구현됩니다. Recipe 클래스는 이러한 기능들을 구성하는 설정을 담은 dictionary 역할을 하는 것으로 생각할 수 있습니다. 예컨대 로그인 및 사용자 관리를 담당하는 AuthRecipe에서는 사용자 그룹, 비밀번호 규칙 등을 설정할 수 있습니다.
+### RecipeController Abstract Class
+상술한 바와 같이 Recipe는 서비스에서 제공할 추상화된 기능을 말합니다. 기능에 따라 소스 추상 클래스를 상속한 AuthRecipeController, DatabaseRecipeController 등이 구현됩니다. RecipeController 클래스는 이러한 기능들을 구성하는 설정을 담은 dictionary 를 조작하는 역할을 하는 것으로 생각할 수 있습니다. 예컨대 로그인 및 사용자 관리를 담당하는 AuthRecipeController 에서는 사용자 그룹, 비밀번호 규칙 등을 설정할 수 있습니다.
 
 ### ServiceController Abstract Class
 레시피에 명시된 바에 따라 Backend (뒷단의 IaaS 서비스)를 조작하는 컨트롤러입니다. 예컨대, AuthSauce가 담긴 Recipe를 ServiceController (이하 SC)에서 apply시키면, AWS DynamoDB 상에서 관련 테이블이 만들어지고 그것을 조작할 수 있는 Lambda 함수와 API Gateway 설정이 만들어집니다. Client SDK 생성 및 관리자 기능 또한 SC에서 제공됩니다. 예컨대 AuthSC에서는 현재 접속한 사용자를 확인하는 등의 기능이 제공됩니다. SC도 Recipe와 마찬가지로 AuthSC, DatabaseSC 등으로 상속되어 구현됩니다.
