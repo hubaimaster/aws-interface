@@ -79,6 +79,7 @@ class AuthServiceController(ServiceController):
     def common_init(self):
         boto3_session = get_boto3_session(self.bundle)
         self.dynamodb = boto3_session.client('dynamodb')
+        self.lambda_client = boto3_session.client('lambda')
         self.__create_table()
 
     def __create_table(self):
@@ -165,10 +166,18 @@ class AuthServiceController(ServiceController):
         )
 
     def apply(self, recipe_controller):
+        self._apply_user_group(recipe_controller)
+        self._apply_cloud_api(recipe_controller)
         return
 
     def _apply_user_group(self, recipe_controller):
         user_groups = recipe_controller.get_user_groups()
+
+    def _apply_cloud_api(self, recipe_controller):
+        cloud_apis = recipe_controller.get_cloud_apis()
+        for cloud_api in cloud_apis:
+            raise NotImplementedError()
+
 
     def generate_sdk(self, recipe_controller):
         return

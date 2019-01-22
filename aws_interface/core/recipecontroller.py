@@ -20,17 +20,21 @@ class RecipeController:
     def get_recipe_type(self):
         return self.data.get('recipe_type', None)
 
-    def add_api(self, name, description, code_path):
-        if 'apis' not in self.data:
-            self.data['apis'] = {}
-        self['apis'][name] = {
+    def put_cloud_api(self, name, description, package, handler):  # 'core.cloud.auth', 'get_user.run'
+        if 'cloud_apis' not in self.data:
+            self.data['cloud_apis'] = {}
+        self['cloud_apis'][name] = {
             'name': name,
             'description': description,
-            'package': 'core.cloudcode.auth',
-            'handler': 'get_user.run'
+            'package': package,
+            'handler': handler,
         }
-        raise NotImplementedError()
+        return True
 
+    def get_cloud_apis(self):
+        cloud_apis = self.data.get('cloud_apis', [])
+        cloud_apis = [cloud_apis[api] for api in cloud_apis]
+        return cloud_apis
 
 
 class BillRecipeController(RecipeController):
@@ -43,6 +47,7 @@ class AuthRecipeController(RecipeController):
         self.data['recipe_type'] = 'auth'
         # put system default groups
         self._init_user_group()
+        self._init_cloud_api()
 
     def _init_user_group(self):
         self.default_groups = {
@@ -53,6 +58,12 @@ class AuthRecipeController(RecipeController):
         for name in self.default_groups:
             description = self.default_groups[name]
             self.put_user_group(name, description)
+
+    def _init_cloud_api(self):
+        self.put_cloud_api('login', '(email:str,password:str)->token:str', 'core.cloud.auth', 'login.do')
+        self.put_cloud_api('logout', '(token:str)->success:bool', 'core.cloud.auth', 'logout.do')
+        self.put_cloud_api('register', '(email:str,password:str,extra:dict)->success:bool', 'core.cloud.auth', 'register.do')
+        self.put_cloud_api('me', '(token:str)->success:bool', 'core.cloud.auth', 'me.do')
 
     def put_user_group(self, name, description):
         if 'user_groups' not in self.data:
