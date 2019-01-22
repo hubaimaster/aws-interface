@@ -46,9 +46,9 @@ class AuthRecipeController(RecipeController):
 
     def _init_user_group(self):
         self.default_groups = {
-            'admin': '모든 읽기/쓰기 권한을 가지고 있습니다.',
-            'owner': '자신이 작성한 데이터에 대해 모든 권한을 가지고 있습니다.',
-            'user': '일반 사용자 그룹입니다.'
+            'admin': '기본그룹, 모든 읽기/쓰기 권한을 가지고 있습니다.',
+            'owner': '기본그룹, 자신이 작성한 데이터에 대해 모든 권한을 가지고 있습니다.',
+            'user': '기본그룹, 일반 사용자 그룹입니다.'
         }
         for name in self.default_groups:
             description = self.default_groups[name]
