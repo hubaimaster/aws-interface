@@ -1,4 +1,8 @@
 import boto3
+import shutil
+import importlib
+import uuid
+import os
 from datetime import date
 
 
@@ -23,51 +27,42 @@ def get_current_month_date():
     return datem
 
 
+def create_zipfile_bin(dir_name):
+    output_filename = uuid.uuid4()
+    shutil.make_archive(output_filename, 'zip', dir_name)
+    zip_file = open(output_filename, 'rb')
+    zip_file_bin = zip_file.read()
+    zip_file.close()
+    os.remove(zip_file)
+    return zip_file_bin
+
+
+def get_aws_iam_role_arn(iam_client):
+    iam_client.CurrentUser().arn
+
 def create_aws_lambda_function(lambda_client, cloud_api):
     name = cloud_api['name']
+    description = cloud_api['description']
     handler = cloud_api['handler']
     package = cloud_api['package']
+    package_path = importlib.import_module(package).__path__
+    zip_file_bin = create_zipfile_bin(package_path)
+    role_arn = ''
     response = lambda_client.create_function(
         FunctionName=name,
         Runtime='python3.6',
-        Role='string',
+        Role=role_arn,  # TODO
         Handler=handler,
         Code={
-            'ZipFile': b'bytes',
-            'S3Bucket': 'string',
-            'S3Key': 'string',
-            'S3ObjectVersion': 'string'
+            'ZipFile': zip_file_bin,
         },
-        Description='string',
-        Timeout=123,
-        MemorySize=123,
-        Publish=True | False,
-        VpcConfig={
-            'SubnetIds': [
-                'string',
-            ],
-            'SecurityGroupIds': [
-                'string',
-            ]
-        },
-        DeadLetterConfig={
-            'TargetArn': 'string'
-        },
-        Environment={
-            'Variables': {
-                'string': 'string'
-            }
-        },
-        KMSKeyArn='string',
+        Description=description,
+        Timeout=32,
+        MemorySize=128,
+        Publish=True,
         TracingConfig={
-            'Mode': 'Active' | 'PassThrough'
-        },
-        Tags={
-            'string': 'string'
-        },
-        Layers=[
-            'string',
-        ]
+            'Mode': 'Active'
+        }
     )
     return response
 

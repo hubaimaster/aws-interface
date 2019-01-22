@@ -1,4 +1,5 @@
 from core.util import *
+from core.backend.aws import *
 
 
 class ServiceController:
@@ -20,8 +21,7 @@ class ServiceController:
 
 class BillServiceController(ServiceController):
     def common_init(self):
-        boto3_session = get_boto3_session(self.bundle)
-        self.cost_explorer = boto3_session.client('ce')
+        self.boto3_session = get_boto3_session(self.bundle)
 
     def apply(self, recipe):
         return
@@ -30,14 +30,7 @@ class BillServiceController(ServiceController):
         return None
 
     def get_cost(self, start, end):
-        response = self.cost_explorer.get_cost_and_usage(
-            TimePeriod={
-                'Start': start,
-                'End': end
-            },
-            Granularity='MONTHLY',
-            Metrics=['BLENDED_COST']
-        )
+        response = CostExplorer(self.boto3_session).get_cost(start, end)
         response = response.get('ResultsByTime', {})
         response = response[-1]
 
@@ -49,20 +42,7 @@ class BillServiceController(ServiceController):
         return result
 
     def get_usage_costs(self, start, end):
-        response = self.cost_explorer.get_cost_and_usage(
-            TimePeriod={
-                'Start': start,
-                'End': end
-            },
-            Granularity='MONTHLY',
-            Metrics=['AmortizedCost'],
-            GroupBy=[
-                {
-                    'Type': 'DIMENSION',
-                    'Key': 'SERVICE'
-                },
-            ],
-        )
+        response = CostExplorer(self.boto3_session).get_cost_and_usage(start, end)
         response = response.get('ResultsByTime', {})
         response = response[-1]
 
@@ -77,9 +57,9 @@ class BillServiceController(ServiceController):
 
 class AuthServiceController(ServiceController):
     def common_init(self):
-        boto3_session = get_boto3_session(self.bundle)
-        self.dynamodb = boto3_session.client('dynamodb')
-        self.lambda_client = boto3_session.client('lambda')
+        self.boto3_session = get_boto3_session(self.bundle)
+        self.dynamodb = self.boto3_session.client('dynamodb')
+        self.lambda_client = self.boto3_session.client('lambda')
         self.__create_table()
 
     def __create_table(self):
