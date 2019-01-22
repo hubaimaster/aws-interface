@@ -26,7 +26,8 @@ class RecipeController:
         self['apis'][name] = {
             'name': name,
             'description': description,
-            'code': ''
+            'package': 'core.cloudcode.auth',
+            'handler': 'get_user.run'
         }
         raise NotImplementedError()
 
