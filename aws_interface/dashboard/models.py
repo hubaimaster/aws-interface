@@ -12,8 +12,8 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
 
-        access_key = extra_fields.pop('aws_access_key')
-        secret_key = extra_fields.pop('aws_secret_key')
+        access_key = extra_fields.pop('aws_access_key', None)
+        secret_key = extra_fields.pop('aws_secret_key', None)
 
         email = self.normalize_email(email)
         user = self.model(username=email, email=email, **extra_fields)
