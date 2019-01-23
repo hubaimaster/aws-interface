@@ -1,5 +1,5 @@
 from core.util import *
-from core.backend.aws import *
+from cloud.aws import *
 
 
 class ServiceController:
