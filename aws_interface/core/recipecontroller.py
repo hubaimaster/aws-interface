@@ -20,10 +20,10 @@ class RecipeController:
     def get_recipe_type(self):
         return self.data.get('recipe_type', None)
 
-    def put_cloud_api(self, name, description, package, handler):  # 'core.cloud.auth', 'get_user.run'
+    def put_cloud_api(self, name, description, package, handler):  # 'core.cloud.auth', 'get_user.do'
         if 'cloud_apis' not in self.data:
             self.data['cloud_apis'] = {}
-        self['cloud_apis'][name] = {
+        self.data['cloud_apis'][name] = {
             'name': name,
             'description': description,
             'package': package,

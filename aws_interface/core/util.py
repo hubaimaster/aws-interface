@@ -38,7 +38,8 @@ def create_zipfile_bin(dir_name):
 
 
 def get_aws_iam_role_arn(iam_client):
-    iam_client.CurrentUser().arn
+    return iam_client.CurrentUser().arn
+
 
 def create_aws_lambda_function(lambda_client, cloud_api):
     name = cloud_api['name']
