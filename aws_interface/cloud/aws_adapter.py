@@ -2,6 +2,7 @@ import urllib
 import cgi
 import json
 import decimal
+import importlib
 
 
 def get_response_header():
@@ -92,10 +93,20 @@ def lambda_handler(event, context):
         'body': None,
     }
     parmas = get_params(event)
+    cloud_api_name = parmas.get('cloud_api_name', None)
+    with open('recipe.json', 'r') as file:
+        recipe = file.read()
+        recipe = json.loads(recipe)
+
+    cloud_apis = recipe.get('cloud_apis', {})
+    cloud_api = cloud_apis.get(cloud_api_name, {})
+    module_name = cloud_api.get('module', None)
+
+    module = importlib.import_module(module_name)
     data = {
         'params': parmas
     }
-    import cloud.auth.me as code
-    body = code.do(data)
+    body = module.do(data)
+
     response['body'] = body
     return response

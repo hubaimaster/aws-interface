@@ -20,14 +20,13 @@ class RecipeController:
     def get_recipe_type(self):
         return self.data.get('recipe_type', None)
 
-    def put_cloud_api(self, name, description, package, handler):  # 'core.cloud.auth', 'get_user.do'
+    def put_cloud_api(self, name, description, module):  # 'cloud.auth.login'
         if 'cloud_apis' not in self.data:
             self.data['cloud_apis'] = {}
         self.data['cloud_apis'][name] = {
             'name': name,
             'description': description,
-            'package': package,
-            'handler': handler,
+            'module': module,
         }
         return True
 
@@ -60,10 +59,10 @@ class AuthRecipeController(RecipeController):
             self.put_user_group(name, description)
 
     def _init_cloud_api(self):
-        self.put_cloud_api('login', '(email:str,password:str)->token:str', 'core.cloud.auth', 'login.do')
-        self.put_cloud_api('logout', '(token:str)->success:bool', 'core.cloud.auth', 'logout.do')
-        self.put_cloud_api('register', '(email:str,password:str,extra:dict)->success:bool', 'core.cloud.auth', 'register.do')
-        self.put_cloud_api('me', '(token:str)->success:bool', 'core.cloud.auth', 'me.do')
+        self.put_cloud_api('login', '(email:str,password:str)->token:str', 'cloud.auth.login')
+        self.put_cloud_api('logout', '(token:str)->success:bool', 'cloud.auth.logout')
+        self.put_cloud_api('register', '(email:str,password:str,extra:dict)->success:bool', 'cloud.auth.register')
+        self.put_cloud_api('me', '(token:str)->success:bool', 'cloud.auth.me')
 
     def put_user_group(self, name, description):
         if 'user_groups' not in self.data:
