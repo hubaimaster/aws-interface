@@ -30,33 +30,33 @@ class DynamoDB:
         self.resource = boto3_session.resource('dynamodb')
 
     def create_table(self, table_name):
-        response = self.lient.create_table(
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'id',
-                    'AttributeType': 'S'
-                }, {
-                    'AttributeName': 'creationDate',
-                    'AttributeType': 'N'
-                }
-            ],
-            TableName=table_name,
-            KeySchema=[
-                {
-                    'AttributeName': 'id',
-                    'KeyType': 'HASH'
+        try:
+            response = self.client.create_table(
+                AttributeDefinitions=[
+                    {
+                        'AttributeName': 'id',
+                        'AttributeType': 'S'
+                    }
+                ],
+                TableName=table_name,
+                KeySchema=[
+                    {
+                        'AttributeName': 'id',
+                        'KeyType': 'HASH'
+                    },
+                ],
+                ProvisionedThroughput={
+                    'ReadCapacityUnits': 1,
+                    'WriteCapacityUnits': 1
                 },
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 1,
-                'WriteCapacityUnits': 1
-            },
-            StreamSpecification={
-                'StreamEnabled': True,
-                'StreamViewType': 'KEYS_ONLY'
-            }
-        )
-        return response
+                StreamSpecification={
+                    'StreamEnabled': True,
+                    'StreamViewType': 'KEYS_ONLY'
+                }
+            )
+            return response
+        except:
+            return None
 
     def update_table(self, table_name, indexes):
         attr_updates = []
@@ -142,8 +142,15 @@ class IAM:
             'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
             'arn:aws:iam::aws:policy/AmazonS3FullAccess'
         ]
-        self.create_role(role_name)
-        self.attach_policies(role_name, policy_arns)
+        try:
+            self.create_role(role_name)
+        except:
+            print('Already have a role', role_name)
+        try:
+            self.attach_policies(role_name, policy_arns)
+        except:
+            print('Fail to attach policies')
+        return self.get_role_arn(role_name)
 
     def get_role_arn(self, role_name):
         role = self.client.Role(role_name)
@@ -185,7 +192,7 @@ class IAM:
 
 class CostExplorer:
     def __init__(self, boto3_session):
-        self.client = boto3_session.client('ce')
+        self.client = boto3_session.client('ce', 'us-east-1')
 
     def get_cost_and_usage(self, start, end):
         response = self.client.get_cost_and_usage(

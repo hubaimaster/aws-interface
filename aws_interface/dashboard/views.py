@@ -196,6 +196,7 @@ class Bill(View):
         context = Util.get_cache(request, cache_key)
         if context:
             return render(request, 'dashboard/app/bill.html', context=context)
+
         context = Util.get_context(request)
         context['app_id'] = app_id
         api = Util.get_api(BillAPI, 'bill', request, app_id)
@@ -227,7 +228,7 @@ class Auth(View):
             name = request.POST['group_name']
             description = request.POST['group_description']
             api.put_user_group(name, description)
-
+        api.apply()
         Util.save_recipe(api.get_recipe_controller(), app_id)
         return redirect(request.path_info)  # Redirect back
 

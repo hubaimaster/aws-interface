@@ -15,31 +15,6 @@ def get_response_header():
     return api_gateway_response_header
 
 
-def get_message(code, nation):
-    nation_codes = {
-        'en': {
-            '0': 'Success',
-            '1': 'Invalid session',
-            '2': 'User already exists',
-            '3': 'Invalid permission',
-            '4': 'This account does not exist'
-        },
-        'ko': {
-            '0': '성공',
-            '1': '만료된 세션입니다',
-            '2': '이미 가입되어있는 회원입니다',
-            '3': '권한이 없습니다',
-            '4': '해당 계정이 존재하지 않습니다'
-        },
-    }
-    if nation not in nation_codes or code not in nation_codes[nation]:
-        return 'Unknown error'
-    return {
-        'code': code,
-        'text': nation_codes[nation][code]
-    }
-
-
 def decimal_default(obj):
     if isinstance(obj, decimal.Decimal):
         return float(obj)
@@ -53,10 +28,6 @@ def put_response(response, key, value):
     response['body'] = json.loads(response['body'])
     response['body'][key] = value
     response['body'] = json.dumps(response['body'], default=decimal_default)
-
-
-def put_response_message(response, code, nation='ko'):
-    put_response(response, 'message', get_message(code, nation))
 
 
 def get_params(event):
@@ -75,18 +46,13 @@ def get_params(event):
     return params
 
 
-def get_param(event, key):
-    param = get_params(event).get(key, None)
-    return param
-
-
-def get_event(params):
-    event = {}
+def make_event(params):
+    event = dict()
     event['queryStringParameters'] = params
     return event
 
 
-def lambda_handler(event, context):
+def handler(event, context):
     response = {
         'statusCode': 200,
         'headers': get_response_header(),

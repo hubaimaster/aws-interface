@@ -22,6 +22,7 @@ class ServiceController:
 class BillServiceController(ServiceController):
     def common_init(self):
         self.boto3_session = get_boto3_session(self.bundle)
+        self.cost_explorer = CostExplorer(self.boto3_session)
 
     def apply(self, recipe):
         return
@@ -30,7 +31,7 @@ class BillServiceController(ServiceController):
         return None
 
     def get_cost(self, start, end):
-        response = CostExplorer(self.boto3_session).get_cost(start, end)
+        response = self.cost_explorer.get_cost(start, end)
         response = response.get('ResultsByTime', {})
         response = response[-1]
 
@@ -42,7 +43,7 @@ class BillServiceController(ServiceController):
         return result
 
     def get_usage_costs(self, start, end):
-        response = CostExplorer(self.boto3_session).get_cost_and_usage(start, end)
+        response = self.cost_explorer.get_cost_and_usage(start, end)
         response = response.get('ResultsByTime', {})
         response = response[-1]
 
@@ -58,110 +59,38 @@ class BillServiceController(ServiceController):
 class AuthServiceController(ServiceController):
     def common_init(self):
         self.boto3_session = get_boto3_session(self.bundle)
-        self.dynamodb = self.boto3_session.client('dynamodb')
-        self.lambda_client = self.boto3_session.client('lambda')
-        self.__create_table()
+        self._init_table()
 
-    def __create_table(self):
+    def _init_table(self):
+        dynamodb = DynamoDB(self.boto3_session)
         table_name = 'auth-' + self.app_id
-        try:
-            _ = self.dynamodb.create_table(
-                AttributeDefinitions=[
-                    {
-                        'AttributeName': 'id',
-                        'AttributeType': 'S'
-                    }, {
-                        'AttributeName': 'createDate',
-                        'AttributeType': 'N'
-                    }, {
-                        'AttributeName': 'partition',
-                        'AttributeType': 'S'
-                    },
-                ],
-                TableName=table_name,
-                KeySchema=[
-                    {
-                        'AttributeName': 'id',
-                        'KeyType': 'HASH'
-                    },
-                ],
-                GlobalSecondaryIndexes=[
-                    {
-                        'IndexName': 'partition-createDate-index',
-                        'KeySchema': [
-                            {
-                                'AttributeName': 'partition',
-                                'KeyType': 'HASH'
-                            }, {
-                                'AttributeName': 'createDate',
-                                'KeyType': 'RANGE'
-                            }
-                        ],
-                        'Projection': {
-                            'ProjectionType': 'ALL'
-                        },
-                        'ProvisionedThroughput': {
-                            'ReadCapacityUnits': 3,
-                            'WriteCapacityUnits': 3
-                        }
-                    },
-                ],
-                ProvisionedThroughput={
-                    'ReadCapacityUnits': 3,
-                    'WriteCapacityUnits': 3
-                }
-            )
-        except:
-            return False
-        return True
-
-    def _insert_item_to_table(self, partition, item):
-        table_name = 'auth-' + self.app_id
-        self.dynamodb.put_item(
-            TableName='string',
-            Item={
-                'string': {
-                    'S': 'string',
-                    'N': 'string',
-                    'B': b'bytes',
-                    'SS': [
-                        'string',
-                    ],
-                    'NS': [
-                        'string',
-                    ],
-                    'BS': [
-                        b'bytes',
-                    ],
-                    'M': {
-                        'string': {'... recursive ...'}
-                    },
-                    'L': [
-                        {'... recursive ...'},
-                    ],
-                    'NULL': True | False,
-                    'BOOL': True | False
-                }
-            },
-        )
+        dynamodb.create_table(table_name)
+        #dynamodb.update_table(table_name, )
+        return
 
     def apply(self, recipe_controller):
         self._apply_user_group(recipe_controller)
         self._apply_cloud_api(recipe_controller)
         return
 
-    def _apply_user_group(self, recipe_controller):
-        user_groups = recipe_controller.get_user_groups()
-
     def _apply_cloud_api(self, recipe_controller):
+        role_name = 'auth-' + self.app_id
+        lambda_client = Lambda(self.boto3_session)
+        iam = IAM(self.boto3_session)
+        role_arn = iam.create_role_and__attach_policies(role_name)
+
         cloud_apis = recipe_controller.get_cloud_apis()
         for cloud_api in cloud_apis:
-            raise NotImplementedError()
-
+            name = cloud_api['name']
+            desc = cloud_api['description']
+            runtime = 'python3.6'
+            handler = 'cloud.lambda_function.handler'
+            try:
+                lambda_client.create_function(name, desc, runtime, role_arn, handler)
+            except:
+                print('Function already exists')
 
     def generate_sdk(self, recipe_controller):
         return
 
-    def get_user_count(self):
-        return 0
 
