@@ -136,7 +136,7 @@ class IAM:
     def __init__(self, boto3_session):
         self.client = boto3_session.client('iam')
 
-    def create_role_and__attach_policies(self, role_name):
+    def create_role_and_attach_policies(self, role_name):
         policy_arns = [
             'arn:aws:iam::aws:policy/AWSLambdaExecute',
             'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
