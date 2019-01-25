@@ -70,7 +70,8 @@ def handler(event, context):
 
     module = importlib.import_module(module_name)
     data = {
-        'params': parmas
+        'params': parmas,
+        'context': context
     }
     body = module.do(data)
 

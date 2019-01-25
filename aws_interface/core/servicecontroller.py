@@ -92,5 +92,3 @@ class AuthServiceController(ServiceController):
 
     def generate_sdk(self, recipe_controller):
         return
-
-
