@@ -32,8 +32,7 @@ class RecipeController:
 
     def get_cloud_apis(self):
         cloud_apis = self.data.get('cloud_apis', [])
-        cloud_apis = [cloud_apis[api] for api in cloud_apis]
-        return cloud_apis
+        return cloud_apis.values()
 
 
 class BillRecipeController(RecipeController):
