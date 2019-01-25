@@ -123,13 +123,9 @@ class DatabaseRecipeController(RecipeController):
         return table
 
     def put_column(self, table_name, column_name, value_type, read_groups, write_groups):
-        if 'tables' not in self.data:
-            self.data['tables'] = {}
-        if table_name not in self.data['tables']:
-            self.data['tables'][table_name] = {}
-        if 'columns' not in self.data['tables'][table_name]:
-            self.data['tables'][table_name]['columns'] = {}
-
+        self.data.setdefault('tables', {})
+        self.data['tables'].setdefault(table_name, {})
+        self.data['tables'][table_name].setdefault('columns', {})
         self.data['tables'][table_name]['columns'][column_name] = {
             'value_type': value_type,
             'read_groups': read_groups,
