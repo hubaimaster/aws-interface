@@ -60,9 +60,8 @@ def handler(event, context):
     }
     parmas = get_params(event)
     cloud_api_name = parmas.get('cloud_api_name', None)
-    with open('recipe.json', 'r') as file:
-        recipe = file.read()
-        recipe = json.loads(recipe)
+    with open('recipe.json', 'r') as f:
+        recipe = json.load(f)
 
     cloud_apis = recipe.get('cloud_apis', {})
     cloud_api = cloud_apis.get(cloud_api_name, {})
