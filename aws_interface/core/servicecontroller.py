@@ -77,7 +77,7 @@ class AuthServiceController(ServiceController):
         role_name = 'auth-' + self.app_id
         lambda_client = Lambda(self.boto3_session)
         iam = IAM(self.boto3_session)
-        role_arn = iam.create_role_and__attach_policies(role_name)
+        role_arn = iam.create_role_and_attach_policies(role_name)
 
         cloud_apis = recipe_controller.get_cloud_apis()
         for cloud_api in cloud_apis:
