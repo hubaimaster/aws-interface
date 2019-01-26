@@ -155,29 +155,33 @@ class Lambda:
         )
         return response
 
+    def update_function_code(self, name, zip_file):
+        response = self.client.update_function_code(
+            FunctionName=name,
+            ZipFile=zip_file,
+            Publish=True
+        )
+        return response
+
 
 class IAM:
     def __init__(self, boto3_session):
         self.client = boto3_session.client('iam')
+        self.resource = boto3_session.resource('iam')
 
     def create_role_and_attach_policies(self, role_name):
         policy_arns = [
             'arn:aws:iam::aws:policy/AWSLambdaExecute',
             'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
-            'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+            'arn:aws:iam::aws:policy/AWSXrayFullAccess',
         ]
-        try:
-            self.create_role(role_name)
-        except:
-            print('Already have a role', role_name)
-        try:
-            self.attach_policies(role_name, policy_arns)
-        except:
-            print('Fail to attach policies')
+        self.create_role(role_name)
+        self.attach_policies(role_name, policy_arns)
         return self.get_role_arn(role_name)
 
     def get_role_arn(self, role_name):
-        role = self.client.Role(role_name)
+        role = self.resource.Role(role_name)
         role_arn = role.arn
         return role_arn
 
@@ -195,11 +199,15 @@ class IAM:
             ]
         }
         assume_role_policy_document = json.dumps(assume_role_policy_document)
-        response = self.client.create_role(
-            Path='/',
-            RoleName=role_name,
-            AssumeRolePolicyDocument=assume_role_policy_document,
-        )
+        try:
+            response = self.client.create_role(
+                Path='/',
+                RoleName=role_name,
+                AssumeRolePolicyDocument=assume_role_policy_document,
+            )
+        except:
+            print('Already have a role', role_name)
+            return None
         return response
 
     def attach_policies(self, role_name, policy_arns):
@@ -207,10 +215,14 @@ class IAM:
             self.attach_policy(role_name, policy_arn)
 
     def attach_policy(self, role_name, policy_arn):
-        response = self.client.attach_role_policy(
-            RoleName=role_name,
-            PolicyArn=policy_arn
-        )
+        try:
+            response = self.client.attach_role_policy(
+                RoleName=role_name,
+                PolicyArn=policy_arn
+            )
+        except:
+            print('Fail to attach policy')
+            return None
         return response
 
 

@@ -1,5 +1,7 @@
 from core.util import *
 from cloud.aws import *
+import importlib
+import os
 
 
 class ServiceController:
@@ -74,28 +76,31 @@ class AuthServiceController(ServiceController):
         return
 
     def apply(self, recipe_controller):
-        self._apply_user_group(recipe_controller)
         self._apply_cloud_api(recipe_controller)
         return
 
     def _apply_cloud_api(self, recipe_controller):
-        role_name = 'auth-' + self.app_id
+        role_name = 'auth-{}'.format(self.app_id)
         lambda_client = Lambda(self.boto3_session)
         iam = IAM(self.boto3_session)
         role_arn = iam.create_role_and_attach_policies(role_name)
 
-        cloud_apis = recipe_controller.get_cloud_apis()
-        print('cloud_apis:', cloud_apis)
-        for cloud_api in cloud_apis:
-            name = cloud_api['name']
-            desc = cloud_api['description']
-            runtime = 'python3.6'
-            handler = 'cloud.lambda_function.handler'
-            zip_file = '#TODO'
-            try:
-                lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
-            except:
-                print('Function already exists')
+        name = 'auth-{}'.format(self.app_id)
+        desc = 'aws-interface cloud api'
+        runtime = 'python3.6'
+        handler = 'cloud.lambda_function.handler'
+
+        module_name = 'cloud'
+        module = importlib.import_module(module_name)
+        module_path = os.path.dirname(module.__file__)
+        zip_file = create_zipfile_bin(module_path)
+
+        try:
+            lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
+        except:
+            print('Function might already exist, Try updating function code.')
+            lambda_client.update_function_code(name, zip_file)
+
 
     def generate_sdk(self, recipe_controller):
         return

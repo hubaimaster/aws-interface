@@ -28,44 +28,24 @@ def get_current_month_date():
     return datem
 
 
-def create_zipfile_bin(dir_name):
-    output_filename = uuid.uuid4()
-    shutil.make_archive(output_filename, 'zip', dir_name)
-    zip_file = open(output_filename, 'rb')
+def create_zipfile_bin(dir_name, root_name='cloud'):
+    output_filename = str(uuid.uuid4())
+    tmp_dir = str(uuid.uuid4())
+    if os.path.isdir(tmp_dir):
+        os.remove(tmp_dir)
+    os.mkdir(tmp_dir)
+    shutil.copytree(dir_name, '{}/{}'.format(tmp_dir, root_name))
+    shutil.make_archive(output_filename, 'zip', tmp_dir)
+    zip_file_name = '{}.zip'.format(output_filename)
+    zip_file = open(zip_file_name, 'rb')
     zip_file_bin = zip_file.read()
     zip_file.close()
-    os.remove(zip_file)
+    os.remove(zip_file_name)
+    shutil.rmtree(tmp_dir)
     return zip_file_bin
 
 
 def get_aws_iam_role_arn(iam_client):
     return iam_client.CurrentUser().arn
-
-
-def create_aws_lambda_function(lambda_client, cloud_api):
-    name = cloud_api['name']
-    description = cloud_api['description']
-    handler = cloud_api['handler']
-    package = cloud_api['package']
-    package_path = importlib.import_module(package).__path__
-    zip_file_bin = create_zipfile_bin(package_path)
-    role_arn = ''
-    response = lambda_client.create_function(
-        FunctionName=name,
-        Runtime='python3.6',
-        Role=role_arn,  # TODO
-        Handler=handler,
-        Code={
-            'ZipFile': zip_file_bin,
-        },
-        Description=description,
-        Timeout=32,
-        MemorySize=128,
-        Publish=True,
-        TracingConfig={
-            'Mode': 'Active'
-        }
-    )
-    return response
 
 

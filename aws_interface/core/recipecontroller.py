@@ -61,7 +61,11 @@ class AuthRecipeController(RecipeController):
         self.put_cloud_api('login', '(email:str,password:str)->token:str', 'cloud.auth.login')
         self.put_cloud_api('logout', '(token:str)->success:bool', 'cloud.auth.logout')
         self.put_cloud_api('register', '(email:str,password:str,extra:dict)->success:bool', 'cloud.auth.register')
-        self.put_cloud_api('me', '(token:str)->success:bool', 'cloud.auth.me')
+        self.put_cloud_api('get_user', '(token:str)->success:bool', 'cloud.auth.get_user')
+        self.put_cloud_api('get_user_count', '()->success:bool', 'cloud.auth.get_user_count')
+        self.put_cloud_api('set_user', '(user_id:str,email:str,password:str,extra:dict)->success:bool',
+                           'cloud.auth.set_user')
+        self.put_cloud_api('delete_user', '(user_id:str)->success:bool', 'cloud.auth.delete_user')
 
     def put_user_group(self, name, description):
         if 'user_groups' not in self.data:

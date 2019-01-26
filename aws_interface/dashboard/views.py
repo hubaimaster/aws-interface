@@ -219,12 +219,12 @@ class Auth(View):
         context['app_id'] = app_id
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
         cmd = request.POST['cmd']
-        if cmd == 'delete':
+        if cmd == 'delete_group':
             name = request.POST['group_name']
             succeed = api.delete_user_group(name)
             if not succeed:
                 Util.add_alert(request, '시스템 그룹은 삭제할 수 없습니다.')
-        elif cmd == 'put':
+        elif cmd == 'put_group':
             name = request.POST['group_name']
             description = request.POST['group_description']
             api.put_user_group(name, description)
