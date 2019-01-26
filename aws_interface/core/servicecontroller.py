@@ -2,6 +2,7 @@ from core.util import *
 from cloud.aws import *
 import importlib
 import shutil
+import json
 import boto3
 import uuid
 import os
@@ -18,7 +19,7 @@ def get_boto3_session(bundle):
     return session
 
 
-def create_lambda_zipfile_bin(recipe_controller, dir_name, root_name='cloud'):
+def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     output_filename = str(uuid.uuid4())
     # Make tmp_dir
     tmp_dir = str(uuid.uuid4())
@@ -30,9 +31,12 @@ def create_lambda_zipfile_bin(recipe_controller, dir_name, root_name='cloud'):
     shutil.copytree(dir_name, '{}/{}'.format(tmp_dir, root_name))
 
     # Copy recipe from recipe_controller
-    recipe = recipe_controller.to_json()
     with open('{}/{}/{}'.format(tmp_dir, root_name, 'recipe.json'), 'w+') as file:
         file.write(recipe)
+
+    # Write txt file included app_id
+    with open('{}/{}/{}'.format(tmp_dir, root_name, 'app_id.txt'), 'w+') as file:
+        file.write(app_id)
 
     # Archive all files
     shutil.make_archive(output_filename, 'zip', tmp_dir)
@@ -40,9 +44,22 @@ def create_lambda_zipfile_bin(recipe_controller, dir_name, root_name='cloud'):
     zip_file = open(zip_file_name, 'rb')
     zip_file_bin = zip_file.read()
     zip_file.close()
+
+    # Remove temp files
     os.remove(zip_file_name)
     shutil.rmtree(tmp_dir)
     return zip_file_bin
+
+
+def make_data(app_id, parmas, recipe_json, admin=False):
+    recipe = json.loads(recipe_json)
+    data = {
+        'params': parmas,
+        'recipe': recipe,
+        'app_id': app_id,
+        'admin': admin,
+    }
+    return data
 
 
 class ServiceController:
@@ -107,12 +124,12 @@ class AuthServiceController(ServiceController):
     def _init_table(self):
         dynamodb = DynamoDB(self.boto3_session)
         table_name = 'auth-' + self.app_id
-        dynamodb.create_table(table_name)
+        dynamodb.init_table(table_name)
         dynamodb.update_table(table_name, indexes=[{
             'hash_key': 'partition',
             'hash_key_type': 'S',
-            'sort_key': 'creationDate',
-            'sort_key_type': 'N'
+            'sort_key': 'email',
+            'sort_key_type': 'S',
         }])
         return
 
@@ -134,7 +151,9 @@ class AuthServiceController(ServiceController):
         module_name = 'cloud'
         module = importlib.import_module(module_name)
         module_path = os.path.dirname(module.__file__)
-        zip_file = create_lambda_zipfile_bin(recipe_controller, module_path)
+
+        recipe = recipe_controller.to_json()
+        zip_file = create_lambda_zipfile_bin(self.app_id, recipe, module_path)
 
         try:
             lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
@@ -153,10 +172,7 @@ class AuthServiceController(ServiceController):
             'password': password,
             'extra': extra,
         }
-        data = {
-            'params': parmas,
-            'recipe': recipe,
-        }
+        data = make_data(self.app_id, parmas, recipe)
         return register.do(data)
 
     def set_user(self, recipe, user_id, email, password, extra):
@@ -167,10 +183,7 @@ class AuthServiceController(ServiceController):
             'password': password,
             'extra': extra,
         }
-        data = {
-            'params': parmas,
-            'recipe': recipe,
-        }
+        data = make_data(self.app_id, parmas, recipe)
         return set_user.do(data)
 
     def delete_user(self, recipe, user_id):
@@ -178,11 +191,7 @@ class AuthServiceController(ServiceController):
         parmas = {
             'user_id': user_id,
         }
-        data = {
-            'params': parmas,
-            'recipe': recipe,
-            'admin': True
-        }
+        data = make_data(self.app_id, parmas, recipe, admin=True)
         return delete_user.do(data)
 
     def get_user(self, recipe, user_id):
@@ -190,19 +199,13 @@ class AuthServiceController(ServiceController):
         parmas = {
             'user_id': user_id,
         }
-        data = {
-            'params': parmas,
-            'recipe': recipe,
-            'admin': True
-        }
+        data = make_data(self.app_id, parmas, recipe, admin=True)
         return get_user.do(data)
 
     def get_user_count(self, recipe):
         import cloud.auth.get_user_count as get_user_count
-        parmas = {}
-        data = {
-            'params': parmas,
-            'recipe': recipe,
-            'admin': True
+        parmas = {
+
         }
+        data = make_data(self.app_id, parmas, recipe, admin=True)
         return get_user_count(data)

@@ -12,6 +12,15 @@ class Salt:
         return os.urandom(size).hex()
 
 
+class Hash:
+    @classmethod
+    def sha3_512(cls, plain):
+        plain = plain.encode()
+        hash = hashlib.sha3_512(plain)
+        hash = str(hash.hexdigest())
+        return hash
+
+
 class AESCipher:
     def __init__(self, key):
         self.key = hashlib.sha256(key.encode()).digest()
@@ -33,15 +42,6 @@ class AESCipher:
         dec = base64.b64decode(dec)
         dec = dec.decode()
         return dec
-
-
-class Hash:
-    @classmethod
-    def sha3_512(cls, plain):
-        plain = plain.encode()
-        hash = hashlib.sha3_512(plain)
-        hash = str(hash.hexdigest())
-        return hash
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 from cloud.aws import *
-from cloud.crypto import *
 import boto3
+import uuid
 
 
 def do(data):
@@ -13,20 +13,14 @@ def do(data):
     password = params['password']
     extra = params.get('extra', {})
 
-    salt = Salt.get_salt(32)
-    password_hash = hash_password(password, salt)
-
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)  # Should be auth-143..
-    partition = 'user'
-
     dynamo = DynamoDB(boto3)
 
-
+    item_id = str(uuid.uuid4())
     item = {
         'email': email,
-        'passwordHash': password_hash,
-        'salt': salt,
+        'password': password,
         'extra': extra,
     }
-    dynamo.put_item(table_name, partition, item)
+    dynamo.put_item(table_name, item_id, item)
     return response

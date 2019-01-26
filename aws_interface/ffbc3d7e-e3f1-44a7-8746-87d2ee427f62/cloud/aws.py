@@ -1,6 +1,5 @@
 import json
-import uuid
-import time
+
 
 class APIGateway:
     def __init__(self, boto3_session):
@@ -29,15 +28,6 @@ class DynamoDB:
     def __init__(self, boto3_session):
         self.client = boto3_session.client('dynamodb')
         self.resource = boto3_session.resource('dynamodb')
-
-    def init_table(self, table_name):
-        self.create_table(table_name)
-        self.update_table(table_name, indexes=[{
-            'hash_key': 'partition',
-            'hash_key_type': 'S',
-            'sort_key': 'creationDate',
-            'sort_key_type': 'N'
-        }])
 
     def create_table(self, table_name):
         try:
@@ -74,26 +64,21 @@ class DynamoDB:
         for index in indexes:
             hash_key = index['hash_key']
             hash_key_type = index['hash_key_type']
-            sort_key = index.get('sort_key', None)
-            sort_key_type = index.get('sort_key_type', None)
-            key_schema = [
-                {
-                    'AttributeName': hash_key,
-                    'KeyType': 'HASH'
-                }
-            ]
-            if sort_key:
-                index_name = hash_key + '-' + sort_key
-                key_schema.append({
-                    'AttributeName': sort_key,
-                    'KeyType': 'RANGE'
-                })
-            else:
-                index_name = hash_key
+            sort_key = index['sort_key']
+            sort_key_type = index['sort_key_type']
+            index_name = hash_key + '-' + sort_key
             index_create = {
                     'Create': {
                         'IndexName': index_name,
-                        'KeySchema': key_schema,
+                        'KeySchema': [
+                            {
+                                'AttributeName': hash_key,
+                                'KeyType': 'HASH'
+                            }, {
+                                'AttributeName': sort_key,
+                                'KeyType': 'RANGE'
+                            }
+                        ],
                         'Projection': {
                             'ProjectionType': 'ALL'
                         },
@@ -107,14 +92,13 @@ class DynamoDB:
                 'AttributeName': hash_key,
                 'AttributeType': hash_key_type
             }
+            sort_key_update = {
+                'AttributeName': sort_key,
+                'AttributeType': sort_key_type
+            }
             index_updates.append(index_create)
             attr_updates.append(hash_key_update)
-            if sort_key:
-                sort_key_update = {
-                    'AttributeName': sort_key,
-                    'AttributeType': sort_key_type
-                }
-                attr_updates.append(sort_key_update)
+            attr_updates.append(sort_key_update)
         try:
             response = self.client.update_table(
                 AttributeDefinitions=attr_updates,
@@ -125,11 +109,9 @@ class DynamoDB:
             return None
         return response
 
-    def put_item(self, table_name, partition, item, item_id=str(uuid.uuid4()), creation_date=int(time.time())):
+    def put_item(self, table_name, item_id, item):
         table = self.resource.Table(table_name)
         item['id'] = item_id
-        item['creationDate'] = creation_date
-        item['partition'] = partition
         response = table.put_item(
             TableName=table_name,
             Item=item,
@@ -147,136 +129,8 @@ class DynamoDB:
         )
         return response
 
-    def get_item(self, table_name, item_id):
-        table = self.resource.Table(table_name)
-        item = table.get_item(Key={
-            'id': item_id
-        })
-        return item
 
-    def query(self, table_name, index_name, partition):  #TODO
-        response = self.client.query(
-            TableName=table_name,
-            IndexName=index_name,
-            Select='ALL_ATTRIBUTES',
-            Limit=200,
-            ConsistentRead=False,
-            KeyConditions={
-                'string': {
-                    'AttributeValueList': [
-                        {
-                            'S': 'string',
-                            'N': 'string',
-                            'B': b'bytes',
-                            'SS': [
-                                'string',
-                            ],
-                            'NS': [
-                                'string',
-                            ],
-                            'BS': [
-                                b'bytes',
-                            ],
-                            'M': {
-                                'string': {'... recursive ...'}
-                            },
-                            'L': [
-                                {'... recursive ...'},
-                            ],
-                            'NULL': True | False,
-                            'BOOL': True | False
-                        },
-                    ],
-                    'ComparisonOperator': 'EQ' | 'NE' | 'IN' | 'LE' | 'LT' | 'GE' | 'GT' | 'BETWEEN' | 'NOT_NULL' | 'NULL' | 'CONTAINS' | 'NOT_CONTAINS' | 'BEGINS_WITH'
-                }
-            },
-            QueryFilter={
-                'string': {
-                    'AttributeValueList': [
-                        {
-                            'S': 'string',
-                            'N': 'string',
-                            'B': b'bytes',
-                            'SS': [
-                                'string',
-                            ],
-                            'NS': [
-                                'string',
-                            ],
-                            'BS': [
-                                b'bytes',
-                            ],
-                            'M': {
-                                'string': {'... recursive ...'}
-                            },
-                            'L': [
-                                {'... recursive ...'},
-                            ],
-                            'NULL': True | False,
-                            'BOOL': True | False
-                        },
-                    ],
-                    'ComparisonOperator': 'EQ' | 'NE' | 'IN' | 'LE' | 'LT' | 'GE' | 'GT' | 'BETWEEN' | 'NOT_NULL' | 'NULL' | 'CONTAINS' | 'NOT_CONTAINS' | 'BEGINS_WITH'
-                }
-            },
-            ConditionalOperator='AND' | 'OR',
-            ScanIndexForward=True | False,
-            ExclusiveStartKey={
-                'string': {
-                    'S': 'string',
-                    'N': 'string',
-                    'B': b'bytes',
-                    'SS': [
-                        'string',
-                    ],
-                    'NS': [
-                        'string',
-                    ],
-                    'BS': [
-                        b'bytes',
-                    ],
-                    'M': {
-                        'string': {'... recursive ...'}
-                    },
-                    'L': [
-                        {'... recursive ...'},
-                    ],
-                    'NULL': True | False,
-                    'BOOL': True | False
-                }
-            },
-            ReturnConsumedCapacity='INDEXES' | 'TOTAL' | 'NONE',
-            ProjectionExpression='string',
-            FilterExpression='string',
-            KeyConditionExpression='string',
-            ExpressionAttributeNames={
-                'string': 'string'
-            },
-            ExpressionAttributeValues={
-                'string': {
-                    'S': 'string',
-                    'N': 'string',
-                    'B': b'bytes',
-                    'SS': [
-                        'string',
-                    ],
-                    'NS': [
-                        'string',
-                    ],
-                    'BS': [
-                        b'bytes',
-                    ],
-                    'M': {
-                        'string': {'... recursive ...'}
-                    },
-                    'L': [
-                        {'... recursive ...'},
-                    ],
-                    'NULL': True | False,
-                    'BOOL': True | False
-                }
-            }
-        )
+
 
 
 class Lambda:
