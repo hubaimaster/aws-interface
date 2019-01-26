@@ -228,6 +228,11 @@ class Auth(View):
             name = request.POST['group_name']
             description = request.POST['group_description']
             api.put_user_group(name, description)
+        elif cmd == 'put_user':
+            email = request.POST['user_email']
+            password = request.POST['user_password']
+            print('api.create_user:', api.create_user(email, password, {}))
+
         api.apply()
         Util.save_recipe(api.get_recipe_controller(), app_id)
         return redirect(request.path_info)  # Redirect back
