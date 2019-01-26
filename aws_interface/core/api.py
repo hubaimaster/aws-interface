@@ -72,22 +72,22 @@ class AuthAPI(API):
 
     # Service
     def create_user(self, email, password, extra):
-        raise NotImplementedError()
+        return self.service_controller.create_user(self.recipe_controller.to_json(), email, password, extra)
 
-    def put_user(self, user_id, email, password, extra):
-        raise NotImplementedError()
+    def set_user(self, user_id, email, password, extra):
+        return self.service_controller.set_user(self.recipe_controller.to_json(), user_id, email, password, extra)
 
     def delete_user(self, user_id):
-        raise NotImplementedError()
+        return self.service_controller.delete_user(self.recipe_controller.to_json(), user_id)
 
     def get_user(self, user_id):
-        raise NotImplementedError()
+        return self.service_controller.get_user(self.recipe_controller.to_json(), user_id)
 
     def search_users(self, query):  # query ex : 'kim' in col('name') and 21 is col('age')
         raise NotImplementedError()
 
     def get_user_count(self):
-        raise NotImplementedError()
+        return self.service_controller.get_user_count(self.recipe_controller.to_json())
 
 
 class DatabaseAPI(API):

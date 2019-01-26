@@ -71,7 +71,7 @@ def handler(event, context):
     module = importlib.import_module(module_name)
     data = {
         'params': parmas,
-        'context': context
+        'recipe': recipe,
     }
     body = module.do(data)
 

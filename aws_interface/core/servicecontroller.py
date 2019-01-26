@@ -65,7 +65,12 @@ class AuthServiceController(ServiceController):
         dynamodb = DynamoDB(self.boto3_session)
         table_name = 'auth-' + self.app_id
         dynamodb.create_table(table_name)
-        #dynamodb.update_table(table_name, )
+        dynamodb.update_table(table_name, indexes=[{
+            'hash_key': 'partition',
+            'hash_key_type': 'S',
+            'sort_key': 'creationDate',
+            'sort_key_type': 'N'
+        }])
         return
 
     def apply(self, recipe_controller):
@@ -80,15 +85,78 @@ class AuthServiceController(ServiceController):
         role_arn = iam.create_role_and_attach_policies(role_name)
 
         cloud_apis = recipe_controller.get_cloud_apis()
+        print('cloud_apis:', cloud_apis)
         for cloud_api in cloud_apis:
             name = cloud_api['name']
             desc = cloud_api['description']
             runtime = 'python3.6'
             handler = 'cloud.lambda_function.handler'
+            zip_file = '#TODO'
             try:
-                lambda_client.create_function(name, desc, runtime, role_arn, handler)
+                lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
             except:
                 print('Function already exists')
 
     def generate_sdk(self, recipe_controller):
         return
+
+    def create_user(self, recipe, email, password, extra):
+        import cloud.auth.register as register
+        parmas = {
+            'email': email,
+            'password': password,
+            'extra': extra,
+        }
+        data = {
+            'params': parmas,
+            'recipe': recipe,
+        }
+        return register.do(data)
+
+    def set_user(self, recipe, user_id, email, password, extra):
+        import cloud.auth.set_user as set_user
+        parmas = {
+            'user_id': user_id,
+            'email': email,
+            'password': password,
+            'extra': extra,
+        }
+        data = {
+            'params': parmas,
+            'recipe': recipe,
+        }
+        return set_user.do(data)
+
+    def delete_user(self, recipe, user_id):
+        import cloud.auth.delete_user as delete_user
+        parmas = {
+            'user_id': user_id,
+        }
+        data = {
+            'params': parmas,
+            'recipe': recipe,
+            'admin': True
+        }
+        return delete_user.do(data)
+
+    def get_user(self, recipe, user_id):
+        import cloud.auth.get_user as get_user
+        parmas = {
+            'user_id': user_id,
+        }
+        data = {
+            'params': parmas,
+            'recipe': recipe,
+            'admin': True
+        }
+        return get_user.do(data)
+
+    def get_user_count(self, recipe):
+        import cloud.auth.get_user_count as get_user_count
+        parmas = {}
+        data = {
+            'params': parmas,
+            'recipe': recipe,
+            'admin': True
+        }
+        return get_user_count(data)

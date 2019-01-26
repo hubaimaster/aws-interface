@@ -99,13 +99,37 @@ class DynamoDB:
             index_updates.append(index_create)
             attr_updates.append(hash_key_update)
             attr_updates.append(sort_key_update)
+        try:
+            response = self.client.update_table(
+                AttributeDefinitions=attr_updates,
+                TableName=table_name,
+                GlobalSecondaryIndexUpdates=index_updates
+            )
+        except:
+            return None
+        return response
 
-        response = self.client.update_table(
-            AttributeDefinitions=attr_updates,
+    def put_item(self, table_name, item_id, item):
+        item['id'] = item_id
+        response = self.client.put_item(
             TableName=table_name,
-            GlobalSecondaryIndexUpdates=index_updates
+            Item=item,
         )
         return response
+
+    def delete_item(self, table_name, item_id):
+        response = self.client.delete_item(
+            TableName=table_name,
+            Key={
+                'id': {
+                    'S': item_id
+                }
+            }
+        )
+        return response
+
+
+
 
 
 class Lambda:
