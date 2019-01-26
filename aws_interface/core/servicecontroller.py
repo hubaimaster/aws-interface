@@ -1,7 +1,48 @@
 from core.util import *
 from cloud.aws import *
 import importlib
+import shutil
+import boto3
+import uuid
 import os
+
+
+def get_boto3_session(bundle):
+    access_key = bundle['access_key']
+    secret_key = bundle['secret_key']
+    session = boto3.Session(
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        #region_name='us-east-1',
+    )
+    return session
+
+
+def create_lambda_zipfile_bin(recipe_controller, dir_name, root_name='cloud'):
+    output_filename = str(uuid.uuid4())
+    # Make tmp_dir
+    tmp_dir = str(uuid.uuid4())
+    if os.path.isdir(tmp_dir):
+        os.remove(tmp_dir)
+    os.mkdir(tmp_dir)
+
+    # Copy temp dir into root_name folder
+    shutil.copytree(dir_name, '{}/{}'.format(tmp_dir, root_name))
+
+    # Copy recipe from recipe_controller
+    recipe = recipe_controller.to_json()
+    with open('{}/{}/{}'.format(tmp_dir, root_name, 'recipe.json'), 'w+') as file:
+        file.write(recipe)
+
+    # Archive all files
+    shutil.make_archive(output_filename, 'zip', tmp_dir)
+    zip_file_name = '{}.zip'.format(output_filename)
+    zip_file = open(zip_file_name, 'rb')
+    zip_file_bin = zip_file.read()
+    zip_file.close()
+    os.remove(zip_file_name)
+    shutil.rmtree(tmp_dir)
+    return zip_file_bin
 
 
 class ServiceController:
@@ -93,7 +134,7 @@ class AuthServiceController(ServiceController):
         module_name = 'cloud'
         module = importlib.import_module(module_name)
         module_path = os.path.dirname(module.__file__)
-        zip_file = create_zipfile_bin(module_path)
+        zip_file = create_lambda_zipfile_bin(recipe_controller, module_path)
 
         try:
             lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
