@@ -23,7 +23,7 @@
                   <div class="row">
                     <div class="col">
                       <h5 class="card-title text-uppercase text-muted mb-0">총 회원 수</h5>
-                      <span class="h2 font-weight-bold mb-0">350,897 명</span>
+                      <span class="h2 font-weight-bold mb-0">{{ user_count.value }} 명</span>
                     </div>
                     <div class="col-auto">
                       <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
@@ -223,7 +223,6 @@
                   <h3 class="mb-0">가입된 회원</h3>
                 </div>
 
-
                   <div class="col text-right">
                   <a data-toggle="modal" data-target="#modal-put-user" class="btn btn-sm btn-primary">
                       <span class="btn-inner--text" style="color: white;">회원 생성</span>
@@ -281,27 +280,28 @@
                     <th scope="col">id</th>
                     <th scope="col">createDate</th>
                     <th scope="col">email</th>
-                    <th scope="col">name</th>
                     <th scope="col">group</th>
+                    <th scope="col">extra</th>
                     <th scope="col"></th>
                   </tr>
                 </thead>
                 <tbody>
+                {% for user in users.items %}
                   <tr>
                     <th scope="row">
-                      dgsejs5621-2sdf3dsw3-sseds4-vghtt5
+                      {{ user.id }}
                     </th>
                     <td>
-                      2019-01-15 05:00:01
+                      {{ user.creationDate }}
                     </td>
                     <td>
-                      kchdully@naver.com
+                      {{ user.email }}
                     </td>
                     <td>
-                      김창환
+                      {{ user.group }}
                     </td>
-                    <td>
-                      user
+                      <td>
+                      {{ user.extra }}
                     </td>
                     <td>
                       <div class="col text-right">
@@ -309,28 +309,8 @@
                       </div>
                     </td>
                   </tr>
-                  <tr>
-                    <th scope="row">
-                      dgsejs5621-2sdf3dsw3-sseds4-vghtt5
-                    </th>
-                    <td>
-                      2019-01-15 05:00:01
-                    </td>
-                    <td>
-                      kchdully@naver.com
-                    </td>
-                    <td>
-                      김창환
-                    </td>
-                    <td>
-                      user
-                    </td>
-                    <td>
-                      <div class="col text-right">
-                        <a href="#!" class="btn btn-sm btn-danger">제거</a>
-                      </div>
-                    </td>
-                  </tr>
+                {% endfor %}
+
 
                 </tbody>
               </table>

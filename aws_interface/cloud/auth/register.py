@@ -25,6 +25,7 @@ def do(data):
         'email': email,
         'passwordHash': password_hash,
         'salt': salt,
+        'group': 'user',
         'extra': extra,
     }
     dynamo.put_item(table_name, partition, item)

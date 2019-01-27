@@ -51,7 +51,7 @@ def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     return zip_file_bin
 
 
-def make_data(app_id, parmas, recipe_json, admin=False):
+def make_data(app_id, parmas, recipe_json, admin=True):
     recipe = json.loads(recipe_json)
     data = {
         'params': parmas,
@@ -191,7 +191,7 @@ class AuthServiceController(ServiceController):
         parmas = {
             'user_id': user_id,
         }
-        data = make_data(self.app_id, parmas, recipe, admin=True)
+        data = make_data(self.app_id, parmas, recipe)
         return delete_user.do(data)
 
     def get_user(self, recipe, user_id):
@@ -199,7 +199,7 @@ class AuthServiceController(ServiceController):
         parmas = {
             'user_id': user_id,
         }
-        data = make_data(self.app_id, parmas, recipe, admin=True)
+        data = make_data(self.app_id, parmas, recipe)
         return get_user.do(data)
 
     def get_user_count(self, recipe):
@@ -207,5 +207,12 @@ class AuthServiceController(ServiceController):
         parmas = {
 
         }
-        data = make_data(self.app_id, parmas, recipe, admin=True)
-        return get_user_count(data)
+        data = make_data(self.app_id, parmas, recipe)
+        return get_user_count.do(data)
+
+    def get_users(self, recipe, start_key, limit):
+        import cloud.auth.get_users as get_users
+        params = {'start_key': start_key,
+                  'limit': limit}
+        data = make_data(self.app_id, params, recipe)
+        return get_users.do(data)

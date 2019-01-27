@@ -212,6 +212,8 @@ class Auth(View):
         context['app_id'] = app_id
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
         context['user_groups'] = api.get_user_groups()
+        context['user_count'] = api.get_user_count()
+        context['users'] = api.get_users()
         return render(request, 'dashboard/app/auth.html', context=context)
 
     def post(self, request, app_id):

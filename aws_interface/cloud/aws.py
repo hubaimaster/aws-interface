@@ -149,18 +149,31 @@ class DynamoDB:
         return item
 
     def get_items(self, table_name, partition, exclusive_start_key=None, limit=100):
+
         index_name = 'partition-creationDate'
         table = self.resource.Table(table_name)
-        response = table.query(
-            IndexName=index_name,
-            Limit=limit,
-            ConsistentRead=False,
-            ExclusiveStartKey=exclusive_start_key,
-            KeyConditionExpression=Key('partition').eq(partition)
-        )
+        if exclusive_start_key:
+            response = table.query(
+                IndexName=index_name,
+                Limit=limit,
+                ConsistentRead=False,
+                ExclusiveStartKey=exclusive_start_key,
+                KeyConditionExpression=Key('partition').eq(partition)
+            )
+        else:
+            response = table.query(
+                IndexName=index_name,
+                Limit=limit,
+                ConsistentRead=False,
+                KeyConditionExpression=Key('partition').eq(partition),
+            )
         return response
 
-    def put_item(self, table_name, partition, item, item_id=str(uuid.uuid4()), creation_date=int(time.time())):
+    def put_item(self, table_name, partition, item, item_id=None, creation_date=None):
+        if not item_id:
+            item_id = str(uuid.uuid4())
+        if not creation_date:
+            creation_date = int(time.time())
         table = self.resource.Table(table_name)
         item['id'] = item_id
         item['creationDate'] = creation_date
@@ -183,7 +196,7 @@ class DynamoDB:
             },
             ExpressionAttributeValues={
                 ':v': {
-                    'N': value_to_add,
+                    'N': str(value_to_add),
                 }
             },
             Key={

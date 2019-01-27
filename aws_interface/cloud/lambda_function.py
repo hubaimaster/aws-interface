@@ -71,8 +71,11 @@ def handler(event, context):
     cloud_apis = recipe.get('cloud_apis', {})
     cloud_api = cloud_apis.get(cloud_api_name, {})
     module_name = cloud_api.get('module', None)
+    permission = cloud_api.get('permission', None)
 
     module = importlib.import_module(module_name)
+
+    # TODO get session data and prevent out permission access
     data = {
         'params': parmas,
         'recipe': recipe,

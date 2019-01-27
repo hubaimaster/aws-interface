@@ -83,8 +83,8 @@ class AuthAPI(API):
     def get_user(self, user_id):
         return self.service_controller.get_user(self.recipe_controller.to_json(), user_id)
 
-    def search_users(self, query):  # query ex : 'kim' in col('name') and 21 is col('age')
-        raise NotImplementedError()
+    def get_users(self, start_key=None, limit=100):  # query ex : 'kim' in col('name') and 21 is col('age')
+        return self.service_controller.get_users(self.recipe_controller.to_json(), start_key, limit)
 
     def get_user_count(self):
         return self.service_controller.get_user_count(self.recipe_controller.to_json())
