@@ -136,6 +136,9 @@ class DynamoDB:
                 }
             }
         )
+        partition = response.get('Attributes', {}).get('partition', {}).get('S', None)
+        if partition:
+            self._add_item_count(table_name, '{}-count'.format(partition), value_to_add=-1)
         return response
 
     def get_item(self, table_name, item_id):
@@ -166,13 +169,14 @@ class DynamoDB:
             TableName=table_name,
             Item=item,
         )
+        self._add_item_count(table_name, '{}-count'.format(partition))
         return response
 
-    def put_count(self, table_name, count_name, value):
-        response = self.put_item(table_name, 'meta_info', {'count': value}, item_id=count_name)
+    def _put_item_count(self, table_name, count_id, value):
+        response = self.put_item(table_name, 'meta_info', {'count': value}, item_id=count_id)
         return response
 
-    def add_count(self, table_name, count_name, value_to_add=1):
+    def _add_item_count(self, table_name, count_id, value_to_add=1):
         response = self.client.update_item(
             ExpressionAttributeNames={
                 '#A': 'count',
@@ -184,7 +188,7 @@ class DynamoDB:
             },
             Key={
                 'id': {
-                    'S': count_name,
+                    'S': count_id,
                 }
             },
             ReturnValues='ALL_NEW',
@@ -193,10 +197,10 @@ class DynamoDB:
         )
         return response
 
-    def get_count(self, table_name, count_name):
-        response = self.get_item(table_name, count_name)
+    def get_item_count(self, table_name, count_id):
+        response = self.get_item(table_name, count_id)
         return response
-    
+
 
 class Lambda:
     def __init__(self, boto3_session):

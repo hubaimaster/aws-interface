@@ -77,6 +77,7 @@ def handler(event, context):
         'params': parmas,
         'recipe': recipe,
         'app_id': app_id,
+        'admin': False,
     }
     body = module.do(data)
 
