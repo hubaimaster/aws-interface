@@ -127,17 +127,6 @@ class DynamoDB:
             return None
         return response
 
-    def put_item(self, table_name, partition, item, item_id=str(uuid.uuid4()), creation_date=int(time.time())):
-        table = self.resource.Table(table_name)
-        item['id'] = item_id
-        item['creationDate'] = creation_date
-        item['partition'] = partition
-        response = table.put_item(
-            TableName=table_name,
-            Item=item,
-        )
-        return response
-
     def delete_item(self, table_name, item_id):
         response = self.client.delete_item(
             TableName=table_name,
@@ -168,6 +157,46 @@ class DynamoDB:
         )
         return response
 
+    def put_item(self, table_name, partition, item, item_id=str(uuid.uuid4()), creation_date=int(time.time())):
+        table = self.resource.Table(table_name)
+        item['id'] = item_id
+        item['creationDate'] = creation_date
+        item['partition'] = partition
+        response = table.put_item(
+            TableName=table_name,
+            Item=item,
+        )
+        return response
+
+    def put_count(self, table_name, count_name, value):
+        response = self.put_item(table_name, 'meta_info', {'count': value}, item_id=count_name)
+        return response
+
+    def add_count(self, table_name, count_name, value_to_add=1):
+        response = self.client.update_item(
+            ExpressionAttributeNames={
+                '#A': 'count',
+            },
+            ExpressionAttributeValues={
+                ':v': {
+                    'N': value_to_add,
+                }
+            },
+            Key={
+                'id': {
+                    'S': count_name,
+                }
+            },
+            ReturnValues='ALL_NEW',
+            TableName=table_name,
+            UpdateExpression='ADD #A :v',
+        )
+        return response
+
+    def get_count(self, table_name, count_name):
+        response = self.get_item(table_name, count_name)
+        return response
+    
 
 class Lambda:
     def __init__(self, boto3_session):

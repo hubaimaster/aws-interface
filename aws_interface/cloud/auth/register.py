@@ -21,7 +21,6 @@ def do(data):
 
     dynamo = DynamoDB(boto3)
 
-
     item = {
         'email': email,
         'passwordHash': password_hash,
