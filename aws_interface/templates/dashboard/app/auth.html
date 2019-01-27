@@ -304,13 +304,14 @@
                       {{ user.extra }}
                     </td>
                     <td>
-                      <div class="col text-right">
-                        <a href="#!" class="btn btn-sm btn-danger">제거</a>
-                      </div>
+                        <form role="form" method="post">{% csrf_token %}
+                              <input name="cmd" value="delete_user" hidden>
+                              <input name="user_id" value="{{ user.id }}" hidden>
+                            <button type="submit" class="btn btn-sm btn-danger">제거</button>
+                          </form>
                     </td>
                   </tr>
                 {% endfor %}
-
 
                 </tbody>
               </table>

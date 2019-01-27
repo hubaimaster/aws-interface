@@ -127,7 +127,7 @@ class DynamoDB:
             return None
         return response
 
-    def delete_item(self, table_name, item_id):
+    def delete_item(self, table_name, partition, item_id):
         response = self.client.delete_item(
             TableName=table_name,
             Key={
@@ -136,9 +136,7 @@ class DynamoDB:
                 }
             }
         )
-        partition = response.get('Attributes', {}).get('partition', {}).get('S', None)
-        if partition:
-            self._add_item_count(table_name, '{}-count'.format(partition), value_to_add=-1)
+        self._add_item_count(table_name, '{}-count'.format(partition), value_to_add=-1)
         return response
 
     def get_item(self, table_name, item_id):

@@ -221,21 +221,29 @@ class Auth(View):
         context['app_id'] = app_id
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
         cmd = request.POST['cmd']
+
+        # Recipe
         if cmd == 'delete_group':
             name = request.POST['group_name']
             succeed = api.delete_user_group(name)
             if not succeed:
                 Util.add_alert(request, '시스템 그룹은 삭제할 수 없습니다.')
+            api.apply()
         elif cmd == 'put_group':
             name = request.POST['group_name']
             description = request.POST['group_description']
             api.put_user_group(name, description)
+            api.apply()
+
+        # Service
         elif cmd == 'put_user':
             email = request.POST['user_email']
             password = request.POST['user_password']
-            print('api.create_user:', api.create_user(email, password, {}))
+            api.create_user(email, password, {})
+        elif cmd == 'delete_user':
+            user_id = request.POST['user_id']
+            api.delete_user(user_id)
 
-        api.apply()
         Util.save_recipe(api.get_recipe_controller(), app_id)
         return redirect(request.path_info)  # Redirect back
 
