@@ -1,6 +1,8 @@
 import json
 import uuid
 import time
+from boto3.dynamodb.conditions import Key
+
 
 class APIGateway:
     def __init__(self, boto3_session):
@@ -154,129 +156,17 @@ class DynamoDB:
         })
         return item
 
-    def query(self, table_name, index_name, partition):  #TODO
-        response = self.client.query(
-            TableName=table_name,
+    def get_items(self, table_name, partition, exclusive_start_key=None, limit=100):
+        index_name = 'partition-creationDate'
+        table = self.resource.Table(table_name)
+        response = table.query(
             IndexName=index_name,
-            Select='ALL_ATTRIBUTES',
-            Limit=200,
+            Limit=limit,
             ConsistentRead=False,
-            KeyConditions={
-                'string': {
-                    'AttributeValueList': [
-                        {
-                            'S': 'string',
-                            'N': 'string',
-                            'B': b'bytes',
-                            'SS': [
-                                'string',
-                            ],
-                            'NS': [
-                                'string',
-                            ],
-                            'BS': [
-                                b'bytes',
-                            ],
-                            'M': {
-                                'string': {'... recursive ...'}
-                            },
-                            'L': [
-                                {'... recursive ...'},
-                            ],
-                            'NULL': True | False,
-                            'BOOL': True | False
-                        },
-                    ],
-                    'ComparisonOperator': 'EQ' | 'NE' | 'IN' | 'LE' | 'LT' | 'GE' | 'GT' | 'BETWEEN' | 'NOT_NULL' | 'NULL' | 'CONTAINS' | 'NOT_CONTAINS' | 'BEGINS_WITH'
-                }
-            },
-            QueryFilter={
-                'string': {
-                    'AttributeValueList': [
-                        {
-                            'S': 'string',
-                            'N': 'string',
-                            'B': b'bytes',
-                            'SS': [
-                                'string',
-                            ],
-                            'NS': [
-                                'string',
-                            ],
-                            'BS': [
-                                b'bytes',
-                            ],
-                            'M': {
-                                'string': {'... recursive ...'}
-                            },
-                            'L': [
-                                {'... recursive ...'},
-                            ],
-                            'NULL': True | False,
-                            'BOOL': True | False
-                        },
-                    ],
-                    'ComparisonOperator': 'EQ' | 'NE' | 'IN' | 'LE' | 'LT' | 'GE' | 'GT' | 'BETWEEN' | 'NOT_NULL' | 'NULL' | 'CONTAINS' | 'NOT_CONTAINS' | 'BEGINS_WITH'
-                }
-            },
-            ConditionalOperator='AND' | 'OR',
-            ScanIndexForward=True | False,
-            ExclusiveStartKey={
-                'string': {
-                    'S': 'string',
-                    'N': 'string',
-                    'B': b'bytes',
-                    'SS': [
-                        'string',
-                    ],
-                    'NS': [
-                        'string',
-                    ],
-                    'BS': [
-                        b'bytes',
-                    ],
-                    'M': {
-                        'string': {'... recursive ...'}
-                    },
-                    'L': [
-                        {'... recursive ...'},
-                    ],
-                    'NULL': True | False,
-                    'BOOL': True | False
-                }
-            },
-            ReturnConsumedCapacity='INDEXES' | 'TOTAL' | 'NONE',
-            ProjectionExpression='string',
-            FilterExpression='string',
-            KeyConditionExpression='string',
-            ExpressionAttributeNames={
-                'string': 'string'
-            },
-            ExpressionAttributeValues={
-                'string': {
-                    'S': 'string',
-                    'N': 'string',
-                    'B': b'bytes',
-                    'SS': [
-                        'string',
-                    ],
-                    'NS': [
-                        'string',
-                    ],
-                    'BS': [
-                        b'bytes',
-                    ],
-                    'M': {
-                        'string': {'... recursive ...'}
-                    },
-                    'L': [
-                        {'... recursive ...'},
-                    ],
-                    'NULL': True | False,
-                    'BOOL': True | False
-                }
-            }
+            ExclusiveStartKey=exclusive_start_key,
+            KeyConditionExpression=Key('partition').eq(partition)
         )
+        return response
 
 
 class Lambda:
