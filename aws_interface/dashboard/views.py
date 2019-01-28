@@ -240,11 +240,19 @@ class Auth(View):
         elif cmd == 'set_email_login':
             default_group = request.POST['email_default_group']
             enabled = request.POST['email_enabled']
+            if enabled == 'true':
+                enabled = True
+            else:
+                enabled = False
             api.set_email_login(enabled, default_group)
             api.apply()
         elif cmd == 'set_guest_login':
             default_group = request.POST['guest_default_group']
             enabled = request.POST['guest_enabled']
+            if enabled == 'true':
+                enabled = True
+            else:
+                enabled = False
             api.set_guest_login(enabled, default_group)
             api.apply()
 

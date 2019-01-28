@@ -358,8 +358,7 @@
   <script>
   function set_email_login(){
       var email_default_group = $("#email_default_group").val();
-      var email_enabled = $("#email_enabled").val();
-      alert(email_enabled);
+      var email_enabled = $("#email_enabled").is(':checked');
       $.post("", {
           cmd: "set_email_login",
           email_default_group: email_default_group,
@@ -370,7 +369,7 @@
   }
   function set_guest_login(){
       var guest_default_group = $("#guest_default_group").val();
-      var guest_enabled = $("#guest_enabled").val();
+      var guest_enabled = $("#guest_enabled").is(':checked');
       $.post("", {
           cmd: "set_guest_login",
           guest_default_group: guest_default_group,
