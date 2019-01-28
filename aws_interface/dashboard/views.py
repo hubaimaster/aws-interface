@@ -7,8 +7,8 @@ from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from dashboard.models import *
 
+from dashboard.models import *
 from core.api import *
 
 
@@ -214,6 +214,9 @@ class Auth(View):
         context['user_groups'] = api.get_user_groups()
         context['user_count'] = api.get_user_count()
         context['users'] = api.get_users()
+        context['email_login'] = api.get_email_login()
+        context['guest_login'] = api.get_guest_login()
+        print('context:', context)
         return render(request, 'dashboard/app/auth.html', context=context)
 
     def post(self, request, app_id):
@@ -233,6 +236,16 @@ class Auth(View):
             name = request.POST['group_name']
             description = request.POST['group_description']
             api.put_user_group(name, description)
+            api.apply()
+        elif cmd == 'set_email_login':
+            default_group = request.POST['email_default_group']
+            enabled = request.POST['email_enabled']
+            api.set_email_login(enabled, default_group)
+            api.apply()
+        elif cmd == 'set_guest_login':
+            default_group = request.POST['guest_default_group']
+            enabled = request.POST['guest_enabled']
+            api.set_guest_login(enabled, default_group)
             api.apply()
 
         # Service

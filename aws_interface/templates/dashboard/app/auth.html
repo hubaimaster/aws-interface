@@ -1,5 +1,6 @@
 {% extends 'dashboard/app/base.html' %}
 {% load staticfiles %}
+{% load timetags %}
 {% block content %}
 
 <div class="main-content">
@@ -174,16 +175,26 @@
                       이메일/비밀번호 로그인
                     </th>
                     <td>
-                        <a href="">awsi.auth.emailLogin</a> 메소드를 이용하여 로그인합니다
+                        <a href="">cloud.auth.login</a> 메소드를 이용하여 로그인합니다
                     </td>
                     <td>
-                        <select class="form-control">
-                          <option value="user" selected>user</option>
+                        <select id="email_default_group" class="form-control">
+                            {% for group in user_groups %}
+                                {% if group.name == email_login.default_group_name %}
+                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                {% else %}
+                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                {% endif %}
+                            {% endfor %}
                         </select>
                     </td>
                     <td>
                         <label class="custom-toggle">
-                          <input type="checkbox" checked>
+                            {% if email_login.enabled %}
+                                <input id="email_enabled" type="checkbox" checked>
+                            {% else %}
+                                <input id="email_enabled" type="checkbox">
+                            {% endif %}
                           <span class="custom-toggle-slider rounded-circle"></span>
                         </label>
                     </td>
@@ -193,16 +204,26 @@
                       익명 로그인
                     </th>
                     <td>
-                      <a href="">awsi.auth.guestLogin</a> 메소드를 이용하여 로그인합니다
+                      <a href="">cloud.auth.guest</a> 메소드를 이용하여 로그인합니다
                     </td>
                     <td>
-                        <select class="form-control">
-                          <option value="user" selected>user</option>
+                        <select id="guest_default_group" class="form-control">
+                            {% for group in user_groups %}
+                                {% if group.name == guest_login.default_group_name %}
+                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                {% else %}
+                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                {% endif %}
+                            {% endfor %}
                         </select>
                     </td>
                     <td>
                         <label class="custom-toggle">
-                          <input type="checkbox">
+                          {% if guest_login.enabled %}
+                              <input id="guest_enabled" type="checkbox" checked>
+                          {% else %}
+                              <input id="guest_enabled" type="checkbox">
+                          {% endif %}
                           <span class="custom-toggle-slider rounded-circle"></span>
                         </label>
                     </td>
@@ -292,7 +313,7 @@
                       {{ user.id }}
                     </th>
                     <td>
-                      {{ user.creationDate }}
+                      {{ user.creationDate|to_date }}
                     </td>
                     <td>
                       {{ user.email }}
@@ -333,5 +354,11 @@
       </footer>
     </div>
   </div>
+
+  <script>
+  $(document).ready(function(){
+    alert("$(document).ready ALERT 경고창");
+  });
+  </script>
 
 {% endblock %}

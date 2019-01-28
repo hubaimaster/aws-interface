@@ -107,6 +107,16 @@ class AuthRecipeController(RecipeController):
         }
         return True
 
+    def get_email_login(self):
+        if not self.data.get('login_method', {}).get('email_login', None):
+            self.set_email_login(True, 'user')
+        return self.data['login_method']['email_login']
+
+    def get_guest_login(self):
+        if not self.data.get('login_method', {}).get('guest_login', None):
+            self.set_guest_login(True, 'user')
+        return self.data['login_method']['guest_login']
+
 
 class DatabaseRecipeController(RecipeController):
     def common_init(self):
