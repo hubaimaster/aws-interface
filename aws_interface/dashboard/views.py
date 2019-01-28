@@ -216,7 +216,7 @@ class Auth(View):
         context['users'] = api.get_users()
         context['email_login'] = api.get_email_login()
         context['guest_login'] = api.get_guest_login()
-        print('context:', context)
+
         return render(request, 'dashboard/app/auth.html', context=context)
 
     def post(self, request, app_id):
@@ -224,7 +224,7 @@ class Auth(View):
         context['app_id'] = app_id
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
         cmd = request.POST['cmd']
-
+        print('cmd:', cmd)
         # Recipe
         if cmd == 'delete_group':
             name = request.POST['group_name']

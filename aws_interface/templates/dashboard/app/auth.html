@@ -356,9 +356,43 @@
   </div>
 
   <script>
-  $(document).ready(function(){
-    alert("$(document).ready ALERT 경고창");
-  });
+  function set_email_login(){
+      var email_default_group = $("#email_default_group").val();
+      var email_enabled = $("#email_enabled").val();
+      alert(email_enabled);
+      $.post("", {
+          cmd: "set_email_login",
+          email_default_group: email_default_group,
+          email_enabled: email_enabled,
+      }, function (data) {
+
+      });
+  }
+  function set_guest_login(){
+      var guest_default_group = $("#guest_default_group").val();
+      var guest_enabled = $("#guest_enabled").val();
+      $.post("", {
+          cmd: "set_guest_login",
+          guest_default_group: guest_default_group,
+          guest_enabled: guest_enabled,
+      }, function (data) {
+
+      });
+  }
+  window.onload = function(){
+    $("#email_default_group").change(function () {
+        set_email_login()
+    });
+    $("#email_enabled").change(function () {
+        set_email_login()
+    });
+    $("#guest_default_group").change(function () {
+        set_guest_login()
+    });
+    $("#guest_enabled").change(function () {
+        set_guest_login()
+    });
+  }
   </script>
 
 {% endblock %}
