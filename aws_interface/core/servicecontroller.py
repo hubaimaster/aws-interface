@@ -1,4 +1,3 @@
-from core.util import *
 from cloud.aws import *
 import importlib
 import shutil
@@ -14,7 +13,6 @@ def get_boto3_session(bundle):
     session = boto3.Session(
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
-        #region_name='us-east-1',
     )
     return session
 

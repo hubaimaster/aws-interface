@@ -1,5 +1,6 @@
 from core.recipecontroller import *
 from core.servicecontroller import *
+from core.util import *
 
 
 class API:  # Abstract class
@@ -94,6 +95,21 @@ class AuthAPI(API):
 
     def get_user_count(self):
         return self.service_controller.get_user_count(self.recipe_controller.to_json())
+
+    def create_session(self, email, password):  # use as login
+        raise NotImplementedError()
+
+    def delete_session(self, session_id):  # use as logout
+        raise NotImplementedError()
+
+    def get_session(self, session_id):  # use as login check
+        raise NotImplementedError()
+
+    def get_sessions(self, start_key=None, limit=100):  # it will connect for dashboard (use as list logged in users)
+        raise NotImplementedError()
+
+    def get_session_count(self):  # it will connect for dashboard
+        return NotImplementedError()
 
 
 class DatabaseAPI(API):
