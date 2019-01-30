@@ -8,6 +8,32 @@ class APIGateway:
     def __init__(self, boto3_session):
         self.client = boto3_session.client('apigateway')
 
+    def connect_with_lambda(self, api_name):
+        apis = self.get_rest_apis().get('items', [])
+        rest_api_id = None
+        for api in apis:
+            if api.get('name') == api_name:
+                rest_api_id = api.get('id', None)
+                break
+
+        return
+
+    def put_method(self, rest_api_id, resource_id, method_type='POST', auth_type='AWS_IAM'):
+        response = self.client.put_method(
+            restApiId=rest_api_id,
+            resourceId=resource_id,
+            httpMethod=method_type,
+            authorizationType=auth_type,
+            apiKeyRequired=False,
+        )
+        return response
+
+    def get_rest_apis(self):
+        response = self.client.get_rest_apis(
+            limit=100
+        )
+        return response
+
     def create_rest_api(self, api_name):
         response = self.client.create_rest_api(
             name=api_name,
@@ -18,6 +44,21 @@ class APIGateway:
                     'EDGE'
                 ]
             }
+        )
+        return response
+
+    def create_resource(self, rest_api_id, parent_id, path_part):
+        response = self.client.create_resource(
+            restApiId=rest_api_id,
+            parentId=parent_id,
+            pathPart=path_part
+        )
+        return response
+
+    def get_resources(self, rest_api_id):
+        response = self.client.get_resources(
+            restApiId=rest_api_id,
+            limit=100,
         )
         return response
 
@@ -147,7 +188,6 @@ class DynamoDB:
         return item
 
     def get_items(self, table_name, partition, exclusive_start_key=None, limit=100):
-
         index_name = 'partition-creationDate'
         table = self.resource.Table(table_name)
         if exclusive_start_key:

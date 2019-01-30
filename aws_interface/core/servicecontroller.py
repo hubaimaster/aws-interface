@@ -136,13 +136,14 @@ class AuthServiceController(ServiceController):
         return
 
     def _apply_cloud_api(self, recipe_controller):
-        role_name = 'auth-{}'.format(self.app_id)
+        recipe_type = recipe_controller.get_recipe_type()
+        role_name = '{}-{}'.format(recipe_type, self.app_id)
         lambda_client = Lambda(self.boto3_session)
         iam = IAM(self.boto3_session)
         role_arn = iam.create_role_and_attach_policies(role_name)
 
-        name = 'auth-{}'.format(self.app_id)
-        desc = 'aws-interface cloud api'
+        name = '{}-{}'.format(recipe_type, self.app_id)
+        desc = 'aws-interface cloud API'
         runtime = 'python3.6'
         handler = 'cloud.lambda_function.handler'
 
@@ -159,6 +160,12 @@ class AuthServiceController(ServiceController):
             print('Function might already exist, Try updating function code.')
             lambda_client.update_function_code(name, zip_file)
 
+    def _deploy_cloud_api(self, recipe_controller):
+        recipe_type = recipe_controller.get_recipe_type()
+        api_name = '{}-{}'.format(recipe_type, self.app_id)
+        api_gateway = APIGateway(self.boto3_session)
+
+        api_gateway.create_rest_api(api_name)
 
     def generate_sdk(self, recipe_controller):
         return

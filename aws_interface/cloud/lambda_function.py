@@ -3,6 +3,7 @@ import cgi
 import json
 import decimal
 import importlib
+import boto3
 
 
 def get_response_header():
@@ -77,6 +78,7 @@ def handler(event, context):
 
     # TODO get session data and prevent out permission access
     data = {
+        'boto3': boto3,
         'params': parmas,
         'recipe': recipe,
         'app_id': app_id,
