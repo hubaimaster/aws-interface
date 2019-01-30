@@ -166,8 +166,9 @@ class AuthServiceController(ServiceController):
     def _deploy_cloud_api(self, recipe_controller):
         recipe_type = recipe_controller.get_recipe_type()
         api_name = '{}-{}'.format(recipe_type, self.app_id)
+        func_name = '{}-{}'.format(recipe_type, self.app_id)
         api_gateway = APIGateway(self.boto3_session)
-        api_gateway.create_rest_api(api_name)
+        api_gateway.connect_with_lambda(api_name, func_name)
 
     def generate_sdk(self, recipe_controller):
         return
