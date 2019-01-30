@@ -20,12 +20,12 @@ class RecipeController:
     def get_recipe_type(self):
         return self.data.get('recipe_type', None)
 
-    def put_cloud_api(self, name, module, permission='all'):  # 'cloud.auth.login'
+    def put_cloud_api(self, name, module, permissions=['all']):  # 'cloud.auth.login'
         if 'cloud_apis' not in self.data:
             self.data['cloud_apis'] = {}
         self.data['cloud_apis'][name] = {
             'name': name,
-            'permission': permission,
+            'permissions': permissions,
             'module': module,
         }
         return True
@@ -63,9 +63,9 @@ class AuthRecipeController(RecipeController):
         self.put_cloud_api('logout', 'cloud.auth.logout')
         self.put_cloud_api('register', 'cloud.auth.register')
         self.put_cloud_api('get_user', 'cloud.auth.get_user')
-        self.put_cloud_api('get_user_count', 'cloud.auth.get_user_count', permission='admin')
-        self.put_cloud_api('set_user', 'cloud.auth.set_user', permission='owner')
-        self.put_cloud_api('delete_user', 'cloud.auth.delete_user', permission='owner')
+        self.put_cloud_api('get_user_count', 'cloud.auth.get_user_count', permissions=['admin'])
+        self.put_cloud_api('set_user', 'cloud.auth.set_user', permissions=['owner'])
+        self.put_cloud_api('delete_user', 'cloud.auth.delete_user', permissions=['owner'])
 
     def put_user_group(self, name, description):
         if 'user_groups' not in self.data:

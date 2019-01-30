@@ -72,19 +72,21 @@ def handler(event, context):
     cloud_apis = recipe.get('cloud_apis', {})
     cloud_api = cloud_apis.get(cloud_api_name, {})
     module_name = cloud_api.get('module', None)
-    permission = cloud_api.get('permission', None)
+    permissions = cloud_api.get('permissions', [])
 
-    module = importlib.import_module(module_name)
-
-    # TODO get session data and prevent out permission access
     data = {
-        'boto3': boto3,
         'params': parmas,
         'recipe': recipe,
         'app_id': app_id,
         'admin': False,
     }
-    body = module.do(data)
 
-    response['body'] = body
+    import cloud.auth.get_me as get_me
+    me = get_me.do(data, boto3).get('item', None)
+
+    if 'all' in permissions or me.get('group', None) in permissions:
+        module = importlib.import_module(module_name)
+        body = module.do(data, boto3)
+        response['body'] = body
+
     return response

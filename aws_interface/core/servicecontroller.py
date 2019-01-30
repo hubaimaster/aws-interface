@@ -178,7 +178,8 @@ class AuthServiceController(ServiceController):
             'extra': extra,
         }
         data = make_data(self.app_id, parmas, recipe)
-        return register.do(data)
+        boto3 = get_boto3_session(self.boto3_session)
+        return register.do(data, boto3)
 
     def set_user(self, recipe, user_id, email, password, extra):
         import cloud.auth.set_user as set_user
@@ -189,7 +190,8 @@ class AuthServiceController(ServiceController):
             'extra': extra,
         }
         data = make_data(self.app_id, parmas, recipe)
-        return set_user.do(data)
+        boto3 = get_boto3_session(self.boto3_session)
+        return set_user.do(data, boto3)
 
     def delete_user(self, recipe, user_id):
         import cloud.auth.delete_user as delete_user
@@ -197,7 +199,8 @@ class AuthServiceController(ServiceController):
             'user_id': user_id,
         }
         data = make_data(self.app_id, parmas, recipe)
-        return delete_user.do(data)
+        boto3 = get_boto3_session(self.boto3_session)
+        return delete_user.do(data, boto3)
 
     def get_user(self, recipe, user_id):
         import cloud.auth.get_user as get_user
@@ -205,7 +208,8 @@ class AuthServiceController(ServiceController):
             'user_id': user_id,
         }
         data = make_data(self.app_id, parmas, recipe)
-        return get_user.do(data)
+        boto3 = get_boto3_session(self.boto3_session)
+        return get_user.do(data, boto3)
 
     def get_user_count(self, recipe):
         import cloud.auth.get_user_count as get_user_count
@@ -213,11 +217,13 @@ class AuthServiceController(ServiceController):
 
         }
         data = make_data(self.app_id, parmas, recipe)
-        return get_user_count.do(data)
+        boto3 = get_boto3_session(self.boto3_session)
+        return get_user_count.do(data, boto3)
 
     def get_users(self, recipe, start_key, limit):
         import cloud.auth.get_users as get_users
         params = {'start_key': start_key,
                   'limit': limit}
         data = make_data(self.app_id, params, recipe)
-        return get_users.do(data)
+        boto3 = get_boto3_session(self.boto3_session)
+        return get_users.do(data, boto3)

@@ -7,12 +7,17 @@ def do(data, boto3):
     params = data['params']
     app_id = data['app_id']
 
-    _user_id = params.get('id', None)
+    session_id = params.get('id', None)
 
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)
-    result = dynamo.get_item(table_name, _user_id)
+    result = dynamo.get_item(table_name, session_id)
     item = result.get('Item', None)
-    response['item'] = item
+    user_id = item.get('userId', None)
+    if user_id:
+        user = dynamo.get_item(table_name, user_id)
+        response['item'] = user
+    else:
+        response['item'] = None
     return response

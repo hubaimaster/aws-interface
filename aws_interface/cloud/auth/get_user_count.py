@@ -1,8 +1,7 @@
 from cloud.aws import *
-import boto3
 
 
-def do(data):
+def do(data, boto3):
     response = {}
     recipe = data['recipe']
     app_id = data['app_id']

@@ -1,9 +1,8 @@
 from cloud.aws import *
 from cloud.crypto import *
-import boto3
 
 
-def do(data):
+def do(data, boto3):
     response = {}
     recipe = data['recipe']
     params = data['params']
