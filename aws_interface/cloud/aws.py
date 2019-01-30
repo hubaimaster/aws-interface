@@ -37,8 +37,6 @@ class APIGateway:
     def create_rest_api(self, api_name):
         response = self.client.create_rest_api(
             name=api_name,
-            minimumCompressionSize=128,
-            apiKeySource='HEADER',
             endpointConfiguration={
                 'types': [
                     'EDGE'
@@ -206,6 +204,26 @@ class DynamoDB:
                 Limit=limit,
                 ConsistentRead=False,
                 KeyConditionExpression=Key('partition').eq(partition),
+            )
+        return response
+
+    def get_items_with_index(self, table_name, index_name, hash_key_name, hash_key_value, sort_key_name, sort_key_value,
+                             exclusive_start_key=None, limit=100):
+        table = self.resource.Table(table_name)
+        if exclusive_start_key:
+            response = table.query(
+                IndexName=index_name,
+                Limit=limit,
+                ConsistentRead=False,
+                ExclusiveStartKey=exclusive_start_key,
+                KeyConditionExpression=Key(hash_key_name).eq(hash_key_value) & Key(sort_key_name).eq(sort_key_value)
+            )
+        else:
+            response = table.query(
+                IndexName=index_name,
+                Limit=limit,
+                ConsistentRead=False,
+                KeyConditionExpression=Key(hash_key_name).eq(hash_key_value) & Key(sort_key_name).eq(sort_key_value),
             )
         return response
 

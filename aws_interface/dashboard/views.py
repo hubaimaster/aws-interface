@@ -213,6 +213,7 @@ class Auth(View):
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
         context['user_groups'] = api.get_user_groups()
         context['user_count'] = api.get_user_count()
+        context['session_count'] = api.get_session_count()
         context['users'] = api.get_users()
         context['email_login'] = api.get_email_login()
         context['guest_login'] = api.get_guest_login()

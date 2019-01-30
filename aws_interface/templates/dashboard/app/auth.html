@@ -24,7 +24,7 @@
                   <div class="row">
                     <div class="col">
                       <h5 class="card-title text-uppercase text-muted mb-0">총 회원 수</h5>
-                      <span class="h2 font-weight-bold mb-0">{{ user_count.value }} 명</span>
+                      <span class="h2 font-weight-bold mb-0">{{ user_count.item.count }} 명</span>
                     </div>
                     <div class="col-auto">
                       <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
@@ -41,7 +41,7 @@
                   <div class="row">
                     <div class="col">
                       <h5 class="card-title text-uppercase text-muted mb-0">접속 중인 회원 수</h5>
-                      <span class="h2 font-weight-bold mb-0">1,897 명</span>
+                      <span class="h2 font-weight-bold mb-0">{{ session_count.item.count }} 명</span>
                     </div>
                     <div class="col-auto">
                         <a target="_blank" href="" class="btn btn-sm btn-primary">자세히 보기</a>

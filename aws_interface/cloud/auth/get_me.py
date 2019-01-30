@@ -7,7 +7,7 @@ def do(data, boto3):
     params = data['params']
     app_id = data['app_id']
 
-    session_id = params.get('id', None)
+    session_id = params.get('session_id', None)
 
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 

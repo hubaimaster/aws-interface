@@ -11,8 +11,6 @@ def do(data, boto3):
 
     dynamo = DynamoDB(boto3)
     count = dynamo.get_item_count(table_name, '{}-count'.format(partition))
-    count = count.get('Item', {})
-    count = count.get('count', 0)
-    count = int(count)
-    response['value'] = count
+    item = count.get('Item', {'count': 0})
+    response['item'] = item
     return response

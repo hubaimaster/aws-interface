@@ -133,7 +133,7 @@ class AuthServiceController(ServiceController):
 
     def apply(self, recipe_controller):
         self._apply_cloud_api(recipe_controller)
-        return
+        self._deploy_cloud_api(recipe_controller)
 
     def _apply_cloud_api(self, recipe_controller):
         recipe_type = recipe_controller.get_recipe_type()
@@ -167,7 +167,6 @@ class AuthServiceController(ServiceController):
         recipe_type = recipe_controller.get_recipe_type()
         api_name = '{}-{}'.format(recipe_type, self.app_id)
         api_gateway = APIGateway(self.boto3_session)
-
         api_gateway.create_rest_api(api_name)
 
     def generate_sdk(self, recipe_controller):
@@ -230,3 +229,46 @@ class AuthServiceController(ServiceController):
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session
         return get_users.do(data, boto3)
+
+    def create_session(self, recipe, email, password):
+        import cloud.auth.login as login
+        params = {
+            'email': email,
+            'password': password
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return login.do(data, boto3)
+
+    def delete_session(self, recipe, session_id):
+        import cloud.auth.logout as logout
+        params = {
+            'session_id': session_id
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return logout.do(data, boto3)
+
+    def get_session(self, recipe, session_id):
+        import cloud.auth.get_session as get_session
+        params = {
+            'session_id': session_id
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return get_session.do(data, boto3)
+
+    def get_sessions(self, recipe, start_key, limit):
+        import cloud.auth.get_sessions as get_sessions
+        params = {'start_key': start_key,
+                  'limit': limit}
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return get_sessions.do(data, boto3)
+
+    def get_session_count(self, recipe):
+        import cloud.auth.get_session_count as get_session_count
+        parmas = {}
+        data = make_data(self.app_id, parmas, recipe)
+        boto3 = self.boto3_session
+        return get_session_count.do(data, boto3)
