@@ -59,14 +59,14 @@ def handler(event, context):
         'headers': get_response_header(),
         'body': None,
     }
-    parmas = get_params(event)
+    parmas = event
     cloud_api_name = parmas.get('cloud_api_name', None)
-    with open('recipe.json', 'r') as file:
+    with open('./cloud/recipe.json', 'r') as file:
         recipe = file.read()
         recipe = json.loads(recipe)
         print('recipe:', type(recipe))
 
-    with open('app_id.txt', 'r') as file:
+    with open('./cloud/app_id.txt', 'r') as file:
         app_id = file.read()
 
     cloud_apis = recipe.get('cloud_apis', {})
@@ -80,13 +80,16 @@ def handler(event, context):
         'app_id': app_id,
         'admin': False,
     }
-
-    import cloud.auth.get_me as get_me
-    me = get_me.do(data, boto3).get('item', None)
-
-    if 'all' in permissions or me.get('group', None) in permissions:
+    print('permissions:', permissions)
+    if 'all' in permissions:
         module = importlib.import_module(module_name)
         body = module.do(data, boto3)
-        response['body'] = body
+    else:
+        import cloud.auth.get_me as get_me
+        me = get_me.do(data, boto3).get('item', None)
+        if me.get('group', None) in permissions:
+            module = importlib.import_module(module_name)
+            body = module.do(data, boto3)
 
+    response['body'] = body
     return response

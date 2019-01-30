@@ -42,17 +42,16 @@ class APIGateway:
                 pathPart=lambda_func_name
             )['id']
 
-        method = self.get_method(rest_api_id, resource_id)
-
-        if not method:
-            # create POST method
+        try:
             method = api_client.put_method(
                 restApiId=rest_api_id,
                 resourceId=resource_id,
                 httpMethod="POST",
                 authorizationType="NONE",
-                apiKeyRequired=True,
+                apiKeyRequired=False,
             )
+        except:
+            print('put_method failed')
 
         lambda_version = aws_lambda.meta.service_model.api_version
 
