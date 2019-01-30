@@ -158,7 +158,10 @@ class AuthServiceController(ServiceController):
             lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
         except:
             print('Function might already exist, Try updating function code.')
-            lambda_client.update_function_code(name, zip_file)
+            try:
+                lambda_client.update_function_code(name, zip_file)
+            except:
+                print('Update function failed')
 
     def _deploy_cloud_api(self, recipe_controller):
         recipe_type = recipe_controller.get_recipe_type()
@@ -178,7 +181,7 @@ class AuthServiceController(ServiceController):
             'extra': extra,
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = get_boto3_session(self.boto3_session)
+        boto3 = self.boto3_session
         return register.do(data, boto3)
 
     def set_user(self, recipe, user_id, email, password, extra):
@@ -190,7 +193,7 @@ class AuthServiceController(ServiceController):
             'extra': extra,
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = get_boto3_session(self.boto3_session)
+        boto3 = self.boto3_session
         return set_user.do(data, boto3)
 
     def delete_user(self, recipe, user_id):
@@ -199,7 +202,7 @@ class AuthServiceController(ServiceController):
             'user_id': user_id,
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = get_boto3_session(self.boto3_session)
+        boto3 = self.boto3_session
         return delete_user.do(data, boto3)
 
     def get_user(self, recipe, user_id):
@@ -208,7 +211,7 @@ class AuthServiceController(ServiceController):
             'user_id': user_id,
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = get_boto3_session(self.boto3_session)
+        boto3 = self.boto3_session
         return get_user.do(data, boto3)
 
     def get_user_count(self, recipe):
@@ -217,7 +220,7 @@ class AuthServiceController(ServiceController):
 
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = get_boto3_session(self.boto3_session)
+        boto3 = self.boto3_session
         return get_user_count.do(data, boto3)
 
     def get_users(self, recipe, start_key, limit):
@@ -225,5 +228,5 @@ class AuthServiceController(ServiceController):
         params = {'start_key': start_key,
                   'limit': limit}
         data = make_data(self.app_id, params, recipe)
-        boto3 = get_boto3_session(self.boto3_session)
+        boto3 = self.boto3_session
         return get_users.do(data, boto3)

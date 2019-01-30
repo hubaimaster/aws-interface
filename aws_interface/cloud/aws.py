@@ -112,9 +112,10 @@ class DynamoDB:
             return None
 
     def update_table(self, table_name, indexes):
-        attr_updates = []
-        index_updates = []
+        responses = []
         for index in indexes:
+            attr_updates = []
+            index_updates = []
             hash_key = index['hash_key']
             hash_key_type = index['hash_key_type']
             sort_key = index.get('sort_key', None)
@@ -158,15 +159,16 @@ class DynamoDB:
                     'AttributeType': sort_key_type
                 }
                 attr_updates.append(sort_key_update)
-        try:
-            response = self.client.update_table(
-                AttributeDefinitions=attr_updates,
-                TableName=table_name,
-                GlobalSecondaryIndexUpdates=index_updates
-            )
-        except:
-            return None
-        return response
+            try:
+                response = self.client.update_table(
+                    AttributeDefinitions=attr_updates,
+                    TableName=table_name,
+                    GlobalSecondaryIndexUpdates=index_updates
+                )
+                responses.append(response)
+            except:
+                continue
+        return responses
 
     def delete_item(self, table_name, partition, item_id):
         response = self.client.delete_item(
