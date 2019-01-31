@@ -30,9 +30,9 @@ urlpatterns = [
     path('logout/', Logout.as_view(), name='logout'),
     path('account/', Account.as_view(), name='account'),
 
-    path('overview/<app_id>', Overview.as_view(), name='overview'),
-    path('bill/<app_id>', Bill.as_view(), name='bill'),
-    path('auth/<app_id>', Auth.as_view(), name='auth'),
-    path('database/<app_id>', Database.as_view(), name='database'),
-    path('storage/<app_id>', Storage.as_view(), name='storage'),
+    path('<app_id>/overview', Overview.as_view(), name='overview'),
+    path('<app_id>/bill', Bill.as_view(), name='bill'),
+    path('<app_id>/auth', Auth.as_view(), name='auth'),
+    path('<app_id>/database', Database.as_view(), name='database'),
+    path('<app_id>/storage', Storage.as_view(), name='storage'),
 ]
