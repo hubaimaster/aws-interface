@@ -1,4 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-aws_interface/static/* linguist-vendored
+aws_interface/static/assets/* linguist-vendored
 aws_interface/templates/* linguist-vendored
