@@ -7,8 +7,8 @@ from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from dashboard.models import *
 
+from dashboard.models import *
 from core.api import *
 
 
@@ -212,6 +212,12 @@ class Auth(View):
         context['app_id'] = app_id
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
         context['user_groups'] = api.get_user_groups()
+        context['user_count'] = api.get_user_count()
+        context['session_count'] = api.get_session_count()
+        context['users'] = api.get_users()
+        context['email_login'] = api.get_email_login()
+        context['guest_login'] = api.get_guest_login()
+
         return render(request, 'dashboard/app/auth.html', context=context)
 
     def post(self, request, app_id):
@@ -219,16 +225,47 @@ class Auth(View):
         context['app_id'] = app_id
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
         cmd = request.POST['cmd']
-        if cmd == 'delete':
+        print('cmd:', cmd)
+        # Recipe
+        if cmd == 'delete_group':
             name = request.POST['group_name']
             succeed = api.delete_user_group(name)
             if not succeed:
                 Util.add_alert(request, '시스템 그룹은 삭제할 수 없습니다.')
-        elif cmd == 'put':
+            api.apply()
+        elif cmd == 'put_group':
             name = request.POST['group_name']
             description = request.POST['group_description']
             api.put_user_group(name, description)
-        api.apply()
+            api.apply()
+        elif cmd == 'set_email_login':
+            default_group = request.POST['email_default_group']
+            enabled = request.POST['email_enabled']
+            if enabled == 'true':
+                enabled = True
+            else:
+                enabled = False
+            api.set_email_login(enabled, default_group)
+            api.apply()
+        elif cmd == 'set_guest_login':
+            default_group = request.POST['guest_default_group']
+            enabled = request.POST['guest_enabled']
+            if enabled == 'true':
+                enabled = True
+            else:
+                enabled = False
+            api.set_guest_login(enabled, default_group)
+            api.apply()
+
+        # Service
+        elif cmd == 'put_user':
+            email = request.POST['user_email']
+            password = request.POST['user_password']
+            api.create_user(email, password, {})
+        elif cmd == 'delete_user':
+            user_id = request.POST['user_id']
+            api.delete_user(user_id)
+
         Util.save_recipe(api.get_recipe_controller(), app_id)
         return redirect(request.path_info)  # Redirect back
 

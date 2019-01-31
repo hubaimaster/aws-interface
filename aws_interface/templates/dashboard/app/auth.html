@@ -1,5 +1,6 @@
 {% extends 'dashboard/app/base.html' %}
 {% load staticfiles %}
+{% load timetags %}
 {% block content %}
 
 <div class="main-content">
@@ -23,7 +24,7 @@
                   <div class="row">
                     <div class="col">
                       <h5 class="card-title text-uppercase text-muted mb-0">총 회원 수</h5>
-                      <span class="h2 font-weight-bold mb-0">350,897 명</span>
+                      <span class="h2 font-weight-bold mb-0">{{ user_count.item.count }} 명</span>
                     </div>
                     <div class="col-auto">
                       <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
@@ -40,7 +41,7 @@
                   <div class="row">
                     <div class="col">
                       <h5 class="card-title text-uppercase text-muted mb-0">접속 중인 회원 수</h5>
-                      <span class="h2 font-weight-bold mb-0">1,897 명</span>
+                      <span class="h2 font-weight-bold mb-0">{{ session_count.item.count }} 명</span>
                     </div>
                     <div class="col-auto">
                         <a target="_blank" href="" class="btn btn-sm btn-primary">자세히 보기</a>
@@ -79,7 +80,7 @@
                           </button>
                         </div>
                         <form method="post">{% csrf_token %}
-                            <input name="cmd" value="put" hidden>
+                            <input name="cmd" value="put_group" hidden>
                             <div class="modal-body">
                                 <div class="pl-lg-12">
                                   <div class="row">
@@ -132,7 +133,7 @@
                     <td>
                       <div class="col text-right">
                           <form role="form" method="post">{% csrf_token %}
-                              <input name="cmd" value="delete" hidden>
+                              <input name="cmd" value="delete_group" hidden>
                               <input name="group_name" value="{{ group.name }}" hidden>
                             <button type="submit" class="btn btn-sm btn-danger">제거</button>
                           </form>
@@ -174,16 +175,26 @@
                       이메일/비밀번호 로그인
                     </th>
                     <td>
-                        <a href="">awsi.auth.emailLogin</a> 메소드를 이용하여 로그인합니다
+                        <a href="">cloud.auth.login</a> 메소드를 이용하여 로그인합니다
                     </td>
                     <td>
-                        <select class="form-control">
-                          <option value="user" selected>user</option>
+                        <select id="email_default_group" class="form-control">
+                            {% for group in user_groups %}
+                                {% if group.name == email_login.default_group_name %}
+                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                {% else %}
+                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                {% endif %}
+                            {% endfor %}
                         </select>
                     </td>
                     <td>
                         <label class="custom-toggle">
-                          <input type="checkbox" checked>
+                            {% if email_login.enabled %}
+                                <input id="email_enabled" type="checkbox" checked>
+                            {% else %}
+                                <input id="email_enabled" type="checkbox">
+                            {% endif %}
                           <span class="custom-toggle-slider rounded-circle"></span>
                         </label>
                     </td>
@@ -193,16 +204,26 @@
                       익명 로그인
                     </th>
                     <td>
-                      <a href="">awsi.auth.guestLogin</a> 메소드를 이용하여 로그인합니다
+                      <a href="">cloud.auth.guest</a> 메소드를 이용하여 로그인합니다
                     </td>
                     <td>
-                        <select class="form-control">
-                          <option value="user" selected>user</option>
+                        <select id="guest_default_group" class="form-control">
+                            {% for group in user_groups %}
+                                {% if group.name == guest_login.default_group_name %}
+                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                {% else %}
+                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                {% endif %}
+                            {% endfor %}
                         </select>
                     </td>
                     <td>
                         <label class="custom-toggle">
-                          <input type="checkbox">
+                          {% if guest_login.enabled %}
+                              <input id="guest_enabled" type="checkbox" checked>
+                          {% else %}
+                              <input id="guest_enabled" type="checkbox">
+                          {% endif %}
                           <span class="custom-toggle-slider rounded-circle"></span>
                         </label>
                     </td>
@@ -222,9 +243,54 @@
                 <div class="col">
                   <h3 class="mb-0">가입된 회원</h3>
                 </div>
-                <div class="col text-right">
-                  <a href="#!" class="btn btn-sm btn-primary">회원 생성</a>
+
+                  <div class="col text-right">
+                  <a data-toggle="modal" data-target="#modal-put-user" class="btn btn-sm btn-primary">
+                      <span class="btn-inner--text" style="color: white;">회원 생성</span>
+                  </a>
                 </div>
+                  <div class="modal fade" id="modal-put-user" tabindex="-1" role="dialog" aria-labelledby="modal-put-user" aria-hidden="true">
+                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title" id="modal-title-default">회원 생성</h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        </div>
+                        <form method="post">{% csrf_token %}
+                            <input name="cmd" value="put_user" hidden>
+                            <div class="modal-body">
+                                <div class="pl-lg-12">
+                                  <div class="row">
+                                    <div class="col-lg-12">
+
+                                      <div class="form-group">
+                                        <label class="form-control-label" for="input-username">이메일</label>
+                                        <input name="user_email" type="email" id="input-username" class="form-control form-control-alternative" placeholder="example@email.com">
+                                      </div>
+                                        <div class="form-group">
+                                        <label class="form-control-label" for="input-username">비밀번호</label>
+                                        <input name="user_password" type="password" id="input-username" class="form-control form-control-alternative" placeholder="******">
+                                      </div>
+
+                                    </div>
+                                  </div>
+                                </div>
+                              <p>
+                                  확인 버튼을 클릭하여 회원을 생성합니다.
+                              </p>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                              <button type="submit" class="btn btn-primary">확인</button>
+                            </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+
               </div>
             </div>
             <div class="table-responsive">
@@ -235,56 +301,38 @@
                     <th scope="col">id</th>
                     <th scope="col">createDate</th>
                     <th scope="col">email</th>
-                    <th scope="col">name</th>
                     <th scope="col">group</th>
+                    <th scope="col">extra</th>
                     <th scope="col"></th>
                   </tr>
                 </thead>
                 <tbody>
+                {% for user in users.items %}
                   <tr>
                     <th scope="row">
-                      dgsejs5621-2sdf3dsw3-sseds4-vghtt5
+                      {{ user.id }}
                     </th>
                     <td>
-                      2019-01-15 05:00:01
+                      {{ user.creationDate|to_date }}
                     </td>
                     <td>
-                      kchdully@naver.com
+                      {{ user.email }}
                     </td>
                     <td>
-                      김창환
+                      {{ user.group }}
+                    </td>
+                      <td>
+                      {{ user.extra }}
                     </td>
                     <td>
-                      user
-                    </td>
-                    <td>
-                      <div class="col text-right">
-                        <a href="#!" class="btn btn-sm btn-danger">제거</a>
-                      </div>
+                        <form role="form" method="post">{% csrf_token %}
+                              <input name="cmd" value="delete_user" hidden>
+                              <input name="user_id" value="{{ user.id }}" hidden>
+                            <button type="submit" class="btn btn-sm btn-danger">제거</button>
+                          </form>
                     </td>
                   </tr>
-                  <tr>
-                    <th scope="row">
-                      dgsejs5621-2sdf3dsw3-sseds4-vghtt5
-                    </th>
-                    <td>
-                      2019-01-15 05:00:01
-                    </td>
-                    <td>
-                      kchdully@naver.com
-                    </td>
-                    <td>
-                      김창환
-                    </td>
-                    <td>
-                      user
-                    </td>
-                    <td>
-                      <div class="col text-right">
-                        <a href="#!" class="btn btn-sm btn-danger">제거</a>
-                      </div>
-                    </td>
-                  </tr>
+                {% endfor %}
 
                 </tbody>
               </table>
@@ -306,5 +354,44 @@
       </footer>
     </div>
   </div>
+
+  <script>
+  function set_email_login(){
+      var email_default_group = $("#email_default_group").val();
+      var email_enabled = $("#email_enabled").is(':checked');
+      $.post("", {
+          cmd: "set_email_login",
+          email_default_group: email_default_group,
+          email_enabled: email_enabled,
+      }, function (data) {
+
+      });
+  }
+  function set_guest_login(){
+      var guest_default_group = $("#guest_default_group").val();
+      var guest_enabled = $("#guest_enabled").is(':checked');
+      $.post("", {
+          cmd: "set_guest_login",
+          guest_default_group: guest_default_group,
+          guest_enabled: guest_enabled,
+      }, function (data) {
+
+      });
+  }
+  window.onload = function(){
+    $("#email_default_group").change(function () {
+        set_email_login()
+    });
+    $("#email_enabled").change(function () {
+        set_email_login()
+    });
+    $("#guest_default_group").change(function () {
+        set_guest_login()
+    });
+    $("#guest_enabled").change(function () {
+        set_guest_login()
+    });
+  }
+  </script>
 
 {% endblock %}

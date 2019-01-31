@@ -43,7 +43,7 @@
           </a>
           <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
             <div class=" dropdown-header noti-title">
-              <h6 class="text-overflow m-0">Welcome!</h6>
+              <h6 class="text-overflow m-0">환영합니다!</h6>
             </div>
             <a href="{% url 'account'%}" class="dropdown-item">
               <i class="ni ni-app"></i>
@@ -152,6 +152,39 @@
   <!-- Argon JS -->
   <script src="{%  static 'assets/js/argon.js' %}"></script>
 
+  <script>
+     // CSRF
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+      }
+      $(document).ready(function() {
+        var csrftoken = getCookie('csrftoken');
+        $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+          }
+        });
+      });
+  </script>
+
   <script type="text/javascript">
      $(function(){
        {% if alert %}
@@ -160,10 +193,10 @@
      });
   </script>
 
-    <script>
-    var id = "link-" + "{{ request.path }}".split('/')[1];
+  <script>
+    var id = "link-" + "{{ request.path }}".split('/')[2];
     $("#" + id).addClass("active");
-    </script>
+  </script>
 
 </body>
 </html>

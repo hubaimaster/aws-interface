@@ -4,81 +4,55 @@ import time
 from boto3.dynamodb.conditions import Key
 
 
-class Config:
-    stage_name = 'prod_aws_interface'
-
-
 class APIGateway:
     def __init__(self, boto3_session):
         self.apigateway_client = boto3_session.client('apigateway')
         self.lambda_client = boto3_session.client('lambda')
         self.iam = IAM(boto3_session)
 
-    def get_rest_api_id(self, rest_api_name):
-        rest_api_id = None
-        apis = self.get_rest_apis().get('items', [])
-        for api in apis:
-            if api['name'] == rest_api_name:
-                rest_api_id = api['id']
-                break
-        if not rest_api_id:
-            response = self.create_rest_api(rest_api_name)
-            rest_api_id = response['id']
-        return rest_api_id
-
-    def get_root_resource_id(self, rest_api_id):
-        resources = self.get_resources(rest_api_id).get('items', [])
-        parent_id = None
-        for res in resources:
-            if res['path'] == '/':
-                parent_id = res['id']
-        return parent_id
-
-    def get_lambda_function_resource_id(self, rest_api_id, lambda_func_name):
-        resources = self.get_resources(rest_api_id).get('items', [])
-        resource_id = None
-        for res in resources:
-            if res.get('pathPart') == lambda_func_name:
-                resource_id = res['id']
-        return resource_id
-
-    def get_rest_api_url(self, cloud_api_name, lambda_func_name, aws_region='ap-northeast-2'):
-        base_url = 'https://{api_id}.execute-api.{region}.amazonaws.com/{stage}/{resource}'
-        api_id = self.get_rest_api_id(cloud_api_name)
-        region = aws_region
-        stage = Config.stage_name
-        resource = self.get_lambda_function_resource_id(cloud_api_name, lambda_func_name)
-        url = base_url.format(api_id, region, stage, resource)
-        return url
-
     def connect_with_lambda(self, cloud_api_name, lambda_func_name, aws_region='ap-northeast-2'):
         api_client = self.apigateway_client
         aws_lambda = self.lambda_client
 
         # Find existing rest api
-        rest_api_id = self.get_rest_api_id(cloud_api_name)
-        root_resource_id = self.get_root_resource_id(cloud_api_name)
-        resource_id = self.get_lambda_function_resource_id(cloud_api_name, lambda_func_name)
+        rest_api_id = None
+        apis = self.get_rest_apis().get('items', [])
+        for api in apis:
+            if api['name'] == cloud_api_name:
+                rest_api_id = api['id']
+                break
+        if not rest_api_id:
+            response = self.create_rest_api(cloud_api_name)
+            rest_api_id = response['id']
 
-        stage_name = Config.stage_name
+        resources = self.get_resources(rest_api_id).get('items', [])
+        resource_id = None
+        print('resources:', resources)
+        for res in resources:
+            if res['path'] == '/':
+                parent_id = res['id']
+            if res.get('pathPart') == lambda_func_name:
+                resource_id = res['id']
 
         if not resource_id:
+            # create resource
             resource_id = api_client.create_resource(
                 restApiId=rest_api_id,
-                parentId=root_resource_id,  # resource id for the Base API path
+                parentId=parent_id,  # resource id for the Base API path
                 pathPart=lambda_func_name
             )['id']
 
-        try:
-            _ = api_client.put_method(
+        method = self.get_method(rest_api_id, resource_id)
+
+        if not method:
+            # create POST method
+            method = api_client.put_method(
                 restApiId=rest_api_id,
                 resourceId=resource_id,
                 httpMethod="POST",
                 authorizationType="NONE",
-                apiKeyRequired=False,
+                apiKeyRequired=True,
             )
-        except:
-            print('put_method failed')
 
         lambda_version = aws_lambda.meta.service_model.api_version
 
@@ -119,7 +93,7 @@ class APIGateway:
                 statusCode="200",
             )
         except:
-            print('{} Method already exists'.format(rest_api_id))
+            print('Put m.r failed')
 
         uri_data['aws-api-id'] = rest_api_id
         source_arn = "arn:aws:execute-api:{aws-region}:{aws-acct-id}:{aws-api-id}/*/POST/{lambda-function-name}".format(
@@ -133,9 +107,10 @@ class APIGateway:
             SourceArn=source_arn
         )
 
+        # state 'your stage name' was already created via API Gateway GUI
         api_client.create_deployment(
             restApiId=rest_api_id,
-            stageName=stage_name,
+            stageName="prod_aws_interface",
         )
 
     def put_method(self, rest_api_id, resource_id, method_type='POST', auth_type='AWS_IAM'):

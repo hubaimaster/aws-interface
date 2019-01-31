@@ -1,5 +1,6 @@
 from core.recipecontroller import *
 from core.servicecontroller import *
+from core.util import *
 
 
 class API:  # Abstract class
@@ -23,6 +24,12 @@ class API:  # Abstract class
 
     def get_recipe_json_string(self):
         return self.get_recipe_controller().to_json()
+
+    def get_rest_api_url(self):
+        return self.service_controller.get_rest_api_url(self.recipe_controller)
+
+    def get_rest_api_sdk(self):
+        return self.service_controller.get_rest_api_sdk(self.recipe_controller)
 
     def common_init(self):
         # called when __init__ finished, it should implement on subclass. not on abstract class.
@@ -70,24 +77,45 @@ class AuthAPI(API):
     def set_guest_login(self, enabled, default_group_name):
         return self.recipe_controller.set_guest_login(enabled, default_group_name)
 
+    def get_email_login(self):
+        return self.recipe_controller.get_email_login()
+
+    def get_guest_login(self):
+        return self.recipe_controller.get_guest_login()
+
     # Service
     def create_user(self, email, password, extra):
-        raise NotImplementedError()
+        return self.service_controller.create_user(self.recipe_controller.to_json(), email, password, extra)
 
-    def put_user(self, user_id, email, password, extra):
-        raise NotImplementedError()
+    def set_user(self, user_id, email, password, extra):
+        return self.service_controller.set_user(self.recipe_controller.to_json(), user_id, email, password, extra)
 
     def delete_user(self, user_id):
-        raise NotImplementedError()
+        return self.service_controller.delete_user(self.recipe_controller.to_json(), user_id)
 
     def get_user(self, user_id):
-        raise NotImplementedError()
+        return self.service_controller.get_user(self.recipe_controller.to_json(), user_id)
 
-    def search_users(self, query):  # query ex : 'kim' in col('name') and 21 is col('age')
-        raise NotImplementedError()
+    def get_users(self, start_key=None, limit=100):
+        return self.service_controller.get_users(self.recipe_controller.to_json(), start_key, limit)
 
     def get_user_count(self):
-        raise NotImplementedError()
+        return self.service_controller.get_user_count(self.recipe_controller.to_json())
+
+    def create_session(self, email, password):  # use as login
+        return self.service_controller.create_session(self.recipe_controller.to_json(), email, password)
+
+    def delete_session(self, session_id):  # use as logout
+        return self.service_controller.delete_session(self.recipe_controller.to_json(), session_id)
+
+    def get_session(self, session_id):  # use as login check
+        return self.service_controller.get_session(self.recipe_controller.to_json(), session_id)
+
+    def get_sessions(self, start_key=None, limit=100):  # it will connect for dashboard (use as list logged in users)
+        return self.service_controller.get_sessions(self.recipe_controller.to_json(), start_key, limit)
+
+    def get_session_count(self):  # it will connect for dashboard
+        return self.service_controller.get_session_count(self.recipe_controller.to_json())
 
 
 class DatabaseAPI(API):

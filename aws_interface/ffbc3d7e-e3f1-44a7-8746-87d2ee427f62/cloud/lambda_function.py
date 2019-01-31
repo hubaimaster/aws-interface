@@ -3,7 +3,6 @@ import cgi
 import json
 import decimal
 import importlib
-import boto3
 
 
 def get_response_header():
@@ -59,36 +58,27 @@ def handler(event, context):
         'headers': get_response_header(),
         'body': None,
     }
-    parmas = event
+    parmas = get_params(event)
     cloud_api_name = parmas.get('cloud_api_name', None)
-    
-    with open('recipe.json', 'r') as f:
-        recipe = json.load(f)
-      
-    with open('./cloud/app_id.txt', 'r') as file:
+    with open('recipe.json', 'rb') as file:
+        recipe = file.read()
+        recipe = json.loads(recipe)
+        print('recipe:', type(recipe))
+
+    with open('app_id.txt', 'r') as file:
         app_id = file.read()
-        
+
     cloud_apis = recipe.get('cloud_apis', {})
     cloud_api = cloud_apis.get(cloud_api_name, {})
     module_name = cloud_api.get('module', None)
-    permissions = cloud_api.get('permissions', [])
 
+    module = importlib.import_module(module_name)
     data = {
         'params': parmas,
         'recipe': recipe,
         'app_id': app_id,
-        'admin': False,
     }
-    print('permissions:', permissions)
-    if 'all' in permissions:
-        module = importlib.import_module(module_name)
-        body = module.do(data, boto3)
-    else:
-        import cloud.auth.get_me as get_me
-        me = get_me.do(data, boto3).get('item', None)
-        if me.get('group', None) in permissions:
-            module = importlib.import_module(module_name)
-            body = module.do(data, boto3)
+    body = module.do(data)
 
     response['body'] = body
     return response

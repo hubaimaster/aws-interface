@@ -20,12 +20,12 @@ class RecipeController:
     def get_recipe_type(self):
         return self.data.get('recipe_type', None)
 
-    def put_cloud_api(self, name, description, module):  # 'cloud.auth.login'
+    def put_cloud_api(self, name, module, permissions=['all']):  # 'cloud.auth.login'
         if 'cloud_apis' not in self.data:
             self.data['cloud_apis'] = {}
         self.data['cloud_apis'][name] = {
             'name': name,
-            'description': description,
+            'permissions': permissions,
             'module': module,
         }
         return True
@@ -49,19 +49,23 @@ class AuthRecipeController(RecipeController):
 
     def _init_user_group(self):
         self.default_groups = {
-            'admin': '기본그룹, 모든 읽기/쓰기 권한을 가지고 있습니다.',
+            'all': '기본그룹, 로그인 하지 않은 익명 그룹입니다.',
+            'admin': '기본그룹, 모든 권한을 가지고 있습니다.',
             'owner': '기본그룹, 자신이 작성한 데이터에 대해 모든 권한을 가지고 있습니다.',
-            'user': '기본그룹, 일반 사용자 그룹입니다.'
+            'user': '기본그룹, 회원 가입한 일반 사용자 그룹입니다.'
         }
         for name in self.default_groups:
             description = self.default_groups[name]
             self.put_user_group(name, description)
 
     def _init_cloud_api(self):
-        self.put_cloud_api('login', '(email:str,password:str)->token:str', 'cloud.auth.login')
-        self.put_cloud_api('logout', '(token:str)->success:bool', 'cloud.auth.logout')
-        self.put_cloud_api('register', '(email:str,password:str,extra:dict)->success:bool', 'cloud.auth.register')
-        self.put_cloud_api('me', '(token:str)->success:bool', 'cloud.auth.me')
+        self.put_cloud_api('login', 'cloud.auth.login')
+        self.put_cloud_api('logout', 'cloud.auth.logout')
+        self.put_cloud_api('register', 'cloud.auth.register')
+        self.put_cloud_api('get_user', 'cloud.auth.get_user')
+        self.put_cloud_api('get_user_count', 'cloud.auth.get_user_count', permissions=['admin'])
+        self.put_cloud_api('set_user', 'cloud.auth.set_user', permissions=['owner'])
+        self.put_cloud_api('delete_user', 'cloud.auth.delete_user', permissions=['owner'])
 
     def put_user_group(self, name, description):
         if 'user_groups' not in self.data:
@@ -102,6 +106,16 @@ class AuthRecipeController(RecipeController):
             'default_group_name': default_group_name,
         }
         return True
+
+    def get_email_login(self):
+        if not self.data.get('login_method', {}).get('email_login', None):
+            self.set_email_login(True, 'user')
+        return self.data['login_method']['email_login']
+
+    def get_guest_login(self):
+        if not self.data.get('login_method', {}).get('guest_login', None):
+            self.set_guest_login(True, 'user')
+        return self.data['login_method']['guest_login']
 
 
 class DatabaseRecipeController(RecipeController):
