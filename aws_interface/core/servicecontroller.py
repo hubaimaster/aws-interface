@@ -70,11 +70,57 @@ class ServiceController:
         #  init object here .. assign boto3 session
         return
 
+    def apply_cloud_api(self, recipe_controller):
+        recipe_type = recipe_controller.get_recipe_type()
+        role_name = '{}-{}'.format(recipe_type, self.app_id)
+        lambda_client = Lambda(self.boto3_session)
+        iam = IAM(self.boto3_session)
+        role_arn = iam.create_role_and_attach_policies(role_name)
+
+        name = '{}-{}'.format(recipe_type, self.app_id)
+        desc = 'aws-interface cloud API'
+        runtime = 'python3.6'
+        handler = 'cloud.lambda_function.handler'
+
+        module_name = 'cloud'
+        module = importlib.import_module(module_name)
+        module_path = os.path.dirname(module.__file__)
+
+        recipe = recipe_controller.to_json()
+        zip_file = create_lambda_zipfile_bin(self.app_id, recipe, module_path)
+
+        try:
+            lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
+        except:
+            print('Function might already exist, Try updating function code.')
+            try:
+                lambda_client.update_function_code(name, zip_file)
+            except:
+                print('Update function failed')
+
+    def deploy_cloud_api(self, recipe_controller):
+        recipe_type = recipe_controller.get_recipe_type()
+        api_name = '{}-{}'.format(recipe_type, self.app_id)
+        func_name = '{}-{}'.format(recipe_type, self.app_id)
+        api_gateway = APIGateway(self.boto3_session)
+        api_gateway.connect_with_lambda(api_name, func_name)
+
+    def get_rest_api_url(self, recipe_controller):
+        api_client = APIGateway(self.boto3_session)
+        recipe_type = recipe_controller.get_recipe_type()
+        api_name = '{}-{}'.format(recipe_type, self.app_id)
+        func_name = '{}-{}'.format(recipe_type, self.app_id)
+        api_url = api_client.get_rest_api_url(api_name, func_name)
+        return api_url
+
+    def get_rest_api_sdk(self, recipe_controller):
+        api_url = self.get_rest_api_url(recipe_controller)
+        raise NotImplementedError()
+
     def apply(self, recipe_controller):
         raise NotImplementedError()
 
-    def generate_sdk(self, recipe_controller):
-        raise NotImplementedError()
+
 
 
 class BillServiceController(ServiceController):
@@ -84,9 +130,6 @@ class BillServiceController(ServiceController):
 
     def apply(self, recipe):
         return
-
-    def generate_sdk(self, recipe):
-        return None
 
     def get_cost(self, start, end):
         response = self.cost_explorer.get_cost(start, end)
@@ -132,46 +175,8 @@ class AuthServiceController(ServiceController):
         return
 
     def apply(self, recipe_controller):
-        self._apply_cloud_api(recipe_controller)
-        self._deploy_cloud_api(recipe_controller)
-
-    def _apply_cloud_api(self, recipe_controller):
-        recipe_type = recipe_controller.get_recipe_type()
-        role_name = '{}-{}'.format(recipe_type, self.app_id)
-        lambda_client = Lambda(self.boto3_session)
-        iam = IAM(self.boto3_session)
-        role_arn = iam.create_role_and_attach_policies(role_name)
-
-        name = '{}-{}'.format(recipe_type, self.app_id)
-        desc = 'aws-interface cloud API'
-        runtime = 'python3.6'
-        handler = 'cloud.lambda_function.handler'
-
-        module_name = 'cloud'
-        module = importlib.import_module(module_name)
-        module_path = os.path.dirname(module.__file__)
-
-        recipe = recipe_controller.to_json()
-        zip_file = create_lambda_zipfile_bin(self.app_id, recipe, module_path)
-
-        try:
-            lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
-        except:
-            print('Function might already exist, Try updating function code.')
-            try:
-                lambda_client.update_function_code(name, zip_file)
-            except:
-                print('Update function failed')
-
-    def _deploy_cloud_api(self, recipe_controller):
-        recipe_type = recipe_controller.get_recipe_type()
-        api_name = '{}-{}'.format(recipe_type, self.app_id)
-        func_name = '{}-{}'.format(recipe_type, self.app_id)
-        api_gateway = APIGateway(self.boto3_session)
-        api_gateway.connect_with_lambda(api_name, func_name)
-
-    def generate_sdk(self, recipe_controller):
-        return
+        self.apply_cloud_api(recipe_controller)
+        self.deploy_cloud_api(recipe_controller)
 
     def create_user(self, recipe, email, password, extra):
         import cloud.auth.register as register

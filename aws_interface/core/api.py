@@ -25,6 +25,12 @@ class API:  # Abstract class
     def get_recipe_json_string(self):
         return self.get_recipe_controller().to_json()
 
+    def get_rest_api_url(self):
+        return self.service_controller.get_rest_api_url(self.recipe_controller)
+
+    def get_rest_api_sdk(self):
+        return self.service_controller.get_rest_api_sdk(self.recipe_controller)
+
     def common_init(self):
         # called when __init__ finished, it should implement on subclass. not on abstract class.
         raise NotImplementedError()
