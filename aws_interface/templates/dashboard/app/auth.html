@@ -12,11 +12,18 @@
         <div class="header-body">
 
             <div class="alert alert-primary" role="alert">
-                <strong>AWS DynamoDB, AWS Lambda</strong>  를 사용합니다.
+                <strong>AWS DynamoDB, AWS Lambda, AWS APIGateway</strong>  를 사용합니다.
             </div>
 
             <div class="alert alert-neutral" role="alert">
-                <strong>{{ rest_api_url }}</strong> 로 POST API 를 사용할 수 있습니다.
+                <div class="row">
+                    <div class="col">
+                        <strong>{{ rest_api_url }}</strong> 의 POST Method 를 호출 할 수 있습니다.
+                    </div>
+                    <div class="col-auto">
+                        <a href="" class="btn btn-sm btn-info">SDK 다운로드</a>
+                    </div>
+                </div>
             </div>
 
 
@@ -44,8 +51,8 @@
                 <div class="card-body">
                   <div class="row">
                     <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">접속 중인 회원 수</h5>
-                      <span class="h2 font-weight-bold mb-0">{{ session_count.item.count }} 명</span>
+                      <h5 class="card-title text-uppercase text-muted mb-0">접속 중인 세션 수</h5>
+                      <span class="h2 font-weight-bold mb-0">{{ session_count.item.count }} 개</span>
                     </div>
                     <div class="col-auto">
                         <a target="_blank" href="" class="btn btn-sm btn-primary">자세히 보기</a>

@@ -48,8 +48,7 @@ class APIGateway:
         api_id = self.get_rest_api_id(cloud_api_name)
         region = aws_region
         stage = Config.stage_name
-        resource = self.get_lambda_function_resource_id(api_id, lambda_func_name)
-        url = base_url.format(api_id, region, stage, resource)
+        url = base_url.format(api_id, region, stage, cloud_api_name)
         return url
 
     def connect_with_lambda(self, cloud_api_name, lambda_func_name, aws_region='ap-northeast-2'):
