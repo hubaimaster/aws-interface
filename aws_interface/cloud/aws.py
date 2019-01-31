@@ -35,6 +35,7 @@ class APIGateway:
         return parent_id
 
     def get_lambda_function_resource_id(self, rest_api_id, lambda_func_name):
+        print('rest_api_id:', rest_api_id)
         resources = self.get_resources(rest_api_id).get('items', [])
         resource_id = None
         for res in resources:
@@ -43,11 +44,11 @@ class APIGateway:
         return resource_id
 
     def get_rest_api_url(self, cloud_api_name, lambda_func_name, aws_region='ap-northeast-2'):
-        base_url = 'https://{api_id}.execute-api.{region}.amazonaws.com/{stage}/{resource}'
+        base_url = 'https://{}.execute-api.{}.amazonaws.com/{}/{}'
         api_id = self.get_rest_api_id(cloud_api_name)
         region = aws_region
         stage = Config.stage_name
-        resource = self.get_lambda_function_resource_id(cloud_api_name, lambda_func_name)
+        resource = self.get_lambda_function_resource_id(api_id, lambda_func_name)
         url = base_url.format(api_id, region, stage, resource)
         return url
 

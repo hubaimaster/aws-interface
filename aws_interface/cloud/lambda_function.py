@@ -79,7 +79,7 @@ def handler(event, context):
         'app_id': app_id,
         'admin': False,
     }
-    print('permissions:', permissions)
+
     if 'all' in permissions:
         module = importlib.import_module(module_name)
         body = module.do(data, boto3)
