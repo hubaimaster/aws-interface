@@ -217,7 +217,7 @@ class Auth(View):
         context['users'] = api.get_users()
         context['email_login'] = api.get_email_login()
         context['guest_login'] = api.get_guest_login()
-
+        context['rest_api_url'] = api.get_rest_api_url()
         return render(request, 'dashboard/app/auth.html', context=context)
 
     def post(self, request, app_id):

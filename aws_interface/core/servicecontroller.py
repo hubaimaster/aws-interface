@@ -20,7 +20,7 @@ def get_boto3_session(bundle):
 def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     output_filename = str(uuid.uuid4())
     # Make tmp_dir
-    tmp_dir = str(uuid.uuid4())
+    tmp_dir = 'tmp_{}'.format(str(uuid.uuid4()))
     if os.path.isdir(tmp_dir):
         os.remove(tmp_dir)
     os.mkdir(tmp_dir)
@@ -111,6 +111,7 @@ class ServiceController:
         api_name = '{}-{}'.format(recipe_type, self.app_id)
         func_name = '{}-{}'.format(recipe_type, self.app_id)
         api_url = api_client.get_rest_api_url(api_name, func_name)
+        print('api_url:', api_url)
         return api_url
 
     def get_rest_api_sdk(self, recipe_controller):
@@ -119,8 +120,6 @@ class ServiceController:
 
     def apply(self, recipe_controller):
         raise NotImplementedError()
-
-
 
 
 class BillServiceController(ServiceController):
