@@ -61,14 +61,13 @@ def handler(event, context):
     }
     parmas = event
     cloud_api_name = parmas.get('cloud_api_name', None)
-    with open('./cloud/recipe.json', 'r') as file:
-        recipe = file.read()
-        recipe = json.loads(recipe)
-        print('recipe:', type(recipe))
-
+    
+    with open('recipe.json', 'r') as f:
+        recipe = json.load(f)
+      
     with open('./cloud/app_id.txt', 'r') as file:
         app_id = file.read()
-
+        
     cloud_apis = recipe.get('cloud_apis', {})
     cloud_api = cloud_apis.get(cloud_api_name, {})
     module_name = cloud_api.get('module', None)
