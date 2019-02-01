@@ -120,17 +120,17 @@
         <!-- Navigation -->
         <ul class="navbar-nav mb-md-3">
           <li class="nav-item">
-            <a class="nav-link" href="">
+            <a id="link-summary" class="nav-link">
               <i class="ni ni-spaceship"></i> Summary
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">
+            <a id="link-event" class="nav-link">
               <i class="ni ni-palette"></i> Event
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">
+            <a id="link-retention" class="nav-link">
               <i class="ni ni-ui-04"></i> Retention
             </a>
           </li>
@@ -182,6 +182,18 @@
             }
           }
         });
+      });
+  </script>
+  
+  <script>
+      $("#link-event").click(function () {
+          alert("곧 지원될 예정입니다");
+      });
+      $("#link-retention").click(function () {
+          alert("곧 지원될 예정입니다");
+      });
+      $("#link-summary").click(function () {
+          alert("곧 지원될 예정입니다");
       });
   </script>
 

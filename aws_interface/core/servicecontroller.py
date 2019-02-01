@@ -25,7 +25,7 @@ def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
         os.remove(tmp_dir)
     os.mkdir(tmp_dir)
 
-    # Copy temp dir into root_name folder
+    # Copy lambda dir into temp/root_name folder
     shutil.copytree(dir_name, '{}/{}'.format(tmp_dir, root_name))
 
     # Copy recipe from recipe_controller
@@ -35,6 +35,50 @@ def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     # Write txt file included app_id
     with open('{}/{}/{}'.format(tmp_dir, root_name, 'app_id.txt'), 'w+') as file:
         file.write(app_id)
+
+    # Archive all files
+    shutil.make_archive(output_filename, 'zip', tmp_dir)
+    zip_file_name = '{}.zip'.format(output_filename)
+    zip_file = open(zip_file_name, 'rb')
+    zip_file_bin = zip_file.read()
+    zip_file.close()
+
+    # Remove temp files
+    os.remove(zip_file_name)
+    shutil.rmtree(tmp_dir)
+    return zip_file_bin
+
+
+def create_sdk_zipfile_bin(rest_api_url):
+    packages = [
+        'core.sdk.java',
+        'core.sdk.javascript',
+        'core.sdk.python3',
+        'core.sdk.swift'
+    ]
+    output_filename = str(uuid.uuid4())
+
+    # Make tmp_dir
+    tmp_dir = 'tmp_{}'.format(str(uuid.uuid4()))
+    if os.path.isdir(tmp_dir):
+        os.remove(tmp_dir)
+    os.mkdir(tmp_dir)
+
+    for package in packages:
+        sdk_name = package.split('.')[-1]
+        module = importlib.import_module(package)
+        module_path = os.path.dirname(module.__file__)
+
+        # Copy module_path into temp/sdk_name folder
+        shutil.copytree(module_path, '{}/{}'.format(tmp_dir, sdk_name))
+
+        # Remove __init__.py and __pycache__
+        os.remove('{}/{}/__init__.py'.format(tmp_dir, sdk_name))
+        shutil.rmtree('{}/{}/__pycache__'.format(tmp_dir, sdk_name))
+
+        # Write txt file included app_id
+        with open('{}/{}/{}'.format(tmp_dir, sdk_name, 'rest_api_url.txt'), 'w+') as file:
+            file.write(rest_api_url)
 
     # Archive all files
     shutil.make_archive(output_filename, 'zip', tmp_dir)
@@ -115,8 +159,9 @@ class ServiceController:
         return api_url
 
     def get_rest_api_sdk(self, recipe_controller):
-        api_url = self.get_rest_api_url(recipe_controller)
-        raise NotImplementedError()
+        rest_api_url = self.get_rest_api_url(recipe_controller)
+        sdk_bin = create_sdk_zipfile_bin(rest_api_url)
+        return sdk_bin
 
     def apply(self, recipe_controller):
         raise NotImplementedError()

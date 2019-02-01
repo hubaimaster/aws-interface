@@ -1,6 +1,6 @@
 import warnings
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.views.generic import View
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import get_user_model, login, logout, authenticate
@@ -211,21 +211,28 @@ class Auth(View):
         context = Util.get_context(request)
         context['app_id'] = app_id
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
-        context['user_groups'] = api.get_user_groups()
-        context['user_count'] = api.get_user_count()
-        context['session_count'] = api.get_session_count()
-        context['users'] = api.get_users()
-        context['email_login'] = api.get_email_login()
-        context['guest_login'] = api.get_guest_login()
-        context['rest_api_url'] = api.get_rest_api_url()
-        return render(request, 'dashboard/app/auth.html', context=context)
+        cmd = request.GET.get('cmd', None)
+        if cmd == 'download_sdk':
+            sdk_bin = api.get_rest_api_sdk()
+            response = HttpResponse(sdk_bin, content_type='application/x-binary')
+            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('auth_sdk.zip')
+            return response
+        else:
+            context['user_groups'] = api.get_user_groups()
+            context['user_count'] = api.get_user_count()
+            context['session_count'] = api.get_session_count()
+            context['users'] = api.get_users()
+            context['email_login'] = api.get_email_login()
+            context['guest_login'] = api.get_guest_login()
+            context['rest_api_url'] = api.get_rest_api_url()
+            return render(request, 'dashboard/app/auth.html', context=context)
 
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
         cmd = request.POST['cmd']
-        print('cmd:', cmd)
+
         # Recipe
         if cmd == 'delete_group':
             name = request.POST['group_name']
