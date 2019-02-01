@@ -49,7 +49,7 @@ def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     return zip_file_bin
 
 
-def create_sdk_zipfile_bin(rest_api_url):
+def create_sdk_zipfile_bin(recipe_controller, rest_api_url):
     packages = [
         'core.sdk.java',
         'core.sdk.javascript',
@@ -77,8 +77,14 @@ def create_sdk_zipfile_bin(rest_api_url):
         shutil.rmtree('{}/{}/__pycache__'.format(tmp_dir, sdk_name))
 
         # Write txt file included app_id
-        with open('{}/{}/{}'.format(tmp_dir, sdk_name, 'rest_api_url.txt'), 'w+') as file:
-            file.write(rest_api_url)
+        cloud_apis = recipe_controller.get_cloud_apis()
+        info = {
+            'rest_api_url': rest_api_url,
+            'cloud_apis': list(cloud_apis)
+        }
+
+        with open('{}/{}/{}'.format(tmp_dir, sdk_name, 'info.json'), 'w+') as fp:
+            json.dump(info, fp)
 
     # Archive all files
     shutil.make_archive(output_filename, 'zip', tmp_dir)
@@ -160,7 +166,7 @@ class ServiceController:
 
     def get_rest_api_sdk(self, recipe_controller):
         rest_api_url = self.get_rest_api_url(recipe_controller)
-        sdk_bin = create_sdk_zipfile_bin(rest_api_url)
+        sdk_bin = create_sdk_zipfile_bin(recipe_controller, rest_api_url)
         return sdk_bin
 
     def apply(self, recipe_controller):
