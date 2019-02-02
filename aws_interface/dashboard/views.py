@@ -91,6 +91,15 @@ class AccessKey(View):
         context = Util.get_context(request)
         return render(request, 'dashboard/accesskey.html', context=context)
 
+    def post(self, request):
+        context = Util.get_context(request)
+        password = request.POST['password']
+        access_key = request.POST['access_key']
+        secret_key = request.POST['secret_key']
+        request.user.set_aws_credentials(password, access_key, secret_key)
+        request.user.save()
+        return redirect('apps')
+
 
 class Register(View):
     def get(self, request):
