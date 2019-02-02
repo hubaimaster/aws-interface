@@ -7,7 +7,7 @@ def examples():  # Just call it. It will help you !
     apis = get_api_list()
     for api in apis:
         print('------> API name: {}'.format(api['name']))
-        print('---->>> call_api("{}", {})'.format(api['name'], api.get('info', {}).get('input_format')))
+        print('------> call_api("{}", {})'.format(api['name'], api.get('info', {}).get('input_format')))
         print('REST API Format: {}'.format(api.get('info', {})))
         print('')
 

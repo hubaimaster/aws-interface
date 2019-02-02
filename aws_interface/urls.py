@@ -28,8 +28,7 @@ urlpatterns = [
     path('register/', Register.as_view(), name='register'),
     path('apps/', Apps.as_view(), name='apps'),
     path('logout/', Logout.as_view(), name='logout'),
-    path('account/', Account.as_view(), name='account'),
-    path('accesskey/', Account.as_view(), name='accesskey'),
+    path('accesskey/', AccessKey.as_view(), name='accesskey'),
 
     path('<app_id>/overview', Overview.as_view(), name='overview'),
     path('<app_id>/bill', Bill.as_view(), name='bill'),

@@ -86,10 +86,10 @@ class Index(LoginRequiredMixin, View):
         return redirect('apps')
 
 
-class Account(View):
+class AccessKey(View):
     def get(self, request):
         context = Util.get_context(request)
-        return render(request, 'dashboard/account.html', context=context)
+        return render(request, 'dashboard/accesskey.html', context=context)
 
 
 class Register(View):
