@@ -11,6 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from dashboard.models import *
 from core.api import *
 
+from botocore.errorfactory import ClientError
 
 class Util:
     @classmethod
@@ -218,14 +219,18 @@ class Auth(View):
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('auth_sdk.zip')
             return response
         else:
-            context['user_groups'] = api.get_user_groups()
-            context['user_count'] = api.get_user_count()
-            context['session_count'] = api.get_session_count()
-            context['users'] = api.get_users()
-            context['email_login'] = api.get_email_login()
-            context['guest_login'] = api.get_guest_login()
-            context['rest_api_url'] = api.get_rest_api_url()
-            return render(request, 'dashboard/app/auth.html', context=context)
+            try:
+                context['user_groups'] = api.get_user_groups()
+                context['user_count'] = api.get_user_count()
+                context['session_count'] = api.get_session_count()
+                context['users'] = api.get_users()
+                context['email_login'] = api.get_email_login()
+                context['guest_login'] = api.get_guest_login()
+                context['rest_api_url'] = api.get_rest_api_url()
+                return render(request, 'dashboard/app/auth.html', context=context)
+            except ClientError as ex:
+                context['error'] = ex
+                return render(request, 'dashboard/wait.html', context=context)
 
     def post(self, request, app_id):
         context = Util.get_context(request)

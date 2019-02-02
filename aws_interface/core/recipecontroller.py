@@ -1,5 +1,5 @@
 import json
-import uuid
+import importlib
 
 
 class RecipeController:
@@ -23,10 +23,16 @@ class RecipeController:
     def put_cloud_api(self, name, module, permissions=['all']):  # 'cloud.auth.login'
         if 'cloud_apis' not in self.data:
             self.data['cloud_apis'] = {}
+        try:
+            info = importlib.import_module(module).info
+        except:
+            print('{} module does not have an info variable'.format(name))
+            info = {}
         self.data['cloud_apis'][name] = {
             'name': name,
             'permissions': permissions,
             'module': module,
+            'info': info
         }
         return True
 

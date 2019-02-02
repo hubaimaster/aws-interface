@@ -2,12 +2,14 @@ import requests
 import json
 
 
-def show_api_list():  # Just call it. It will help you !
+def examples():  # Just call it. It will help you !
     print('Those are examples of aws_interface usage')
     apis = get_api_list()
     for api in apis:
-        print('------>API name:{}', api['name'])
-        print('ex:>>> call_api("{}", {})'.format(api['name'], {'email': 'str', 'password': 'str'}))
+        print('------> API name: {}'.format(api['name']))
+        print('---->>> call_api("{}", {})'.format(api['name'], api.get('info', {}).get('input_format')))
+        print('REST API Format: {}'.format(api.get('info', {})))
+        print('')
 
 
 def get_api_list():
@@ -29,7 +31,9 @@ def post(url, data):
     return response
 
 
-def call_api(api_name, data):
+def call_api(api_name, data=None):
+    if not data:
+        data = {}
     url = get_api_url()
     data['cloud_api_name'] = api_name
     data = json.dumps(data)
@@ -37,6 +41,5 @@ def call_api(api_name, data):
     return resp.json()
 
 
-if __name__ == '__main__':  # EXAMPLE
-    resp = call_api("login", {'email': 'str', 'password': 'str'})
-    print(resp)
+if __name__ == '__main__':  # SHOW EXAMPLE
+    examples()
