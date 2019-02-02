@@ -96,8 +96,10 @@ class AccessKey(View):
         password = request.POST['password']
         access_key = request.POST['access_key']
         secret_key = request.POST['secret_key']
+        # Logic 
         request.user.set_aws_credentials(password, access_key, secret_key)
         request.user.save()
+        Util.add_alert(request, 'AccessKey 를 변경하였습니다.')
         return redirect('apps')
 
 
