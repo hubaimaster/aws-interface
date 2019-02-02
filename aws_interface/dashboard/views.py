@@ -1,4 +1,5 @@
 import warnings
+import boto3
 
 from django.shortcuts import render, redirect, HttpResponse
 from django.views.generic import View
@@ -12,6 +13,7 @@ from dashboard.models import *
 from core.api import *
 
 from botocore.errorfactory import ClientError
+
 
 class Util:
     @classmethod
@@ -96,7 +98,7 @@ class AccessKey(View):
         password = request.POST['password']
         access_key = request.POST['access_key']
         secret_key = request.POST['secret_key']
-        # Logic 
+        # Check AccessKey.. TODO
         request.user.set_aws_credentials(password, access_key, secret_key)
         request.user.save()
         Util.add_alert(request, 'AccessKey 를 변경하였습니다.')
@@ -198,7 +200,9 @@ class Apps(LoginRequiredMixin, View):
 class Overview(View):
     def get(self, request, app_id):
         context = Util.get_context(request)
+        app = App.objects.get(id=app_id)
         context['app_id'] = app_id
+        context['app_name'] = app.name
         return render(request, 'dashboard/app/overview.html', context=context)
 
 
