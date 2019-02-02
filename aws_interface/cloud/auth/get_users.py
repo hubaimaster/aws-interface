@@ -2,12 +2,21 @@ from cloud.aws import *
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
-input_format = {
-
-}
-output_format = {
-    'item': {
-        'count': int
+info = {
+    'input_format': {
+        'start_key': 'str'
+    },
+    'output_format': {
+        'items': [{
+            'id': 'str',
+            'creationDate': 'int',
+            'email': 'str',
+            'passwordHash': 'str',
+            'salt': 'str',
+            'group': 'str',
+            'extra': 'map',
+        }, ],
+        'end_key': 'str'
     }
 }
 

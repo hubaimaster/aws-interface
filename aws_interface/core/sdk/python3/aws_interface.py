@@ -37,6 +37,6 @@ def call_api(api_name, data):
     return resp.json()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # EXAMPLE
     resp = call_api("login", {'email': 'str', 'password': 'str'})
     print(resp)

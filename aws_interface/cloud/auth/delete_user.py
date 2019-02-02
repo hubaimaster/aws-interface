@@ -3,12 +3,12 @@ from cloud.aws import *
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
-input_format = {
-
-}
-output_format = {
-    'item': {
-        'count': int
+info = {
+    'input_format': {
+        'session_id': 'str'
+    },
+    'output_format': {
+        'success': 'bool'
     }
 }
 

@@ -4,12 +4,14 @@ from cloud.crypto import *
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
-input_format = {
-
-}
-output_format = {
-    'item': {
-        'count': int
+info = {
+    'input_format': {
+        'email': 'str',
+        'password': 'str',
+        'extra': 'map'
+    },
+    'output_format': {
+        'message': 'str',
     }
 }
 
@@ -31,13 +33,20 @@ def do(data, boto3):
     partition = 'user'
 
     dynamo = DynamoDB(boto3)
-
-    item = {
-        'email': email,
-        'passwordHash': password_hash,
-        'salt': salt,
-        'group': 'user',
-        'extra': extra,
-    }
-    dynamo.put_item(table_name, partition, item)
-    return response
+    resp = dynamo.get_items_with_index(table_name, 'partition-email', 'partition', 'user', 'email', email)
+    users = resp['Items']
+    if len(users) > 0:
+        response['message'] = '이미 가입된 회원이 존재합니다.'
+        response['error'] = '1'
+        return response
+    else:
+        item = {
+            'email': email,
+            'passwordHash': password_hash,
+            'salt': salt,
+            'group': 'user',
+            'extra': extra,
+        }
+        dynamo.put_item(table_name, partition, item)
+        response['message'] = '회원가입에 성공하였습니다.'
+        return response

@@ -3,12 +3,18 @@ from cloud.aws import *
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
-input_format = {
-
-}
-output_format = {
-    'item': {
-        'count': int
+info = {
+    'input_format': {
+        'session_id': 'str'
+    },
+    'output_format': {
+        'item': {
+            'email': 'str',
+            'passwordHash': 'str',
+            'salt': 'str',
+            'group': 'str',
+            'extra': 'map',
+        }
     }
 }
 
@@ -19,7 +25,7 @@ def do(data, boto3):
     params = data['params']
     app_id = data['app_id']
 
-    session_id = params.get('id', None)
+    session_id = params.get('session_id', None)
 
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 

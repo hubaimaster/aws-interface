@@ -3,12 +3,20 @@ from cloud.aws import *
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
-input_format = {
-
-}
-output_format = {
-    'item': {
-        'count': int
+info = {
+    'input_format': {
+        'user_id': 'str'
+    },
+    'output_format': {
+        'item': {
+            'id': 'str',
+            'creationDate': 'int',
+            'email': 'str',
+            'passwordHash': 'str',
+            'salt': 'str',
+            'group': 'str',
+            'extra': 'map',
+        }
     }
 }
 
@@ -19,12 +27,12 @@ def do(data, boto3):
     params = data['params']
     app_id = data['app_id']
 
-    _user_id = params.get('id', None)
+    user_id = params.get('user_id', None)
 
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)
-    result = dynamo.get_item(table_name, _user_id)
+    result = dynamo.get_item(table_name, user_id)
     item = result.get('Item', None)
     response['item'] = item
     return response
