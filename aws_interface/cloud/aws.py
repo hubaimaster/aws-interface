@@ -35,7 +35,6 @@ class APIGateway:
         return parent_id
 
     def get_lambda_function_resource_id(self, rest_api_id, lambda_func_name):
-        print('rest_api_id:', rest_api_id)
         resources = self.get_resources(rest_api_id).get('items', [])
         resource_id = None
         for res in resources:
@@ -57,8 +56,8 @@ class APIGateway:
 
         # Find existing rest api
         rest_api_id = self.get_rest_api_id(cloud_api_name)
-        root_resource_id = self.get_root_resource_id(cloud_api_name)
-        resource_id = self.get_lambda_function_resource_id(cloud_api_name, lambda_func_name)
+        root_resource_id = self.get_root_resource_id(rest_api_id)
+        resource_id = self.get_lambda_function_resource_id(rest_api_id, lambda_func_name)
 
         stage_name = Config.stage_name
 

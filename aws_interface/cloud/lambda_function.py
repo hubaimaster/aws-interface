@@ -62,7 +62,7 @@ def handler(event, context):
     parmas = event
     cloud_api_name = parmas.get('cloud_api_name', None)
     
-    with open('recipe.json', 'r') as f:
+    with open('./cloud/recipe.json', 'r') as f:
         recipe = json.load(f)
       
     with open('./cloud/app_id.txt', 'r') as file:
