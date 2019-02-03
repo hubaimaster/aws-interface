@@ -158,15 +158,13 @@ class DatabaseAPI(API):
     def get_item(self, item_id):
         return self.service_controller.get_item(item_id)
 
+    def delete_item(self, item_id):
+        raise self.service_controller.delete_item(item_id)
+
     def get_items(self, partition):
         return self.service_controller.get_items(partition)
 
-    def search_item_ids(self, query):
+    def search_items(self, query):
         raise NotImplementedError()
 
-    def create_item(self, item_json):
-        raise NotImplementedError()
-
-    def delete_item(self, item_id):
-        raise NotImplementedError()
 

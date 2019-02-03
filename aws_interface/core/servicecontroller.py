@@ -344,3 +344,19 @@ class DatabaseServiceController(ServiceController):
     def apply(self, recipe_controller):
         self.apply_cloud_api(recipe_controller)
         self.deploy_cloud_api(recipe_controller)
+
+    def put_item(self, partition, item):
+        return
+
+    def update_item(self, item_id, field_name, field_value):
+        return
+
+    def get_item(self, item_id):
+        return
+
+    def delete_item(self, item_id):
+        return
+
+    def get_items(self, partition):
+        return
+
