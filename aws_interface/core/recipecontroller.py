@@ -128,17 +128,17 @@ class DatabaseRecipeController(RecipeController):
     def common_init(self):
         self.data['recipe_type'] = 'database'
 
-    def put_table(self, table_name):
-        if 'tables' not in self.data:
-            self.data['tables'] = {}
-        self.data['tables'][table_name] = {}
+    def put_partition(self, partition_name):
+        if 'partitions' not in self.data:
+            self.data['partitions'] = {}
+        self.data['partitions'][partition_name] = {}
 
-    def get_tables(self):
+    def get_partitions(self):
         tables = self.data.get('tables', {})
         return tables
 
-    def get_table(self, table_name):
-        tables = self.get_tables()
+    def get_partition(self, table_name):
+        tables = self.get_partitions()
         table = tables.get(table_name, None)
         return table
 
@@ -154,7 +154,7 @@ class DatabaseRecipeController(RecipeController):
         return True
 
     def get_columns(self, table_name):
-        table = self.get_table(table_name)
+        table = self.get_partition(table_name)
         columns = table.get('columns', {})
         return columns
 

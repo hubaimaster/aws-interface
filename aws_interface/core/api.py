@@ -126,21 +126,40 @@ class DatabaseAPI(API):
             self.recipe_controller.load_json_string(self.recipe_json_string)
 
     # Recipe
-    def get_tables(self):
-        return self.recipe_controller.get_tables()
+    def get_partitions(self):
+        return self.recipe_controller.get_partitions()
 
-    def put_table(self, table_name):
-        return self.recipe_controller.put_table(table_name)
+    def put_partition(self, partition_name):
+        return self.recipe_controller.put_partition(partition_name)
 
-    def delete_table(self, table_name):
-        raise NotImplementedError()
+    def delete_partition(self, partition_name):
+        return self.recipe_controller.delete_partition(partition_name)
 
-    def get_table(self, table_name):
-        return self.recipe_controller.get_table(table_name)
+    def get_partition(self, partition_name):
+        return self.recipe_controller.get_partition(partition_name)
+
+    def put_partition_field_info(self, partition_name, field_name, field_type, read_permission, write_permission):
+        return self.recipe_controller.put_partition_field_info(partition_name, field_name,
+                                                               field_type, read_permission, write_permission)
+
+    def get_partition_field_info(self, partition_name, field_name):
+        return self.recipe_controller.get_partition_field_info(partition_name, field_name)
+
+    def delete_partition_field_info(self, partition_name, field_name):
+        return self.recipe_controller.delete_partition_field_info(partition_name, field_name)
 
     # Service
+    def put_item(self, partition, item):
+        return self.service_controller.put_item(partition, item)
+
+    def update_item(self, item_id, field_name, field_value):
+        return self.service_controller.update_item(item_id, field_name, field_value)
+
     def get_item(self, item_id):
-        raise NotImplementedError()
+        return self.service_controller.get_item(item_id)
+
+    def get_items(self, partition):
+        return self.service_controller.get_items(partition)
 
     def search_item_ids(self, query):
         raise NotImplementedError()
