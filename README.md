@@ -20,6 +20,7 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 - Auth: 로그인 및 사용자 인증
 - Database: 각종 데이터
 - Storage: 파일 저장 및 배포
+- Logic : 서버리스 API 코드 생성 및 배포
 
 ### Dashboard (대시보드)
 레시피를 구성하고, DB를 관리할 수 있는 웹 인터페이스를 대시보드라고 부릅니다. [aws-interface.com](http://aws-interface.com) 에서  IAM 정보를 입력해서 계정을 만들거나 로컬에서 호스팅된 대시보드에 IAM 정보를 등록한 후에 이용 가능합니다. 웹 인터페이스는 Django 프레임워크를 기반으로 합니다.
