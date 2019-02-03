@@ -134,23 +134,38 @@ class DatabaseRecipeController(RecipeController):
         self.data['partitions'][partition_name] = {}
 
     def get_partitions(self):
-        tables = self.data.get('tables', {})
-        return tables
+        partitions = self.data.get('partitions', {})
+        return partitions
 
-    def get_partition(self, table_name):
-        tables = self.get_partitions()
-        table = tables.get(table_name, None)
-        return table
+    def get_partition(self, partition_name):
+        partitions = self.get_partitions()
+        partition = partitions.get(partition_name, None)
+        return partition
 
-    def put_column(self, table_name, column_name, value_type, read_groups, write_groups):
-        self.data.setdefault('tables', {})
-        self.data['tables'].setdefault(table_name, {})
-        self.data['tables'][table_name].setdefault('columns', {})
-        self.data['tables'][table_name]['columns'][column_name] = {
-            'value_type': value_type,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
+    def delete_partition(self, partition_name):
+        if 'partitions' not in self.data:
+            self.data['partitions'] = {}
+        self.data['partitions'].pop(partition_name)
+        return True
+
+    def put_partition_field_info(self, partition_name, field_name, field_type, read_permission, write_permission):
+        self.data.setdefault('partitions', {})
+        self.data['partitions'].setdefault(partition_name, {})
+        self.data['partitions'][partition_name].setdefault(field_name, {})
+        self.data['partitions'][partition_name][field_name] = {
+            'field_name': field_name,
+            'field_type': field_type,
+            'read_permission': read_permission,
+            'write_permission': write_permission,
         }
+        return True
+
+    def get_partition_field_info(self, partition_name, field_name):
+        field_info = self.data.get('partitions', {}).get(partition_name, {}).get(field_name, None)
+        return field_info
+
+    def delete_partition_field_info(self, partition_name, field_name):
+        self.data.get('partitions', {}).get(partition_name, {}).pop(field_name)
         return True
 
     def get_columns(self, table_name):
