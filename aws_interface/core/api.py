@@ -138,9 +138,8 @@ class DatabaseAPI(API):
     def get_partition(self, partition_name):
         return self.recipe_controller.get_partition(partition_name)
 
-    def put_partition_field_info(self, partition_name, field_name, field_type, read_permission, write_permission):
-        return self.recipe_controller.put_partition_field_info(partition_name, field_name,
-                                                               field_type, read_permission, write_permission)
+    def put_partition_field_info(self, partition_name, field_name, field_type, required):
+        return self.recipe_controller.put_partition_field_info(partition_name, field_name, field_type, required)
 
     def get_partition_field_info(self, partition_name, field_name):
         return self.recipe_controller.get_partition_field_info(partition_name, field_name)
@@ -149,11 +148,14 @@ class DatabaseAPI(API):
         return self.recipe_controller.delete_partition_field_info(partition_name, field_name)
 
     # Service
-    def put_item(self, partition, item):
-        return self.service_controller.put_item(partition, item)
+    def create_item(self, partition, item, read_permissions=['all'], write_permissions=['all']):
+        return self.service_controller.create_item(partition, item, read_permissions, write_permissions)
 
-    def update_item(self, item_id, field_name, field_value):
-        return self.service_controller.update_item(item_id, field_name, field_value)
+    def update_item(self, item_id, item, read_permissions=['all'], write_permissions=['all']):
+        return self.service_controller.update_item(item_id, item, read_permissions, write_permissions)
+
+    def update_item_field(self, item_id, field_name, field_value):
+        return self.service_controller.update_item_field(item_id, field_name, field_value)
 
     def get_item(self, item_id):
         return self.service_controller.get_item(item_id)

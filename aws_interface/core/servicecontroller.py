@@ -345,10 +345,13 @@ class DatabaseServiceController(ServiceController):
         self.apply_cloud_api(recipe_controller)
         self.deploy_cloud_api(recipe_controller)
 
-    def put_item(self, partition, item):
+    def create_item(self, partition, item, read_permissions, write_permissions):
         return
 
-    def update_item(self, item_id, field_name, field_value):
+    def update_item(self, item_id, item, read_permissions, write_permissions):
+        return
+
+    def update_item_field(self, item_id, field_name, field_value):
         return
 
     def get_item(self, item_id):

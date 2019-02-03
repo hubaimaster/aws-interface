@@ -5,7 +5,8 @@ from cloud.aws import *
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'session_id': 'str'
+        'session_id': 'str',
+        'user_id': 'str',
     },
     'output_format': {
         'success': 'bool'
@@ -24,6 +25,6 @@ def do(data, boto3):
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)
-    _ = dynamo.delete_item(table_name, 'user', user_id)
+    _ = dynamo.delete_item(table_name, user_id)
     response['success'] = True
     return response

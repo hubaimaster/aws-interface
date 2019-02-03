@@ -55,7 +55,7 @@ class AuthRecipeController(RecipeController):
 
     def _init_user_group(self):
         self.default_groups = {
-            'all': '기본그룹, 로그인 하지 않은 익명 그룹입니다.',
+            'all': '기본그룹, 로그인 하지 않은 익명 사용자를 포함한 모든 그룹입니다.',
             'admin': '기본그룹, 모든 권한을 가지고 있습니다.',
             'owner': '기본그룹, 자신이 작성한 데이터에 대해 모든 권한을 가지고 있습니다.',
             'user': '기본그룹, 회원 가입한 일반 사용자 그룹입니다.'
@@ -148,15 +148,14 @@ class DatabaseRecipeController(RecipeController):
         self.data['partitions'].pop(partition_name)
         return True
 
-    def put_partition_field_info(self, partition_name, field_name, field_type, read_permission, write_permission):
+    def put_partition_field_info(self, partition_name, field_name, field_type, required):
         self.data.setdefault('partitions', {})
         self.data['partitions'].setdefault(partition_name, {})
         self.data['partitions'][partition_name].setdefault(field_name, {})
         self.data['partitions'][partition_name][field_name] = {
             'field_name': field_name,
             'field_type': field_type,
-            'read_permission': read_permission,
-            'write_permission': write_permission,
+            'required': required,
         }
         return True
 
@@ -167,13 +166,3 @@ class DatabaseRecipeController(RecipeController):
     def delete_partition_field_info(self, partition_name, field_name):
         self.data.get('partitions', {}).get(partition_name, {}).pop(field_name)
         return True
-
-    def get_columns(self, table_name):
-        table = self.get_partition(table_name)
-        columns = table.get('columns', {})
-        return columns
-
-    def get_column(self, table_name, column_name):
-        columns = self.get_columns(table_name)
-        column = columns.get(column_name, None)
-        return column

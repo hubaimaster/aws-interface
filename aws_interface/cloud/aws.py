@@ -304,7 +304,12 @@ class DynamoDB:
                 continue
         return responses
 
-    def delete_item(self, table_name, partition, item_id):
+    def delete_item(self, table_name, item_id):
+        item = self.get_item(table_name, item_id)
+        partition = item.get('Item', {}).get('partition', None)
+        if not partition:
+            print('It cannot be removed. table_name: {}, item_id: {}'.format(table_name, item_id))
+            return False
         response = self.client.delete_item(
             TableName=table_name,
             Key={

@@ -79,16 +79,20 @@ def handler(event, context):
         'app_id': app_id,
         'admin': False,
     }
+    import cloud.auth.get_me as get_me
+    user = get_me.do(data, boto3).get('item', None)
+    data['user'] = user
 
+    module = importlib.import_module(module_name)
     if 'all' in permissions:
-        module = importlib.import_module(module_name)
+        body = module.do(data, boto3)
+    elif user.get('group', None) in permissions:
         body = module.do(data, boto3)
     else:
-        import cloud.auth.get_me as get_me
-        me = get_me.do(data, boto3).get('item', None)
-        if me.get('group', None) in permissions:
-            module = importlib.import_module(module_name)
-            body = module.do(data, boto3)
+        body = {
+            'error': '3',
+            'message': 'permission denied'
+        }
 
     response['body'] = body
     return response
