@@ -35,4 +35,5 @@ urlpatterns = [
     path('<app_id>/auth', Auth.as_view(), name='auth'),
     path('<app_id>/database', Database.as_view(), name='database'),
     path('<app_id>/storage', Storage.as_view(), name='storage'),
+    path('<app_id>/logic', Logic.as_view(), name='logic'),
 ]

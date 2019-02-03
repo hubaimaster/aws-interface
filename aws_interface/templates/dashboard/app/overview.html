@@ -16,7 +16,7 @@
           <div class="col-lg-9 col-md-9">
             <h1 class="display-2 text-white">{{ app_name }}</h1>
             <h2 class="text-white">AWS-Interface 에 오신걸 환영합니다</h2>
-            <p class="text-white mt-0 mb-5">몇번의 클릭을 통해 강력한 백엔드 서비스를 순식간에 생성할 수 있습니다.</p>
+            <p class="text-white mt-0 mb-5">간단한 설정을 통해 강력한 백엔드 서비스를 순식간에 생성할 수 있습니다.</p>
             <a href="#!" class="btn btn-success">공식 문서 확인</a>
               <a href="https://github.com/hubaimaster/aws-interface" target="_blank" class="btn btn-neutral btn-icon">
                   <span class="nav-link-inner--text">View on Github</span>
@@ -28,7 +28,6 @@
 
     <!-- Page content -->
     <div class="container-fluid mt--8">
-
       <div class="row mt-3">
         <div class="col-xl-6 mb-5 mb-xl-0">
           <div class="card card-stats shadow">
@@ -44,7 +43,7 @@
               </div>
             </div>
             <div class="card-footer">
-                <a class="btn btn-sm btn-primary text-white">바로가기</a>
+                <a href="{% url 'bill' app_id %}" class="btn btn-sm btn-primary text-white">바로가기</a>
             </div>
           </div>
         </div>
@@ -63,8 +62,8 @@
               </div>
             </div>
               <div class="card-footer">
-                <a class="btn btn-sm btn-primary text-white">바로가기</a>
-                <a class="btn btn-sm btn-info text-white">SDK 다운로드</a>
+                <a href="{% url 'auth' app_id %}" class="btn btn-sm btn-primary text-white">바로가기</a>
+                <a href="{% url 'auth' app_id %}?cmd=download_sdk" class="btn btn-sm btn-info text-white">SDK 다운로드</a>
             </div>
           </div>
         </div>
@@ -86,8 +85,8 @@
               </div>
             </div>
               <div class="card-footer">
-                <a class="btn btn-sm btn-primary text-white">바로가기</a>
-                  <a class="btn btn-sm btn-info text-white">SDK 다운로드</a>
+                <a href="{% url 'database' app_id %}" class="btn btn-sm btn-primary text-white">바로가기</a>
+                  <a href="{% url 'database' app_id %}?cmd=download_sdk" class="btn btn-sm btn-info text-white">SDK 다운로드</a>
             </div>
           </div>
         </div>
@@ -106,8 +105,8 @@
               </div>
             </div>
               <div class="card-footer">
-                <a class="btn btn-sm btn-primary text-white">바로가기</a>
-                  <a class="btn btn-sm btn-info text-white">SDK 다운로드</a>
+                <a href="{% url 'storage' app_id %}" class="btn btn-sm btn-primary text-white">바로가기</a>
+                  <a href="{% url 'storage' app_id %}?cmd=download_sdk" class="btn btn-sm btn-info text-white">SDK 다운로드</a>
             </div>
           </div>
         </div>
@@ -130,8 +129,8 @@
               </div>
             </div>
               <div class="card-footer">
-                <a class="btn btn-sm btn-primary text-white">바로가기</a>
-                  <a class="btn btn-sm btn-info text-white">SDK 다운로드</a>
+                <a href="{% url 'logic' app_id %}" class="btn btn-sm btn-primary text-white">바로가기</a>
+                  <a href="{% url 'logic' app_id %}?cmd=download_sdk" class="btn btn-sm btn-info text-white">SDK 다운로드</a>
             </div>
           </div>
         </div>
