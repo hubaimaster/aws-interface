@@ -31,26 +31,61 @@
               <table class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
-                    <th scope="col">테이블</th>
+                    <th scope="col">파티션</th>
                   </tr>
                 </thead>
                 <tbody>
 
                   <tr>
-                    <th scope="row" class="text-primary">
-                      테이블 추가 +
+                    <th scope="row" data-toggle="modal" data-target="#modal-add-partition" class="text-primary">
+                      파티션 추가 +
                     </th>
+                    <div class="modal fade" id="modal-add-partition" tabindex="-1" role="dialog" aria-labelledby="modal-add-partition" aria-hidden="true">
+                        <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h4 class="modal-title" id="modal-title-default">파티션 추가</h4>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                              </button>
+                            </div>
+                                <input name="cmd" value="put_group" hidden>
+                                <div class="modal-body">
+                                    <div class="pl-lg-12">
+                                      <div class="row">
+                                        <div class="col-lg-12">
+                                          <div class="form-group">
+                                            <label class="form-control-label" for="partition-name">이름</label>
+                                            <input id="partition-name" type="text" class="form-control form-control-alternative" placeholder="파티션 이름">
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  <p>
+                                      확인 버튼을 클릭하여 파티션을 생성합니다. </br> 파티션은 RDB의 테이블과 유사한 개념입니다.
+                                  </p>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                  <button id="add-partition-btn" class="btn btn-primary">확인</button>
+                                </div>
+                          </div>
+                        </div>
+                      </div>
                   </tr>
+
                   <tr>
                     <th scope="row">
                       테이블트
                     </th>
                   </tr>
-                <tr>
+
+                  <tr>
                     <th scope="row">
                       테이블스리
                     </th>
                   </tr>
+
                 </tbody>
               </table>
             </div>
@@ -65,7 +100,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <th scope="row" class="text-primary">
+                    <th id="add-item-btn" scope="row" data-toggle="modal" class="text-primary">
                       아이템 추가 +
                     </th>
                   </tr>
@@ -93,9 +128,65 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <th scope="row" class="text-primary">
+                    <th scope="row" data-toggle="modal" data-target="#modal-add-field" class="text-primary">
                       필드 추가 +
                     </th>
+                    <div class="modal fade" id="modal-add-field" tabindex="-1" role="dialog" aria-labelledby="modal-add-field" aria-hidden="true">
+                        <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h4 class="modal-title" id="modal-title-default">필드 추가</h4>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                              </button>
+                            </div>
+                                <input name="cmd" value="put_group" hidden>
+                                <div class="modal-body">
+                                    <div class="pl-lg-12">
+                                      <div class="row">
+                                        <div class="col-lg-12">
+                                          <div class="form-group">
+                                            <label class="form-control-label" for="field-key">키</label>
+                                            <input id="field-key" type="text" class="form-control form-control-alternative" placeholder="필드 키">
+                                          </div>
+                                          <div class="form-group">
+                                            <label class="form-control-label" for="field-value">값</label>
+                                            <input id="field-value" type="text" class="form-control form-control-alternative" placeholder="필드 값">
+                                          </div>
+                                          <div class="form-group">
+                                            <label class="form-control-label" for="field-value">읽기 권한</label>
+                                            <select id="field-read-permission" class="form-control">
+                                                {% for group in user_groups %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                          </div>
+
+                                          <div class="form-group">
+                                            <label class="form-control-label" for="field-value">쓰기/지우기 권한</label>
+                                            <select id="field-write-permission" class="form-control">
+                                                {% for group in user_groups %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                          </div>
+
+                                        </div>
+                                      </div>
+                                    </div>
+                                  <p>
+                                      확인 버튼을 클릭하여 아이템을 생성합니다. </br>
+                                      필드 키는 RDB 컬럼의 이름, 필드 값은 컬럼의 값과 같은 개념입니다. </br>
+                                      필드는 아이템에 종속됩니다.
+                                  </p>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                  <button id="add-field-btn" class="btn btn-primary">확인</button>
+                                </div>
+                          </div>
+                        </div>
+                      </div>
                   </tr>
                   <tr>
                     <th scope="row">
@@ -127,5 +218,50 @@
       </footer>
     </div>
   </div>
+
+  <script>
+  function add_partition(){
+      var partition_name = $("#partition-name").val();
+      $.post("", {
+          cmd: "add_partition",
+          partition_name: partition_name,
+      }, function (data) {
+
+      });
+  }
+  function add_item(){
+      $.post("", {
+          cmd: "add_item",
+      }, function (data) {
+
+      });
+  }
+  function add_field(){
+      var field_key = $("#field-key").val();
+      var field_value = $("#field-value").val();
+      var field_read_permission = $("#field-read-permission").val();
+      var field_write_permission = $("#field-write-permission").val();
+      $.post("", {
+          cmd: "add_field",
+          field_key: field_key,
+          field_value: field_value,
+          field_read_permission: field_read_permission,
+          field_write_permission: field_write_permission,
+      }, function (data) {
+
+      });
+  }
+  window.onload = function(){
+    $("#add-partition-btn").click(function () {
+        add_partition();
+    });
+    $("#add-item-btn").click(function () {
+        add_item();
+    });
+    $("#add-field-btn").click(function () {
+        add_field();
+    });
+  }
+  </script>
 
 {% endblock %}
