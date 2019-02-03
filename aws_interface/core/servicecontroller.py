@@ -328,3 +328,19 @@ class AuthServiceController(ServiceController):
         data = make_data(self.app_id, parmas, recipe)
         boto3 = self.boto3_session
         return get_session_count.do(data, boto3)
+
+
+class DatabaseServiceController(ServiceController):
+    def common_init(self):
+        self.boto3_session = get_boto3_session(self.bundle)
+        self._init_table()
+
+    def _init_table(self):
+        dynamodb = DynamoDB(self.boto3_session)
+        table_name = 'database-{}'.format(self.app_id)
+        dynamodb.init_table(table_name)
+        return
+
+    def apply(self, recipe_controller):
+        self.apply_cloud_api(recipe_controller)
+        self.deploy_cloud_api(recipe_controller)

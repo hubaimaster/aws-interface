@@ -120,7 +120,10 @@ class AuthAPI(API):
 
 class DatabaseAPI(API):
     def common_init(self):
-        return
+        self.service_controller = DatabaseServiceController(self.bundle, self.app_id)
+        self.recipe_controller = DatabaseRecipeController()
+        if self.recipe_json_string:
+            self.recipe_controller.load_json_string(self.recipe_json_string)
 
     # Recipe
     def get_tables(self):
