@@ -91,6 +91,8 @@
                         <button scope="row" data-toggle="modal" data-target="#modal-add-item" class="btn btn-sm">
                             아이템 추가 +
                         </button>
+
+
                         <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                               <div class="modal-content">
@@ -258,7 +260,9 @@
       }
       for (var i = 0; i < item_ids.length; i++){
           var iid = item_ids[i];
-          var row = "<tr><th onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +  "</th></tr>";
+          var row = "<tr><th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +
+              "<button class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+              "</th></tr>";
           $("#item-table").append(row);
       }
   }
@@ -280,7 +284,9 @@
       var item = _item['Item'];
       Object.entries(item).forEach(([key, value]) => {
           var row = "<tr><th onclick=\"set_field('" + key + "', '" + value + "');\" name=\"field\" id=\"" +
-              key + "\" scope=\"row\">" + key + " : " + value +  "</th></tr>";
+              key + "\" scope=\"row\">" + key + " : " + value +
+              "<button class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+              "</th></tr>";
           $("#field-table").append(row);
       });
   }
