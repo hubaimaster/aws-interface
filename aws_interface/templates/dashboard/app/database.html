@@ -183,7 +183,7 @@
                                               </div>
                                                 <div class="form-group">
                                                 <label class="form-control-label" for="field-type">타입</label>
-                                                <select value="field-type" class="form-control">
+                                                <select id="field-type" class="form-control">
                                                     <option value="S">문자열</option>
                                                     <option value="N">숫자</option>
                                                     <option value="L">리스트</option>
@@ -284,18 +284,20 @@
   }
   function set_fields(_item) {
       $("#field-table>tbody").empty();
-      var item = _item['Item'];
+      var item = _item;
       Object.entries(item).forEach(([key, value]) => {
+          var value_type = '';
           if (typeof value == 'string'){
+              value_type = 'S';
               value = String(value);
-          }else if (typeof value == 'int') {
-              value = parseInt(value);
-          }else if (typeof value == 'float'){
+          }else if (typeof value == 'number') {
+              value_type = 'N';
               value = parseFloat(value);
           }else if (typeof value == 'object'){
+              value_type = 'L';
               value = JSON.stringify(value);
           }
-          var row = "<tr><th onclick=\"set_field('" + key + "', '" + value + "');\" name=\"field\" id=\"" +
+          var row = "<tr><th onclick=\"set_field('" + key + "', '" + value + "','" + value_type + "');\" name=\"field\" id=\"" +
               key + "\" scope=\"row\">" + key + " : " + value +
               "<button class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
               "</th></tr>";
@@ -303,9 +305,11 @@
       });
   }
 
-  function set_field(key, value) {
+  function set_field(key, value, type) {
       $("#field-name").val(key);
       $("#field-value").val(value);
+      alert(type);
+      $("#field-type").val(type);
       $("#modal-add-field").modal('show');
   }
 
@@ -344,11 +348,14 @@
       }
       var field_name = $("#field-name").val();
       var field_value = $("#field-value").val();
+      var field_type = $("#field-type").val();
+
       $.post("", {
           cmd: "add_field",
           item_id: item_id,
           field_name: field_name,
           field_value: field_value,
+          field_type: field_type,
       }, function (data) {
           set_item(item_id);
       });

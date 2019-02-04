@@ -1,5 +1,4 @@
 import warnings
-import boto3
 
 from django.shortcuts import render, redirect, HttpResponse
 from django.views.generic import View
@@ -13,6 +12,8 @@ from dashboard.models import *
 from core.api import *
 
 from botocore.errorfactory import ClientError
+from numbers import Number
+from decimal import Decimal
 
 
 class Util:
@@ -79,6 +80,19 @@ class Util:
     @classmethod
     def get_cache(cls, request, key):
         return request.session.get(key, None)
+
+    @classmethod
+    def encode_dict(cls, dict_obj):
+        def cast_number(v):
+            if isinstance(v, dict):
+                return cls.encode_dict(v)
+            if not isinstance(v, Number):
+                return v
+            if v % 1 == 0:
+                return int(v)
+            else:
+                return float(v)
+        return {k: cast_number(v) for k, v in dict_obj.items()}
 
 
 class Index(LoginRequiredMixin, View):
@@ -326,6 +340,13 @@ class Database(View):
             item_id = request.POST['item_id']
             field_name = request.POST['field_name']
             field_value = request.POST['field_value']
+            field_type = request.POST['field_type']
+            if field_type == 'S':
+                field_value = str(field_value)
+            elif field_type == 'N':
+                field_value = Decimal(field_value)
+            elif field_type == 'L':
+                field_value = list(field_value)
             _ = database.put_item_field(item_id, field_name, field_value)
         elif cmd == 'delete_partition':
             partition_name = request.POST['partition_name']
@@ -334,14 +355,17 @@ class Database(View):
         elif cmd == 'get_items':
             partition = request.POST['partition']
             result = database.get_items(partition)
+            result = Util.encode_dict(result)
             return JsonResponse(result)
         elif cmd == 'get_item':
             item_id = request.POST['item_id']
             result = database.get_item(item_id)
+            result = Util.encode_dict(result)
             return JsonResponse(result)
 
         Util.save_recipe(database.get_recipe_controller(), app_id)
         return redirect(request.path_info)  # Redirect back
+
 
 class Storage(View):
     def get(self, request, app_id):

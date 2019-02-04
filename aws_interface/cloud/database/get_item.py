@@ -30,12 +30,13 @@ def do(data, boto3):
     dynamo = DynamoDB(boto3)
 
     item = dynamo.get_item(table_name, item_id)
-    read_permission = item.get('Item', {}).get('read_permissions', [])
+    item = item.get('Item', {})
+    read_permission = item.get('read_permissions', [])
     if 'all' in read_permission or user_group in read_permission:
         # Remove system key
-        item.get('Item', {}).pop('partition', None)
-        item.get('Item', {}).pop('read_permissions', None)
-        item.get('Item', {}).pop('write_permissions', None)
+        item.pop('partition', None)
+        item.pop('read_permissions', None)
+        item.pop('write_permissions', None)
         response['item'] = item
         response['success'] = True
     else:
