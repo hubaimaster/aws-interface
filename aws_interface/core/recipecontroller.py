@@ -37,7 +37,7 @@ class RecipeController:
         return True
 
     def get_cloud_apis(self):
-        cloud_apis = self.data.get('cloud_apis', [])
+        cloud_apis = self.data.get('cloud_apis', {})
         return cloud_apis.values()
 
 
@@ -127,6 +127,15 @@ class AuthRecipeController(RecipeController):
 class DatabaseRecipeController(RecipeController):
     def common_init(self):
         self.data['recipe_type'] = 'database'
+        self._init_cloud_api()
+
+    def _init_cloud_api(self):
+        self.put_cloud_api('create_item', 'cloud.database.create_item')
+        self.put_cloud_api('delete_item', 'cloud.database.delete_item')
+        self.put_cloud_api('get_item', 'cloud.database.get_item')
+        self.put_cloud_api('get_items', 'cloud.database.get_items')
+        self.put_cloud_api('put_item_field', 'cloud.database.put_item_field')
+        self.put_cloud_api('update_item', 'cloud.database.update_item')
 
     def put_partition(self, partition_name):
         if 'partitions' not in self.data:

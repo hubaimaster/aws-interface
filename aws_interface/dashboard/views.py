@@ -317,9 +317,21 @@ class Database(View):
         auth = Util.get_api(AuthAPI, 'auth', request, app_id)
         database = Util.get_api(DatabaseAPI, 'database', request, app_id)
         context['app_id'] = app_id
-        context['user_groups'] = auth.get_user_groups()
-        context['partitions'] = database.get_partitions()
-        return render(request, 'dashboard/app/database.html', context=context)
+        cmd = request.GET.get('cmd', None)
+        if cmd == 'download_sdk':
+            sdk_bin = database.get_rest_api_sdk()
+            response = HttpResponse(sdk_bin, content_type='application/x-binary')
+            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('database_sdk.zip')
+            return response
+        else:
+            try:
+                context['user_groups'] = auth.get_user_groups()
+                context['partitions'] = database.get_partitions()
+                context['rest_api_url'] = database.get_rest_api_url()
+                return render(request, 'dashboard/app/database.html', context=context)
+            except ClientError as ex:
+                context['error'] = ex
+                return render(request, 'dashboard/wait.html', context=context)
 
     def post(self, request, app_id):
         context = Util.get_context(request)

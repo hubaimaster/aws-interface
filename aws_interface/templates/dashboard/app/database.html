@@ -16,6 +16,18 @@
             <div class="alert alert-default" role="alert">
                 <strong>Auth </strong> 에 의존합니다.
             </div>
+
+            <div class="alert alert-neutral" role="alert">
+                <div class="row">
+                    <div class="col">
+                        <strong>{{ rest_api_url }}</strong> 의 POST Method 를 호출 할 수 있습니다.
+                    </div>
+                    <div class="col-auto">
+                        <a target="_blank" href="{% url 'database' app_id %}?cmd=download_sdk" class="btn btn-sm btn-info">SDK 다운로드</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
       </div>
     </div>
@@ -160,7 +172,7 @@
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">
-                        <button scope="row" data-toggle="modal" data-target="#modal-add-field" class="btn btn-sm">
+                        <button id="open-add-field-modal" scope="row" class="btn btn-sm">
                             필드 추가 +
                         </button>
                         <div class="modal fade" id="modal-add-field" tabindex="-1" role="dialog" aria-labelledby="modal-add-field" aria-hidden="true">
@@ -376,6 +388,12 @@
     });
     $("#add-field-btn").click(function () {
         add_field();
+    });
+    $("#open-add-field-modal").click(function () {
+        $("#field-name").val(null);
+        $("#field-value").val(null);
+        $("#field-type").val('S');
+        $("#modal-add-field").modal('show');
     });
   }
   </script>
