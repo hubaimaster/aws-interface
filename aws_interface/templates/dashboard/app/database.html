@@ -105,8 +105,8 @@
                                           <div class="row">
                                             <div class="col-lg-12">
                                               <div class="form-group">
-                                                <label class="form-control-label" for="field-key">아이디</label>
-                                                <input id="field-key" type="text" class="form-control form-control-alternative" placeholder="자동생성" disabled>
+                                                <label class="form-control-label">아이디</label>
+                                                <input type="text" class="form-control form-control-alternative" placeholder="자동생성" disabled>
                                               </div>
                                               <div class="form-group">
                                                 <label class="form-control-label" for="field-value">읽기 권한</label>
@@ -153,7 +153,7 @@
 
              <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 col-xl-5" style="padding-left: 0;">
               <!-- Projects table -->
-              <table class="table table-sm table-hover table-borderless">
+              <table id="field-table" class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">
@@ -175,11 +175,11 @@
                                           <div class="row">
                                             <div class="col-lg-12">
                                               <div class="form-group">
-                                                <label class="form-control-label" for="field-key">키</label>
-                                                <input id="field-key" type="text" class="form-control form-control-alternative" placeholder="필드 키">
+                                                <label class="form-control-label" for="field-name">이름</label>
+                                                <input id="field-name" type="text" class="form-control form-control-alternative" placeholder="필드 이름">
                                               </div>
                                                 <div class="form-group">
-                                                <label class="form-control-label" for="field-key">타입</label>
+                                                <label class="form-control-label" for="field-type">타입</label>
                                                 <select value="field-type" class="form-control">
                                                     <option value="S">문자열</option>
                                                     <option value="N">숫자</option>
@@ -194,8 +194,7 @@
                                         </div>
                                       <p>
                                           확인 버튼을 클릭하여 필드를 생성합니다. </br>
-                                          필드 키는 DB 컬럼의 이름, 필드 값은 컬럼의 값과 같은 개념입니다. </br>
-                                          필드는 아이템에 종속됩니다.
+                                          필드는 컬럼과 같은 개념이며, 아이템에 종속됩니다.
                                       </p>
                                     </div>
                                     <div class="modal-footer">
@@ -209,16 +208,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope="row">
-                      id: dsfw4-sds34
-                    </th>
-                  </tr>
-                <tr>
-                    <th scope="row">
-                      테이블스리
-                    </th>
-                  </tr>
+
                 </tbody>
               </table>
             </div>
@@ -242,7 +232,11 @@
 
   <script>
   var partition = null;
+  var item_id = null;
+  item_ids = [];
+  item_fields = [];
   function set_partition(p) {
+      item_ids = [];
       partition = p;
       $("th[name='partition']").css({backgroundColor: 'white'});
       $("#" + partition).css({backgroundColor: '#BBB'});
@@ -258,9 +252,43 @@
   function set_items(items) {
       $("#item-table>tbody").empty();
       for (var i = 0; i < items.length; i++){
-          var row = "<tr><th scope=\"row\">" + items[i]["id"] +  "</th></tr>";
+          if (item_ids.includes(items[i]["id"]) == false) {
+              item_ids.push(items[i]["id"]);
+          }
+      }
+      for (var i = 0; i < item_ids.length; i++){
+          var iid = item_ids[i];
+          var row = "<tr><th onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +  "</th></tr>";
           $("#item-table").append(row);
       }
+  }
+  function set_item(_item_id) {
+      item_fields = [];
+      item_id = _item_id;
+      $("th[name='item']").css({backgroundColor: 'white'});
+      $("#" + _item_id).css({backgroundColor: '#BBB'});
+      $.post("", {
+          cmd: "get_item",
+          item_id: item_id,
+      }, function (data) {
+          var item = data['item'];
+          set_fields(item);
+      });
+  }
+  function set_fields(_item) {
+      $("#field-table>tbody").empty();
+      var item = _item['Item'];
+      Object.entries(item).forEach(([key, value]) => {
+          var row = "<tr><th onclick=\"set_field('" + key + "', '" + value + "');\" name=\"field\" id=\"" +
+              key + "\" scope=\"row\">" + key + " : " + value +  "</th></tr>";
+          $("#field-table").append(row);
+      });
+  }
+
+  function set_field(key, value) {
+      $("#field-name").val(key);
+      $("#field-value").val(value);
+      $("#modal-add-field").modal('show');
   }
 
   function add_partition(){
@@ -287,24 +315,26 @@
           read_permission: read_permission,
           write_permission: write_permission,
       }, function (data) {
-          location.reload();
+          set_partition(partition);
       });
       $("#modal-add-item").modal('hide');
   }
   function add_field(){
-      var field_key = $("#field-key").val();
+      if (partition == null || item_id == null || partition.length == 0 || item_id.length == 0){
+          alert("파티션과 아이템을 지정해주세요");
+          return;
+      }
+      var field_name = $("#field-name").val();
       var field_value = $("#field-value").val();
-      var field_read_permission = $("#field-read-permission").val();
-      var field_write_permission = $("#field-write-permission").val();
       $.post("", {
           cmd: "add_field",
-          field_key: field_key,
+          item_id: item_id,
+          field_name: field_name,
           field_value: field_value,
-          field_read_permission: field_read_permission,
-          field_write_permission: field_write_permission,
       }, function (data) {
-
+          set_item(item_id);
       });
+      $("#modal-add-field").modal('hide');
   }
   window.onload = function(){
     $("#add-partition-btn").click(function () {

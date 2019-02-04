@@ -322,10 +322,19 @@ class Database(View):
             read_permission = request.POST['read_permission']
             write_permission = request.POST['write_permission']
             _ = database.create_item(partition, {}, [read_permission], [write_permission])
+        elif cmd == 'add_field':
+            item_id = request.POST['item_id']
+            field_name = request.POST['field_name']
+            field_value = request.POST['field_value']
+            _ = database.put_item_field(item_id, field_name, field_value)
 
         elif cmd == 'get_items':
             partition = request.POST['partition']
             result = database.get_items(partition)
+            return JsonResponse(result)
+        elif cmd == 'get_item':
+            item_id = request.POST['item_id']
+            result = database.get_item(item_id)
             return JsonResponse(result)
 
         Util.save_recipe(database.get_recipe_controller(), app_id)

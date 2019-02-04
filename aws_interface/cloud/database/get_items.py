@@ -8,7 +8,8 @@ info = {
         'session_id': 'str',
         'partition': 'str',
         'start_key': 'str',
-        'limit': 'int=100'
+        'limit': 'int=100',
+        'reverse': 'bool=False',
     },
     'output_format': {
         'items': 'list',
@@ -28,12 +29,13 @@ def do(data, boto3):
     partition = params.get('partition', None)
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
+    reverse = params.get('reverse', False)
 
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)
 
-    result = dynamo.get_items(table_name, partition, start_key, limit)
+    result = dynamo.get_items(table_name, partition, start_key, limit, reverse)
     end_key = result.get('LastEvaluatedKey', None)
     items = result.get('Items', [])
 

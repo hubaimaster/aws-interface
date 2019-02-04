@@ -328,7 +328,8 @@ class DynamoDB:
         })
         return item
 
-    def get_items(self, table_name, partition, exclusive_start_key=None, limit=100):
+    def get_items(self, table_name, partition, exclusive_start_key=None, limit=100, reverse=False):
+        scan_index_forward = not reverse
         index_name = 'partition-creationDate'
         table = self.resource.Table(table_name)
         if exclusive_start_key:
@@ -337,7 +338,8 @@ class DynamoDB:
                 Limit=limit,
                 ConsistentRead=False,
                 ExclusiveStartKey=exclusive_start_key,
-                KeyConditionExpression=Key('partition').eq(partition)
+                KeyConditionExpression=Key('partition').eq(partition),
+                ScanIndexForward=scan_index_forward,
             )
         else:
             response = table.query(
@@ -345,6 +347,7 @@ class DynamoDB:
                 Limit=limit,
                 ConsistentRead=False,
                 KeyConditionExpression=Key('partition').eq(partition),
+                ScanIndexForward=scan_index_forward,
             )
         return response
 

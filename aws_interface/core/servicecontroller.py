@@ -404,10 +404,11 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    def get_items(self, recipe, partition):
+    def get_items(self, recipe, partition, reverse):
         import cloud.database.get_items as method
         params = {
             'partition': partition,
+            'reverse': reverse,
         }
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session

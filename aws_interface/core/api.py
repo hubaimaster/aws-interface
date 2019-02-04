@@ -144,8 +144,8 @@ class DatabaseAPI(API):
         return self.service_controller.update_item(self.recipe_controller.to_json(),
                                                    item_id, item, read_permissions, write_permissions)
 
-    def update_item_field(self, item_id, field_name, field_value):
-        return self.service_controller.update_item_field(self.recipe_controller.to_json(),
+    def put_item_field(self, item_id, field_name, field_value):
+        return self.service_controller.put_item_field(self.recipe_controller.to_json(),
                                                          item_id, field_name, field_value)
 
     def get_item(self, item_id):
@@ -154,8 +154,8 @@ class DatabaseAPI(API):
     def delete_item(self, item_id):
         raise self.service_controller.delete_item(self.recipe_controller.to_json(), item_id)
 
-    def get_items(self, partition):
-        return self.service_controller.get_items(self.recipe_controller.to_json(), partition)
+    def get_items(self, partition, reverse=True):  # New item will be on the top
+        return self.service_controller.get_items(self.recipe_controller.to_json(), partition, reverse)
 
     def get_item_count(self, partition):
         return self.service_controller.get_item_count(self.recipe_controller.to_json(), partition)
