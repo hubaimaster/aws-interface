@@ -135,18 +135,6 @@ class DatabaseAPI(API):
     def delete_partition(self, partition_name):
         return self.recipe_controller.delete_partition(partition_name)
 
-    def get_partition(self, partition_name):
-        return self.recipe_controller.get_partition(partition_name)
-
-    def put_partition_field_info(self, partition_name, field_name, field_type, required):
-        return self.recipe_controller.put_partition_field_info(partition_name, field_name, field_type, required)
-
-    def get_partition_field_info(self, partition_name, field_name):
-        return self.recipe_controller.get_partition_field_info(partition_name, field_name)
-
-    def delete_partition_field_info(self, partition_name, field_name):
-        return self.recipe_controller.delete_partition_field_info(partition_name, field_name)
-
     # Service
     def create_item(self, partition, item, read_permissions=['all'], write_permissions=['all']):
         return self.service_controller.create_item(partition, item, read_permissions, write_permissions)
@@ -165,6 +153,9 @@ class DatabaseAPI(API):
 
     def get_items(self, partition):
         return self.service_controller.get_items(partition)
+
+    def get_item_count(self, partition):
+        return self.service_controller.get_item_count(partition)
 
     def search_items(self, query):
         raise NotImplementedError()

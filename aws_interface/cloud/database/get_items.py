@@ -8,7 +8,7 @@ info = {
         'session_id': 'str',
         'partition': 'str',
         'start_key': 'str',
-        'limit': 'int'
+        'limit': 'int=100'
     },
     'output_format': {
         'items': 'list',
@@ -26,18 +26,23 @@ def do(data, boto3):
 
     user_group = user.get('group', None)
     partition = params.get('partition', None)
+    start_key = params.get('start_key', None)
+    limit = params.get('limit', 100)
 
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)
 
-    items = dynamo.get_items(table_name, partition)
-    for item in items:  # Problem of efficiency TODO TODO TODO TODO TODO !!!
-        read_permission = item.get('Item', {}).get('read_permissions', [])
+    result = dynamo.get_items(table_name, partition, start_key, limit)
+    end_key = result.get('LastEvaluatedKey', None)
+    items = result.get('Items', [])
+
+    filtered = []
+    for item in items:
+        read_permission = item.get('read_permissions', [])
         if 'all' in read_permission or user_group in read_permission:
-            response['item'] = item
-            response['success'] = True
-        else:
-            response['success'] = False
-            response['message'] = 'permission denied'
-        return response
+            filtered.append(item)
+
+    response['items'] = filtered
+    response['end_key'] =  end_key
+    return response

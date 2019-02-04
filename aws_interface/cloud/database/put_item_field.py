@@ -7,9 +7,8 @@ info = {
     'input_format': {
         'session_id': 'str',
         'item_id': 'str',
-        'item': 'map',
-        'read_permissions': 'list',
-        'write_permissions': 'list',
+        'field_name': 'str',
+        'field_value': '?',
     },
     'output_format': {
         'success': 'bool',
@@ -27,12 +26,8 @@ def do(data, boto3):
     user_group = user.get('group', None)
 
     item_id = params.get('item_id', None)
-    new_item = params.get('item', {})
-    read_permissions = params.get('read_permissions', [])
-    write_permissions = params.get('write_permissions', [])
-
-    new_item['read_permissions'] = read_permissions
-    new_item['write_permissions'] = write_permissions
+    field_name = params.get('field_name', None)
+    field_value = params.get('field_value', None)
 
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
@@ -40,10 +35,11 @@ def do(data, boto3):
 
     result = dynamo.get_item(table_name, item_id)
     item = result.get('Item', {})
+    item[field_name] = field_value
 
     write_permissions = item.get('write_permissions', [])
     if 'all' in write_permissions or user_group in write_permissions:
-        dynamo.update_item(table_name, item_id, new_item)
+        dynamo.update_item(table_name, item_id, item)
         response['success'] = True
     else:
         response['success'] = False

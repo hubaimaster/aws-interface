@@ -384,6 +384,17 @@ class DynamoDB:
         self._add_item_count(table_name, '{}-count'.format(partition))
         return response
 
+    def update_item(self, table_name, item_id, item):
+        table = self.resource.Table(table_name)
+        updation_date = int(time.time())
+        item['id'] = item_id
+        item['updation_date'] = updation_date
+        response = table.put_item(
+            TableName=table_name,
+            Item=item,
+        )
+        return response
+
     def _put_item_count(self, table_name, count_id, value):
         response = self.put_item(table_name, 'meta_info', {'count': value}, item_id=count_id)
         return response
