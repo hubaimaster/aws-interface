@@ -31,48 +31,46 @@
               <table class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
-                    <th scope="col">파티션</th>
+                    <th scope="col">
+                        <button scope="row" data-toggle="modal" data-target="#modal-add-partition" class="btn btn-sm">
+                            파티션 추가 +
+                        </button>
+                        <div class="modal fade" id="modal-add-partition" tabindex="-1" role="dialog" aria-labelledby="modal-add-partition" aria-hidden="true">
+                            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h4 class="modal-title" id="modal-title-default">파티션 추가</h4>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                  </button>
+                                </div>
+                                    <div class="modal-body">
+                                        <div class="pl-lg-12">
+                                          <div class="row">
+                                            <div class="col-lg-12">
+                                              <div class="form-group">
+                                                <label class="form-control-label" for="partition-name">이름</label>
+                                                <input id="partition-name" type="text" class="form-control form-control-alternative" placeholder="파티션 이름">
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      <p>
+                                          확인 버튼을 클릭하여 파티션을 생성합니다. </br>
+                                          파티션은 DB의 테이블과 유사한 개념입니다.
+                                      </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                      <button id="add-partition-btn" class="btn btn-primary">확인</button>
+                                    </div>
+                              </div>
+                            </div>
+                        </div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-
-                  <tr>
-                    <th scope="row" data-toggle="modal" data-target="#modal-add-partition" class="text-primary">
-                      파티션 추가 +
-                    </th>
-                    <div class="modal fade" id="modal-add-partition" tabindex="-1" role="dialog" aria-labelledby="modal-add-partition" aria-hidden="true">
-                        <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h4 class="modal-title" id="modal-title-default">파티션 추가</h4>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                              </button>
-                            </div>
-                                <div class="modal-body">
-                                    <div class="pl-lg-12">
-                                      <div class="row">
-                                        <div class="col-lg-12">
-                                          <div class="form-group">
-                                            <label class="form-control-label" for="partition-name">이름</label>
-                                            <input id="partition-name" type="text" class="form-control form-control-alternative" placeholder="파티션 이름">
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  <p>
-                                      확인 버튼을 클릭하여 파티션을 생성합니다. </br>
-                                      파티션은 DB의 테이블과 유사한 개념입니다.
-                                  </p>
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                  <button id="add-partition-btn" class="btn btn-primary">확인</button>
-                                </div>
-                          </div>
-                        </div>
-                      </div>
-                  </tr>
                   {% for partition in partitions %}
                   <tr>
                     <th id="{{ partition }}" name="partition" scope="row" onclick="set_partition('{{ partition }}');">
@@ -86,70 +84,69 @@
 
               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 col-xl-4" style="padding: 0;">
               <!-- Projects table -->
-              <table class="table table-sm table-hover table-borderless">
+              <table id="item-table" class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
-                    <th scope="col">아이템</th>
+                    <th scope="col">
+                        <button scope="row" data-toggle="modal" data-target="#modal-add-item" class="btn btn-sm">
+                            아이템 추가 +
+                        </button>
+                        <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
+                            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h4 class="modal-title" id="modal-title-default">아이템 추가</h4>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                  </button>
+                                </div>
+                                    <div class="modal-body">
+                                        <div class="pl-lg-12">
+                                          <div class="row">
+                                            <div class="col-lg-12">
+                                              <div class="form-group">
+                                                <label class="form-control-label" for="field-key">아이디</label>
+                                                <input id="field-key" type="text" class="form-control form-control-alternative" placeholder="자동생성" disabled>
+                                              </div>
+                                              <div class="form-group">
+                                                <label class="form-control-label" for="field-value">읽기 권한</label>
+                                                <select id="item-read-permission" class="form-control">
+                                                    {% for group in user_groups %}
+                                                        <option value="{{ group.name }}">{{ group.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                              </div>
+
+                                              <div class="form-group">
+                                                <label class="form-control-label" for="field-value">쓰기/지우기 권한</label>
+                                                <select id="item-write-permission" class="form-control">
+                                                    {% for group in user_groups %}
+                                                        <option value="{{ group.name }}">{{ group.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                              </div>
+
+                                            </div>
+                                          </div>
+                                        </div>
+                                      <p>
+                                          확인 버튼을 클릭하여 아이템을 생성합니다. </br>
+                                      </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                      <button id="add-item-btn" class="btn btn-primary">확인</button>
+                                    </div>
+                              </div>
+                            </div>
+                        </div>
+                    </th>
                   </tr>
                 </thead>
+
                 <tbody>
-                  <tr>
-                    <th scope="row" data-toggle="modal" data-target="#modal-add-item" class="text-primary">
-                      아이템 추가 +
-                    </th>
-                      <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
-                        <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h4 class="modal-title" id="modal-title-default">아이템 추가</h4>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                              </button>
-                            </div>
-                                <div class="modal-body">
-                                    <div class="pl-lg-12">
-                                      <div class="row">
-                                        <div class="col-lg-12">
-                                          <div class="form-group">
-                                            <label class="form-control-label" for="field-key">아이디</label>
-                                            <input id="field-key" type="text" class="form-control form-control-alternative" placeholder="자동생성" disabled>
-                                          </div>
-                                          <div class="form-group">
-                                            <label class="form-control-label" for="field-value">읽기 권한</label>
-                                            <select id="item-read-permission" class="form-control">
-                                                {% for group in user_groups %}
-                                                    <option value="{{ group.name }}">{{ group.name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                          </div>
 
-                                          <div class="form-group">
-                                            <label class="form-control-label" for="field-value">쓰기/지우기 권한</label>
-                                            <select id="item-write-permission" class="form-control">
-                                                {% for group in user_groups %}
-                                                    <option value="{{ group.name }}">{{ group.name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                          </div>
 
-                                        </div>
-                                      </div>
-                                    </div>
-                                  <p>
-                                      확인 버튼을 클릭하여 아이템을 생성합니다. </br>
-                                  </p>
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                  <button id="add-item-btn" class="btn btn-primary">확인</button>
-                                </div>
-                          </div>
-                        </div>
-                      </div>
-                  </tr>
-                  <div id="item-rows">
-
-                  </div>
                 </tbody>
               </table>
             </div>
@@ -159,60 +156,59 @@
               <table class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
-                    <th scope="col">필드</th>
+                    <th scope="col">
+                        <button scope="row" data-toggle="modal" data-target="#modal-add-field" class="btn btn-sm">
+                            필드 추가 +
+                        </button>
+                        <div class="modal fade" id="modal-add-field" tabindex="-1" role="dialog" aria-labelledby="modal-add-field" aria-hidden="true">
+                            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h4 class="modal-title" id="modal-title-default">필드 추가</h4>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                  </button>
+                                </div>
+                                    <input name="cmd" value="put_group" hidden>
+                                    <div class="modal-body">
+                                        <div class="pl-lg-12">
+                                          <div class="row">
+                                            <div class="col-lg-12">
+                                              <div class="form-group">
+                                                <label class="form-control-label" for="field-key">키</label>
+                                                <input id="field-key" type="text" class="form-control form-control-alternative" placeholder="필드 키">
+                                              </div>
+                                                <div class="form-group">
+                                                <label class="form-control-label" for="field-key">타입</label>
+                                                <select value="field-type" class="form-control">
+                                                    <option value="S">문자열</option>
+                                                    <option value="N">숫자</option>
+                                                </select>
+                                              </div>
+                                              <div class="form-group">
+                                                <label class="form-control-label" for="field-value">값</label>
+                                                <input id="field-value" type="text" class="form-control form-control-alternative" placeholder="필드 값">
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      <p>
+                                          확인 버튼을 클릭하여 필드를 생성합니다. </br>
+                                          필드 키는 DB 컬럼의 이름, 필드 값은 컬럼의 값과 같은 개념입니다. </br>
+                                          필드는 아이템에 종속됩니다.
+                                      </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                      <button id="add-field-btn" class="btn btn-primary">확인</button>
+                                    </div>
+                              </div>
+                            </div>
+                          </div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope="row" data-toggle="modal" data-target="#modal-add-field" class="text-primary">
-                      필드 추가 +
-                    </th>
-                    <div class="modal fade" id="modal-add-field" tabindex="-1" role="dialog" aria-labelledby="modal-add-field" aria-hidden="true">
-                        <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h4 class="modal-title" id="modal-title-default">필드 추가</h4>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                              </button>
-                            </div>
-                                <input name="cmd" value="put_group" hidden>
-                                <div class="modal-body">
-                                    <div class="pl-lg-12">
-                                      <div class="row">
-                                        <div class="col-lg-12">
-                                          <div class="form-group">
-                                            <label class="form-control-label" for="field-key">키</label>
-                                            <input id="field-key" type="text" class="form-control form-control-alternative" placeholder="필드 키">
-                                          </div>
-                                            <div class="form-group">
-                                            <label class="form-control-label" for="field-key">타입</label>
-                                            <select value="field-type" class="form-control">
-                                                <option value="S">문자열</option>
-                                                <option value="N">숫자</option>
-                                            </select>
-                                          </div>
-                                          <div class="form-group">
-                                            <label class="form-control-label" for="field-value">값</label>
-                                            <input id="field-value" type="text" class="form-control form-control-alternative" placeholder="필드 값">
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  <p>
-                                      확인 버튼을 클릭하여 필드를 생성합니다. </br>
-                                      필드 키는 DB 컬럼의 이름, 필드 값은 컬럼의 값과 같은 개념입니다. </br>
-                                      필드는 아이템에 종속됩니다.
-                                  </p>
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                  <button id="add-field-btn" class="btn btn-primary">확인</button>
-                                </div>
-                          </div>
-                        </div>
-                      </div>
-                  </tr>
                   <tr>
                     <th scope="row">
                       id: dsfw4-sds34
@@ -260,11 +256,11 @@
       });
   }
   function set_items(items) {
-      var rows = ""
+      $("#item-table>tbody").empty();
       for (var i = 0; i < items.length; i++){
-          rows += "<tr><th scope=\"row\">" + items[i]["id"] +  "</th></tr>";
+          var row = "<tr><th scope=\"row\">" + items[i]["id"] +  "</th></tr>";
+          $("#item-table").append(row);
       }
-      $("#item-rows").html(rows);
   }
 
   function add_partition(){
