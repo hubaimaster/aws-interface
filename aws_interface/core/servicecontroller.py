@@ -106,6 +106,12 @@ def make_data(app_id, parmas, recipe_json, admin=True):
         'recipe': recipe,
         'app_id': app_id,
         'admin': admin,
+        'user': {
+            'id': 'admin-{}'.format(app_id),
+            'group': 'admin',
+            'creationDate': 0,
+            'extra': {}
+        }
     }
     return data
 

@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.http import JsonResponse
 
 from dashboard.models import *
 from core.api import *
@@ -301,10 +301,35 @@ class Database(View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         auth = Util.get_api(AuthAPI, 'auth', request, app_id)
+        database = Util.get_api(DatabaseAPI, 'database', request, app_id)
         context['app_id'] = app_id
         context['user_groups'] = auth.get_user_groups()
+        context['partitions'] = database.get_partitions()
         return render(request, 'dashboard/app/database.html', context=context)
 
+    def post(self, request, app_id):
+        context = Util.get_context(request)
+        context['app_id'] = app_id
+        database = Util.get_api(DatabaseAPI, 'database', request, app_id)
+        cmd = request.POST['cmd']
+
+        if cmd == 'add_partition':
+            partition_name = request.POST['partition_name']
+            _ = database.put_partition(partition_name)
+            database.apply()
+        elif cmd == 'add_item':
+            partition = request.POST['partition']
+            read_permission = request.POST['read_permission']
+            write_permission = request.POST['write_permission']
+            _ = database.create_item(partition, {}, [read_permission], [write_permission])
+
+        elif cmd == 'get_items':
+            partition = request.POST['partition']
+            result = database.get_items(partition)
+            return JsonResponse(result)
+
+        Util.save_recipe(database.get_recipe_controller(), app_id)
+        return redirect(request.path_info)  # Redirect back
 
 class Storage(View):
     def get(self, request, app_id):

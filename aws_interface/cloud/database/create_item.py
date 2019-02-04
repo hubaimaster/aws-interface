@@ -27,7 +27,7 @@ def do(data, boto3):
     user_id = user.get('id', None)
 
     partition = params.get('partition', None)
-    item = params.get('item', None)
+    item = params.get('item', {})
     read_permissions = params.get('read_permissions', [])
     write_permissions = params.get('write_permissions', [])
 

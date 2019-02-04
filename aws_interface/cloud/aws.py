@@ -377,6 +377,7 @@ class DynamoDB:
         item['id'] = item_id
         item['creationDate'] = creation_date
         item['partition'] = partition
+
         response = table.put_item(
             TableName=table_name,
             Item=item,

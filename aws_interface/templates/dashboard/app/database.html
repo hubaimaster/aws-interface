@@ -49,7 +49,6 @@
                                 <span aria-hidden="true">×</span>
                               </button>
                             </div>
-                                <input name="cmd" value="put_group" hidden>
                                 <div class="modal-body">
                                     <div class="pl-lg-12">
                                       <div class="row">
@@ -62,7 +61,8 @@
                                       </div>
                                     </div>
                                   <p>
-                                      확인 버튼을 클릭하여 파티션을 생성합니다. </br> 파티션은 RDB의 테이블과 유사한 개념입니다.
+                                      확인 버튼을 클릭하여 파티션을 생성합니다. </br>
+                                      파티션은 DB의 테이블과 유사한 개념입니다.
                                   </p>
                                 </div>
                                 <div class="modal-footer">
@@ -73,19 +73,13 @@
                         </div>
                       </div>
                   </tr>
-
+                  {% for partition in partitions %}
                   <tr>
-                    <th scope="row">
-                      테이블트
+                    <th id="{{ partition }}" name="partition" scope="row" onclick="set_partition('{{ partition }}');">
+                      {{ partition }}
                     </th>
                   </tr>
-
-                  <tr>
-                    <th scope="row">
-                      테이블스리
-                    </th>
-                  </tr>
-
+                  {% endfor %}
                 </tbody>
               </table>
             </div>
@@ -100,20 +94,62 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <th id="add-item-btn" scope="row" data-toggle="modal" class="text-primary">
+                    <th scope="row" data-toggle="modal" data-target="#modal-add-item" class="text-primary">
                       아이템 추가 +
                     </th>
+                      <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
+                        <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h4 class="modal-title" id="modal-title-default">아이템 추가</h4>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                              </button>
+                            </div>
+                                <div class="modal-body">
+                                    <div class="pl-lg-12">
+                                      <div class="row">
+                                        <div class="col-lg-12">
+                                          <div class="form-group">
+                                            <label class="form-control-label" for="field-key">아이디</label>
+                                            <input id="field-key" type="text" class="form-control form-control-alternative" placeholder="자동생성" disabled>
+                                          </div>
+                                          <div class="form-group">
+                                            <label class="form-control-label" for="field-value">읽기 권한</label>
+                                            <select id="item-read-permission" class="form-control">
+                                                {% for group in user_groups %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                          </div>
+
+                                          <div class="form-group">
+                                            <label class="form-control-label" for="field-value">쓰기/지우기 권한</label>
+                                            <select id="item-write-permission" class="form-control">
+                                                {% for group in user_groups %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                          </div>
+
+                                        </div>
+                                      </div>
+                                    </div>
+                                  <p>
+                                      확인 버튼을 클릭하여 아이템을 생성합니다. </br>
+                                  </p>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                  <button id="add-item-btn" class="btn btn-primary">확인</button>
+                                </div>
+                          </div>
+                        </div>
+                      </div>
                   </tr>
-                  <tr>
-                    <th scope="row">
-                      아이템1
-                    </th>
-                  </tr>
-                <tr>
-                    <th scope="row">
-                      아아템2
-                    </th>
-                  </tr>
+                  <div id="item-rows">
+
+                  </div>
                 </tbody>
               </table>
             </div>
@@ -149,34 +185,23 @@
                                             <label class="form-control-label" for="field-key">키</label>
                                             <input id="field-key" type="text" class="form-control form-control-alternative" placeholder="필드 키">
                                           </div>
+                                            <div class="form-group">
+                                            <label class="form-control-label" for="field-key">타입</label>
+                                            <select value="field-type" class="form-control">
+                                                <option value="S">문자열</option>
+                                                <option value="N">숫자</option>
+                                            </select>
+                                          </div>
                                           <div class="form-group">
                                             <label class="form-control-label" for="field-value">값</label>
                                             <input id="field-value" type="text" class="form-control form-control-alternative" placeholder="필드 값">
                                           </div>
-                                          <div class="form-group">
-                                            <label class="form-control-label" for="field-value">읽기 권한</label>
-                                            <select id="field-read-permission" class="form-control">
-                                                {% for group in user_groups %}
-                                                    <option value="{{ group.name }}">{{ group.name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                          </div>
-
-                                          <div class="form-group">
-                                            <label class="form-control-label" for="field-value">쓰기/지우기 권한</label>
-                                            <select id="field-write-permission" class="form-control">
-                                                {% for group in user_groups %}
-                                                    <option value="{{ group.name }}">{{ group.name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                          </div>
-
                                         </div>
                                       </div>
                                     </div>
                                   <p>
-                                      확인 버튼을 클릭하여 아이템을 생성합니다. </br>
-                                      필드 키는 RDB 컬럼의 이름, 필드 값은 컬럼의 값과 같은 개념입니다. </br>
+                                      확인 버튼을 클릭하여 필드를 생성합니다. </br>
+                                      필드 키는 DB 컬럼의 이름, 필드 값은 컬럼의 값과 같은 개념입니다. </br>
                                       필드는 아이템에 종속됩니다.
                                   </p>
                                 </div>
@@ -220,21 +245,55 @@
   </div>
 
   <script>
+  var partition = null;
+  function set_partition(p) {
+      partition = p;
+      $("th[name='partition']").css({backgroundColor: 'white'});
+      $("#" + partition).css({backgroundColor: '#BBB'});
+      $.post("", {
+          cmd: "get_items",
+          partition: partition,
+      }, function (data) {
+          var items = data['items'];
+          var end_key = data['end_key'];
+          set_items(items);
+      });
+  }
+  function set_items(items) {
+      var rows = ""
+      for (var i = 0; i < items.length; i++){
+          rows += "<tr><th scope=\"row\">" + items[i]["id"] +  "</th></tr>";
+      }
+      $("#item-rows").html(rows);
+  }
+
   function add_partition(){
       var partition_name = $("#partition-name").val();
       $.post("", {
           cmd: "add_partition",
           partition_name: partition_name,
       }, function (data) {
-
+          location.reload();
       });
+      $("#partition-name").val(null);
+      $("#modal-add-partition").modal('hide');
   }
   function add_item(){
+      if (partition == null || partition.length == 0){
+          alert("파티션을 지정해주세요");
+          return;
+      }
+      var read_permission = $("#item-read-permission").val();
+      var write_permission = $("#item-write-permission").val();
       $.post("", {
           cmd: "add_item",
+          partition: partition,
+          read_permission: read_permission,
+          write_permission: write_permission,
       }, function (data) {
-
+          location.reload();
       });
+      $("#modal-add-item").modal('hide');
   }
   function add_field(){
       var field_key = $("#field-key").val();
