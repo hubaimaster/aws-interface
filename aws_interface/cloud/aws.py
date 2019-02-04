@@ -2,7 +2,7 @@ import json
 import uuid
 import time
 from boto3.dynamodb.conditions import Key
-
+from time import sleep
 
 class Config:
     stage_name = 'prod_aws_interface'
@@ -124,14 +124,21 @@ class APIGateway:
         source_arn = "arn:aws:execute-api:{aws-region}:{aws-acct-id}:{aws-api-id}/*/POST/{lambda-function-name}".format(
             **uri_data)
 
-        aws_lambda.add_permission(
-            FunctionName=lambda_func_name,
-            StatementId=uuid.uuid4().hex,
-            Action="lambda:InvokeFunction",
-            Principal="apigateway.amazonaws.com",
-            SourceArn=source_arn
-        )
+        def add_permission():
+            try:
+                aws_lambda.add_permission(
+                    FunctionName=lambda_func_name,
+                    StatementId=uuid.uuid4().hex,
+                    Action="lambda:InvokeFunction",
+                    Principal="apigateway.amazonaws.com",
+                    SourceArn=source_arn
+                )
+            except BaseException as ex:
+                print(ex)
+                sleep(3.0)
+                add_permission()
 
+        add_permission()
         api_client.create_deployment(
             restApiId=rest_api_id,
             stageName=stage_name,

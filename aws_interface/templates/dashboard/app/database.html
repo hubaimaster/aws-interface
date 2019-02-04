@@ -75,6 +75,7 @@
                   <tr>
                     <th id="{{ partition }}" name="partition" scope="row" onclick="set_partition('{{ partition }}');">
                       {{ partition }}
+                        <button onclick="delete_partition('{{ partition }}');" style='font-size:7pt; margin-left:16px;'>삭제</button>
                     </th>
                   </tr>
                   {% endfor %}
@@ -185,6 +186,7 @@
                                                 <select value="field-type" class="form-control">
                                                     <option value="S">문자열</option>
                                                     <option value="N">숫자</option>
+                                                    <option value="L">리스트</option>
                                                 </select>
                                               </div>
                                               <div class="form-group">
@@ -284,6 +286,15 @@
       $("#field-table>tbody").empty();
       var item = _item['Item'];
       Object.entries(item).forEach(([key, value]) => {
+          if (typeof value == 'string'){
+              value = String(value);
+          }else if (typeof value == 'int') {
+              value = parseInt(value);
+          }else if (typeof value == 'float'){
+              value = parseFloat(value);
+          }else if (typeof value == 'object'){
+              value = JSON.stringify(value);
+          }
           var row = "<tr><th onclick=\"set_field('" + key + "', '" + value + "');\" name=\"field\" id=\"" +
               key + "\" scope=\"row\">" + key + " : " + value +
               "<button class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
@@ -342,6 +353,14 @@
           set_item(item_id);
       });
       $("#modal-add-field").modal('hide');
+  }
+  function delete_partition(partition_name){
+    $.post("", {
+          cmd: "delete_partition",
+          partition_name: partition_name,
+      }, function (data) {
+          location.reload();
+      });
   }
   window.onload = function(){
     $("#add-partition-btn").click(function () {

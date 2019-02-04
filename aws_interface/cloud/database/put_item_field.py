@@ -35,10 +35,9 @@ def do(data, boto3):
 
     result = dynamo.get_item(table_name, item_id)
     item = result.get('Item', {})
-    item[field_name] = field_value
-
     write_permissions = item.get('write_permissions', [])
     if 'all' in write_permissions or user_group in write_permissions:
+        item[field_name] = field_value
         dynamo.update_item(table_name, item_id, item)
         response['success'] = True
     else:

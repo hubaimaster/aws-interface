@@ -327,6 +327,9 @@ class Database(View):
             field_name = request.POST['field_name']
             field_value = request.POST['field_value']
             _ = database.put_item_field(item_id, field_name, field_value)
+        elif cmd == 'delete_partition':
+            partition_name = request.POST['partition_name']
+            _ = database.delete_partition(partition_name)
 
         elif cmd == 'get_items':
             partition = request.POST['partition']
