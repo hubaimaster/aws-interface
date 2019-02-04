@@ -243,6 +243,7 @@ class Auth(View):
         api = Util.get_api(AuthAPI, 'auth', request, app_id)
         cmd = request.GET.get('cmd', None)
         if cmd == 'download_sdk':
+            api.apply()
             sdk_bin = api.get_rest_api_sdk()
             response = HttpResponse(sdk_bin, content_type='application/x-binary')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('auth_sdk.zip')
@@ -319,6 +320,8 @@ class Database(View):
         context['app_id'] = app_id
         cmd = request.GET.get('cmd', None)
         if cmd == 'download_sdk':
+            database.apply()
+            Util.save_recipe(database.get_recipe_controller(), app_id)
             sdk_bin = database.get_rest_api_sdk()
             response = HttpResponse(sdk_bin, content_type='application/x-binary')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('database_sdk.zip')
@@ -368,11 +371,13 @@ class Database(View):
             partition = request.POST['partition']
             result = database.get_items(partition)
             result = Util.encode_dict(result)
+            Util.save_recipe(database.get_recipe_controller(), app_id)
             return JsonResponse(result)
         elif cmd == 'get_item':
             item_id = request.POST['item_id']
             result = database.get_item(item_id)
             result = Util.encode_dict(result)
+            Util.save_recipe(database.get_recipe_controller(), app_id)
             return JsonResponse(result)
 
         Util.save_recipe(database.get_recipe_controller(), app_id)

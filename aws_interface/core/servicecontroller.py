@@ -176,7 +176,12 @@ class ServiceController:
         return sdk_bin
 
     def apply(self, recipe_controller):
-        raise NotImplementedError()
+        self.apply_cloud_api(recipe_controller)
+        self.deploy_cloud_api(recipe_controller)
+        self.common_apply(recipe_controller)
+
+    def common_apply(self, recipe_controller):
+        raise NotImplementedError
 
 
 class BillServiceController(ServiceController):
@@ -184,7 +189,7 @@ class BillServiceController(ServiceController):
         self.boto3_session = get_boto3_session(self.bundle)
         self.cost_explorer = CostExplorer(self.boto3_session)
 
-    def apply(self, recipe):
+    def common_apply(self, recipe_controller):
         return
 
     def get_cost(self, start, end):
@@ -230,9 +235,8 @@ class AuthServiceController(ServiceController):
         }])
         return
 
-    def apply(self, recipe_controller):
-        self.apply_cloud_api(recipe_controller)
-        self.deploy_cloud_api(recipe_controller)
+    def common_apply(self, recipe_controller):
+        return
 
     def create_user(self, recipe, email, password, extra):
         import cloud.auth.register as register
@@ -347,9 +351,8 @@ class DatabaseServiceController(ServiceController):
         dynamodb.init_table(table_name)
         return
 
-    def apply(self, recipe_controller):
-        self.apply_cloud_api(recipe_controller)
-        self.deploy_cloud_api(recipe_controller)
+    def common_apply(self, recipe_controller):
+        return
 
     def create_item(self, recipe, partition, item, read_permissions, write_permissions):
         import cloud.database.create_item as method

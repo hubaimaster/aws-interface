@@ -16,6 +16,7 @@ class RecipeController:
 
     def load_json_string(self, json_string):
         self.data = json.loads(json_string)
+        self.common_init()
 
     def get_recipe_type(self):
         return self.data.get('recipe_type', None)
