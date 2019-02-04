@@ -345,21 +345,65 @@ class DatabaseServiceController(ServiceController):
         self.apply_cloud_api(recipe_controller)
         self.deploy_cloud_api(recipe_controller)
 
-    def create_item(self, partition, item, read_permissions, write_permissions):
-        return
+    def create_item(self, recipe, partition, item, read_permissions, write_permissions):
+        import cloud.database.create_item as method
+        params = {
+            'partition': partition,
+            'item': item,
+            'read_permissions': read_permissions,
+            'write_permissions': write_permissions,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
 
-    def update_item(self, item_id, item, read_permissions, write_permissions):
-        return
+    def update_item(self, recipe, item_id, item, read_permissions, write_permissions):
+        import cloud.database.update_item as method
+        params = {
+            'item_id': item_id,
+            'item': item,
+            'read_permissions': read_permissions,
+            'write_permissions': write_permissions,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
 
-    def update_item_field(self, item_id, field_name, field_value):
-        return
+    def put_item_field(self, recipe, item_id, field_name, field_value):
+        import cloud.database.put_item_field as method
+        params = {
+            'item_id': item_id,
+            'field_name': field_name,
+            'field_value': field_value,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
 
-    def get_item(self, item_id):
-        return
+    def get_item(self, recipe, item_id):
+        import cloud.database.get_item as method
+        params = {
+            'item_id': item_id,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
 
-    def delete_item(self, item_id):
-        return
+    def delete_item(self, recipe, item_id):
+        import cloud.database.delete_item as method
+        params = {
+            'item_id': item_id,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
 
-    def get_items(self, partition):
-        return
+    def get_items(self, recipe, partition):
+        import cloud.database.get_items as method
+        params = {
+            'partition': partition,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
 

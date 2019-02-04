@@ -386,9 +386,9 @@ class DynamoDB:
 
     def update_item(self, table_name, item_id, item):
         table = self.resource.Table(table_name)
-        updation_date = int(time.time())
+        update_date = int(time.time())
         item['id'] = item_id
-        item['updation_date'] = updation_date
+        item['update_date'] = update_date
         response = table.put_item(
             TableName=table_name,
             Item=item,
