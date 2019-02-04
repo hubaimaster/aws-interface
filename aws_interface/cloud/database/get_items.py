@@ -34,7 +34,6 @@ def do(data, boto3):
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)
-
     result = dynamo.get_items(table_name, partition, start_key, limit, reverse)
     end_key = result.get('LastEvaluatedKey', None)
     items = result.get('Items', [])
@@ -43,8 +42,12 @@ def do(data, boto3):
     for item in items:
         read_permission = item.get('read_permissions', [])
         if 'all' in read_permission or user_group in read_permission:
+            # Remove system key
+            item.get('Item', {}).pop('partition', None)
+            item.get('Item', {}).pop('read_permissions', None)
+            item.get('Item', {}).pop('write_permissions', None)
             filtered.append(item)
 
     response['items'] = filtered
-    response['end_key'] =  end_key
+    response['end_key'] = end_key
     return response
