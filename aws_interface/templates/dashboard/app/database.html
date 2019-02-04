@@ -186,7 +186,6 @@
                                                 <select id="field-type" class="form-control">
                                                     <option value="S">문자열</option>
                                                     <option value="N">숫자</option>
-                                                    <option value="L">리스트</option>
                                                 </select>
                                               </div>
                                               <div class="form-group">
@@ -308,7 +307,6 @@
   function set_field(key, value, type) {
       $("#field-name").val(key);
       $("#field-value").val(value);
-      alert(type);
       $("#field-type").val(type);
       $("#modal-add-field").modal('show');
   }
