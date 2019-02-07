@@ -252,6 +252,7 @@
   item_ids = [];
   item_fields = [];
   function set_partition(p) {
+      $("#field-table>tbody").empty();
       item_ids = [];
       partition = p;
       $("th[name='partition']").css({backgroundColor: 'white'});
