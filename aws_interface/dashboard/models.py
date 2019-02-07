@@ -2,6 +2,7 @@ from django.db import models
 from dashboard.security.crypto import AESCipher
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import uuid
+import shortuuid
 
 
 class UserManager(BaseUserManager):
@@ -91,14 +92,14 @@ class User(AbstractUser):
 
 
 class App(models.Model):
-    id = models.CharField(max_length=255, primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
     user_id = models.CharField(max_length=255)
     name = models.CharField(max_length=255, blank=False, unique=True)
 
 
 class Recipe(models.Model):
-    id = models.CharField(max_length=255, primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
     recipe_id = models.CharField(max_length=255)
     recipe_type = models.CharField(max_length=255)

@@ -3,6 +3,8 @@ import uuid
 import time
 from boto3.dynamodb.conditions import Key
 from time import sleep
+from shortuuid import ShortUUID
+
 
 class Config:
     stage_name = 'prod_aws_interface'
@@ -380,7 +382,7 @@ class DynamoDB:
 
     def put_item(self, table_name, partition, item, item_id=None, creation_date=None):
         if not item_id:
-            item_id = str(uuid.uuid4())
+            item_id = str(ShortUUID().uuid())
         if not creation_date:
             creation_date = int(time.time())
         table = self.resource.Table(table_name)
