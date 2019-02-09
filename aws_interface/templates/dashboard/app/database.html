@@ -101,7 +101,7 @@
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">
-                        <button scope="row" data-toggle="modal" data-target="#modal-add-item" class="btn btn-sm">
+                        <button id="open-add-item-modal" scope="row" class="btn btn-sm">
                             아이템 추가 +
                         </button>
 
@@ -276,7 +276,7 @@
       for (var i = 0; i < item_ids.length; i++){
           var iid = item_ids[i];
           var row = "<tr><th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +
-              "<button class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+              "<button onclick='delete_item(\"" + iid + "\");' class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
               "</th></tr>";
           $("#item-table").append(row);
       }
@@ -380,6 +380,14 @@
           location.reload();
       });
   }
+  function delete_item(item_id){
+      $.post("", {
+          cmd: "delete_item",
+          item_id: item_id,
+      }, function (data) {
+          set_partition(partition);
+      });
+  }
   window.onload = function(){
     $("#add-partition-btn").click(function () {
         add_partition();
@@ -389,6 +397,13 @@
     });
     $("#add-field-btn").click(function () {
         add_field();
+    });
+    $("#open-add-item-modal").click(function () {
+       if (partition == null || partition.length == 0){
+          alert("파티션을 지정해주세요");
+          return;
+       }
+       $("#modal-add-item").modal('show');
     });
     $("#open-add-field-modal").click(function () {
         $("#field-name").val(null);

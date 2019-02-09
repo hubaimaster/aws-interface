@@ -371,13 +371,15 @@ class Database(View):
             partition = request.POST['partition']
             result = database.get_items(partition)
             result = Util.encode_dict(result)
-            Util.save_recipe(database.get_recipe_controller(), app_id)
             return JsonResponse(result)
         elif cmd == 'get_item':
             item_id = request.POST['item_id']
             result = database.get_item(item_id)
             result = Util.encode_dict(result)
-            Util.save_recipe(database.get_recipe_controller(), app_id)
+            return JsonResponse(result)
+        elif cmd == 'delete_item':
+            item_id = request.POST['item_id']
+            result = database.delete_item(item_id)
             return JsonResponse(result)
 
         Util.save_recipe(database.get_recipe_controller(), app_id)
