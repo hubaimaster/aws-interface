@@ -309,9 +309,9 @@
               value_type = 'L';
               value = JSON.stringify(value);
           }
-          var row = "<tr><th onclick=\"set_field('" + key + "', '" + value + "','" + value_type + "');\" name=\"field\" id=\"" +
-              key + "\" scope=\"row\">" + key + " : " + value +
-              "<button class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+          var row = "<tr><th name=\"field\" id=\"" +
+              key + "\" scope=\"row\"><a onclick=\"set_field('" + key + "', '" + value + "','" + value_type + "');\">" + key + " : " + value + "</a>" +
+              "<button onclick='delete_field(\"" + key + "\");' class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
               "</th></tr>";
           $("#field-table").append(row);
       });
@@ -386,6 +386,15 @@
           item_id: item_id,
       }, function (data) {
           set_partition(partition);
+      });
+  }
+  function delete_field(field_name){
+      $.post("", {
+          cmd: "delete_field",
+          item_id: item_id,
+          field_name: field_name,
+      }, function (data) {
+          set_item(item_id);
       });
   }
   window.onload = function(){

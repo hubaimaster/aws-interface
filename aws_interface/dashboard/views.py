@@ -381,6 +381,11 @@ class Database(View):
             item_id = request.POST['item_id']
             result = database.delete_item(item_id)
             return JsonResponse(result)
+        elif cmd == 'delete_field':
+            item_id = request.POST['item_id']
+            field_name = request.POST['field_name']
+            result = database.put_item_field(item_id, field_name, None)
+            return JsonResponse(result)
 
         Util.save_recipe(database.get_recipe_controller(), app_id)
         return redirect(request.path_info)  # Redirect back
