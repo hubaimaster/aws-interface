@@ -126,7 +126,7 @@ class APIGateway:
         source_arn = "arn:aws:execute-api:{aws-region}:{aws-acct-id}:{aws-api-id}/*/POST/{lambda-function-name}".format(
             **uri_data)
 
-        def add_permission():
+        def add_permission(count=0):
             try:
                 aws_lambda.add_permission(
                     FunctionName=lambda_func_name,
@@ -138,7 +138,8 @@ class APIGateway:
             except BaseException as ex:
                 print(ex)
                 sleep(3.0)
-                add_permission()
+                if count < 5:
+                    add_permission(count + 1)
 
         add_permission()
         api_client.create_deployment(
