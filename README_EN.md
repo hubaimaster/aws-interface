@@ -1,11 +1,11 @@
 ![Language](https://img.shields.io/badge/Language-Python3.6-blue.svg)
 ![Language](https://img.shields.io/badge/NaverFest-Finalist-brightgreen.svg)
 
-**[Naver D2 Fest 결승 진출!! 끼요오오옷ㅅㅅ](https://github.com/D2CampusFest/6th)**
+**[WE R Naver D2 Fest Finalists!](https://github.com/D2CampusFest/6th)**
 
 # AWS-Interface
 
-**AWS 인터페이스** 는 Amazon Web Services (AWS)에서 제공하는 IAM, DynamoDB, Lambda, API Gateway 등의 서비스를 추상화하여 손쉽게 사용할 수 있게 해주는 인터페이스입니다.
+AWS-Interface lets you jump start your next big idea with a powerful and flexible backend. Configure a scalable backend for your service within minutes through a simple web interface. All services are based on AWS's powerful services including IAM, DynamoDB, Lambda, API Gateway etc.
 
 새로운 서비스를 제작할 때, 주로 확장성과 초기 투자 비용 사이의 trade-off를 고민하게 됩니다. 처음에는 EC2 인스턴스를 하나 파서 웹 프레임워크와 함께 서버 안에서 돌려도 되지만, 서비스가 커지면 AWS DynamoDB와 같은 서비스를 고려해야 합니다. 사실 DynamoDB도 확장성 좋고 쓰기 쉬운 서비스라고 만들었겠지만, 정작 능숙하게 다룰줄 아는 개발자가 몇명이나 될까요?
 
