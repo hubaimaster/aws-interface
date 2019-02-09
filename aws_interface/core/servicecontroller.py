@@ -417,3 +417,11 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
+    def get_item_count(self, recipe, partition):
+        import cloud.database.get_item_count as method
+        params = {
+            'partition': partition,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)

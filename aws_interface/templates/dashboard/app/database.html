@@ -85,9 +85,9 @@
                 <tbody>
                   {% for partition in partitions %}
                   <tr>
-                    <th id="{{ partition }}" name="partition" scope="row" onclick="set_partition('{{ partition }}');">
-                      {{ partition }}
-                        <button onclick="delete_partition('{{ partition }}');" style='font-size:7pt; margin-left:16px;'>삭제</button>
+                    <th id="{{ partition.name }}" name="partition" scope="row" onclick="set_partition('{{ partition.name }}');">
+                      {{ partition.name }}
+                        <button onclick="delete_partition('{{ partition.name }}');" style='font-size:7pt; margin-left:16px;'>삭제</button>
                     </th>
                   </tr>
                   {% endfor %}
@@ -104,6 +104,7 @@
                         <button id="open-add-item-modal" scope="row" class="btn btn-sm">
                             아이템 추가 +
                         </button>
+                        <text id="item_count"></text>
 
 
                         <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
@@ -264,7 +265,12 @@
           var items = data['items'];
           var end_key = data['end_key'];
           set_items(items);
+          get_item_count(p, function (data) {
+              var ment = "총 " + data['item']["count"] + "개 항목 중 " + items.length + "개";
+              $("#item_count").html(ment);
+          });
       });
+
   }
   function set_items(items) {
       $("#item-table>tbody").empty();
@@ -395,6 +401,14 @@
           field_name: field_name,
       }, function (data) {
           set_item(item_id);
+      });
+  }
+  function get_item_count(partition, callback){
+      $.post("", {
+          cmd: "get_item_count",
+          partition: partition,
+      }, function (data) {
+          callback(data);
       });
   }
   window.onload = function(){

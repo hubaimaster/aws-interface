@@ -328,8 +328,15 @@ class Database(View):
             return response
         else:
             try:
+                partitions = database.get_partitions()
+                partitions = Util.encode_dict(partitions)
+                for partition in partitions:
+                    result = database.get_item_count(partition)
+                    partitions[partition]['item_count'] = result['item']['count']
+                partitions = partitions.values()
+
                 context['user_groups'] = auth.get_user_groups()
-                context['partitions'] = database.get_partitions()
+                context['partitions'] = partitions
                 context['rest_api_url'] = database.get_rest_api_url()
                 return render(request, 'dashboard/app/database.html', context=context)
             except ClientError as ex:
@@ -385,6 +392,11 @@ class Database(View):
             item_id = request.POST['item_id']
             field_name = request.POST['field_name']
             result = database.put_item_field(item_id, field_name, None)
+            return JsonResponse(result)
+        elif cmd == 'get_item_count':
+            partition = request.POST['partition']
+            result = database.get_item_count(partition)
+            result = Util.encode_dict(result)
             return JsonResponse(result)
 
         Util.save_recipe(database.get_recipe_controller(), app_id)
