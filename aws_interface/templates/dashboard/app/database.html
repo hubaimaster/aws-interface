@@ -255,6 +255,7 @@
   function set_partition(p) {
       $("#field-table>tbody").empty();
       item_ids = [];
+      item_id = null;
       partition = p;
       $("th[name='partition']").css({backgroundColor: 'white'});
       $("#" + partition).css({backgroundColor: '#BBB'});
@@ -422,13 +423,17 @@
         add_field();
     });
     $("#open-add-item-modal").click(function () {
-       if (partition == null || partition.length == 0){
+       if (partition == null){
           alert("파티션을 지정해주세요");
           return;
        }
        $("#modal-add-item").modal('show');
     });
     $("#open-add-field-modal").click(function () {
+        if (partition == null || item_id == null){
+          alert("아이템을 지정해주세요");
+          return;
+       }
         $("#field-name").val(null);
         $("#field-value").val(null);
         $("#field-type").val('S');
