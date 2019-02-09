@@ -3,7 +3,7 @@ import uuid
 import time
 from boto3.dynamodb.conditions import Key
 from time import sleep
-from shortuuid import ShortUUID
+import cloud.shortuuid as shortuuid
 
 
 class Config:
@@ -382,7 +382,7 @@ class DynamoDB:
 
     def put_item(self, table_name, partition, item, item_id=None, creation_date=None):
         if not item_id:
-            item_id = str(ShortUUID().uuid())
+            item_id = str(shortuuid.uuid())
         if not creation_date:
             creation_date = int(time.time())
         table = self.resource.Table(table_name)

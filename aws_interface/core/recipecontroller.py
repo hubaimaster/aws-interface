@@ -67,6 +67,7 @@ class AuthRecipeController(RecipeController):
 
     def _init_cloud_api(self):
         self.put_cloud_api('login', 'cloud.auth.login')
+        self.put_cloud_api('guest', 'cloud.auth.guest')
         self.put_cloud_api('logout', 'cloud.auth.logout')
         self.put_cloud_api('register', 'cloud.auth.register')
         self.put_cloud_api('get_user', 'cloud.auth.get_user')

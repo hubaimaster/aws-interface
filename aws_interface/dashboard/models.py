@@ -2,7 +2,7 @@ from django.db import models
 from dashboard.security.crypto import AESCipher
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import uuid
-import shortuuid
+import cloud.shortuuid as shortuuid
 
 
 class UserManager(BaseUserManager):

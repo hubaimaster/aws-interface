@@ -31,6 +31,18 @@ def do(data, boto3):
 
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)  # Should be auth-143..
     partition = 'user'
+    login_conf = recipe['login_method']['email_login']
+    default_group_name = login_conf['default_group_name']
+    enabled = login_conf['enabled']
+    if enabled == 'true':
+        enabled = True
+    elif enabled == 'false':
+        enabled = False
+
+    if not enabled:
+        response['error'] = '4'
+        response['message'] = '이메일 로그인이 비활성화 상태입니다.'
+        return response
 
     dynamo = DynamoDB(boto3)
     resp = dynamo.get_items_with_index(table_name, 'partition-email', 'partition', 'user', 'email', email)
@@ -44,8 +56,9 @@ def do(data, boto3):
             'email': email,
             'passwordHash': password_hash,
             'salt': salt,
-            'group': 'user',
+            'group': default_group_name,
             'extra': extra,
+            'loginMethod': 'email_login',
         }
         dynamo.put_item(table_name, partition, item)
         response['message'] = '회원가입에 성공하였습니다.'
