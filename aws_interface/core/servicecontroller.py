@@ -167,7 +167,6 @@ class ServiceController:
         api_name = '{}-{}'.format(recipe_type, self.app_id)
         func_name = '{}-{}'.format(recipe_type, self.app_id)
         api_url = api_client.get_rest_api_url(api_name, func_name)
-        print('api_url:', api_url)
         return api_url
 
     def get_rest_api_sdk(self, recipe_controller):
@@ -425,3 +424,16 @@ class DatabaseServiceController(ServiceController):
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session
         return method.do(data, boto3)
+
+
+class StorageServiceController(ServiceController):
+    def common_init(self):
+        self.boto3_session = get_boto3_session(self.bundle)
+        self._init_bucket()
+
+    def _init_bucket(self):
+        s3 = None #TODO
+        return
+
+    def common_apply(self, recipe_controller):
+        return

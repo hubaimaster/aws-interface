@@ -181,3 +181,13 @@ class DatabaseRecipeController(RecipeController):
     def delete_partition_field_info(self, partition_name, field_name):
         self.data.get('partitions', {}).get(partition_name, {}).pop(field_name)
         return True
+
+
+class StorageRecipeController(RecipeController):
+    def common_init(self):
+        self.data['recipe_type'] = 'storage'
+        self._init_cloud_api()
+
+    def _init_cloud_api(self):
+        return
+

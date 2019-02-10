@@ -164,3 +164,12 @@ class DatabaseAPI(API):
         raise NotImplementedError()
 
 
+class StorageAPI(API):
+    def common_init(self):
+        self.service_controller = StorageServiceController(self.bundle, self.app_id)
+        self.recipe_controller = StorageRecipeController()
+        if self.recipe_json_string:
+            self.recipe_controller.load_json_string(self.recipe_json_string)
+
+    # Recipe
+    # Service
