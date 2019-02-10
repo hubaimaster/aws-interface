@@ -173,3 +173,5 @@ class StorageAPI(API):
 
     # Recipe
     # Service
+    def create_folder(self, parent_dir, name):
+        return
