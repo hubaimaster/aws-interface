@@ -1,4 +1,5 @@
 from cloud.aws import *
+from cloud.response import Response
 
 
 # Define the input output format of the function.
@@ -20,7 +21,7 @@ info = {
 
 
 def do(data, boto3):
-    response = {}
+    body = {}
     recipe = data['recipe']
     params = data['params']
     app_id = data['app_id']
@@ -32,5 +33,5 @@ def do(data, boto3):
     dynamo = DynamoDB(boto3)
     result = dynamo.get_item(table_name, session_id)
     item = result.get('Item', None)
-    response['item'] = item
-    return response
+    body['item'] = item
+    return Response(body)

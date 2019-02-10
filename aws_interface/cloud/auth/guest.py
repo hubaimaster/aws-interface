@@ -1,6 +1,7 @@
 from cloud.aws import *
-from cloud.crypto import *
+from cloud.response import Response
 import cloud.shortuuid as shortuuid
+
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -16,7 +17,7 @@ info = {
 
 
 def do(data, boto3):
-    response = {}
+    body = {}
     recipe = data['recipe']
     params = data['params']
     app_id = data['app_id']
@@ -33,9 +34,9 @@ def do(data, boto3):
         enabled = False
 
     if not enabled:
-        response['error'] = '6'
-        response['message'] = '게스트 로그인이 비활성화 상태입니다.'
-        return response
+        body['error'] = '6'
+        body['message'] = '게스트 로그인이 비활성화 상태입니다.'
+        return Response(body)
 
     dynamo = DynamoDB(boto3)
 
@@ -46,12 +47,12 @@ def do(data, boto3):
                 'userId': guest_id
             }
             dynamo.put_item(table_name, 'session', session_item)
-            response['message'] = '게스트 로그인 성공'
-            return response
+            body['message'] = '게스트 로그인 성공'
+            return Response(body)
         else:
-            response['error'] = '7'
-            response['message'] = '해당 게스트가 없습니다'
-            return response
+            body['error'] = '7'
+            body['message'] = '해당 게스트가 없습니다'
+            return Response(body)
     else:
         guest_id = shortuuid.uuid()
         email = '{}@guest.com'.format(shortuuid.uuid())
@@ -67,8 +68,8 @@ def do(data, boto3):
             'userId': guest_id
         }
         dynamo.put_item(table_name, 'session', session_item, item_id=session_id)
-        response['session_id'] = session_id
-        response['guest_id'] = guest_id
-        response['message'] = '게스트 로그인 성공'
-        return response
+        body['session_id'] = session_id
+        body['guest_id'] = guest_id
+        body['message'] = '게스트 로그인 성공'
+        return Response(body)
 

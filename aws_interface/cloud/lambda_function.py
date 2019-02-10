@@ -1,34 +1,9 @@
 import urllib
 import cgi
 import json
-import decimal
 import importlib
 import boto3
-
-
-def get_response_header():
-    api_gateway_response_header = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With',
-        'Access-Control-Allow-Credentials': True,
-        'Content-Type': 'application/json'
-    }
-    return api_gateway_response_header
-
-
-def decimal_default(obj):
-    if isinstance(obj, decimal.Decimal):
-        return float(obj)
-    raise TypeError
-
-
-def put_response(response, key, value):
-    if response['body'] is None:
-        response['body'] = {}
-        response['body'] = json.dumps(response['body'])
-    response['body'] = json.loads(response['body'])
-    response['body'][key] = value
-    response['body'] = json.dumps(response['body'], default=decimal_default)
+import cloud.auth.get_me as get_me
 
 
 def get_params(event):
@@ -47,18 +22,7 @@ def get_params(event):
     return params
 
 
-def make_event(params):
-    event = dict()
-    event['queryStringParameters'] = params
-    return event
-
-
 def handler(event, context):
-    response = {
-        'statusCode': 200,
-        'headers': get_response_header(),
-        'body': None,
-    }
     parmas = event
     cloud_api_name = parmas.get('cloud_api_name', None)
     
@@ -79,20 +43,26 @@ def handler(event, context):
         'app_id': app_id,
         'admin': False,
     }
-    import cloud.auth.get_me as get_me
+
     user = get_me.do(data, boto3).get('item', None)
     data['user'] = user
 
     module = importlib.import_module(module_name)
     if 'all' in permissions:
-        body = module.do(data, boto3)
+        module_response = module.do(data, boto3)
     elif user.get('group', None) in permissions:
-        body = module.do(data, boto3)
+        module_response = module.do(data, boto3)
     else:
-        body = {
-            'error': '3',
-            'message': 'permission denied'
+        module_response = {
+            'statusCode': 201,
+            'body': {
+                'message': 'permission denied'
+            }
         }
 
-    response['body'] = body
+    response = {
+        'statusCode': module_response.get('statusCode', 200),
+        'headers': module_response.get('header', {}),
+        'body': module_response.get('body', {}),
+    }
     return response

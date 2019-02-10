@@ -1,4 +1,5 @@
 from cloud.aws import *
+from cloud.response import Response
 
 
 # Define the input output format of the function.
@@ -14,7 +15,7 @@ info = {
 
 
 def do(data, boto3):
-    response = {}
+    body = {}
     recipe = data['recipe']
     params = data['params']
     app_id = data['app_id']
@@ -25,5 +26,5 @@ def do(data, boto3):
 
     dynamo = DynamoDB(boto3)
     dynamo.delete_item(table_name, 'session', session_id)
-    response['message'] = '로그아웃 되었습니다.'
-    return response
+    body['message'] = '로그아웃 되었습니다.'
+    return Response(body)

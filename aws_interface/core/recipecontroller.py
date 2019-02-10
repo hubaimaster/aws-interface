@@ -53,6 +53,7 @@ class AuthRecipeController(RecipeController):
         # put system default groups
         self._init_user_group()
         self._init_cloud_api()
+        self._init_login_method()
 
     def _init_user_group(self):
         self.default_groups = {
@@ -74,6 +75,10 @@ class AuthRecipeController(RecipeController):
         self.put_cloud_api('get_user_count', 'cloud.auth.get_user_count', permissions=['admin'])
         self.put_cloud_api('set_user', 'cloud.auth.set_user', permissions=['owner'])
         self.put_cloud_api('delete_user', 'cloud.auth.delete_user', permissions=['owner'])
+
+    def _init_login_method(self):
+        self.get_email_login()
+        self.get_guest_login()
 
     def put_user_group(self, name, description):
         if 'user_groups' not in self.data:

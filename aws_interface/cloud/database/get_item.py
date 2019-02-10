@@ -1,4 +1,5 @@
 from cloud.aws import *
+from cloud.response import Response
 
 
 # Define the input output format of the function.
@@ -16,7 +17,7 @@ info = {
 
 
 def do(data, boto3):
-    response = {}
+    body = {}
     recipe = data['recipe']
     params = data['params']
     app_id = data['app_id']
@@ -37,9 +38,9 @@ def do(data, boto3):
         item.pop('partition', None)
         item.pop('read_permissions', None)
         item.pop('write_permissions', None)
-        response['item'] = item
-        response['success'] = True
+        body['item'] = item
+        body['success'] = True
     else:
-        response['success'] = False
-        response['message'] = 'permission denied'
-    return response
+        body['success'] = False
+        body['message'] = 'permission denied'
+    return Response(body)
