@@ -355,9 +355,9 @@ class Database(View):
             database.apply()
         elif cmd == 'add_item':
             partition = request.POST['partition']
-            read_permission = request.POST['read_permission']
-            write_permission = request.POST['write_permission']
-            _ = database.create_item(partition, {}, [read_permission], [write_permission])
+            read_groups = request.POST.getlist('read_groups[]')
+            write_groups = request.POST.getlist('write_groups[]')
+            _ = database.create_item(partition, {}, read_groups, write_groups)
         elif cmd == 'add_field':
             item_id = request.POST['item_id']
             field_name = request.POST['field_name']
@@ -407,9 +407,19 @@ class Storage(View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         auth = Util.get_api(AuthAPI, 'auth', request, app_id)
+        storage = Util.get_api(StorageAPI, 'storage', request, app_id)
         context['app_id'] = app_id
         context['user_groups'] = auth.get_user_groups()
         return render(request, 'dashboard/app/storage.html', context=context)
+
+    def post(self, request, app_id):
+        context = Util.get_context(request)
+        context['app_id'] = app_id
+        storage = Util.get_api(StorageAPI, 'storage', request, app_id)
+        cmd = request.POST['cmd']
+
+        if cmd == 'create_folder':
+            return
 
 
 class Logic(View):
