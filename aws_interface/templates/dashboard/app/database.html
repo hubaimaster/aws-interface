@@ -374,6 +374,10 @@
           alert("파티션을 지정해주세요");
           return;
       }
+      if (read_groups.length == 0 || write_groups.length == 0){
+          alert("권한 그룹은 1개 이상 지정해야 합니다");
+          return;
+      }
       $.post("", {
           cmd: "add_item",
           partition: partition,
