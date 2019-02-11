@@ -46,16 +46,15 @@
                             <span aria-hidden="true">×</span>
                           </button>
                         </div>
-                        <form method="post">{% csrf_token %}
-                            <input name="cmd" value="put_user" hidden>
+
                             <div class="modal-body">
                                 <div class="pl-lg-12">
                                   <div class="row">
                                     <div class="col-lg-12">
 
                                       <div class="form-group">
-                                        <label class="form-control-label" for="create-folder">생성 위치</label>
-                                        <input name="create-folder" type="text" id="create-folder" class="form-control form-control-alternative" placeholder="/" disabled>
+                                        <label class="form-control-label" for="folder-parent-path">생성 위치</label>
+                                        <input name="folder-parent-path" type="text" id="folder-parent-path" class="form-control form-control-alternative" placeholder="/" disabled>
                                       </div>
 
                                       <div class="form-group">
@@ -72,9 +71,9 @@
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                              <button type="submit" class="btn btn-primary">확인</button>
+                              <button id="create-folder" class="btn btn-primary">확인</button>
                             </div>
-                        </form>
+
                       </div>
                     </div>
                   </div>
@@ -88,7 +87,7 @@
                             <span aria-hidden="true">×</span>
                           </button>
                         </div>
-                        <form method="post">{% csrf_token %}
+
                             <input name="cmd" value="put_user" hidden>
                             <div class="modal-body">
                                 <div class="pl-lg-12">
@@ -96,20 +95,18 @@
                                     <div class="col-lg-12">
 
                                       <div class="form-group">
-                                        <label class="form-control-label" for="input-username">업로드 위치</label>
-                                        <input name="upload-folder" type="text" id="upload-folder" class="form-control form-control-alternative" placeholder="/" disabled>
+                                        <label class="form-control-label" for="file-parent-path">업로드 위치</label>
+                                        <input name="file-parent-path" type="text" id="file-parent-path" class="form-control form-control-alternative" placeholder="/" disabled>
                                       </div>
                                       <div class="form-group">
-                                        <label class="form-control-label" for="input-username">파일</label>
-                                        <input name="upload-file" type="file" id="upload-file" class="form-control form-control-alternative btn">
+                                        <label class="form-control-label" for="file-bin">파일</label>
+                                        <input name="file-bin" type="file" id="file-bin" class="form-control form-control-alternative btn">
                                       </div>
 
                                       <div class="form-group">
                                         <label class="form-control-label" for="input-username">파일을 읽을 수 있는 그룹</label>
-                                        <div class="mb-2">
-                                            <a class="badge badge-primary">admin</a>
-                                            <a class="badge badge-primary">user</a>
-                                            <a class="badge badge-primary">owner</a>
+                                        <div id="read-groups" class="mb-2">
+
                                         </div>
 
                                           <div class="dropdown">
@@ -117,11 +114,11 @@
                                                 그룹 추가
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                <a class="dropdown-item" href="#">admin</a>
-                                                <a class="dropdown-item" href="#">Another action</a>
-                                                <a class="dropdown-item" href="#">Something else here</a>
+                                                {% for group in user_groups %}
+                                                <a class="dropdown-item" onclick="put_read_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                {% endfor %}
                                                 <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" href="#">회원 그룹 관리</a>
+                                                <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
                                               </div>
                                           </div>
 
@@ -129,10 +126,8 @@
 
                                       <div class="form-group">
                                         <label class="form-control-label" for="input-username">파일을 쓰기 또는 삭제 할 수 있는 그룹</label>
-                                        <div class="mb-2">
-                                            <a class="badge badge-primary">admin</a>
-                                            <a class="badge badge-primary">user</a>
-                                            <a class="badge badge-primary">owner</a>
+                                        <div id="write-groups" class="mb-2">
+
                                         </div>
 
                                           <div class="dropdown">
@@ -140,11 +135,11 @@
                                                 그룹 추가
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                <a class="dropdown-item" href="#">admin</a>
-                                                <a class="dropdown-item" href="#">Another action</a>
-                                                <a class="dropdown-item" href="#">Something else here</a>
+                                                {% for group in user_groups %}
+                                                <a class="dropdown-item" onclick="put_write_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                {% endfor %}
                                                 <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" href="#">회원 그룹 관리</a>
+                                                <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
                                               </div>
                                           </div>
                                       </div>
@@ -158,9 +153,9 @@
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                              <button type="submit" class="btn btn-primary">확인</button>
+                              <button id="upload-file" class="btn btn-primary">확인</button>
                             </div>
-                        </form>
+                      
                       </div>
                     </div>
                   </div>
@@ -170,7 +165,7 @@
             </div>
             <div class="table-responsive">
               <!-- Projects table -->
-              <table class="table align-items-center table-flush">
+              <table id="dir-table" class="table align-items-center table-flush">
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">name</th>
@@ -223,5 +218,100 @@
       </footer>
     </div>
   </div>
+
+  <script>
+    var read_groups = ["all"];
+    var write_groups = ["all"];
+    function render_folder(folder_path) {
+        $("#dir-table>tbody").empty();
+    }
+    function create_folder(parent_path, folder_name) {
+        $.post("", {
+            cmd: "create_folder",
+            parent_path: parent_path,
+            folder_name: folder_name,
+        }, function (data) {
+            render_folder(parent_path);
+        });
+    }
+    function upload_file(parent_path, file_bin, read_groups, write_groups) {
+        $.post("", {
+            cmd: "upload_file",
+            parent_path: parent_path,
+            file_bin: file_bin,
+            read_groups: read_groups,
+            write_groups: write_groups,
+        }, function (data) {
+            render_folder(parent_path);
+        });
+    }
+
+    function render_read_groups() {
+        $("#read-groups").empty();
+        for (var i = 0; i < read_groups.length; i++){
+            var group = read_groups[i];
+            var tag = "<a onclick=\"remove_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+            $("#read-groups").append(tag);
+        }
+    }
+    function render_write_groups() {
+        $("#write-groups").empty();
+        for (var i = 0; i < write_groups.length; i++){
+            var group = write_groups[i];
+            var tag = "<a onclick=\"remove_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+            $("#write-groups").append(tag);
+        }
+    }
+    function put_read_group(group_name) {
+        if (read_groups.includes(group_name)){
+            alert("이미 해당 그룹이 존재합니다");
+        }else{
+            read_groups.push(group_name);
+            render_read_groups();
+        }
+    }
+    function remove_read_group(group_name) {
+        read_groups.remove(group_name);
+        render_read_groups();
+    }
+    function put_write_group(group_name) {
+        if (write_groups.includes(group_name)){
+            alert("이미 해당 그룹이 존재합니다");
+        }else{
+            write_groups.push(group_name);
+            render_write_groups();
+        }
+    }
+    function remove_write_group(group_name) {
+        write_groups.remove(group_name);
+        render_write_groups();
+    }
+    window.onload = function () {
+        render_read_groups();
+        render_write_groups();
+        $("#create-folder").click(function () {
+            var parent_path = $("#folder-parent-path").val();
+            var folder_name = $("#folder-name").val();
+            if (folder_name == null || folder_name.length == 0){
+                alert("폴더 이름을 채워주세요");
+                return;
+            }
+            create_folder(parent_path, folder_name);
+        });
+        $("#upload-file").click(function () {
+            var parent_path = $("#folder-parent-path").val();
+            var file_bin = $("#file-bin").val();
+            if (file_bin == null || file_bin.length == 0){
+                alert("파일을 지정해주세요");
+                return;
+            }
+            if (read_groups.length == 0 || write_groups.length == 0){
+                alert("권한 그룹은 1개 이상 지정해야 합니다");
+                return;
+            }
+            upload_file(parent_path, file_bin, read_groups, write_groups);
+        });
+    };
+  </script>
 
 {% endblock %}

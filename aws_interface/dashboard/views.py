@@ -406,7 +406,9 @@ class Database(View):
 class Storage(View):
     def get(self, request, app_id):
         context = Util.get_context(request)
+        auth = Util.get_api(AuthAPI, 'auth', request, app_id)
         context['app_id'] = app_id
+        context['user_groups'] = auth.get_user_groups()
         return render(request, 'dashboard/app/storage.html', context=context)
 
 
