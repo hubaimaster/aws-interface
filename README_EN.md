@@ -11,9 +11,11 @@ Amazon's web services were meant to be easy and simple—but they're simply not 
 
 Here's how it works: register your AWS IAM credentials for us to work with. Then, select the Recipes that you need for your backend service and tweak them through our website. That's it! We've built an infinitely scalable backend for your service via AWS services, and an auto-generated SDK for the frontend platform of your choice.\
 
-## 서비스 구성 (사용자 입장)
 
-### Recipe (레시피)
+## How To Use AWS Interface?
+
+### Recipe
+
 서비스하고자 하는 앱의 백엔드 및 DB 단에 들어갈 요소를 설정하는 단위입니다. 서비스에 추가할 추상화된 기능이라고 생각할 수 있습니다. 초기에는 5가지 레시피를 지원할 예정입니다.
 
 - Bill: 백엔드 요금 사용 내역 확인
