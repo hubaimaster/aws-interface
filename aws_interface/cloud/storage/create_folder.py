@@ -27,16 +27,18 @@ def do(data, boto3):
 
     user_id = user.get('id', None)
 
-    parent_name = params.get('parent_path')
+    parent_path = params.get('parent_path')
     folder_name = params.get('folder_name')
     read_groups = params.get('read_groups', [])
     write_groups = params.get('write_groups', [])
 
     item = {
-
+        'owner': user_id,
+        'parent_path': parent_path,
+        'folder_name': folder_name,
+        'read_groups': read_groups,
+        'write_groups': write_groups,
     }
-    item['owner'] = user_id
-
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)

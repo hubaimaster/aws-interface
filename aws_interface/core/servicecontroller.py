@@ -455,10 +455,16 @@ class StorageServiceController(ServiceController):
     def common_init(self):
         self.boto3_session = get_boto3_session(self.bundle)
         self._init_bucket()
+        self._init_table()
 
     def _init_bucket(self):
         s3 = None #TODO
         return
+
+    def _init_table(self):
+        dynamodb = DynamoDB(self.boto3_session)
+        table_name = 'storage-{}'.format(self.app_id)
+        dynamodb.init_table(table_name)
 
     def common_apply(self, recipe_controller):
         return

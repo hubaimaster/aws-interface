@@ -471,6 +471,14 @@ class Lambda:
         return response
 
 
+class S3:
+    def __init__(self, boto3_session):
+        self.cilent = boto3_session.client('s3')
+        self.resource = boto3_session.resource('s3')
+
+
+
+
 class IAM:
     def __init__(self, boto3_session):
         self.client = boto3_session.client('iam')
