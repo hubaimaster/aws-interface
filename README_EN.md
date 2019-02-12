@@ -16,13 +16,13 @@ Here's how it works: register your AWS IAM credentials for us to work with. Then
 
 ### Recipe
 
-서비스하고자 하는 앱의 백엔드 및 DB 단에 들어갈 요소를 설정하는 단위입니다. 서비스에 추가할 추상화된 기능이라고 생각할 수 있습니다. 초기에는 5가지 레시피를 지원할 예정입니다.
+This is an abstraction of backend/DB components for you to use in your service. We will support these five recipes when we first kick off AWS Interface.
 
-- Bill: 백엔드 요금 사용 내역 확인
-- Auth: 로그인 및 사용자 인증
-- Database: 각종 데이터
-- Storage: 파일 저장 및 배포
-- Logic : 서버리스 API 코드 생성 및 배포
+- **Bill**: Billing for your underlying AWS account 
+- **Auth**: Login/authentication of users
+- **Database**: General-purpose *database stuff*
+- **Storage**: File storage and distribution
+- **Logic** : Deployment of server-less (state-less) logic
 
 ### Dashboard (대시보드)
 레시피를 구성하고, DB를 관리할 수 있는 웹 인터페이스를 대시보드라고 부릅니다. [aws-interface.com](http://aws-interface.com) 에서  IAM 정보를 입력해서 계정을 만들거나 로컬에서 호스팅된 대시보드에 IAM 정보를 등록한 후에 이용 가능합니다. 웹 인터페이스는 Django 프레임워크를 기반으로 합니다.
