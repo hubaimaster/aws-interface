@@ -7,9 +7,9 @@
 
 AWS-Interface lets you jump start your next big idea with a powerful and flexible backend. Configure a scalable backend for your service within minutes through a simple web interface. All services are based on AWS's powerful services including IAM, DynamoDB, Lambda, API Gateway etc.
 
-새로운 서비스를 제작할 때, 주로 확장성과 초기 투자 비용 사이의 trade-off를 고민하게 됩니다. 처음에는 EC2 인스턴스를 하나 파서 웹 프레임워크와 함께 서버 안에서 돌려도 되지만, 서비스가 커지면 AWS DynamoDB와 같은 서비스를 고려해야 합니다. 사실 DynamoDB도 확장성 좋고 쓰기 쉬운 서비스라고 만들었겠지만, 정작 능숙하게 다룰줄 아는 개발자가 몇명이나 될까요?
+Amazon's web services were meant to be easy and simple—but they're simply not ☹️. There are often too many services for us mere mortals to track. With AWS Interface, we take away the nitty-gritty and let you focus on your ideas and your business.
 
-AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe)라는 추상적인 개념으로 DB를 구성할 수 있도록 합니다. 레시피를 작성하면 실제 백엔드를 담당하는 AWS 등의 IaaS 서비스가 자동으로 구성되고 이와 손쉽게 통신할 수 있는 플랫폼별 SDK가 만들어집니다. DB를 관리할 수 있는 대시보드 또한 AWS 인터페이스에서 제공됩니다.
+Here's how it works: register your AWS IAM credentials for us to work with. Then, select the Recipes that you need for your backend service and tweak them through our website. That's it! We've built an infinitely scalable backend for your service via AWS services, and an auto-generated SDK for the frontend platform of your choice.\
 
 ## 서비스 구성 (사용자 입장)
 
