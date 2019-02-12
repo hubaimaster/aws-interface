@@ -31,10 +31,11 @@ This is where you can configure and manage your Recipes/internal database.
 
 ### Backend
 
-This is the actual IaaS service, like AWS, that handles your backend. Right now we only support AWS, but we may support other Backends like Google Cloud Platform, Naver Cloud Platform, or a local test deployment environment, *in the future*.
+The Backend refers to the AWS services that actually serve your Recipes. Currently, the Backend consists of AWS services such as DynamoDB, Lambda, API Gateways etc (which you don't need to care about). We plan do to support other Backends like Google Cloud Platform or Naver Cloud Platform (which you might care about). *Not for now*.
 
 ### Client SDK
-레시피를 기반으로 자동으로 구성된 백엔드를 클라이언트 앱에서 접근하기 위한 SDK를 말합니다. SDK는 Python, Swift, Java 등 다양한 플랫폼에서 지원하는 언어로 자동 생성됩니다.
+
+You can use the auto-generated client SDK's within your client apps to communicate with the Backend. Client SDK's can be generated in the language or platform of your choice. We currently plan to support Python, Swift and Java.
 
 ## 서비스 설계 (개발자 입장)
 
