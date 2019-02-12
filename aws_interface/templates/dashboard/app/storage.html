@@ -262,20 +262,26 @@
 
   <script>
 
+    var current_path = "/";
     var folder_read_groups = ["all"];
     var folder_write_groups = ["all"];
 
     var file_read_groups = ["all"];
     var file_write_groups = ["all"];
     function render_folder(folder_path) {
+        current_path = folder_path
         $("#dir-table>tbody").empty();
         $("#path-name").html(folder_path);
+        $("#folder-parent-name").val(current_path);
+        $("#file-parent-name").val(current_path);
     }
-    function create_folder(parent_name, folder_name) {
+    function create_folder(parent_name, folder_name, read_groups, write_groups) {
         $.post("", {
             cmd: "create_folder",
             parent_name: parent_name,
             folder_name: folder_name,
+            'read_groups[]': read_groups,
+            'write_groups[]': write_groups,
         }, function (data) {
             render_folder(parent_name);
         });
@@ -387,7 +393,7 @@
                 alert("폴더 이름을 채워주세요");
                 return;
             }
-            create_folder(parent_name, folder_name);
+            create_folder(parent_name, folder_name, folder_read_groups, folder_write_groups);
         });
         $("#upload-file").click(function () {
             var parent_name = $("#folder-parent-name").val();

@@ -417,9 +417,19 @@ class Storage(View):
         context['app_id'] = app_id
         storage = Util.get_api(StorageAPI, 'storage', request, app_id)
         cmd = request.POST['cmd']
-
         if cmd == 'create_folder':
-            return
+            parent_name = request.POST['parent_name']
+            folder_name = request.POST['folder_name']
+            read_groups = request.POST.getlist('read_groups[]')
+            write_groups = request.POST.getlist('write_group[]')
+            result = storage.create_folder(parent_name, folder_name, read_groups, write_groups)
+            return JsonResponse(result)
+        if cmd == 'upload_file':
+            parent_name = request.POST['parent_name']
+            file_bin = request.POST['file_bin']
+            read_groups = request.POST.getlist('read_groups[]')
+            write_groups = request.POST.getlist('write_group[]')
+            
 
 
 class Logic(View):
