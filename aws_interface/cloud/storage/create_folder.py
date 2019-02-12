@@ -7,8 +7,10 @@ from cloud.response import Response
 info = {
     'input_format': {
         'session_id': 'str',
-        'parent_name': 'str',
+        'parent_path': 'str',
         'folder_name': 'str',
+        'read_groups': 'list',
+        'write_groups': 'list',
     },
     'output_format': {
         'success': 'bool'
@@ -25,7 +27,7 @@ def do(data, boto3):
 
     user_id = user.get('id', None)
 
-    parent_name = params.get('parent_name')
+    parent_name = params.get('parent_path')
     folder_name = params.get('folder_name')
     read_groups = params.get('read_groups', [])
     write_groups = params.get('write_groups', [])
