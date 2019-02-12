@@ -18,17 +18,20 @@ Here's how it works: register your AWS IAM credentials for us to work with. Then
 
 This is an abstraction of backend/DB components for you to use in your service. We will support these five recipes when we first kick off AWS Interface.
 
-- **Bill**: Billing for your underlying AWS account 
+- **Bill**: Billing for your internal AWS account 
 - **Auth**: Login/authentication of users
 - **Database**: General-purpose *database stuff*
 - **Storage**: File storage and distribution
 - **Logic** : Deployment of server-less (state-less) logic
 
-### Dashboard (대시보드)
+### Dashboard
+
+This is where you can configure and manage your Recipes/internal database. 
 레시피를 구성하고, DB를 관리할 수 있는 웹 인터페이스를 대시보드라고 부릅니다. [aws-interface.com](http://aws-interface.com) 에서  IAM 정보를 입력해서 계정을 만들거나 로컬에서 호스팅된 대시보드에 IAM 정보를 등록한 후에 이용 가능합니다. 웹 인터페이스는 Django 프레임워크를 기반으로 합니다.
 
-### Backend (백엔드)
-실제 뒷단에서 사용하는 IaaS 서비스를 말합니다. 현재는 AWS 백엔드만 제공하지만 향후에는 Google Cloud Platform, Naver Cloud Platform, 테스트용 Local Deployment 등을 추가적으로 지원할 예정입니다.
+### Backend
+
+This is the actual IaaS service, like AWS, that handles your backend. Right now we only support AWS, but we may support other Backends like Google Cloud Platform, Naver Cloud Platform, or a local test deployment environment, *in the future*.
 
 ### Client SDK
 레시피를 기반으로 자동으로 구성된 백엔드를 클라이언트 앱에서 접근하기 위한 SDK를 말합니다. SDK는 Python, Swift, Java 등 다양한 플랫폼에서 지원하는 언어로 자동 생성됩니다.
