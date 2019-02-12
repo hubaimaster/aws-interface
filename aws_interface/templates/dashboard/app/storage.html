@@ -64,6 +64,46 @@
                                         <label class="form-control-label" for="folder-name">이름</label>
                                         <input name="folder-name" type="text" id="folder-name" class="form-control form-control-alternative" placeholder="폴더 이름">
                                       </div>
+                                        
+                                      <div class="form-group">
+                                        <label class="form-control-label" for="input-username">폴더 내부 목록을 조회 할 수 있는 그룹</label>
+                                        <div id="folder-read-groups" class="mb-2">
+
+                                        </div>
+
+                                          <div class="dropdown">
+                                              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                그룹 추가
+                                              </button>
+                                              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                {% for group in user_groups %}
+                                                <a class="dropdown-item" onclick="put_folder_read_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                {% endfor %}
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
+                                              </div>
+                                          </div>
+                                      </div>
+
+                                      <div class="form-group">
+                                        <label class="form-control-label" for="input-username">폴더를 삭제하거나 내부에 파일을 쓰기 또는 삭제 할 수 있는 그룹</label>
+                                        <div id="folder-write-groups" class="mb-2">
+
+                                        </div>
+
+                                          <div class="dropdown">
+                                              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                그룹 추가
+                                              </button>
+                                              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                {% for group in user_groups %}
+                                                <a class="dropdown-item" onclick="put_folder_write_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                {% endfor %}
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
+                                              </div>
+                                          </div>
+                                      </div>
 
                                     </div>
                                   </div>
@@ -107,7 +147,7 @@
 
                                       <div class="form-group">
                                         <label class="form-control-label" for="input-username">파일을 읽을 수 있는 그룹</label>
-                                        <div id="read-groups" class="mb-2">
+                                        <div id="file-read-groups" class="mb-2">
 
                                         </div>
 
@@ -117,7 +157,7 @@
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                 {% for group in user_groups %}
-                                                <a class="dropdown-item" onclick="put_read_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                <a class="dropdown-item" onclick="put_file_read_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
                                                 {% endfor %}
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -127,7 +167,7 @@
 
                                       <div class="form-group">
                                         <label class="form-control-label" for="input-username">파일을 쓰기 또는 삭제 할 수 있는 그룹</label>
-                                        <div id="write-groups" class="mb-2">
+                                        <div id="file-write-groups" class="mb-2">
 
                                         </div>
 
@@ -137,7 +177,7 @@
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                 {% for group in user_groups %}
-                                                <a class="dropdown-item" onclick="put_write_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                <a class="dropdown-item" onclick="put_file_write_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
                                                 {% endfor %}
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -221,8 +261,12 @@
   </div>
 
   <script>
-    var read_groups = ["all"];
-    var write_groups = ["all"];
+
+    var folder_read_groups = ["all"];
+    var folder_write_groups = ["all"];
+
+    var file_read_groups = ["all"];
+    var file_write_groups = ["all"];
     function render_folder(folder_path) {
         $("#dir-table>tbody").empty();
         $("#path-name").html(folder_path);
@@ -248,49 +292,94 @@
         });
     }
 
-    function render_read_groups() {
-        $("#read-groups").empty();
-        for (var i = 0; i < read_groups.length; i++){
-            var group = read_groups[i];
-            var tag = "<a onclick=\"remove_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
-            $("#read-groups").append(tag);
+    function render_file_read_groups() {
+        $("#file-read-groups").empty();
+        for (var i = 0; i < file_read_groups.length; i++){
+            var group = file_read_groups[i];
+            var tag = "<a onclick=\"remove_file_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+            $("#file-read-groups").append(tag);
         }
     }
-    function render_write_groups() {
-        $("#write-groups").empty();
-        for (var i = 0; i < write_groups.length; i++){
-            var group = write_groups[i];
-            var tag = "<a onclick=\"remove_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
-            $("#write-groups").append(tag);
+    function render_file_write_groups() {
+        $("#file-write-groups").empty();
+        for (var i = 0; i < file_write_groups.length; i++){
+            var group = file_write_groups[i];
+            var tag = "<a onclick=\"remove_file_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+            $("#file-write-groups").append(tag);
         }
     }
-    function put_read_group(group_name) {
-        if (read_groups.includes(group_name)){
+    function put_file_read_group(group_name) {
+        if (file_read_groups.includes(group_name)){
             alert("이미 해당 그룹이 존재합니다");
         }else{
-            read_groups.push(group_name);
-            render_read_groups();
+            file_read_groups.push(group_name);
+            render_file_read_groups();
         }
     }
-    function remove_read_group(group_name) {
-        read_groups.remove(group_name);
-        render_read_groups();
+    function remove_file_read_group(group_name) {
+        file_read_groups.remove(group_name);
+        render_file_read_groups();
     }
-    function put_write_group(group_name) {
-        if (write_groups.includes(group_name)){
+    function put_file_write_group(group_name) {
+        if (file_write_groups.includes(group_name)){
             alert("이미 해당 그룹이 존재합니다");
         }else{
-            write_groups.push(group_name);
-            render_write_groups();
+            file_write_groups.push(group_name);
+            render_file_write_groups();
         }
     }
-    function remove_write_group(group_name) {
-        write_groups.remove(group_name);
-        render_write_groups();
+    function remove_file_write_group(group_name) {
+        file_write_groups.remove(group_name);
+        render_file_write_groups();
     }
+
+
+    function render_folder_read_groups() {
+        $("#folder-read-groups").empty();
+        for (var i = 0; i < folder_read_groups.length; i++){
+            var group = folder_read_groups[i];
+            var tag = "<a onclick=\"remove_folder_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+            $("#folder-read-groups").append(tag);
+        }
+    }
+    function render_folder_write_groups() {
+        $("#folder-write-groups").empty();
+        for (var i = 0; i < folder_write_groups.length; i++){
+            var group = folder_write_groups[i];
+            var tag = "<a onclick=\"remove_folder_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+            $("#folder-write-groups").append(tag);
+        }
+    }
+    function put_folder_read_group(group_name) {
+        if (folder_read_groups.includes(group_name)){
+            alert("이미 해당 그룹이 존재합니다");
+        }else{
+            folder_read_groups.push(group_name);
+            render_folder_read_groups();
+        }
+    }
+    function remove_folder_read_group(group_name) {
+        folder_read_groups.remove(group_name);
+        render_folder_read_groups();
+    }
+    function put_folder_write_group(group_name) {
+        if (folder_write_groups.includes(group_name)){
+            alert("이미 해당 그룹이 존재합니다");
+        }else{
+            folder_write_groups.push(group_name);
+            render_folder_write_groups();
+        }
+    }
+    function remove_folder_write_group(group_name) {
+        folder_write_groups.remove(group_name);
+        render_folder_write_groups();
+    }
+
     window.onload = function () {
-        render_read_groups();
-        render_write_groups();
+        render_folder_read_groups();
+        render_folder_write_groups();
+        render_file_read_groups();
+        render_file_write_groups();
         $("#create-folder").click(function () {
             var parent_name = $("#folder-parent-name").val();
             var folder_name = $("#folder-name").val();
@@ -307,11 +396,11 @@
                 alert("파일을 지정해주세요");
                 return;
             }
-            if (read_groups.length == 0 || write_groups.length == 0){
+            if (file_read_groups.length == 0 || file_write_groups.length == 0){
                 alert("권한 그룹은 1개 이상 지정해야 합니다");
                 return;
             }
-            upload_file(parent_name, file_bin, read_groups, write_groups);
+            upload_file(parent_name, file_bin, file_read_groups, file_write_groups);
         });
         render_folder("/");
     };
