@@ -458,8 +458,9 @@ class StorageServiceController(ServiceController):
         self._init_table()
 
     def _init_bucket(self):
-        s3 = None #TODO
-        return
+        s3 = S3(self.boto3_session)
+        bucket_name = 'storage-{}'.format(self.app_id)
+        s3.init_bucket(bucket_name)
 
     def _init_table(self):
         dynamodb = DynamoDB(self.boto3_session)
