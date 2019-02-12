@@ -515,3 +515,13 @@ class StorageServiceController(ServiceController):
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session
         return method.do(data, boto3)
+
+    @response_body
+    def download_file(self, recipe, file_path):
+        import cloud.storage.download_file as method
+        params = {
+            'file_path': file_path,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)

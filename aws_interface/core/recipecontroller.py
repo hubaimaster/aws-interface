@@ -167,26 +167,6 @@ class DatabaseRecipeController(RecipeController):
         self.data['partitions'].pop(partition_name)
         return True
 
-    def put_partition_field_info(self, partition_name, field_name, field_type, required):
-        self.data.setdefault('partitions', {})
-        self.data['partitions'].setdefault(partition_name, {})
-        self.data['partitions'][partition_name].setdefault(field_name, {})
-        self.data['partitions'][partition_name].setdefault('item_count', 0)
-        self.data['partitions'][partition_name][field_name] = {
-            'field_name': field_name,
-            'field_type': field_type,
-            'required': required,
-        }
-        return True
-
-    def get_partition_field_info(self, partition_name, field_name):
-        field_info = self.data.get('partitions', {}).get(partition_name, {}).get(field_name, None)
-        return field_info
-
-    def delete_partition_field_info(self, partition_name, field_name):
-        self.data.get('partitions', {}).get(partition_name, {}).pop(field_name)
-        return True
-
 
 class StorageRecipeController(RecipeController):
     def common_init(self):
@@ -198,4 +178,5 @@ class StorageRecipeController(RecipeController):
         self.put_cloud_api('upload_file', 'cloud.storage.upload_file')
         self.put_cloud_api('delete_folder', 'cloud.storage.delete_folder')
         self.put_cloud_api('delete_file', 'cloud.storage.delete_file')
+        self.put_cloud_api('download_file', 'cloud.storage.download_file')
 
