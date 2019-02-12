@@ -24,9 +24,8 @@ This is an abstraction of backend/DB components for you to use in your service. 
 
 ### Dashboard
 
-This is where you can configure and manage your Recipes/internal database. 
-레시피를 구성하고, DB를 관리할 수 있는 웹 인터페이스를 대시보드라고 부릅니다. [aws-interface.com](http://aws-interface.com) 에서  IAM 정보를 입력해서 계정을 만들거나 로컬에서 호스팅된 대시보드에 IAM 정보를 등록한 후에 이용 가능합니다. 웹 인터페이스는 Django 프레임워크를 기반으로 합니다.
-
+This is where you can configure and manage your Recipes/internal database. You can access your dashboard via [aws-interface.com](http://aws-interface.com) or host your own dashboard on your local server. Make sure to register your AWS IAM credentials to start using AWS Interface. The Dashboard is currently build on the Django framework.
+A
 ### Backend
 
 The Backend refers to the AWS services that actually serve your Recipes. Currently, the Backend consists of AWS services such as DynamoDB, Lambda, API Gateways etc (which you don't need to care about). We plan do to support other Backends like Google Cloud Platform or Naver Cloud Platform (which you might care about). *Not for now*.
