@@ -23,10 +23,6 @@ def get_boto3_session(bundle):
 def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     output_filename = str(uuid.uuid4())
     # Make tmp_dir
-    # tmp_dir = 'tmp_{}'.format(str(uuid.uuid4()))
-    # if os.path.isdir(tmp_dir):
-    #     os.remove(tmp_dir)
-    # os.mkdir(tmp_dir)
     tmp_dir = tempfile.mkdtemp()
 
     # Copy lambda dir into temp/root_name folder
