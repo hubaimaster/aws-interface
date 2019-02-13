@@ -54,6 +54,6 @@ def do(data, boto3):
         body['success'] = False
         return Response(body)
 
-    dynamo.put_item(table_name, 'folder', item, item_id=folder_path)
+    dynamo.put_item(table_name, parent_path, item, item_id=folder_path)
     body['success'] = True
     return Response(body)

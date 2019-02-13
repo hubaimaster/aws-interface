@@ -483,10 +483,11 @@ class StorageServiceController(ServiceController):
         return method.do(data, boto3)
 
     @response_body
-    def upload_file(self, recipe, parent_path, file_bin, read_groups, write_groups):
+    def upload_file(self, recipe, parent_path, file_name, file_bin, read_groups, write_groups):
         import cloud.storage.upload_file as method
         params = {
             'parent_path': parent_path,
+            'file_name': file_name,
             'file_bin': file_bin,
             'read_groups': read_groups,
             'write_groups': write_groups,
