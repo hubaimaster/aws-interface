@@ -5,6 +5,7 @@ import json
 import boto3
 import os
 import tempfile
+from abc import ABCMeta, abstractmethod
 
 
 def get_boto3_session(bundle):
@@ -122,15 +123,16 @@ def response_body(func):
     return wrap
 
 
-class ServiceController:
+class ServiceController(metaclass=ABCMeta):
     def __init__(self, bundle, app_id):
         self.bundle = bundle
         self.app_id = app_id
         self.common_init()
 
+    @abstractmethod
     def common_init(self):
-        #  init object here .. assign boto3 session
-        return
+        # init object here .. assign boto3 session
+        pass
 
     def apply_cloud_api(self, recipe_controller):
         recipe_type = recipe_controller.get_recipe_type()
@@ -185,8 +187,9 @@ class ServiceController:
         self.deploy_cloud_api(recipe_controller)
         self.common_apply(recipe_controller)
 
+    @abstractmethod
     def common_apply(self, recipe_controller):
-        raise NotImplementedError
+        pass
 
 
 class BillServiceController(ServiceController):

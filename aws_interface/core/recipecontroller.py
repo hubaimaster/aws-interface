@@ -1,15 +1,16 @@
 import json
 import importlib
+from abc import ABCMeta, abstractmethod
 
 
-class RecipeController:
+class RecipeController(metaclass=ABCMeta):
     def __init__(self):
         self.data = dict()
         self.common_init()
 
+    @abstractmethod
     def common_init(self):
-        #  init object here
-        return
+        pass
 
     def to_json(self):
         return json.dumps(self.data)

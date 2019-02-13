@@ -1,9 +1,10 @@
 from core.recipecontroller import *
 from core.servicecontroller import *
 from core.util import *
+from abc import ABCMeta, abstractmethod
 
 
-class API:  # Abstract class
+class API(metaclass=ABCMeta):  # Abstract class
     def __init__(self, bundle, app_id, recipe_json_string=None):
         self.bundle = bundle
         self.app_id = app_id
@@ -31,9 +32,10 @@ class API:  # Abstract class
     def get_rest_api_sdk(self):
         return self.service_controller.get_rest_api_sdk(self.recipe_controller)
 
+    @abstractmethod
     def common_init(self):
         # called when __init__ finished, it should implement on subclass. not on abstract class.
-        raise NotImplementedError()
+        pass
 
 
 class BillAPI(API):
@@ -146,7 +148,7 @@ class DatabaseAPI(API):
 
     def put_item_field(self, item_id, field_name, field_value):
         return self.service_controller.put_item_field(self.recipe_controller.to_json(),
-                                                         item_id, field_name, field_value)
+                                                      item_id, field_name, field_value)
 
     def get_item(self, item_id):
         return self.service_controller.get_item(self.recipe_controller.to_json(), item_id)
