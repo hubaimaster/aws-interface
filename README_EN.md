@@ -76,18 +76,23 @@ pip install -r requirements.txt  # install packages
 # deactivate  # deactivate virtual environment
 ```
 
-#### AWS EC2 (Ubuntu) 사용자를 위한 Python 버전 팁
-Ubuntu 16.04에서 apt로 받을 수 있는 기본 Python3 버전은 3.5입니다. 다른 방식으로 Python 버전을 올릴 수는 있지만, 처음부터 EC2 인스턴스를 Ubuntu 18.04로 만드는 것을 추천드립니다.
+#### Python Versions on AWS EC2 (Ubuntu)
 
-### IAM 계정
-AWS 인터페이스를 이용하기 위해서는 AWS 계정에 접속할 수 있는 관리자 권한이 필요합니다. 대시보드에 접근하기 위해서는 AWS 계정 내에서 관리자 권한을 가진 IAM User의 Access Key와 Secret Access Key를 입력해야 합니다.
+The default Python3 provided via apt on Ubuntu 16.04 is version 3.5. It is possible to upgrade to 3.6 from there, but we recommend that you start with a Ubuntu 18.04 instance.
 
-#### 참고
-- [AWS 계정 생성](https://aws.amazon.com/ko/premiumsupport/knowledge-center/create-and-activate-aws-account/)
-- [IAM 계정 생성](https://docs.aws.amazon.com/ko_kr/IAM/latest/UserGuide/id_users_create.html)
+### IAM Account
 
-## 빠른 실행
-다음 명령어를 이용해서 로컬 대시보드 서버를 호스팅하여 테스트해보실 수 있습니다.
+To use AWS Interface, you must provide administrator rights to your AWS account. Before you access your dashboard, you must provide your AWS IAM User's 'Access Key' and 'Secret Access Key'.
+
+#### Reference
+
+- [Create an AWS account](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
+- [Create an IAM account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
+
+
+## Quick Start
+
+You can use the following commands to quickly launch the dashboard on your local environment.
 ```
 # activate virtual environment
 cd aws_interface
@@ -96,15 +101,17 @@ python3 manage.py runserver
 # open 127.0.0.1:8000 on your browser
 ```
 
-## Contribution 가이드라인
 
-버그 리포팅과 피드백을 받기 위해 [깃허브 이슈](https://github.com/hubaimaster/AWSInterface/issues)를 사용하고 있습니다.
+## Contribution Guideline
 
-- 클라이언트 SDK 자동 생성 언어 확장 관련 Contribution 환영합니다.
-- AWSInterface 프로젝트는 Apache 2.0 라이센스를 따릅니다.
+We accept bug reports and feedback via [GitHub Issues](https://github.com/hubaimaster/AWSInterface/issues).
 
-### Git Commit 메시지
-Commit 메시지는 [다음과 같은 형식](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)으로 해주세요. Reddit 유저 왈, "the defacto standard".
+- We welcome contribution to SDK generators.
+- The AWSInterface projects follows the Apache 2.0 licence.
+
+### Git Commit Messages
+
+Please follow [this formant](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for Git commit messages—"the defacto standard", according to a Reddit user.
 
 ```
 Capitalized, short (50 chars or less) summary
