@@ -263,11 +263,19 @@
   <script>
 
     var current_path = "/";
-    var folder_read_groups = ["all"];
-    var folder_write_groups = ["all"];
+    var folder_read_groups = [];
+    var folder_write_groups = [];
 
-    var file_read_groups = ["all"];
-    var file_write_groups = ["all"];
+    var file_read_groups = [];
+    var file_write_groups = [];
+
+    {% for user_group in user_groups %}
+      folder_read_groups.push('{{ user_group.name }}');
+      folder_write_groups.push('{{ user_group.name }}');
+      file_read_groups.push('{{ user_group.name }}');
+      file_write_groups.push('{{ user_group.name }}');
+    {% endfor %}
+
     function render_folder(folder_path) {
         current_path = folder_path
         $("#dir-table>tbody").empty();
