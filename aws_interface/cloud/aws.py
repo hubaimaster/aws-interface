@@ -3,6 +3,7 @@ import uuid
 import time
 import tempfile
 import botocore
+from cloud.crypto import Base64
 from boto3.dynamodb.conditions import Key
 from time import sleep
 import cloud.shortuuid as shortuuid
@@ -478,6 +479,17 @@ class S3:
         self.client = boto3_session.client('s3')
         self.resource = boto3_session.resource('s3')
 
+    @classmethod
+    def to_dns_name(cls, bucket_name):
+        def f(c):
+            if c.isupper():
+                return 'c.{}'.format(c.lower())
+            else:
+                return c
+        bucket_name = [f(c) for c in bucket_name]
+        bucket_name = ''.join(bucket_name)
+        return bucket_name
+
     def init_bucket(self, bucket_name):
         try:
             self.create_bucket(bucket_name)
@@ -486,15 +498,28 @@ class S3:
             print(ex)
 
     def create_bucket(self, bucket_name):
-        return self.client.create_bucket(Bucket=bucket_name)
+        bucket_name = self.to_dns_name(bucket_name)
+        response = self.client.create_bucket(
+            ACL='private',
+            Bucket=bucket_name,
+            CreateBucketConfiguration={
+                'LocationConstraint': 'ap-northeast-2'
+            },
+        )
+        return response
 
-    def upload_file_bin(self, bucket_name, file_name, file_bin):
-        return self.client.upload_fileobj(file_bin, bucket_name, file_name)
+    def upload_file_bin_base64(self, bucket_name, file_name, file_bin_base64):
+        bucket_name = self.to_dns_name(bucket_name)
+        file_bin = Base64.base64_to_file_bin(file_bin_base64)
+        response = self.client.upload_fileobj(file_bin, bucket_name, file_name)
+        return response
 
     def delete_file_bin(self, bucket_name, file_name):
+        bucket_name = self.to_dns_name(bucket_name)
         return self.resource.Object(bucket_name, file_name).delete()
 
     def download_file_bin(self, bucket_name, file_name):
+        bucket_name = self.to_dns_name(bucket_name)
         try:
             with tempfile.NamedTemporaryFile(mode='wb') as data:
                 self.client.download_fileobj(bucket_name, file_name, data)

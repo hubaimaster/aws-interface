@@ -404,6 +404,17 @@
         render_folder_write_groups();
     }
 
+    function fileTobase64(file, onSuccess) {
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function () {
+        onSuccess(reader.result);
+      };
+      reader.onerror = function (error) {
+        alert(JSON.stringify(error));
+      };
+    }
+
     window.onload = function () {
         render_folder_read_groups();
         render_folder_write_groups();
@@ -422,8 +433,8 @@
         });
         $("#upload-file").click(function () {
             var parent_path = $("#folder-parent-path").val();
-            var file_bin = $("#file-bin").val();
-            var filename = file_bin.val().replace(/.*(\/|\\)/, '');
+            var file_bin = document.getElementById("file-bin").files[0];
+            var filename = $("#file-bin").val().replace(/.*(\/|\\)/, '');
             if (file_bin == null || file_bin.length == 0){
                 alert("파일을 지정해주세요");
                 return;
@@ -432,7 +443,10 @@
                 alert("권한 그룹은 1개 이상 지정해야 합니다");
                 return;
             }
-            upload_file(parent_path, filename, file_bin, file_read_groups, file_write_groups);
+            fileTobase64(file_bin, function (file_base64) {
+                upload_file(parent_path, filename, file_base64, file_read_groups, file_write_groups);
+            });
+
             $("#modal-upload-file").modal('hide');
             $("#file-bin").val(null);
         });
