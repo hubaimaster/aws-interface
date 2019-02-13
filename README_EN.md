@@ -42,7 +42,10 @@ You can use the auto-generated client SDK's within your client apps to communica
 You can think of Recipes as abstract features for your backend. Each abstract feature is implemented via a concrete child of RecipeController, such as the AuthRecipeController and DatabaseRecipeController. The main role of the RecipeController is to manage the dictionary that stores configuration info for each abstract feature. For example, the AuthRecipeController provides an interface to control user groups and password rules.
 
 ### ServiceController Abstract Class
-레시피에 명시된 바에 따라 Backend (뒷단의 IaaS 서비스)를 조작하는 컨트롤러입니다. 예컨대, AuthSauce가 담긴 Recipe를 ServiceController (이하 SC)에서 apply시키면, AWS DynamoDB 상에서 관련 테이블이 만들어지고 그것을 조작할 수 있는 Lambda 함수와 API Gateway 설정이 만들어집니다. Client SDK 생성 및 관리자 기능 또한 SC에서 제공됩니다. 예컨대 AuthSC에서는 현재 접속한 사용자를 확인하는 등의 기능이 제공됩니다. SC도 Recipe와 마찬가지로 AuthSC, DatabaseSC 등으로 상속되어 구현됩니다.
+
+The main role of the ServiceController is to configure the Backend (your AWS services) according to the provided Recipes. For example, when you apply your AuthRecipe, the AuthServiceController will create a table in AWS DynamoDB, and create the required interfaces via AWS Lambda and API Gateway.
+
+The ServiceController also serves as an admin interface for your backend and also serves as the SDK generator. For example, the AuthServiceController allows you to manage your users, check who is online, etc.
 
 ### Django
 장고 웹 인터페이스 단에서는 위의 core 클래스들을 import해서 필요한 함수를 호출하는 방식으로 구현됩니다.
