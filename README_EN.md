@@ -52,18 +52,18 @@ The ServiceController also serves as an admin interface for your backend and als
 The dashboard provides a web interface based on Django. The dashboard communicates with the above core classes by via imports.
 
 
-## 환경 설정
+## Environment
 
-### Python 버젼 및 라이브러리
+### Python Version & Libraries
 
-AWS 인터페이스는 Python 3.6에서 작성되었습니다. 
+AWS Interface uses Python version 3.6.
 
-Python 모듈 설치는 프로젝트 단위로 독립적으로 하시면 좋아요! 요런걸 주로 virtual environment라고 부르는데, 방법은 정말 [다양](https://stackoverflow.com/questions/41573587/what-is-the-difference-between-venv-pyvenv-pyenv-virtualenv-virtualenvwrappe)합니다.
+When installing Python libraries, we recommend that you use a virtual environment [of your choice](https://stackoverflow.com/questions/41573587/what-is-the-difference-between-venv-pyvenv-pyenv-virtualenv-virtualenvwrappe).
 
-아래는 Python 3에서 제공하는 공식 패키지인 venv를 사용하는 방식입니다.
+This is how you use the venv module provided by Python 3.5+.
 
 ```bash
-# Ubuntu 등에서 Python 설치
+# Install Python on Linux Debian
 sudo apt update
 sudo apt install python3
 sudo apt install python3-venv
@@ -71,9 +71,9 @@ sudo apt install python3-venv
 
 ```
 python3 -m venv venv
-source venv/bin/activate  # virtual environment 작동
-pip install -r requirements.txt  # 패키지 설치
-# deactivate 이거는 virtual environment 해제
+source venv/bin/activate  # activate virtual environment
+pip install -r requirements.txt  # install packages
+# deactivate  # deactivate virtual environment
 ```
 
 #### AWS EC2 (Ubuntu) 사용자를 위한 Python 버전 팁
