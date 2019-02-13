@@ -44,6 +44,7 @@ def do(data, boto3):
         'read_groups': read_groups,
         'write_groups': write_groups,
         'folder_path': folder_path,
+        'path_type': 'folder',
     }
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 

@@ -55,6 +55,7 @@ def do(data, boto3):
         'file_key': file_key,
         'read_groups': read_groups,
         'write_groups': write_groups,
+        'path_type': 'file',
     }
 
     dynamo = DynamoDB(boto3)
