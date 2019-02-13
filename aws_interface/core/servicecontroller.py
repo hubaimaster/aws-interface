@@ -10,9 +10,11 @@ import os
 def get_boto3_session(bundle):
     access_key = bundle['access_key']
     secret_key = bundle['secret_key']
+    region_name = bundle.get('region_name', 'ap-northeast-2')  # TODO
     session = boto3.Session(
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
+        region_name=region_name,
     )
     return session
 

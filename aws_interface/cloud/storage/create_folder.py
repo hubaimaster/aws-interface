@@ -48,7 +48,7 @@ def do(data, boto3):
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)
-    
+
     folder = dynamo.get_item(table_name, folder_path)
     if folder.get('Item'):
         body['success'] = False
