@@ -51,18 +51,6 @@ The ServiceController also serves as an admin interface for your backend and als
 
 The dashboard provides a web interface based on Django. The dashboard communicates with the above core classes by via imports.
 
-### AWS 상세 구현
-대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이어 자동으로 생성된 SDK 는 API Gateway와 http 방식으로 통신을 하게 됩니다.
-
-예를 들어, 아래는 Auth 레시피가 실제 구현되는 과정입니다.
-
-1. (사용자) AWS IAM 인증 정보를 AWS 인터페이스에 등록합니다.
-2. (사용자) Auth 레시피를 구성하고 deploy합니다.
-3. (AWS 인터페이스) DynamoDB에서 단일 테이블을 만들고 그 안에 사용자 모델을 빌드합니다. 
-4. (AWS 인터페이스) 모델들을 읽고 쓸 수 있는 Lambda 함수를 작성합니다.
-5. (AWS 인터페이스) 작성된 Lambda 함수를 외부에서 이용할 수 있게 API Gateway로 배포합니다.
-6. (AWS 인터페이스) API Gateway에 배포한 API에 접근할 수 있는 SDK를 Java, Python, Swift 등으로 자동 생성합니다.
-7. (사용자) 자동 생성된 SDK를 클라이언트 앱에서 불러와서 AWS 리소스와 통신합니다.
 
 ## 환경 설정
 
