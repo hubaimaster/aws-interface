@@ -10,7 +10,7 @@ AWS-Interface lets you jump start your next big idea with a powerful and flexibl
 Here's how it works: register your AWS IAM credentials for us to work with. Then, select the Recipes that you need for your backend service and tweak them through our website. That's it! We've built an infinitely scalable backend for your service via AWS services, and an auto-generated SDK for the frontend platform of your choice.\
 
 
-## How To Use AWS Interface?
+## For Users
 
 ### Recipe
 
@@ -34,9 +34,11 @@ The Backend refers to the AWS services that actually serve your Recipes. Current
 
 You can use the auto-generated client SDK's within your client apps to communicate with the Backend. Client SDK's can be generated in the language or platform of your choice. We currently plan to support Python, Swift and Java.
 
-## 서비스 설계 (개발자 입장)
+
+## For Contributors
 
 ### RecipeController Abstract Class
+
 상술한 바와 같이 Recipe는 서비스에서 제공할 추상화된 기능을 말합니다. 기능에 따라 소스 추상 클래스를 상속한 AuthRecipeController, DatabaseRecipeController 등이 구현됩니다. RecipeController 클래스는 이러한 기능들을 구성하는 설정을 담은 dictionary 를 조작하는 역할을 하는 것으로 생각할 수 있습니다. 예컨대 로그인 및 사용자 관리를 담당하는 AuthRecipeController 에서는 사용자 그룹, 비밀번호 규칙 등을 설정할 수 있습니다.
 
 ### ServiceController Abstract Class
