@@ -525,3 +525,14 @@ class StorageServiceController(ServiceController):
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session
         return method.do(data, boto3)
+
+    @response_body
+    def get_folder_list(self, recipe, folder_path, start_key):
+        import cloud.storage.get_folder_list as method
+        params = {
+            'folder_path': folder_path,
+            'start_key': start_key,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)

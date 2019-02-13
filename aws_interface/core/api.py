@@ -187,3 +187,6 @@ class StorageAPI(API):
 
     def delete_file(self, file_path):
         return self.service_controller.delete_file(self.recipe_controller.to_json(), file_path)
+
+    def get_folder_list(self, folder_path, start_key):
+        return self.service_controller.get_folder_list(self.recipe_controller.to_json(), folder_path, start_key)

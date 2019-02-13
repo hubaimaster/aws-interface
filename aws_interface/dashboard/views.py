@@ -430,9 +430,13 @@ class Storage(View):
             file_name = request.POST['file_name']
             read_groups = request.POST.getlist('read_groups[]')
             write_groups = request.POST.getlist('write_groups[]')
-            result = storage.upload_file()
+            result = storage.upload_file(parent_path, file_name, file_bin, read_groups, write_groups)
             return JsonResponse(result)
-
+        if cmd == 'get_folder_list':
+            folder_path = request.POST['folder_path']
+            start_key = request.POST.get('start_key', None)
+            result = storage.get_folder_list(folder_path, start_key)
+            return JsonResponse(result)
 
 class Logic(View):
     def get(self, request, app_id):

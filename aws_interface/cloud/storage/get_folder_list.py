@@ -26,10 +26,10 @@ def do(data, boto3):
 
     user_id = user.get('id', None)
 
-    def has_permission(item):
-        read_groups = item['read_groups']
+    def has_permission(_item):
+        read_groups = _item['read_groups']
         if 'owner' in read_groups:
-            owner_id = item['owner']
+            owner_id = _item['owner']
             if owner_id == user_id:
                 return True
         user_group = user['group']
@@ -44,16 +44,16 @@ def do(data, boto3):
     item = dynamo.get_item(table_name, folder_path).get('Item', None)
     if item:
         if has_permission(item):
-            return
+            result = dynamo.get_items(table_name, folder_path, start_key)
+            body['items'] = result.get('Items', [])
+            body['end_key'] = result.get('LastEvaluatedKey', None)
+            return Response(body)
+        else:
+            body['success'] = False
+            body['message'] = 'Permission denied'
+            return Response(body)
+    else:
+        body['success'] = False
+        body['message'] = 'No folder_path: {}'.format(folder_path)
+        return Response(body)
 
-
-
-    result = dynamo.get_items(table_name, folder_path, start_key)
-    items = result.get('Items', [])
-    filtered = []
-    for item in items:
-        if has_permission(item):
-            filtered.append(item)
-
-    body['items'] = filtered
-    return Response(body)
