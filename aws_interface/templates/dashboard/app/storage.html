@@ -219,28 +219,6 @@
                 </thead>
                 <tbody>
 
-                    <tr>
-                    <th scope="row">
-                      sd
-                    </th>
-                    <td>
-                      sd
-                    </td>
-                    <td>
-                      sd
-                    </td>
-                    <td>
-                      sd
-                    </td>
-                      <td>
-                      sd
-                    </td>
-                    <td>
-                        <button type="submit" class="btn btn-sm btn-outline-danger">수정</button>
-                        <button type="submit" class="btn btn-sm btn-danger">제거</button>
-                    </td>
-                  </tr>
-
                 </tbody>
               </table>
             </div>
@@ -262,6 +240,7 @@
 
   <script>
 
+    var prev_path = "/";
     var current_path = "/";
     var folder_read_groups = [];
     var folder_write_groups = [];
@@ -277,11 +256,46 @@
     {% endfor %}
 
     function render_folder(folder_path) {
+        prev_path = folder_path.split("/");
+        prev_path.pop();
+        prev_path = prev_path.join("/");
+        if (!prev_path.startsWith("/")){
+            prev_path = "/" + prev_path;
+        }
         current_path = folder_path
         $("#dir-table>tbody").empty();
-        $("#path-name").html(folder_path);
+        $("#path-name").html("<a href='#' onclick=\"render_folder('" + prev_path + "')\">" + prev_path + "</a> .. " + folder_path);
         $("#folder-parent-path").val(current_path);
         $("#file-parent-path").val(current_path);
+        $.post("", {
+            cmd: "get_folder_list",
+            folder_path: folder_path,
+        }, function (data) {
+            var items = data["items"];
+            for (var i = 0; i < items.length; i++){
+                var item = items[i];
+                var func = "";
+                if (item["type"] == "folder"){
+                    var path = item["path"];
+                    func = "render_folder('" + path + "');";
+                }else if (item["type"] == "file"){
+                    var path = item["path"];
+                    func = "download_file('" + path + "');";
+                }
+                var row =   "<tr>" +
+                                "<th scope=\"row\"><a onclick=\"" + func + "\" href='#'>" + item["name"] + "</a></th>" +
+                                "<td>" + item["type"] + "</td>" +
+                                "<td>" + item["creationDate"] + "</td>" +
+                                "<td>" + item["read_groups"] + "</td>" +
+                                "<td>" + item["write_groups"] + "</td>" +
+                                "<td>" +
+                                    "<button type=\"submit\" class=\"btn btn-sm btn-outline-danger\">수정</button>" +
+                                    "<button type=\"submit\" class=\"btn btn-sm btn-danger\">제거</button>" +
+                                "</td>\n" +
+                            "</tr>";
+                $("#dir-table>tbody").append(row);
+            }
+        });
     }
     function create_folder(parent_path, folder_name, read_groups, write_groups) {
         $.post("", {
@@ -418,7 +432,9 @@
             }
             upload_file(parent_path, filename, file_bin, file_read_groups, file_write_groups);
         });
-        render_folder("/");
+        $(document).ready(function () {
+            render_folder("/");
+        });
     };
   </script>
 

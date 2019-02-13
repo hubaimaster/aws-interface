@@ -35,16 +35,16 @@ def do(data, boto3):
     folder_path = str(parent_path)
     if not folder_path.endswith('/'):
         folder_path += '/'
-        folder_path += folder_name
+    folder_path += folder_name
 
     item = {
         'owner': user_id,
         'parent_path': parent_path,
-        'folder_name': folder_name,
+        'name': folder_name,
         'read_groups': read_groups,
         'write_groups': write_groups,
-        'folder_path': folder_path,
-        'path_type': 'folder',
+        'path': folder_path,
+        'type': 'folder',
     }
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 

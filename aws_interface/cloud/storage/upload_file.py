@@ -40,7 +40,7 @@ def do(data, boto3):
     file_path = str(parent_path)
     if not file_path.endswith('/'):
         file_path += '/'
-        file_path += file_name
+    file_path += file_name
 
     file_key = '{}-{}'.format(shortuuid.uuid(), file_name)
 
@@ -50,12 +50,12 @@ def do(data, boto3):
     item = {
         'owner': user_id,
         'parent_path': parent_path,
-        'file_name': file_name,
-        'file_path': file_path,
+        'name': file_name,
+        'path': file_path,
         'file_key': file_key,
         'read_groups': read_groups,
         'write_groups': write_groups,
-        'path_type': 'file',
+        'type': 'file',
     }
 
     dynamo = DynamoDB(boto3)
