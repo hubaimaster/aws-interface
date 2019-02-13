@@ -25,7 +25,12 @@ def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     tmp_dir = 'tmp_{}'.format(str(uuid.uuid4()))
     if os.path.isdir(tmp_dir):
         os.remove(tmp_dir)
-    os.mkdir(tmp_dir)
+
+    try:
+        original_umask = os.umask(0)
+        os.mkdir(tmp_dir, 0o777)
+    finally:
+        os.umask(original_umask)
 
     # Copy lambda dir into temp/root_name folder
     shutil.copytree(dir_name, '{}/{}'.format(tmp_dir, root_name))
