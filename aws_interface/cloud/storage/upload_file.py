@@ -62,6 +62,7 @@ def do(data, boto3):
     folder = dynamo.get_item(table_name, file_path)
     if folder.get('Item'):
         body['success'] = False
+        body['message'] = 'file_path: {} exists'.format(file_path)
         return Response(body)
 
     dynamo.put_item(table_name, 'path', item, item_id=file_path)

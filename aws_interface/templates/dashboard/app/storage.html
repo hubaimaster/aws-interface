@@ -294,10 +294,11 @@
             render_folder(parent_path);
         });
     }
-    function upload_file(parent_path, file_bin, read_groups, write_groups) {
+    function upload_file(parent_path, file_name, file_bin, read_groups, write_groups) {
         $.post("", {
             cmd: "upload_file",
             parent_path: parent_path,
+            file_name: file_name,
             file_bin: file_bin,
             'read_groups[]': read_groups,
             'write_groups[]': write_groups,
@@ -406,6 +407,7 @@
         $("#upload-file").click(function () {
             var parent_path = $("#folder-parent-path").val();
             var file_bin = $("#file-bin").val();
+            var filename = file_bin.val().replace(/.*(\/|\\)/, '');
             if (file_bin == null || file_bin.length == 0){
                 alert("파일을 지정해주세요");
                 return;
@@ -414,7 +416,7 @@
                 alert("권한 그룹은 1개 이상 지정해야 합니다");
                 return;
             }
-            upload_file(parent_path, file_bin, file_read_groups, file_write_groups);
+            upload_file(parent_path, filename, file_bin, file_read_groups, file_write_groups);
         });
         render_folder("/");
     };
