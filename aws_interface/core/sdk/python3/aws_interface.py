@@ -11,12 +11,13 @@ def examples():  # Just call it. It will help you !
         api_info = api.get('info', {})
         sdk_dict = api_info.get('input_format')
         rest_dict = api_info
+        sdk_example = 'call_api("{}", {})'.format( api['name'], json.dumps(sdk_dict, indent=4))
+        rest_example = json.dumps(rest_dict, indent=4)
 
         print('[SDK Function Call Format]')
-        print('call_api("{}", {})'.format( api['name'], json.dumps(sdk_dict, indent=4)))
-
+        print(sdk_example)
         print('[REST API Format]')
-        print(json.dumps(rest_dict, indent=4))
+        print(rest_example)
 
 
 def get_api_list():
