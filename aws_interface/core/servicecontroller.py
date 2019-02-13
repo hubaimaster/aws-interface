@@ -3,7 +3,6 @@ import importlib
 import shutil
 import json
 import boto3
-import uuid
 import os
 import tempfile
 
@@ -21,7 +20,7 @@ def get_boto3_session(bundle):
 
 
 def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
-    output_filename = str(uuid.uuid4())
+    output_filename = tempfile.mktemp()
     # Make tmp_dir
     tmp_dir = tempfile.mkdtemp()
 
@@ -56,13 +55,10 @@ def create_sdk_zipfile_bin(recipe_controller, rest_api_url):
         'core.sdk.python3',
         'core.sdk.swift'
     ]
-    output_filename = str(uuid.uuid4())
+    output_filename = tempfile.mktemp()
 
     # Make tmp_dir
-    tmp_dir = 'tmp_{}'.format(str(uuid.uuid4()))
-    if os.path.isdir(tmp_dir):
-        os.remove(tmp_dir)
-    os.mkdir(tmp_dir)
+    tmp_dir = tempfile.mkdtemp()
 
     for package in packages:
         sdk_name = package.split('.')[-1]
