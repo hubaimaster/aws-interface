@@ -65,6 +65,6 @@ def do(data, boto3):
         body['message'] = 'file_path: {} exists'.format(file_path)
         return Response(body)
 
-    dynamo.put_item(table_name, 'path', item, item_id=file_path)
+    dynamo.put_item(table_name, parent_path, item, item_id=file_path)
     body['success'] = True
     return Response(body)
