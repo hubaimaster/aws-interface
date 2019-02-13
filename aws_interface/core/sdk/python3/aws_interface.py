@@ -6,10 +6,17 @@ def examples():  # Just call it. It will help you !
     print('Those are examples of aws_interface usage')
     apis = get_api_list()
     for api in apis:
-        print('------> API name: {}'.format(api['name']))
-        print('------> call_api("{}", {})'.format(api['name'], api.get('info', {}).get('input_format')))
-        print('REST API Format: {}'.format(api.get('info', {})))
-        print('')
+        print('API Name: {}'.format(api['name']).center(80, '-'))
+
+        api_info = api.get('info', {})
+        sdk_dict = api_info.get('input_format')
+        rest_dict = api_info
+
+        print('[SDK Function Call Format]')
+        print('call_api("{}", {})'.format( api['name'], json.dumps(sdk_dict, indent=4)))
+
+        print('[REST API Format]')
+        print(json.dumps(rest_dict, indent=4))
 
 
 def get_api_list():
