@@ -69,8 +69,11 @@ def create_sdk_zipfile_bin(recipe_controller, rest_api_url):
         shutil.copytree(module_path, '{}/{}'.format(tmp_dir, sdk_name))
 
         # Remove __init__.py and __pycache__
-        os.remove('{}/{}/__init__.py'.format(tmp_dir, sdk_name))
-        shutil.rmtree('{}/{}/__pycache__'.format(tmp_dir, sdk_name))
+        try:
+            os.remove('{}/{}/__init__.py'.format(tmp_dir, sdk_name))
+            shutil.rmtree('{}/{}/__pycache__'.format(tmp_dir, sdk_name))
+        except BaseException as ex:
+            print(ex)
 
         # Write txt file included app_id
         cloud_apis = recipe_controller.get_cloud_apis()
