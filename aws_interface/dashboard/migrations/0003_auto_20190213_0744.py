@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='app',
             name='id',
-            field=models.CharField(default=cloud.shortuuid.ShortUUID.uuid, editable=False, max_length=255, primary_key=True, serialize=False),
+            field=models.CharField(default=cloud.shortuuid.uuid, editable=False, max_length=255, primary_key=True, serialize=False),
         ),
         migrations.AlterField(
             model_name='recipe',
             name='id',
-            field=models.CharField(default=cloud.shortuuid.ShortUUID.uuid, editable=False, max_length=255, primary_key=True, serialize=False),
+            field=models.CharField(default=cloud.shortuuid.uuid, editable=False, max_length=255, primary_key=True, serialize=False),
         ),
     ]
