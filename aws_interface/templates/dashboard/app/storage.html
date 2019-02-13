@@ -417,6 +417,7 @@
                 return;
             }
             create_folder(parent_path, folder_name, folder_read_groups, folder_write_groups);
+            $("#modal-put-folder").modal('hide');
         });
         $("#upload-file").click(function () {
             var parent_path = $("#folder-parent-path").val();
@@ -431,6 +432,7 @@
                 return;
             }
             upload_file(parent_path, filename, file_bin, file_read_groups, file_write_groups);
+            $("#modal-upload-file").modal('hide');
         });
         $(document).ready(function () {
             render_folder("/");
