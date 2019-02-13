@@ -178,9 +178,9 @@ class StorageAPI(API):
         return self.service_controller.create_folder(self.recipe_controller.to_json(),
                                                      parent_path, folder_name, read_groups, write_groups)
 
-    def upload_file(self, parent_path, file_bin, read_groups, write_groups):
+    def upload_file(self, parent_path, file_name, file_bin, read_groups, write_groups):
         return self.service_controller.upload_file(self.recipe_controller.to_json(),
-                                                   parent_path, file_bin, read_groups, write_groups)
+                                                   parent_path, file_name, file_bin, read_groups, write_groups)
 
     def delete_folder(self, folder_path):
         return self.service_controller.delete_folder(self.recipe_controller.to_json(), folder_path)

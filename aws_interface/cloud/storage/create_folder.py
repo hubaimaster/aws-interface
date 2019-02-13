@@ -32,17 +32,29 @@ def do(data, boto3):
     read_groups = params.get('read_groups', [])
     write_groups = params.get('write_groups', [])
 
+    folder_path = str(parent_path)
+    if not folder_path.endswith('/'):
+        folder_path += '/'
+        folder_path += folder_name
+
     item = {
         'owner': user_id,
         'parent_path': parent_path,
         'folder_name': folder_name,
         'read_groups': read_groups,
         'write_groups': write_groups,
+        'folder_path': folder_path,
+        'path_type': 'folder',
     }
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)
 
+    folder = dynamo.get_item(table_name, folder_path)
+    if folder.get('Item'):
+        body['success'] = False
+        return Response(body)
 
+    dynamo.put_item(table_name, parent_path, item, item_id=folder_path)
     body['success'] = True
     return Response(body)

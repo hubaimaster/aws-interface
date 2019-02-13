@@ -272,9 +272,12 @@
   var partition = null;
   var item_id = null;
 
-  var read_groups = ["all"];
-  var write_groups = ["all"];
-
+  var read_groups = [];
+  var write_groups = [];
+  {% for user_group in user_groups %}
+      read_groups.push('{{ user_group.name }}');
+      write_groups.push('{{ user_group.name }}');
+  {% endfor %}
 
   var item_ids = [];
   var item_fields = [];

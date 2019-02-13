@@ -57,7 +57,6 @@ class AuthRecipeController(RecipeController):
 
     def _init_user_group(self):
         self.default_groups = {
-            'all': '기본그룹, 로그인 하지 않은 익명 사용자를 포함한 모든 그룹입니다.',
             'admin': '기본그룹, 모든 권한을 가지고 있습니다.',
             'owner': '기본그룹, 자신이 작성한 데이터에 대해 모든 권한을 가지고 있습니다.',
             'user': '기본그룹, 회원 가입한 일반 사용자 그룹입니다.'

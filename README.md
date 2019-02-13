@@ -25,7 +25,7 @@ This is an abstraction of backend/DB components for you to use in your service. 
 ### Dashboard
 
 This is where you can configure and manage your Recipes/internal database. You can access your dashboard via [aws-interface.com](http://aws-interface.com) or host your own dashboard on your local server. Make sure to register your AWS IAM credentials to start using AWS Interface. The Dashboard is currently build on the Django framework.
-A
+
 ### Backend
 
 The Backend refers to the AWS services that actually serve your Recipes. Currently, the Backend consists of AWS services such as DynamoDB, Lambda, API Gateways etc (which you don't need to care about). We plan do to support other Backends like Google Cloud Platform or Naver Cloud Platform (which you might care about). *Not for now*.
@@ -111,7 +111,7 @@ We accept bug reports and feedback via [GitHub Issues](https://github.com/hubaim
 
 ### Git Commit Messages
 
-Please follow [this formant](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for Git commit messages—"the defacto standard", according to a Reddit user.
+Please follow [this format](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) for Git commit messages—"the defacto standard", according to a Reddit user.
 
 ```
 Capitalized, short (50 chars or less) summary

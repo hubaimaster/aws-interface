@@ -3,27 +3,26 @@ import importlib
 import shutil
 import json
 import boto3
-import uuid
 import os
+import tempfile
 
 
 def get_boto3_session(bundle):
     access_key = bundle['access_key']
     secret_key = bundle['secret_key']
+    region_name = bundle.get('region_name', 'ap-northeast-2')  # TODO
     session = boto3.Session(
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
+        region_name=region_name,
     )
     return session
 
 
 def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
-    output_filename = str(uuid.uuid4())
+    output_filename = tempfile.mktemp()
     # Make tmp_dir
-    tmp_dir = 'tmp_{}'.format(str(uuid.uuid4()))
-    if os.path.isdir(tmp_dir):
-        os.remove(tmp_dir)
-    os.mkdir(tmp_dir)
+    tmp_dir = tempfile.mkdtemp()
 
     # Copy lambda dir into temp/root_name folder
     shutil.copytree(dir_name, '{}/{}'.format(tmp_dir, root_name))
@@ -56,13 +55,10 @@ def create_sdk_zipfile_bin(recipe_controller, rest_api_url):
         'core.sdk.python3',
         'core.sdk.swift'
     ]
-    output_filename = str(uuid.uuid4())
+    output_filename = tempfile.mktemp()
 
     # Make tmp_dir
-    tmp_dir = 'tmp_{}'.format(str(uuid.uuid4()))
-    if os.path.isdir(tmp_dir):
-        os.remove(tmp_dir)
-    os.mkdir(tmp_dir)
+    tmp_dir = tempfile.mkdtemp()
 
     for package in packages:
         sdk_name = package.split('.')[-1]
@@ -73,8 +69,11 @@ def create_sdk_zipfile_bin(recipe_controller, rest_api_url):
         shutil.copytree(module_path, '{}/{}'.format(tmp_dir, sdk_name))
 
         # Remove __init__.py and __pycache__
-        os.remove('{}/{}/__init__.py'.format(tmp_dir, sdk_name))
-        shutil.rmtree('{}/{}/__pycache__'.format(tmp_dir, sdk_name))
+        try:
+            os.remove('{}/{}/__init__.py'.format(tmp_dir, sdk_name))
+            shutil.rmtree('{}/{}/__pycache__'.format(tmp_dir, sdk_name))
+        except BaseException as ex:
+            print(ex)
 
         # Write txt file included app_id
         cloud_apis = recipe_controller.get_cloud_apis()
@@ -484,10 +483,11 @@ class StorageServiceController(ServiceController):
         return method.do(data, boto3)
 
     @response_body
-    def upload_file(self, recipe, parent_path, file_bin, read_groups, write_groups):
+    def upload_file(self, recipe, parent_path, file_name, file_bin, read_groups, write_groups):
         import cloud.storage.upload_file as method
         params = {
             'parent_path': parent_path,
+            'file_name': file_name,
             'file_bin': file_bin,
             'read_groups': read_groups,
             'write_groups': write_groups,
