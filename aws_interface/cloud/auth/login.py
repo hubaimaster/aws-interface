@@ -1,5 +1,6 @@
 from cloud.aws import *
 from cloud.crypto import *
+from cloud.response import Response
 import cloud.shortuuid as shortuuid
 
 # Define the input output format of the function.
@@ -18,7 +19,7 @@ info = {
 
 
 def do(data, boto3):
-    response = {}
+    body = {}
     recipe = data['recipe']
     params = data['params']
     app_id = data['app_id']
@@ -36,9 +37,9 @@ def do(data, boto3):
         enabled = False
 
     if not enabled:
-        response['error'] = '5'
-        response['message'] = '이메일 로그인이 비활성화 상태입니다.'
-        return response
+        body['error'] = '5'
+        body['message'] = '이메일 로그인이 비활성화 상태입니다.'
+        return Response(body)
 
     dynamo = DynamoDB(boto3)
     result = dynamo.get_items_with_index(table_name, 'partition-email', 'partition', 'user', 'email', email)
@@ -54,12 +55,12 @@ def do(data, boto3):
                 'userId': user_id,
             }
             dynamo.put_item(table_name, 'session', session_item, item_id=session_id)
-            response['session_id'] = session_id
-            response['message'] = '로그인 성공'
+            body['session_id'] = session_id
+            body['message'] = '로그인 성공'
         else:
-            response['message'] = '비밀번호가 틀립니다.'
-            response['error'] = '2'
+            body['message'] = '비밀번호가 틀립니다.'
+            body['error'] = '2'
     else:
-        response['message'] = '해당 계정이 존재하지 않습니다.'
-        response['error'] = '1'
-    return response
+        body['message'] = '해당 계정이 존재하지 않습니다.'
+        body['error'] = '1'
+    return Response(body)

@@ -1,6 +1,8 @@
 import json
 import uuid
 import time
+import tempfile
+import botocore
 from boto3.dynamodb.conditions import Key
 from time import sleep
 import cloud.shortuuid as shortuuid
@@ -470,6 +472,39 @@ class Lambda:
         )
         return response
 
+
+class S3:
+    def __init__(self, boto3_session):
+        self.client = boto3_session.client('s3')
+        self.resource = boto3_session.resource('s3')
+
+    def init_bucket(self, bucket_name):
+        try:
+            self.create_bucket(bucket_name)
+            print('create_bucket success')
+        except Exception as ex:
+            print(ex)
+
+    def create_bucket(self, bucket_name):
+        return self.client.create_bucket(Bucket=bucket_name)
+
+    def upload_file_bin(self, bucket_name, file_name, file_bin):
+        return self.client.upload_fileobj(file_bin, bucket_name, file_name)
+
+    def delete_file_bin(self, bucket_name, file_name):
+        return self.resource.Object(bucket_name, file_name).delete()
+
+    def download_file_bin(self, bucket_name, file_name):
+        try:
+            with tempfile.NamedTemporaryFile(mode='wb') as data:
+                self.client.download_fileobj(bucket_name, file_name, data)
+                return data
+        except botocore.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                print("The object does not exist.")
+                return None
+            else:
+                raise
 
 class IAM:
     def __init__(self, boto3_session):

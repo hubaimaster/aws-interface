@@ -1,4 +1,5 @@
 from cloud.aws import *
+from cloud.response import Response
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -22,7 +23,7 @@ info = {
 
 
 def do(data, boto3):
-    response = {}
+    body = {}
     recipe = data['recipe']
     params = data['params']
     app_id = data['app_id']
@@ -37,6 +38,6 @@ def do(data, boto3):
     result = dynamo.get_items(table_name, partition, exclusive_start_key=start_key, limit=limit)
     items = result.get('Items', [])
     end_key = result.get('LastEvaluatedKey', None)
-    response['items'] = items
-    response['end_key'] = end_key
-    return response
+    body['items'] = items
+    body['end_key'] = end_key
+    return Response(body)

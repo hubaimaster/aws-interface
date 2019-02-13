@@ -116,6 +116,13 @@ def make_data(app_id, parmas, recipe_json, admin=True):
     return data
 
 
+def response_body(func):
+    def wrap(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return result.get('body', {})
+    return wrap
+
+
 class ServiceController:
     def __init__(self, bundle, app_id):
         self.bundle = bundle
@@ -167,7 +174,6 @@ class ServiceController:
         api_name = '{}-{}'.format(recipe_type, self.app_id)
         func_name = '{}-{}'.format(recipe_type, self.app_id)
         api_url = api_client.get_rest_api_url(api_name, func_name)
-        print('api_url:', api_url)
         return api_url
 
     def get_rest_api_sdk(self, recipe_controller):
@@ -238,6 +244,7 @@ class AuthServiceController(ServiceController):
     def common_apply(self, recipe_controller):
         return
 
+    @response_body
     def create_user(self, recipe, email, password, extra):
         import cloud.auth.register as register
         parmas = {
@@ -247,8 +254,9 @@ class AuthServiceController(ServiceController):
         }
         data = make_data(self.app_id, parmas, recipe)
         boto3 = self.boto3_session
-        return register.do(data, boto3)
+        return register.do(data, boto3)['body']
 
+    @response_body
     def set_user(self, recipe, user_id, email, password, extra):
         import cloud.auth.set_user as set_user
         parmas = {
@@ -261,6 +269,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return set_user.do(data, boto3)
 
+    @response_body
     def delete_user(self, recipe, user_id):
         import cloud.auth.delete_user as delete_user
         parmas = {
@@ -270,6 +279,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return delete_user.do(data, boto3)
 
+    @response_body
     def get_user(self, recipe, user_id):
         import cloud.auth.get_user as get_user
         parmas = {
@@ -279,6 +289,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_user.do(data, boto3)
 
+    @response_body
     def get_user_count(self, recipe):
         import cloud.auth.get_user_count as get_user_count
         parmas = {
@@ -288,6 +299,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_user_count.do(data, boto3)
 
+    @response_body
     def get_users(self, recipe, start_key, limit):
         import cloud.auth.get_users as get_users
         params = {'start_key': start_key,
@@ -296,6 +308,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_users.do(data, boto3)
 
+    @response_body
     def create_session(self, recipe, email, password):
         import cloud.auth.login as login
         params = {
@@ -306,6 +319,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return login.do(data, boto3)
 
+    @response_body
     def delete_session(self, recipe, session_id):
         import cloud.auth.logout as logout
         params = {
@@ -315,6 +329,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return logout.do(data, boto3)
 
+    @response_body
     def get_session(self, recipe, session_id):
         import cloud.auth.get_session as get_session
         params = {
@@ -324,6 +339,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_session.do(data, boto3)
 
+    @response_body
     def get_sessions(self, recipe, start_key, limit):
         import cloud.auth.get_sessions as get_sessions
         params = {'start_key': start_key,
@@ -332,6 +348,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_sessions.do(data, boto3)
 
+    @response_body
     def get_session_count(self, recipe):
         import cloud.auth.get_session_count as get_session_count
         parmas = {}
@@ -354,6 +371,7 @@ class DatabaseServiceController(ServiceController):
     def common_apply(self, recipe_controller):
         return
 
+    @response_body
     def create_item(self, recipe, partition, item, read_permissions, write_permissions):
         import cloud.database.create_item as method
         params = {
@@ -366,6 +384,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
+    @response_body
     def update_item(self, recipe, item_id, item, read_permissions, write_permissions):
         import cloud.database.update_item as method
         params = {
@@ -378,6 +397,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
+    @response_body
     def put_item_field(self, recipe, item_id, field_name, field_value):
         import cloud.database.put_item_field as method
         params = {
@@ -389,6 +409,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
+    @response_body
     def get_item(self, recipe, item_id):
         import cloud.database.get_item as method
         params = {
@@ -398,6 +419,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
+    @response_body
     def delete_item(self, recipe, item_id):
         import cloud.database.delete_item as method
         params = {
@@ -407,6 +429,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
+    @response_body
     def get_items(self, recipe, partition, reverse):
         import cloud.database.get_items as method
         params = {
@@ -417,10 +440,87 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
+    @response_body
     def get_item_count(self, recipe, partition):
         import cloud.database.get_item_count as method
         params = {
             'partition': partition,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
+
+
+class StorageServiceController(ServiceController):
+    def common_init(self):
+        self.boto3_session = get_boto3_session(self.bundle)
+        self._init_bucket()
+        self._init_table()
+
+    def _init_bucket(self):
+        s3 = S3(self.boto3_session)
+        bucket_name = 'storage-{}'.format(self.app_id)
+        s3.init_bucket(bucket_name)
+
+    def _init_table(self):
+        dynamodb = DynamoDB(self.boto3_session)
+        table_name = 'storage-{}'.format(self.app_id)
+        dynamodb.init_table(table_name)
+
+    def common_apply(self, recipe_controller):
+        return
+
+    @response_body
+    def create_folder(self, recipe, parent_path, folder_name, read_groups, write_groups):
+        import cloud.storage.create_folder as method
+        params = {
+            'parent_path': parent_path,
+            'folder_name': folder_name,
+            'read_groups': read_groups,
+            'write_groups': write_groups,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
+
+    @response_body
+    def upload_file(self, recipe, parent_path, file_bin, read_groups, write_groups):
+        import cloud.storage.upload_file as method
+        params = {
+            'parent_path': parent_path,
+            'file_bin': file_bin,
+            'read_groups': read_groups,
+            'write_groups': write_groups,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
+
+    @response_body
+    def delete_folder(self, recipe, folder_path):
+        import cloud.storage.delete_folder as method
+        params = {
+            'folder_path': folder_path,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
+
+    @response_body
+    def delete_file(self, recipe, file_path):
+        import cloud.storage.delete_file as method
+        params = {
+            'file_path': file_path,
+        }
+        data = make_data(self.app_id, params, recipe)
+        boto3 = self.boto3_session
+        return method.do(data, boto3)
+
+    @response_body
+    def download_file(self, recipe, file_path):
+        import cloud.storage.download_file as method
+        params = {
+            'file_path': file_path,
         }
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session

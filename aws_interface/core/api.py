@@ -164,3 +164,26 @@ class DatabaseAPI(API):
         raise NotImplementedError()
 
 
+class StorageAPI(API):
+    def common_init(self):
+        self.service_controller = StorageServiceController(self.bundle, self.app_id)
+        self.recipe_controller = StorageRecipeController()
+        if self.recipe_json_string:
+            self.recipe_controller.load_json_string(self.recipe_json_string)
+
+    # Recipe
+
+    # Service
+    def create_folder(self, parent_path, folder_name, read_groups, write_groups):
+        return self.service_controller.create_folder(self.recipe_controller.to_json(),
+                                                     parent_path, folder_name, read_groups, write_groups)
+
+    def upload_file(self, parent_path, file_bin, read_groups, write_groups):
+        return self.service_controller.upload_file(self.recipe_controller.to_json(),
+                                                   parent_path, file_bin, read_groups, write_groups)
+
+    def delete_folder(self, folder_path):
+        return self.service_controller.delete_folder(self.recipe_controller.to_json(), folder_path)
+
+    def delete_file(self, file_path):
+        return self.service_controller.delete_file(self.recipe_controller.to_json(), file_path)

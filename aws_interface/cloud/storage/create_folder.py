@@ -7,10 +7,10 @@ from cloud.response import Response
 info = {
     'input_format': {
         'session_id': 'str',
-        'item': 'str',
-        'partition': 'str',
-        'read_permissions': 'list',
-        'write_permissions': 'list',
+        'parent_path': 'str',
+        'folder_name': 'str',
+        'read_groups': 'list',
+        'write_groups': 'list',
     },
     'output_format': {
         'success': 'bool'
@@ -27,19 +27,22 @@ def do(data, boto3):
 
     user_id = user.get('id', None)
 
-    partition = params.get('partition', None)
-    item = params.get('item', {})
-    read_permissions = params.get('read_permissions', [])
-    write_permissions = params.get('write_permissions', [])
+    parent_path = params.get('parent_path')
+    folder_name = params.get('folder_name')
+    read_groups = params.get('read_groups', [])
+    write_groups = params.get('write_groups', [])
 
-    item['read_permissions'] = read_permissions
-    item['write_permissions'] = write_permissions
-    item['owner'] = user_id
-
+    item = {
+        'owner': user_id,
+        'parent_path': parent_path,
+        'folder_name': folder_name,
+        'read_groups': read_groups,
+        'write_groups': write_groups,
+    }
     table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
 
     dynamo = DynamoDB(boto3)
-    dynamo.put_item(table_name, partition, item)
+
 
     body['success'] = True
     return Response(body)

@@ -53,6 +53,7 @@ class AuthRecipeController(RecipeController):
         # put system default groups
         self._init_user_group()
         self._init_cloud_api()
+        self._init_login_method()
 
     def _init_user_group(self):
         self.default_groups = {
@@ -74,6 +75,10 @@ class AuthRecipeController(RecipeController):
         self.put_cloud_api('get_user_count', 'cloud.auth.get_user_count', permissions=['admin'])
         self.put_cloud_api('set_user', 'cloud.auth.set_user', permissions=['owner'])
         self.put_cloud_api('delete_user', 'cloud.auth.delete_user', permissions=['owner'])
+
+    def _init_login_method(self):
+        self.get_email_login()
+        self.get_guest_login()
 
     def put_user_group(self, name, description):
         if 'user_groups' not in self.data:
@@ -162,22 +167,16 @@ class DatabaseRecipeController(RecipeController):
         self.data['partitions'].pop(partition_name)
         return True
 
-    def put_partition_field_info(self, partition_name, field_name, field_type, required):
-        self.data.setdefault('partitions', {})
-        self.data['partitions'].setdefault(partition_name, {})
-        self.data['partitions'][partition_name].setdefault(field_name, {})
-        self.data['partitions'][partition_name].setdefault('item_count', 0)
-        self.data['partitions'][partition_name][field_name] = {
-            'field_name': field_name,
-            'field_type': field_type,
-            'required': required,
-        }
-        return True
 
-    def get_partition_field_info(self, partition_name, field_name):
-        field_info = self.data.get('partitions', {}).get(partition_name, {}).get(field_name, None)
-        return field_info
+class StorageRecipeController(RecipeController):
+    def common_init(self):
+        self.data['recipe_type'] = 'storage'
+        self._init_cloud_api()
 
-    def delete_partition_field_info(self, partition_name, field_name):
-        self.data.get('partitions', {}).get(partition_name, {}).pop(field_name)
-        return True
+    def _init_cloud_api(self):
+        self.put_cloud_api('create_folder', 'cloud.storage.create_folder')
+        self.put_cloud_api('upload_file', 'cloud.storage.upload_file')
+        self.put_cloud_api('delete_folder', 'cloud.storage.delete_folder')
+        self.put_cloud_api('delete_file', 'cloud.storage.delete_file')
+        self.put_cloud_api('download_file', 'cloud.storage.download_file')
+

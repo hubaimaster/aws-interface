@@ -37,7 +37,7 @@
         <div class="col-xl-12 mb-5 mb-xl-0">
           <div class="card shadow">
 
-              <div class="row">
+            <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xl-3" style="padding-right: 0;">
               <!-- Projects table -->
               <table class="table table-sm table-hover table-borderless">
@@ -95,9 +95,9 @@
               </table>
             </div>
 
-              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 col-xl-4" style="padding: 0;">
+              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xl-3" style="padding: 0;">
               <!-- Projects table -->
-              <table id="item-table" class="table table-sm table-hover table-borderless">
+              <table style="display:table; width:100%; table-layout:fixed;" id="item-table" class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">
@@ -105,7 +105,6 @@
                             아이템 추가 +
                         </button>
                         <text id="item_count"></text>
-
 
                         <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
@@ -124,22 +123,44 @@
                                                 <label class="form-control-label">아이디</label>
                                                 <input type="text" class="form-control form-control-alternative" placeholder="자동생성" disabled>
                                               </div>
-                                              <div class="form-group">
-                                                <label class="form-control-label" for="field-value">읽기 권한</label>
-                                                <select id="item-read-permission" class="form-control">
-                                                    {% for group in user_groups %}
-                                                        <option value="{{ group.name }}">{{ group.name }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                              </div>
 
                                               <div class="form-group">
-                                                <label class="form-control-label" for="field-value">쓰기/지우기 권한</label>
-                                                <select id="item-write-permission" class="form-control">
-                                                    {% for group in user_groups %}
-                                                        <option value="{{ group.name }}">{{ group.name }}</option>
-                                                    {% endfor %}
-                                                </select>
+                                                <label class="form-control-label" for="input-username">아이템을 읽을 수 있는 그룹</label>
+                                                <div id="read-groups" class="mb-2">
+
+                                                </div>
+                                                <div class="dropdown">
+                                                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        그룹 추가
+                                                      </button>
+                                                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                        {% for group in user_groups %}
+                                                        <a class="dropdown-item" onclick="put_read_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                        {% endfor %}
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
+                                                      </div>
+                                                 </div>
+                                              </div>
+
+
+                                              <div class="form-group">
+                                                <label class="form-control-label" for="input-username">아이템을 쓰기 혹은 삭제 할 수 있는 그룹</label>
+                                                <div id="write-groups" class="mb-2">
+
+                                                </div>
+                                                <div class="dropdown">
+                                                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        그룹 추가
+                                                      </button>
+                                                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                        {% for group in user_groups %}
+                                                        <a class="dropdown-item" onclick="put_write_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                        {% endfor %}
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
+                                                      </div>
+                                                 </div>
                                               </div>
 
                                             </div>
@@ -160,14 +181,14 @@
                   </tr>
                 </thead>
 
-                <tbody>
-
+                <tbody style="display: block; height: 600px; overflow-y: auto;">
 
                 </tbody>
+
               </table>
             </div>
 
-             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 col-xl-5" style="padding-left: 0;">
+             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 col-xl-6" style="padding-left: 0;">
               <!-- Projects table -->
               <table id="field-table" class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
@@ -250,8 +271,13 @@
   <script>
   var partition = null;
   var item_id = null;
-  item_ids = [];
-  item_fields = [];
+
+  var read_groups = ["all"];
+  var write_groups = ["all"];
+
+
+  var item_ids = [];
+  var item_fields = [];
   function set_partition(p) {
       $("#field-table>tbody").empty();
       item_ids = [];
@@ -282,7 +308,8 @@
       }
       for (var i = 0; i < item_ids.length; i++){
           var iid = item_ids[i];
-          var row = "<tr><th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +
+          var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\">" +
+              "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +
               "<button onclick='delete_item(\"" + iid + "\");' class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
               "</th></tr>";
           $("#item-table").append(row);
@@ -347,13 +374,15 @@
           alert("파티션을 지정해주세요");
           return;
       }
-      var read_permission = $("#item-read-permission").val();
-      var write_permission = $("#item-write-permission").val();
+      if (read_groups.length == 0 || write_groups.length == 0){
+          alert("권한 그룹은 1개 이상 지정해야 합니다");
+          return;
+      }
       $.post("", {
           cmd: "add_item",
           partition: partition,
-          read_permission: read_permission,
-          write_permission: write_permission,
+          'read_groups[]': read_groups,
+          'write_groups[]': write_groups,
       }, function (data) {
           set_partition(partition);
       });
@@ -412,34 +441,81 @@
           callback(data);
       });
   }
-  window.onload = function(){
-    $("#add-partition-btn").click(function () {
-        add_partition();
-    });
-    $("#add-item-btn").click(function () {
-        add_item();
-    });
-    $("#add-field-btn").click(function () {
-        add_field();
-    });
-    $("#open-add-item-modal").click(function () {
-       if (partition == null){
-          alert("파티션을 지정해주세요");
-          return;
-       }
-       $("#modal-add-item").modal('show');
-    });
-    $("#open-add-field-modal").click(function () {
-        if (partition == null || item_id == null){
-          alert("아이템을 지정해주세요");
-          return;
-       }
-        $("#field-name").val(null);
-        $("#field-value").val(null);
-        $("#field-type").val('S');
-        $("#modal-add-field").modal('show');
-    });
-  }
+  </script>
+
+  <script>
+    function render_read_groups() {
+        $("#read-groups").empty();
+        for (var i = 0; i < read_groups.length; i++){
+            var group = read_groups[i];
+            var tag = "<a onclick=\"remove_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+            $("#read-groups").append(tag);
+        }
+    }
+    function render_write_groups() {
+        $("#write-groups").empty();
+        for (var i = 0; i < write_groups.length; i++){
+            var group = write_groups[i];
+            var tag = "<a onclick=\"remove_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+            $("#write-groups").append(tag);
+        }
+    }
+    function put_read_group(group_name) {
+        if (read_groups.includes(group_name)){
+            alert("이미 해당 그룹이 존재합니다");
+        }else{
+            read_groups.push(group_name);
+            render_read_groups();
+        }
+    }
+    function remove_read_group(group_name) {
+        read_groups.remove(group_name);
+        render_read_groups();
+    }
+    function put_write_group(group_name) {
+        if (write_groups.includes(group_name)){
+            alert("이미 해당 그룹이 존재합니다");
+        }else{
+            write_groups.push(group_name);
+            render_write_groups();
+        }
+    }
+    function remove_write_group(group_name) {
+        write_groups.remove(group_name);
+        render_write_groups();
+    }
+  </script>
+  <script>
+    window.onload = function(){
+        $("#add-partition-btn").click(function () {
+            add_partition();
+        });
+        $("#add-item-btn").click(function () {
+            add_item();
+        });
+        $("#add-field-btn").click(function () {
+            add_field();
+        });
+        $("#open-add-item-modal").click(function () {
+           if (partition == null){
+              alert("파티션을 지정해주세요");
+              return;
+           }
+           $("#modal-add-item").modal('show');
+        });
+        $("#open-add-field-modal").click(function () {
+            if (partition == null || item_id == null){
+              alert("아이템을 지정해주세요");
+              return;
+           }
+            $("#field-name").val(null);
+            $("#field-value").val(null);
+            $("#field-type").val('S');
+            $("#modal-add-field").modal('show');
+        });
+        render_read_groups();
+        render_write_groups();
+    }
   </script>
 
 {% endblock %}

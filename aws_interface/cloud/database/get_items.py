@@ -1,4 +1,5 @@
 from cloud.aws import *
+from cloud.response import Response
 
 
 # Define the input output format of the function.
@@ -19,7 +20,7 @@ info = {
 
 
 def do(data, boto3):
-    response = {}
+    body = {}
     recipe = data['recipe']
     params = data['params']
     app_id = data['app_id']
@@ -48,6 +49,6 @@ def do(data, boto3):
             item.pop('write_permissions', None)
             filtered.append(item)
 
-    response['items'] = filtered
-    response['end_key'] = end_key
-    return response
+        body['items'] = filtered
+    body['end_key'] = end_key
+    return Response(body)
