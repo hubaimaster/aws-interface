@@ -192,3 +192,6 @@ class StorageAPI(API):
 
     def get_folder_list(self, folder_path, start_key):
         return self.service_controller.get_folder_list(self.recipe_controller.to_json(), folder_path, start_key)
+
+    def download_file(self, file_path):
+        return self.service_controller.download_file(self.recipe_controller.to_json(), file_path)

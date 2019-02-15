@@ -17,6 +17,17 @@
                 <strong>Auth </strong> 에 의존합니다.
             </div>
 
+            <div class="alert alert-neutral" role="alert">
+                <div class="row">
+                    <div class="col">
+                        <strong>{{ rest_api_url }}</strong> 의 POST Method 를 호출 할 수 있습니다.
+                    </div>
+                    <div class="col-auto">
+                        <a target="_blank" href="{% url 'storage' app_id %}?cmd=download_sdk" class="btn btn-sm btn-info">SDK 다운로드</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
       </div>
     </div>
@@ -309,7 +320,6 @@
         });
     }
     function upload_file(parent_path, file_name, file_bin, read_groups, write_groups) {
-
         var formData = new FormData();
         formData.append('cmd', 'upload_file');
         formData.append('file_bin', file_bin);
@@ -327,6 +337,9 @@
                    render_folder(parent_path);
                }
         });
+    }
+    function download_file(path) {
+        alert(path);
     }
 
     function render_file_read_groups() {
@@ -411,18 +424,7 @@
         folder_write_groups.remove(group_name);
         render_folder_write_groups();
     }
-
-    function fileTobase64(file, onSuccess) {
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = function () {
-        onSuccess(reader.result);
-      };
-      reader.onerror = function (error) {
-        alert(JSON.stringify(error));
-      };
-    }
-
+    
     window.onload = function () {
         render_folder_read_groups();
         render_folder_write_groups();

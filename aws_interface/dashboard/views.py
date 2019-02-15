@@ -319,6 +319,7 @@ class Database(View):
         database = Util.get_api(DatabaseAPI, 'database', request, app_id)
         context['app_id'] = app_id
         cmd = request.GET.get('cmd', None)
+
         if cmd == 'download_sdk':
             database.apply()
             Util.save_recipe(database.get_recipe_controller(), app_id)
@@ -408,9 +409,23 @@ class Storage(View):
         context = Util.get_context(request)
         auth = Util.get_api(AuthAPI, 'auth', request, app_id)
         storage = Util.get_api(StorageAPI, 'storage', request, app_id)
-        context['app_id'] = app_id
-        context['user_groups'] = auth.get_user_groups()
-        return render(request, 'dashboard/app/storage.html', context=context)
+        cmd = request.GET.get('cmd', None)
+        if cmd == 'download_sdk':
+            storage.apply()
+            Util.save_recipe(storage.get_recipe_controller(), app_id)
+            sdk_bin = storage.get_rest_api_sdk()
+            response = HttpResponse(sdk_bin, content_type='application/x-binary')
+            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
+            return response
+        else:
+            try:
+                context['app_id'] = app_id
+                context['user_groups'] = auth.get_user_groups()
+                context['rest_api_url'] = storage.get_rest_api_url()
+                return render(request, 'dashboard/app/storage.html', context=context)
+            except ClientError as ex:
+                context['error'] = ex
+                return render(request, 'dashboard/error.html', context=context)
 
     def post(self, request, app_id):
         context = Util.get_context(request)
@@ -424,7 +439,7 @@ class Storage(View):
             write_groups = request.POST.getlist('write_groups[]')
             result = storage.create_folder(parent_path, folder_name, read_groups, write_groups)
             return JsonResponse(result)
-        if cmd == 'upload_file':
+        elif cmd == 'upload_file':
             parent_path = request.POST['parent_path']
             file_bin = request.FILES['file_bin']
             file_name = request.POST['file_name']
@@ -432,11 +447,17 @@ class Storage(View):
             write_groups = request.POST.getlist('write_groups[]')
             result = storage.upload_file(parent_path, file_name, file_bin, read_groups, write_groups)
             return JsonResponse(result)
-        if cmd == 'get_folder_list':
+        elif cmd == 'get_folder_list':
             folder_path = request.POST['folder_path']
             start_key = request.POST.get('start_key', None)
             result = storage.get_folder_list(folder_path, start_key)
             return JsonResponse(result)
+        elif cmd == 'download_file':
+            result = storage.download
+            response = HttpResponse(file_bin, content_type='application/x-binary')
+            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
+            return response
+
 
 class Logic(View):
     def get(self, request, app_id):
