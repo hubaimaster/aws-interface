@@ -36,7 +36,7 @@ def do(data, boto3):
     item['write_permissions'] = write_permissions
     item['owner'] = user_id
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'database-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
     dynamo.put_item(table_name, partition, item)
