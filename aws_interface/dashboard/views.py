@@ -16,6 +16,7 @@ from numbers import Number
 from decimal import Decimal
 
 import json
+import base64
 
 
 class Util:
@@ -419,11 +420,24 @@ class Storage(View):
             response = HttpResponse(sdk_bin, content_type='application/x-binary')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
             return response
+        elif cmd == 'download_file':
+            file_path = request.GET['file_path']
+            file_name = file_path.split('/').pop()
+            file_bin_b64 = storage.download_file(file_path)
+            file_bin = base64.b64decode(file_bin_b64)
+            response = HttpResponse(file_bin, content_type='application/x-binary')
+            file_name = file_name.encode('utf8').decode('ISO-8859-1')
+            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(file_name)
+            return response
         else:
             try:
+                folder_path = request.GET.get('folder_path', '/')
+                start_key = request.GET.get('start_key', None)
                 context['app_id'] = app_id
+                context['folder_path'] = folder_path
                 context['user_groups'] = auth.get_user_groups()
                 context['rest_api_url'] = storage.get_rest_api_url()
+                context['folder_list'] = storage.get_folder_list(folder_path, start_key)
                 return render(request, 'dashboard/app/storage.html', context=context)
             except ClientError as ex:
                 context['error'] = ex

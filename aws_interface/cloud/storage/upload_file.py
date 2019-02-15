@@ -57,6 +57,7 @@ def do(data, boto3):
         'write_groups': write_groups,
         'type': 'file',
     }
+    print(item)
 
     dynamo = DynamoDB(boto3)
 
