@@ -35,7 +35,7 @@ def do(data, boto3):
     new_item['read_permissions'] = read_permissions
     new_item['write_permissions'] = write_permissions
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'database-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
 
