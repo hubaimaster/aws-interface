@@ -37,7 +37,7 @@ def do(data, boto3):
     except BaseException as ex:
         print(ex)
         body['message'] = 'permission denied'
-        Response(body)
+        return Response(body)
 
     item = result.get('Item', {})
     user_id = item.get('userId', None)

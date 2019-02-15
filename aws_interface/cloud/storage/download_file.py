@@ -1,5 +1,6 @@
 from cloud.aws import *
 from cloud.response import Response
+import base64
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -46,8 +47,10 @@ def do(data, boto3):
             if item['type'] == 'file':
                 file_key = item['file_key']
                 file_bin = s3.download_file_bin(bucket_name, file_key)
-                body = file_bin
-                return Response(body, 'application/octet-stream')
+                body = base64.b64encode(file_bin).decode('utf-8')
+                response = Response(body, 'application/x-binary')
+                response['isBase64Encoded'] = True
+                return response
             else:
                 body['success'] = False
                 body['message'] = 'file_path is not a file'

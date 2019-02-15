@@ -15,6 +15,8 @@ from botocore.errorfactory import ClientError
 from numbers import Number
 from decimal import Decimal
 
+import json
+
 
 class Util:
     @classmethod
@@ -443,8 +445,9 @@ class Storage(View):
             parent_path = request.POST['parent_path']
             file_bin = request.FILES['file_bin']
             file_name = request.POST['file_name']
-            read_groups = request.POST.getlist('read_groups[]')
-            write_groups = request.POST.getlist('write_groups[]')
+            read_groups = json.loads(request.POST.get('read_groups'))
+            write_groups = json.loads(request.POST.get('write_groups'))
+
             result = storage.upload_file(parent_path, file_name, file_bin, read_groups, write_groups)
             return JsonResponse(result)
         elif cmd == 'get_folder_list':

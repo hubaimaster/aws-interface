@@ -23,8 +23,10 @@ def get_params(event):
 
 
 def handler(event, context):
-    parmas = event
-    cloud_api_name = parmas.get('cloud_api_name', None)
+    params = event
+    print('params:', params)
+
+    cloud_api_name = params.get('cloud_api_name', None)
     
     with open('./cloud/recipe.json', 'r') as f:
         recipe = json.load(f)
@@ -34,11 +36,11 @@ def handler(event, context):
         
     cloud_apis = recipe.get('cloud_apis', {})
     cloud_api = cloud_apis.get(cloud_api_name, {})
-    module_name = cloud_api.get('module', None)
+    module_name = cloud_api.get('module')
     permissions = cloud_api.get('permissions', [])
 
     data = {
-        'params': parmas,
+        'params': params,
         'recipe': recipe,
         'app_id': app_id,
         'admin': False,

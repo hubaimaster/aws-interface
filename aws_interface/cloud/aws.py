@@ -74,7 +74,7 @@ class APIGateway:
             )['id']
 
         self.put_method(rest_api_id, resource_id, 'POST')
-        self.put_method(rest_api_id, resource_id, 'GET')
+        #self.put_method(rest_api_id, resource_id, 'GET')
 
         lambda_version = aws_lambda.meta.service_model.api_version
 
@@ -90,21 +90,25 @@ class APIGateway:
 
         # create integration
         self.put_integration(rest_api_id, resource_id, 'POST', uri)
-        self.put_integration(rest_api_id, resource_id, 'GET', uri)
+        #self.put_integration(rest_api_id, resource_id, 'GET', uri)
 
         self.put_integration_response(rest_api_id, resource_id, 'POST')
-        self.put_integration_response(rest_api_id, resource_id, 'GET')
+        #self.put_integration_response(rest_api_id, resource_id, 'GET')
 
         self.put_method_response(rest_api_id, resource_id, 'POST')
-        self.put_method_response(rest_api_id, resource_id, 'GET')
+        #self.put_method_response(rest_api_id, resource_id, 'GET')
 
         uri_data['aws-api-id'] = rest_api_id
         post_source_arn = self.get_source_arn(uri_data, 'POST')
-        get_source_arn = self.get_source_arn(uri_data, 'GET')
+        #get_source_arn = self.get_source_arn(uri_data, 'GET')
 
-        self.add_permission(lambda_func_name, post_source_arn)
-        self.add_permission(lambda_func_name, get_source_arn)
+        print('add_permission post')
+        self.put_permission(lambda_func_name, post_source_arn)
 
+        #print('add_permission get')
+        #self.put_permission(lambda_func_name, get_source_arn)
+
+        print('create_deployment')
         api_client.create_deployment(
             restApiId=rest_api_id,
             stageName=stage_name,
@@ -164,15 +168,24 @@ class APIGateway:
         return response
 
     def get_source_arn(self, uri_data, method_type):
+        method_type = 'POST'
         arn = "arn:aws:execute-api:{aws-region}:{aws-acct-id}:{aws-api-id}/*/" + method_type + "/{lambda-function-name}"
         arn = arn.format(**uri_data)
         return arn
 
-    def add_permission(self, lambda_func_name, source_arn, count=0):
+    def put_permission(self, lambda_func_name, source_arn, count=0):
+        statement_id = 'state{}'.format(lambda_func_name)
+        try:
+            _ = self.lambda_client.remove_permission(
+                FunctionName=lambda_func_name,
+                StatementId=statement_id,
+            )
+        except BaseException as ex:
+            print(ex)
         try:
             self.lambda_client.add_permission(
                 FunctionName=lambda_func_name,
-                StatementId=uuid.uuid4().hex,
+                StatementId=statement_id,
                 Action="lambda:InvokeFunction",
                 Principal="apigateway.amazonaws.com",
                 SourceArn=source_arn
@@ -181,7 +194,7 @@ class APIGateway:
             print(ex)
             sleep(3.0)
             if count < 5:
-                self.add_permission(lambda_func_name, source_arn, count + 1)
+                self.put_permission(lambda_func_name, source_arn, count + 1)
 
     def get_method(self, rest_api_id, resource_id, method_type='POST'):
         response = self.apigateway_client.get_method(
@@ -543,9 +556,10 @@ class S3:
     def download_file_bin(self, bucket_name, file_name):
         bucket_name = self.to_dns_name(bucket_name)
         try:
-            with tempfile.NamedTemporaryFile(mode='wb') as data:
+            with tempfile.NamedTemporaryFile() as data:
                 self.client.download_fileobj(bucket_name, file_name, data)
-                return data
+                data.seek(0)
+                return data.read()
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] == "404":
                 print("The object does not exist.")

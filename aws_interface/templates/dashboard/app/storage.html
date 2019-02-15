@@ -325,8 +325,8 @@
         formData.append('file_bin', file_bin);
         formData.append('parent_path', parent_path);
         formData.append('file_name', file_name);
-        formData.append('read_groups[]', read_groups);
-        formData.append('write_groups[]', write_groups);
+        formData.append('read_groups', JSON.stringify(read_groups));
+        formData.append('write_groups', JSON.stringify(write_groups));
         $.ajax({
                url : '',
                type : 'POST',
