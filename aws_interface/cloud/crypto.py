@@ -46,7 +46,7 @@ class Base64:
         text = base64.b64decode(text)
         text = text.decode('utf-8')
         obj = json.loads(text)
-        use_decimal(obj)
+        cls.use_decimal(obj)
         return obj
 
     @classmethod

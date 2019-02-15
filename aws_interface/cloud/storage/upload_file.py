@@ -45,7 +45,7 @@ def do(data, boto3):
     file_key = '{}-{}'.format(shortuuid.uuid(), file_name)
 
     s3 = S3(boto3)
-    s3.upload_file_bin_base64(bucket_name, file_key, file_bin)
+    s3.upload_file_bin(bucket_name, file_key, file_bin)
 
     item = {
         'owner': user_id,

@@ -508,9 +508,8 @@ class S3:
         )
         return response
 
-    def upload_file_bin_base64(self, bucket_name, file_name, file_bin_base64):
+    def upload_file_bin(self, bucket_name, file_name, file_bin):
         bucket_name = self.to_dns_name(bucket_name)
-        file_bin = Base64.base64_to_file_bin(file_bin_base64)
         response = self.client.upload_fileobj(file_bin, bucket_name, file_name)
         return response
 

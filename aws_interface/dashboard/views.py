@@ -426,7 +426,7 @@ class Storage(View):
             return JsonResponse(result)
         if cmd == 'upload_file':
             parent_path = request.POST['parent_path']
-            file_bin = request.POST['file_bin']
+            file_bin = request.FILES['file_bin']
             file_name = request.POST['file_name']
             read_groups = request.POST.getlist('read_groups[]')
             write_groups = request.POST.getlist('write_groups[]')
