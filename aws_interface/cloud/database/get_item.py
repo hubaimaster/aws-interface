@@ -26,7 +26,7 @@ def do(data, boto3):
     user_group = user.get('group', None)
     item_id = params.get('item_id', None)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'database-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
 
