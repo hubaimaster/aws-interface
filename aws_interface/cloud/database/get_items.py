@@ -32,7 +32,7 @@ def do(data, boto3):
     limit = params.get('limit', 100)
     reverse = params.get('reverse', False)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'database-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
     result = dynamo.get_items(table_name, partition, start_key, limit, reverse)
