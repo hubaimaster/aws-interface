@@ -73,92 +73,115 @@ class APIGateway:
                 pathPart=lambda_func_name
             )['id']
 
-        try:
-            _ = api_client.put_method(
-                restApiId=rest_api_id,
-                resourceId=resource_id,
-                httpMethod="POST",
-                authorizationType="NONE",
-                apiKeyRequired=False,
-            )
-        except:
-            print('put_method failed')
+        self.put_method(rest_api_id, resource_id, 'POST')
+        self.put_method(rest_api_id, resource_id, 'GET')
 
         lambda_version = aws_lambda.meta.service_model.api_version
 
         aws_account_id = self.iam.get_account_id()
+
         uri_data = {
             "aws-region": aws_region,
             "api-version": lambda_version,
             "aws-acct-id": aws_account_id,
             "lambda-function-name": lambda_func_name,
         }
-
-        uri = "arn:aws:apigateway:{aws-region}:lambda:path/{api-version}/functions/arn:aws:lambda:{aws-region}:{aws-acct-id}:function:{lambda-function-name}/invocations".format(
-            **uri_data)
+        uri = self.get_uri(uri_data)
 
         # create integration
-        integration_resp = api_client.put_integration(
-            restApiId=rest_api_id,
-            resourceId=resource_id,
-            httpMethod="POST",
-            type="AWS",
-            integrationHttpMethod="POST",
-            uri=uri,
-        )
+        self.put_integration(rest_api_id, resource_id, 'POST', uri)
+        self.put_integration(rest_api_id, resource_id, 'GET', uri)
 
-        api_client.put_integration_response(
-            restApiId=rest_api_id,
-            resourceId=resource_id,
-            httpMethod="POST",
-            statusCode="200",
-            selectionPattern=".*"
-        )
+        self.put_integration_response(rest_api_id, resource_id, 'POST')
+        self.put_integration_response(rest_api_id, resource_id, 'GET')
 
-        try:
-            api_client.put_method_response(
-                restApiId=rest_api_id,
-                resourceId=resource_id,
-                httpMethod="POST",
-                statusCode="200",
-            )
-        except:
-            print('{} Method already exists'.format(rest_api_id))
+        self.put_method_response(rest_api_id, resource_id, 'POST')
+        self.put_method_response(rest_api_id, resource_id, 'GET')
 
         uri_data['aws-api-id'] = rest_api_id
-        source_arn = "arn:aws:execute-api:{aws-region}:{aws-acct-id}:{aws-api-id}/*/POST/{lambda-function-name}".format(
-            **uri_data)
+        post_source_arn = self.get_source_arn(uri_data, 'POST')
+        get_source_arn = self.get_source_arn(uri_data, 'GET')
 
-        def add_permission(count=0):
-            try:
-                aws_lambda.add_permission(
-                    FunctionName=lambda_func_name,
-                    StatementId=uuid.uuid4().hex,
-                    Action="lambda:InvokeFunction",
-                    Principal="apigateway.amazonaws.com",
-                    SourceArn=source_arn
-                )
-            except BaseException as ex:
-                print(ex)
-                sleep(3.0)
-                if count < 5:
-                    add_permission(count + 1)
+        self.add_permission(lambda_func_name, post_source_arn)
+        self.add_permission(lambda_func_name, get_source_arn)
 
-        add_permission()
         api_client.create_deployment(
             restApiId=rest_api_id,
             stageName=stage_name,
         )
 
-    def put_method(self, rest_api_id, resource_id, method_type='POST', auth_type='AWS_IAM'):
-        response = self.apigateway_client.put_method(
+    def put_method(self, rest_api_id, resource_id, method_type, auth_type='NONE'):
+        try:
+            response = self.apigateway_client.put_method(
+                restApiId=rest_api_id,
+                resourceId=resource_id,
+                httpMethod=method_type,
+                authorizationType=auth_type,
+                apiKeyRequired=False,
+            )
+        except BaseException as ex:
+            print(ex)
+            return None
+        return response
+
+    def put_method_response(self, rest_api_id, resource_id, method_type):
+        try:
+            response = self.apigateway_client.put_method_response(
+                restApiId=rest_api_id,
+                resourceId=resource_id,
+                httpMethod=method_type,
+                statusCode="200",
+            )
+        except BaseException as ex:
+            response = None
+            print(ex)
+        return response
+
+    def get_uri(self, uri_data):
+        uri = "arn:aws:apigateway:{aws-region}:lambda:path/{api-version}/functions/arn:aws:lambda:{aws-region}:" \
+               "{aws-acct-id}:function:{lambda-function-name}/invocations".format(**uri_data)
+        return uri
+
+    def put_integration(self, rest_api_id, resource_id, method_type, uri):
+        integration_resp = self.apigateway_client.put_integration(
             restApiId=rest_api_id,
             resourceId=resource_id,
             httpMethod=method_type,
-            authorizationType=auth_type,
-            apiKeyRequired=False,
+            type="AWS",
+            integrationHttpMethod=method_type,
+            uri=uri,
+        )
+        return integration_resp
+
+    def put_integration_response(self, rest_api_id, resource_id, method_type):
+        response = self.apigateway_client.put_integration_response(
+            restApiId=rest_api_id,
+            resourceId=resource_id,
+            httpMethod=method_type,
+            statusCode="200",
+            selectionPattern=".*"
         )
         return response
+
+    def get_source_arn(self, uri_data, method_type):
+        arn = "arn:aws:execute-api:{aws-region}:{aws-acct-id}:{aws-api-id}/*/" + method_type + "/{lambda-function-name}"
+        arn = arn.format(**uri_data)
+        return arn
+
+    def add_permission(self, lambda_func_name, source_arn, count=0):
+        try:
+            self.lambda_client.add_permission(
+                FunctionName=lambda_func_name,
+                StatementId=uuid.uuid4().hex,
+                Action="lambda:InvokeFunction",
+                Principal="apigateway.amazonaws.com",
+                SourceArn=source_arn
+            )
+        except BaseException as ex:
+            print(ex)
+            sleep(3.0)
+            if count < 5:
+                self.add_permission(lambda_func_name, source_arn, count + 1)
 
     def get_method(self, rest_api_id, resource_id, method_type='POST'):
         response = self.apigateway_client.get_method(
