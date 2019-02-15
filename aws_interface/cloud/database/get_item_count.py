@@ -22,7 +22,7 @@ def do(data, boto3):
     app_id = data['app_id']
     params = data['params']
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'database-{}'.format(app_id)
     partition = params['partition']
 
     dynamo = DynamoDB(boto3)
