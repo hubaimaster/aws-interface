@@ -30,7 +30,7 @@ def do(data, boto3):
     field_name = params.get('field_name', None)
     field_value = params.get('field_value', None)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'database-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
 
