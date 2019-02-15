@@ -30,7 +30,7 @@ def do(data, boto3):
     salt = Salt.get_salt(32)
     password_hash = hash_password(password, salt)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)  # Should be auth-143..
+    table_name = 'auth-{}'.format(app_id)  # Should be auth-143..
     partition = 'user'
     print(recipe)
     login_conf = recipe['login_method']['email_login']

@@ -20,7 +20,7 @@ def do(data, boto3):
     recipe = data['recipe']
     app_id = data['app_id']
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'auth-{}'.format(app_id)
     partition = 'session'
 
     dynamo = DynamoDB(boto3)

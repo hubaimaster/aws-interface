@@ -453,7 +453,8 @@ class Storage(View):
             result = storage.get_folder_list(folder_path, start_key)
             return JsonResponse(result)
         elif cmd == 'download_file':
-            result = storage.download
+            file_path = request.POST['file_path']
+            file_bin = storage.download_file(file_path)
             response = HttpResponse(file_bin, content_type='application/x-binary')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
             return response

@@ -28,7 +28,7 @@ def do(data, boto3):
 
     session_id = params.get('session_id', None)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'auth-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
     result = dynamo.get_item(table_name, session_id)

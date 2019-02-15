@@ -46,7 +46,7 @@ def do(data, boto3):
         'path': folder_path,
         'type': 'folder',
     }
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'storage-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
 

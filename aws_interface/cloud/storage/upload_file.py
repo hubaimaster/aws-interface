@@ -33,9 +33,9 @@ def do(data, boto3):
     file_name = params.get('file_name')
     read_groups = params.get('read_groups', [])
     write_groups = params.get('write_groups', [])
-
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
-    bucket_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    
+    table_name = 'storage-{}'.format(app_id)
+    bucket_name = 'storage-{}'.format(app_id)
 
     file_path = str(parent_path)
     if not file_path.endswith('/'):

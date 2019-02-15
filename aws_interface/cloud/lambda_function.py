@@ -44,7 +44,7 @@ def handler(event, context):
         'admin': False,
     }
 
-    user = get_me.do(data, boto3).get('item', None)
+    user = get_me.do(data, boto3).get('body', {}).get('item', None)
     data['user'] = user
 
     module = importlib.import_module(module_name)

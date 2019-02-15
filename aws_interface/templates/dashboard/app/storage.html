@@ -338,8 +338,14 @@
                }
         });
     }
+
     function download_file(path) {
-        alert(path);
+        $.post("", {
+            cmd: "download_file",
+            file_path: path
+        }, function (data) {
+            alert(JSON.stringify(data['message']));
+        });
     }
 
     function render_file_read_groups() {

@@ -27,7 +27,7 @@ def do(data, boto3):
     email = params.get('email', None)
     password = params.get('password', None)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'auth-{}'.format(app_id)
 
     login_conf = recipe['login_method']['email_login']
     enabled = login_conf['enabled']

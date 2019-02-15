@@ -23,7 +23,7 @@ def do(data, boto3):
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'auth-{}'.format(app_id)
     partition = 'session'
 
     dynamo = DynamoDB(boto3)

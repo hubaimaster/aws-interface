@@ -30,7 +30,7 @@ def do(data, boto3):
 
     user_id = params.get('user_id', None)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'auth-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
     result = dynamo.get_item(table_name, user_id)

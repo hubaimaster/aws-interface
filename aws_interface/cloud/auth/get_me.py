@@ -29,18 +29,20 @@ def do(data, boto3):
 
     session_id = params.get('session_id', None)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'auth-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
     try:
         result = dynamo.get_item(table_name, session_id)
     except BaseException as ex:
-        result = dict()
         print(ex)
+        body['message'] = 'permission denied'
+        Response(body)
+
     item = result.get('Item', {})
     user_id = item.get('userId', None)
     if user_id:
-        user = dynamo.get_item(table_name, user_id)
+        user = dynamo.get_item(table_name, user_id).get('Item', None)
         body['item'] = user
     else:
         body['item'] = None

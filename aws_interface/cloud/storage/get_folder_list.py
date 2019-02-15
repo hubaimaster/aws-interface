@@ -38,7 +38,7 @@ def do(data, boto3):
     folder_path = params.get('folder_path')
     start_key = params.get('start_key', None)
 
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'storage-{}'.format(app_id)
     dynamo = DynamoDB(boto3)
 
     item = dynamo.get_item(table_name, folder_path).get('Item', None)

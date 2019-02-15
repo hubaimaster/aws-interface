@@ -23,7 +23,7 @@ def do(data, boto3):
     app_id = data['app_id']
 
     guest_id = params.get('guest_id', None)
-    table_name = '{}-{}'.format(recipe['recipe_type'], app_id)
+    table_name = 'auth-{}'.format(app_id)
 
     login_conf = recipe['login_method']['guest_login']
     default_group_name = login_conf['default_group_name']
