@@ -39,13 +39,13 @@
         <div class="header-body text-center mb-7">
           <div class="row justify-content-center">
             <div class="col-lg-5 col-md-6">
-              <h1 class="text-white">잠시만요!</h1>
-              <h2 class="text-lead text-light">AWS-Interface 가 백엔드 리소스를 생성하고 있습니다</h2>
-              <h3 class="text-lead text-light">경우에 따라 10초에서 최대 10분 정도 소요될 수 있습니다</h3>
+              <h1 class="text-white">ERROR</h1>
+              <h2 class="text-lead text-light">{{ title }}</h2>
+              <h3 class="text-lead text-light">{{ desc }}</h3>
               <h5>{{ error }}</h5>
-              <a class="btn btn-dark" href="{% url 'overview' app_id %}">
-                  메인으로 돌아가기
-              </a>
+              {% if link %}
+              <a href="{{ link }}" class="btn btn-primary text-white">{{ link_desc }}</a>
+              {% endif %}
             </div>
           </div>
         </div>

@@ -98,18 +98,53 @@ class Util:
         return {k: cast_number(v) for k, v in dict_obj.items()}
 
 
+def page_manage(func):
+    def wrap(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+        except ClientError as ex:
+            title = 'Unknown Error'
+            desc = '원인을 알 수 없는 에러입니다'
+            link = None
+            link_desc = None
+
+            request = args[1]
+            context = Util.get_context(request)
+            code = ex.response.get('Error', {}).get('Code', None)
+            if code == 'UnrecognizedClientException':
+                title = '등록된 IAM AccessKey 를 확인해주세요'
+                desc = '유효하지 않은 AccessKey 가 입력되어 있습니다'
+            elif code == 'AccessDeniedException':
+                title = '등록된 IAM AccessKey 의 권한이 부족합니다'
+                desc = '아래 링크로 들어가서 AdminUser 권한을 추가합니다'
+                link = 'overview'
+                link_desc = 'AWS IAM AccessKey 권한 추가히기'
+
+            context['error'] = ex
+            context['title'] = title
+            context['desc'] = desc
+            context['link'] = link
+            context['link_desc'] = link_desc
+            return render(request, 'dashboard/error.html', context=context)
+        return result
+    return wrap
+
+
 class Index(LoginRequiredMixin, View):
     redirect_field_name = 'next'
 
+    @page_manage
     def get(self, request):
         return redirect('apps')
 
 
 class AccessKey(View):
+    @page_manage
     def get(self, request):
         context = Util.get_context(request)
         return render(request, 'dashboard/accesskey.html', context=context)
 
+    @page_manage
     def post(self, request):
         context = Util.get_context(request)
         password = request.POST['password']
@@ -118,15 +153,22 @@ class AccessKey(View):
         # Check AccessKey.. TODO
         request.user.set_aws_credentials(password, access_key, secret_key)
         request.user.save()
+
+        bundle = dict()
+        bundle['access_key'] = request.user.get_aws_access_key(password)
+        bundle['secret_key'] = request.user.get_aws_secret_key(password)
+        Util.set_login(request, True, bundle=bundle)
         Util.add_alert(request, 'AccessKey 를 변경하였습니다.')
         return redirect('apps')
 
 
 class Register(View):
+    @page_manage
     def get(self, request):
         context = Util.get_context(request)
         return render(request, 'dashboard/register.html', context=context)
 
+    @page_manage
     def post(self, request):
         email = request.POST['email']
         password = request.POST['password']
@@ -155,6 +197,7 @@ class Register(View):
 
 
 class Login(View):
+    @page_manage
     def get(self, request):
         if request.user.is_authenticated:
             return redirect(settings.LOGIN_REDIRECT_URL)
@@ -162,6 +205,7 @@ class Login(View):
             context = Util.get_context(request)
             return render(request, 'dashboard/login.html', context=context)
 
+    @page_manage
     def post(self, request):
         email = request.POST['email']
         password = request.POST['password']
@@ -180,6 +224,7 @@ class Login(View):
 
 
 class Logout(View):
+    @page_manage
     def get(self, request):
         request.session['access_key'] = None
         request.session['secret_key'] = None
@@ -189,6 +234,7 @@ class Logout(View):
 
 
 class Apps(LoginRequiredMixin, View):
+    @page_manage
     def get(self, request):
         context = Util.get_context(request)
         try:
@@ -199,6 +245,7 @@ class Apps(LoginRequiredMixin, View):
             context['apps'] = []
         return render(request, 'dashboard/apps.html', context=context)
 
+    @page_manage
     def post(self, request): # create app
         name = request.POST['name']
         user_id = Util.get_user_id(request)
@@ -215,6 +262,7 @@ class Apps(LoginRequiredMixin, View):
 
 
 class Overview(View):
+    @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
         app = App.objects.get(id=app_id)
@@ -224,6 +272,7 @@ class Overview(View):
 
 
 class Bill(View):
+    @page_manage
     def get(self, request, app_id):
         cache_key = 'bill-context-' + app_id
         context = Util.get_cache(request, cache_key)
@@ -240,6 +289,7 @@ class Bill(View):
 
 
 class Auth(View):
+    @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
@@ -252,19 +302,16 @@ class Auth(View):
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('auth_sdk.zip')
             return response
         else:
-            try:
-                context['user_groups'] = api.get_user_groups()
-                context['user_count'] = api.get_user_count()
-                context['session_count'] = api.get_session_count()
-                context['users'] = api.get_users()
-                context['email_login'] = api.get_email_login()
-                context['guest_login'] = api.get_guest_login()
-                context['rest_api_url'] = api.get_rest_api_url()
-                return render(request, 'dashboard/app/auth.html', context=context)
-            except ClientError as error:
-                context['error'] = error
-                return render(request, 'dashboard/error.html', context=context)
+            context['user_groups'] = api.get_user_groups()
+            context['user_count'] = api.get_user_count()
+            context['session_count'] = api.get_session_count()
+            context['users'] = api.get_users()
+            context['email_login'] = api.get_email_login()
+            context['guest_login'] = api.get_guest_login()
+            context['rest_api_url'] = api.get_rest_api_url()
+            return render(request, 'dashboard/app/auth.html', context=context)
 
+    @page_manage
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
@@ -316,6 +363,7 @@ class Auth(View):
 
 
 class Database(View):
+    @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
         auth = Util.get_api(AuthAPI, 'auth', request, app_id)
@@ -331,22 +379,19 @@ class Database(View):
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('database_sdk.zip')
             return response
         else:
-            try:
-                partitions = database.get_partitions()
-                partitions = Util.encode_dict(partitions)
-                for partition in partitions:
-                    result = database.get_item_count(partition)
-                    partitions[partition]['item_count'] = result['item']['count']
-                partitions = partitions.values()
+            partitions = database.get_partitions()
+            partitions = Util.encode_dict(partitions)
+            for partition in partitions:
+                result = database.get_item_count(partition)
+                partitions[partition]['item_count'] = result['item']['count']
+            partitions = partitions.values()
 
-                context['user_groups'] = auth.get_user_groups()
-                context['partitions'] = partitions
-                context['rest_api_url'] = database.get_rest_api_url()
-                return render(request, 'dashboard/app/database.html', context=context)
-            except ClientError as ex:
-                context['error'] = ex
-                return render(request, 'dashboard/error.html', context=context)
+            context['user_groups'] = auth.get_user_groups()
+            context['partitions'] = partitions
+            context['rest_api_url'] = database.get_rest_api_url()
+            return render(request, 'dashboard/app/database.html', context=context)
 
+    @page_manage
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
@@ -408,6 +453,7 @@ class Database(View):
 
 
 class Storage(View):
+    @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
         auth = Util.get_api(AuthAPI, 'auth', request, app_id)
@@ -430,19 +476,16 @@ class Storage(View):
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(file_name)
             return response
         else:
-            try:
-                folder_path = request.GET.get('folder_path', '/')
-                start_key = request.GET.get('start_key', None)
-                context['app_id'] = app_id
-                context['folder_path'] = folder_path
-                context['user_groups'] = auth.get_user_groups()
-                context['rest_api_url'] = storage.get_rest_api_url()
-                context['folder_list'] = storage.get_folder_list(folder_path, start_key)
-                return render(request, 'dashboard/app/storage.html', context=context)
-            except ClientError as ex:
-                context['error'] = ex
-                return render(request, 'dashboard/error.html', context=context)
+            folder_path = request.GET.get('folder_path', '/')
+            start_key = request.GET.get('start_key', None)
+            context['app_id'] = app_id
+            context['folder_path'] = folder_path
+            context['user_groups'] = auth.get_user_groups()
+            context['rest_api_url'] = storage.get_rest_api_url()
+            context['folder_list'] = storage.get_folder_list(folder_path, start_key)
+            return render(request, 'dashboard/app/storage.html', context=context)
 
+    @page_manage
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
@@ -486,6 +529,7 @@ class Storage(View):
 
 
 class Logic(View):
+    @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
