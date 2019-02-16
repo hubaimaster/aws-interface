@@ -67,12 +67,12 @@ def create_sdk_zipfile_bin(recipe_controller, rest_api_url):
         module_path = os.path.dirname(module.__file__)
 
         # Copy module_path into temp/sdk_name folder
-        shutil.copytree(module_path, '{}/{}'.format(tmp_dir, sdk_name))
+        shutil.copytree(module_path, os.path.join(tmp_dir, sdk_name))
 
         # Remove __init__.py and __pycache__
         try:
-            os.remove('{}/{}/__init__.py'.format(tmp_dir, sdk_name))
-            shutil.rmtree('{}/{}/__pycache__'.format(tmp_dir, sdk_name))
+            os.remove(os.path.join(tmp_dir, sdk_name, '__init__.py'))
+            shutil.rmtree(os.path.join(tmp_dir, sdk_name, '__pycache__'))
         except BaseException as ex:
             print(ex)
 
@@ -83,7 +83,7 @@ def create_sdk_zipfile_bin(recipe_controller, rest_api_url):
             'cloud_apis': list(cloud_apis)
         }
 
-        with open('{}/{}/{}'.format(tmp_dir, sdk_name, 'info.json'), 'w+') as fp:
+        with open(os.path.join(tmp_dir, sdk_name, 'info.json'), 'w+') as fp:
             json.dump(info, fp)
 
     # Archive all files

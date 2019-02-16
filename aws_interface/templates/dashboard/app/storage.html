@@ -39,7 +39,7 @@
             <div class="card-header border-0">
               <div class="row align-items-center">
                 <div class="col">
-                  <h3 id="path-name" class="mb-0">/</h3>
+                  <h3 id="path-name" class="mb-0">{{ folder_path }}</h3>
                 </div>
 
                   <div class="col text-right">
@@ -241,8 +241,13 @@
                         <td>{{ item.read_groups }}</td>
                         <td>{{ item.write_groups }}</td>
                         <td>
+                            {% if item.type == 'file' %}
                             <button type="submit" class="btn btn-sm btn-outline-danger">수정</button>
-                            <button type="submit" class="btn btn-sm btn-danger">제거</button>
+                            <button onclick="delete_file('{{ item.path }}')" class="btn btn-sm btn-danger">제거</button>
+                            {% elif item.type == 'folder' %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">수정</button>
+                            <button onclick="delete_folder('{{ item.path }}')" class="btn btn-sm btn-danger">제거</button>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
@@ -437,7 +442,25 @@
         folder_write_groups.remove(group_name);
         render_folder_write_groups();
     }
-    
+
+    function delete_file(file_path){
+        $.post("", {
+            cmd: 'delete_file',
+            file_path: file_path,
+        }, function (data) {
+            window.location.reload();
+        });
+    }
+
+    function delete_folder(folder_path){
+        $.post("", {
+            cmd: 'delete_folder',
+            folder_path: folder_path,
+        }, function (data) {
+            window.location.reload();
+        });
+    }
+
     window.onload = function () {
         render_folder_read_groups();
         render_folder_write_groups();

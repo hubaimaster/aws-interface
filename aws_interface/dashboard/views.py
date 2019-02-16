@@ -475,6 +475,14 @@ class Storage(View):
             response = HttpResponse(file_bin, content_type='application/x-binary')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
             return response
+        elif cmd == 'delete_file':
+            file_path = request.POST['file_path']
+            result = storage.delete_file(file_path)
+            return JsonResponse(result)
+        elif cmd == 'delete_folder':
+            folder_path = request.POST['folder_path']
+            result = storage.delete_folder(folder_path)
+            return JsonResponse(result)
 
 
 class Logic(View):

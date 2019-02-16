@@ -27,6 +27,8 @@ def do(data, boto3):
     user_id = user.get('id', None)
 
     def has_permission(_item):
+        if not _item:
+            return False
         read_groups = _item['read_groups']
         if 'owner' in read_groups:
             owner_id = _item['owner']
@@ -42,8 +44,8 @@ def do(data, boto3):
     dynamo = DynamoDB(boto3)
 
     item = dynamo.get_item(table_name, folder_path).get('Item', None)
-    if item:
-        if has_permission(item):
+    if item or folder_path == '/':
+        if has_permission(item) or folder_path == '/':
             result = dynamo.get_items(table_name, folder_path, start_key)
             body['items'] = result.get('Items', [])
             body['end_key'] = result.get('LastEvaluatedKey', None)
