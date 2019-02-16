@@ -116,8 +116,8 @@ def page_manage(func):
                 desc = '유효하지 않은 AccessKey 가 입력되어 있습니다'
             elif code == 'AccessDeniedException':
                 title = '등록된 IAM AccessKey 의 권한이 부족합니다'
-                desc = '아래 링크로 들어가서 AdminUser 권한을 추가합니다'
-                link = 'overview'
+                desc = '아래 가이드 링크를 참고하여 AdminUser 권한을 추가합니다'
+                link = 'guide'
                 link_desc = 'AWS IAM AccessKey 권한 추가히기'
 
             context['error'] = ex
@@ -268,6 +268,16 @@ class Overview(View):
         context['app_id'] = app_id
         context['app_name'] = app.name
         return render(request, 'dashboard/app/overview.html', context=context)
+
+
+class Guide(View):
+    @page_manage
+    def get(self, request, app_id):
+        context = Util.get_context(request)
+        app = App.objects.get(id=app_id)
+        context['app_id'] = app_id
+        context['app_name'] = app.name
+        return render(request, 'dashboard/app/guide.html', context=context)
 
 
 class Bill(View):

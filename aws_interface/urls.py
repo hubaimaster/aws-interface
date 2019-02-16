@@ -31,6 +31,7 @@ urlpatterns = [
     path('accesskey/', AccessKey.as_view(), name='accesskey'),
 
     path('<app_id>/overview', Overview.as_view(), name='overview'),
+    path('<app_id>/guide', Guide.as_view(), name='guide'),
     path('<app_id>/bill', Bill.as_view(), name='bill'),
     path('<app_id>/auth', Auth.as_view(), name='auth'),
     path('<app_id>/database', Database.as_view(), name='database'),
