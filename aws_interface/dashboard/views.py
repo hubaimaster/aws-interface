@@ -146,7 +146,6 @@ class AccessKey(View):
 
     @page_manage
     def post(self, request):
-        context = Util.get_context(request)
         password = request.POST['password']
         access_key = request.POST['access_key']
         secret_key = request.POST['secret_key']
