@@ -1,9 +1,7 @@
 import json
-import uuid
 import time
 import tempfile
 import botocore
-from cloud.crypto import Base64
 from boto3.dynamodb.conditions import Key
 from time import sleep
 import cloud.shortuuid as shortuuid
