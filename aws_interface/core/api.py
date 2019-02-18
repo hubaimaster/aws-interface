@@ -164,12 +164,8 @@ class DatabaseAPI(API):
 
 
 class StorageAPI(API):
-    def __init__(self, bundle, app_id, recipe_json_string=None):
-        super(StorageAPI, self).__init__(bundle, app_id, recipe_json_string)
-        self.service_controller = StorageServiceController(self.bundle, self.app_id)
-        self.recipe_controller = StorageRecipeController()
-        if self.recipe_json_string:
-            self.recipe_controller.load_json_string(self.recipe_json_string)
+    RC_CLASS = StorageRecipeController
+    SC_CLASS = StorageServiceController
 
     # Recipe
 
