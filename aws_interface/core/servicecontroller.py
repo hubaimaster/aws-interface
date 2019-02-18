@@ -194,22 +194,24 @@ class ServiceController(metaclass=ABCMeta):
         return sdk_bin
 
     def apply(self, recipe_controller):
+        """
+        Apply/deploy the recipe to AWS backend services. This includes
+        setting up interfaces through AWS Lambda and API Gateway.
+
+        To add recipe-specific actions, override this method and REMEMBER TO
+        CALL THE BASE METHOD.
+
+        :param recipe_controller:
+        :return:
+        """
         self.apply_cloud_api(recipe_controller)
         self.deploy_cloud_api(recipe_controller)
-        self.common_apply(recipe_controller)
-
-    @abstractmethod
-    def common_apply(self, recipe_controller):
-        pass
 
 
 class BillServiceController(ServiceController):
     def __init__(self, bundle, app_id):
         super(BillServiceController, self).__init__(bundle, app_id)
         self.cost_explorer = CostExplorer(self.boto3_session)
-
-    def common_apply(self, recipe_controller):
-        return
 
     def get_cost(self, start, end):
         response = self.cost_explorer.get_cost(start, end)
@@ -252,9 +254,6 @@ class AuthServiceController(ServiceController):
             'sort_key': 'email',
             'sort_key_type': 'S',
         }])
-        return
-
-    def common_apply(self, recipe_controller):
         return
 
     @response_body
@@ -479,9 +478,6 @@ class StorageServiceController(ServiceController):
         dynamodb = DynamoDB(self.boto3_session)
         table_name = 'storage-{}'.format(self.app_id)
         dynamodb.init_table(table_name)
-
-    def common_apply(self, recipe_controller):
-        return
 
     @response_body
     def create_folder(self, recipe, parent_path, folder_name, read_groups, write_groups):
