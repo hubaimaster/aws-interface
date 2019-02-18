@@ -29,11 +29,11 @@ def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     shutil.copytree(dir_name, '{}/{}'.format(tmp_dir, root_name))
 
     # Copy recipe from recipe_controller
-    with open('{}/{}/{}'.format(tmp_dir, root_name, 'recipe.json'), 'w+') as file:
+    with open(os.path.join(tmp_dir, root_name, 'recipe.json'), 'w+') as file:
         file.write(recipe)
 
     # Write txt file included app_id
-    with open('{}/{}/{}'.format(tmp_dir, root_name, 'app_id.txt'), 'w+') as file:
+    with open(os.path.join(tmp_dir, root_name, 'app_id.txt'), 'w+') as file:
         file.write(app_id)
 
     # Archive all files
