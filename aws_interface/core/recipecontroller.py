@@ -4,20 +4,28 @@ from abc import ABCMeta, abstractmethod
 
 
 class RecipeController(metaclass=ABCMeta):
-    def __init__(self):
-        self.data = dict()
-        self.common_init()
+    """
+    Make sure to set RECIPE_TYPE when you inherit this class.
+    """
+    RECIPE_TYPE = None
 
-    @abstractmethod
-    def common_init(self):
-        pass
+    def __init__(self):
+        """
+        To add recipe-specific actions, override __init__. Make sure to
+        CALL THIS BASE __init__ FUNCTION.
+        """
+        self.data = dict()
+        assert (type(self).RECIPE_TYPE is not None)
+        self.data['recipe_type'] = type(self).RECIPE_TYPE
 
     def to_json(self):
         return json.dumps(self.data)
 
     def load_json_string(self, json_string):
         self.data = json.loads(json_string)
-        self.common_init()
+        # self.common_init() this should be named something like update()
+        # currently, there is no use for this
+        # consider redesigning the __init__ function to accept a data variable
 
     def get_recipe_type(self):
         return self.data.get('recipe_type', None)
@@ -44,14 +52,14 @@ class RecipeController(metaclass=ABCMeta):
 
 
 class BillRecipeController(RecipeController):
-    def common_init(self):
-        self.data['recipe_type'] = 'bill'
+    RECIPE_TYPE = 'bill'
 
 
 class AuthRecipeController(RecipeController):
-    def common_init(self):
-        self.data['recipe_type'] = 'auth'
-        # put system default groups
+    RECIPE_TYPE = 'auth'
+
+    def __init__(self):
+        super(AuthRecipeController, self).__init__()
         self._init_user_group()
         self._init_cloud_api()
         self._init_login_method()
@@ -132,8 +140,10 @@ class AuthRecipeController(RecipeController):
 
 
 class DatabaseRecipeController(RecipeController):
-    def common_init(self):
-        self.data['recipe_type'] = 'database'
+    RECIPE_TYPE = 'database'
+
+    def __init__(self):
+        super(DatabaseRecipeController, self).__init__()
         self._init_cloud_api()
 
     def _init_cloud_api(self):
@@ -169,8 +179,10 @@ class DatabaseRecipeController(RecipeController):
 
 
 class StorageRecipeController(RecipeController):
-    def common_init(self):
-        self.data['recipe_type'] = 'storage'
+    RECIPE_TYPE = 'storage'
+
+    def __init__(self):
+        super(StorageRecipeController, self).__init__()
         self._init_cloud_api()
 
     def _init_cloud_api(self):
@@ -179,4 +191,3 @@ class StorageRecipeController(RecipeController):
         self.put_cloud_api('delete_folder', 'cloud.storage.delete_folder')
         self.put_cloud_api('delete_file', 'cloud.storage.delete_file')
         self.put_cloud_api('download_file', 'cloud.storage.download_file')
-
