@@ -31,6 +31,7 @@ def generate(controller_pairs, platform):
 
     template_dir = os.path.dirname(os.path.abspath(__file__))
     template_dir = os.path.join(template_dir, 'templates')
+    template_dir = os.path.join(template_dir, platform)
     print(template_dir)
     working_dir = tempfile.mkdtemp()
     sdk_dir = os.path.join(working_dir, 'sdk')
