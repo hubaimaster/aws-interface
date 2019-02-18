@@ -6,13 +6,20 @@ from abc import ABCMeta, abstractmethod
 
 class API(metaclass=ABCMeta):  # Abstract class
     def __init__(self, bundle, app_id, recipe_json_string=None):
+        """
+        Make sure to override this method and set recipe_controller
+        and service_controller
+
+        :param bundle:
+        :param app_id:
+        :param recipe_json_string:
+        """
         self.bundle = bundle
         self.app_id = app_id
         self.recipe_json_string = recipe_json_string
 
         self.recipe_controller = None
         self.service_controller = None
-        self.common_init()  # Set recipe and service_controller
 
     def apply(self):
         self.service_controller.apply(self.recipe_controller)
@@ -29,17 +36,10 @@ class API(metaclass=ABCMeta):  # Abstract class
     def get_rest_api_url(self):
         return self.service_controller.get_rest_api_url(self.recipe_controller)
 
-    def get_rest_api_sdk(self):
-        return self.service_controller.get_rest_api_sdk(self.recipe_controller)
-
-    @abstractmethod
-    def common_init(self):
-        # called when __init__ finished, it should implement on subclass. not on abstract class.
-        pass
-
 
 class BillAPI(API):
-    def common_init(self):
+    def __init__(self, bundle, app_id, recipe_json_string=None):
+        super(BillAPI, self).__init__(self, bundle, app_id, recipe_json_string)
         self.service_controller = BillServiceController(self.bundle, self.app_id)
         self.recipe_controller = BillRecipeController()
         if self.recipe_json_string:
@@ -57,7 +57,8 @@ class BillAPI(API):
 
 
 class AuthAPI(API):
-    def common_init(self):
+    def __init__(self, bundle, app_id, recipe_json_string=None):
+        super(AuthAPI, self).__init__(self, bundle, app_id, recipe_json_string)
         self.service_controller = AuthServiceController(self.bundle, self.app_id)
         self.recipe_controller = AuthRecipeController()
         if self.recipe_json_string:
@@ -121,7 +122,8 @@ class AuthAPI(API):
 
 
 class DatabaseAPI(API):
-    def common_init(self):
+    def __init__(self, bundle, app_id, recipe_json_string=None):
+        super(DatabaseAPI, self).__init__(self, bundle, app_id, recipe_json_string)
         self.service_controller = DatabaseServiceController(self.bundle, self.app_id)
         self.recipe_controller = DatabaseRecipeController()
         if self.recipe_json_string:
@@ -167,7 +169,8 @@ class DatabaseAPI(API):
 
 
 class StorageAPI(API):
-    def common_init(self):
+    def __init__(self, bundle, app_id, recipe_json_string=None):
+        super(StorageAPI, self).__init__(self, bundle, app_id, recipe_json_string)
         self.service_controller = StorageServiceController(self.bundle, self.app_id)
         self.recipe_controller = StorageRecipeController()
         if self.recipe_json_string:
