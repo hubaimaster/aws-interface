@@ -195,3 +195,8 @@ class StorageAPI(API):
 
     def download_file(self, file_path):
         return self.service_controller.download_file(self.recipe_controller.to_json(), file_path)
+
+
+api_list = [
+    BillAPI, AuthAPI, DatabaseAPI, StorageAPI
+]
