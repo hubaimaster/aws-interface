@@ -3,30 +3,32 @@ import json
 
 
 class Client():
-    def __init(self):
+    def __init__(self):
         with open('manifest.json', 'r') as fp:
-            self.data = json.load(fp)
+            self.manifest = json.load(fp)
 
     @property
     def recipe_keys(self):
-        return self.data['recipe_keys']
+        return self.manifest['recipe_keys']
 
     def examples(self):
         print('Usage examples')
-        apis = self.get_api_list()
-        for api in apis:
-            print('API Name: {}'.format(api['name']).center(80, '-'))
+        for recipe_key in self.recipe_keys:
+            print('Recipe: {}'.format(recipe_key).upper().center(80, '#'))
+            apis = self.get_api_list(recipe_key)
+            for api in apis:
+                print('API Name: {}'.format(api['name']).center(80, '-'))
 
-            api_info = api.get('info', {})
-            sdk_dict = api_info.get('input_format')
-            rest_dict = api_info
-            sdk_example = 'call_api("{}", {})'.format( api['name'], json.dumps(sdk_dict, indent=4))
-            rest_example = json.dumps(rest_dict, indent=4)
+                api_info = api.get('info', {})
+                sdk_dict = api_info.get('input_format')
+                rest_dict = api_info
+                sdk_example = "call_api('{}', '{}', {})".format(recipe_key, api['name'], json.dumps(sdk_dict, indent=4))
+                rest_example = json.dumps(rest_dict, indent=4)
 
-            print('[SDK Function Call Format]')
-            print(sdk_example)
-            print('[REST API Format]')
-            print(rest_example)
+                print('[SDK Function Call Format]')
+                print(sdk_example)
+                print('[REST API Format]')
+                print(rest_example)
 
     def get_recipe_manifest(self, recipe_key):
         if recipe_key not in self.recipe_keys:
