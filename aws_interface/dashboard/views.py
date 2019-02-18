@@ -114,7 +114,10 @@ def page_manage(func):
                 link = 'guide'
                 link_desc = 'AWS IAM AccessKey 권한 추가히기'
             elif code == 'ResourceNotFoundException':
-                title = '잠시만 기다려주세요 AWS Interface 가 백엔드 서비스를 생성중입니다'
+                title = '잠시만 기다려주세요 AWS Interface 가 백엔드 서비스를 생성중 입니다'
+                desc = '경우에 따라 최대 10분 정도 소요될 수 있습니다'
+            elif code == 'ValidationException':
+                title = 'AWS Interface 가 백엔드 서비스를 생성중 일 수 있습니다'
                 desc = '경우에 따라 최대 10분 정도 소요될 수 있습니다'
 
             context['error'] = ex
