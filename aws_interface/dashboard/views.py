@@ -272,7 +272,7 @@ class Overview(LoginRequiredMixin, View):
 
             sdk_bin = generate_sdk(apis, 'python3')
             response = HttpResponse(sdk_bin, content_type='application/x-binary')
-            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
+            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('AWS Interface SDK.zip')
             return response
         else:
             context = Util.get_context(request)
