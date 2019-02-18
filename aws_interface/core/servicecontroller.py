@@ -116,7 +116,7 @@ def make_data(app_id, parmas, recipe_json, admin=True):
     return data
 
 
-def response_body(func):
+def lambda_method(func):
     def wrap(*args, **kwargs):
         result = func(*args, **kwargs)
         return result.get('body', {})
@@ -166,11 +166,13 @@ class ServiceController(metaclass=ABCMeta):
 
         try:
             lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
-        except:
+        except BaseException as ex:
+            print(ex)
             print('Function might already exist, Try updating function code.')
             try:
                 lambda_client.update_function_code(name, zip_file)
-            except:
+            except BaseException as ex:
+                print(ex)
                 print('Update function failed')
 
     def deploy_cloud_api(self, recipe_controller):
@@ -256,7 +258,7 @@ class AuthServiceController(ServiceController):
         }])
         return
 
-    @response_body
+    @lambda_method
     def create_user(self, recipe, email, password, extra):
         import cloud.auth.register as register
         parmas = {
@@ -268,7 +270,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return register.do(data, boto3)['body']
 
-    @response_body
+    @lambda_method
     def set_user(self, recipe, user_id, email, password, extra):
         import cloud.auth.set_user as set_user
         parmas = {
@@ -281,7 +283,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return set_user.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def delete_user(self, recipe, user_id):
         import cloud.auth.delete_user as delete_user
         parmas = {
@@ -291,7 +293,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return delete_user.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_user(self, recipe, user_id):
         import cloud.auth.get_user as get_user
         parmas = {
@@ -301,7 +303,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_user.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_user_count(self, recipe):
         import cloud.auth.get_user_count as get_user_count
         parmas = {
@@ -311,7 +313,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_user_count.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_users(self, recipe, start_key, limit):
         import cloud.auth.get_users as get_users
         params = {'start_key': start_key,
@@ -320,7 +322,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_users.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def create_session(self, recipe, email, password):
         import cloud.auth.login as login
         params = {
@@ -331,7 +333,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return login.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def delete_session(self, recipe, session_id):
         import cloud.auth.logout as logout
         params = {
@@ -341,7 +343,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return logout.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_session(self, recipe, session_id):
         import cloud.auth.get_session as get_session
         params = {
@@ -351,7 +353,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_session.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_sessions(self, recipe, start_key, limit):
         import cloud.auth.get_sessions as get_sessions
         params = {'start_key': start_key,
@@ -360,7 +362,7 @@ class AuthServiceController(ServiceController):
         boto3 = self.boto3_session
         return get_sessions.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_session_count(self, recipe):
         import cloud.auth.get_session_count as get_session_count
         parmas = {}
@@ -383,7 +385,7 @@ class DatabaseServiceController(ServiceController):
     def common_apply(self, recipe_controller):
         return
 
-    @response_body
+    @lambda_method
     def create_item(self, recipe, partition, item, read_permissions, write_permissions):
         import cloud.database.create_item as method
         params = {
@@ -396,7 +398,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def update_item(self, recipe, item_id, item, read_permissions, write_permissions):
         import cloud.database.update_item as method
         params = {
@@ -409,7 +411,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def put_item_field(self, recipe, item_id, field_name, field_value):
         import cloud.database.put_item_field as method
         params = {
@@ -421,7 +423,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_item(self, recipe, item_id):
         import cloud.database.get_item as method
         params = {
@@ -431,7 +433,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def delete_item(self, recipe, item_id):
         import cloud.database.delete_item as method
         params = {
@@ -441,7 +443,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_items(self, recipe, partition, reverse):
         import cloud.database.get_items as method
         params = {
@@ -452,7 +454,7 @@ class DatabaseServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_item_count(self, recipe, partition):
         import cloud.database.get_item_count as method
         params = {
@@ -479,7 +481,7 @@ class StorageServiceController(ServiceController):
         table_name = 'storage-{}'.format(self.app_id)
         dynamodb.init_table(table_name)
 
-    @response_body
+    @lambda_method
     def create_folder(self, recipe, parent_path, folder_name, read_groups, write_groups):
         import cloud.storage.create_folder as method
         params = {
@@ -492,7 +494,7 @@ class StorageServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def upload_file(self, recipe, parent_path, file_name, file_bin, read_groups, write_groups):
         import cloud.storage.upload_file as method
         params = {
@@ -506,7 +508,7 @@ class StorageServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def delete_folder(self, recipe, folder_path):
         import cloud.storage.delete_folder as method
         params = {
@@ -516,7 +518,7 @@ class StorageServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def delete_file(self, recipe, file_path):
         import cloud.storage.delete_file as method
         params = {
@@ -526,7 +528,7 @@ class StorageServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def download_file(self, recipe, file_path):
         import cloud.storage.download_file as method
         params = {
@@ -536,7 +538,7 @@ class StorageServiceController(ServiceController):
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
-    @response_body
+    @lambda_method
     def get_folder_list(self, recipe, folder_path, start_key):
         import cloud.storage.get_folder_list as method
         params = {
