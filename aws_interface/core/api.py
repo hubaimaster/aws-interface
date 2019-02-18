@@ -22,8 +22,8 @@ class API(metaclass=ABCMeta):  # Abstract class
         self.app_id = app_id
         self.recipe_json_string = recipe_json_string
 
-        self.recipe_controller = type(self).RC_CLASS(bundle, app_id)
-        self.service_controller = type(self).SC_CLASS()
+        self.recipe_controller = type(self).RC_CLASS()
+        self.service_controller = type(self).SC_CLASS(bundle, app_id)
 
         if self.recipe_json_string:
             self.recipe_controller.load_json_string(self.recipe_json_string)
