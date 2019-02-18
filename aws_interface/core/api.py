@@ -2,6 +2,7 @@ from core.recipecontroller import *
 from core.servicecontroller import *
 from core.util import *
 from abc import ABCMeta, abstractmethod
+from core import sdk
 
 
 class API(metaclass=ABCMeta):  # Abstract class
@@ -198,6 +199,16 @@ class StorageAPI(API):
 
     def download_file(self, file_path):
         return self.service_controller.download_file(self.recipe_controller.to_json(), file_path)
+
+
+def generate_sdk(apis, platform):
+    controller_pairs = []
+    api: API
+    for api in apis:
+        rc = api.get_recipe_controller()
+        sc = api.service_controller
+        controller_pairs.append((rc, sc))
+    return sdk.generate(controller_pairs, platform)
 
 
 api_list = [
