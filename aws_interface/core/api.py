@@ -6,11 +6,14 @@ from core import sdk
 
 
 class API(metaclass=ABCMeta):  # Abstract class
+    """
+    Make sure to set RC_CLASS and SC_CLASS when you inherit this class.
+    """
+    RC_CLASS = None
+    SC_CLASS = None
+
     def __init__(self, bundle, app_id, recipe_json_string=None):
         """
-        Make sure to override this method and set recipe_controller
-        and service_controller
-
         :param bundle:
         :param app_id:
         :param recipe_json_string:
@@ -19,8 +22,11 @@ class API(metaclass=ABCMeta):  # Abstract class
         self.app_id = app_id
         self.recipe_json_string = recipe_json_string
 
-        self.recipe_controller = None
-        self.service_controller = None
+        self.recipe_controller = type(self).RC_CLASS(bundle, app_id)
+        self.service_controller = type(self).SC_CLASS()
+
+        if self.recipe_json_string:
+            self.recipe_controller.load_json_string(self.recipe_json_string)
 
     def apply(self):
         self.service_controller.apply(self.recipe_controller)
@@ -39,12 +45,8 @@ class API(metaclass=ABCMeta):  # Abstract class
 
 
 class BillAPI(API):
-    def __init__(self, bundle, app_id, recipe_json_string=None):
-        super(BillAPI, self).__init__(bundle, app_id, recipe_json_string)
-        self.service_controller = BillServiceController(self.bundle, self.app_id)
-        self.recipe_controller = BillRecipeController()
-        if self.recipe_json_string:
-            self.recipe_controller.load_json_string(self.recipe_json_string)
+    RC_CLASS = BillRecipeController
+    SC_CLASS = BillServiceController
 
     def get_current_cost(self):
         start = get_current_month_date().isoformat()
@@ -58,12 +60,8 @@ class BillAPI(API):
 
 
 class AuthAPI(API):
-    def __init__(self, bundle, app_id, recipe_json_string=None):
-        super(AuthAPI, self).__init__(bundle, app_id, recipe_json_string)
-        self.service_controller = AuthServiceController(self.bundle, self.app_id)
-        self.recipe_controller = AuthRecipeController()
-        if self.recipe_json_string:
-            self.recipe_controller.load_json_string(self.recipe_json_string)
+    RC_CLASS = AuthRecipeController
+    SC_CLASS = AuthServiceController
 
     # Recipe
     def get_user_groups(self):
@@ -123,12 +121,8 @@ class AuthAPI(API):
 
 
 class DatabaseAPI(API):
-    def __init__(self, bundle, app_id, recipe_json_string=None):
-        super(DatabaseAPI, self).__init__(bundle, app_id, recipe_json_string)
-        self.service_controller = DatabaseServiceController(self.bundle, self.app_id)
-        self.recipe_controller = DatabaseRecipeController()
-        if self.recipe_json_string:
-            self.recipe_controller.load_json_string(self.recipe_json_string)
+    RC_CLASS = DatabaseRecipeController
+    SC_CLASS = DatabaseServiceController
 
     # Recipe
     def get_partitions(self):
