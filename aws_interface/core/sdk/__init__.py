@@ -32,9 +32,10 @@ def generate(controller_pairs, platform):
     template_dir = os.path.dirname(os.path.abspath(__file__))
     template_dir = os.path.join(template_dir, 'templates')
     print(template_dir)
-    sdk_dir = tempfile.mkdtemp()
+    working_dir = tempfile.mkdtemp()
+    sdk_dir = os.path.join(working_dir, 'sdk')
 
-    shutil.copytree(sdk_dir, template_dir)
+    shutil.copytree(template_dir, sdk_dir)
     manifest = _generate_manifest(controller_pairs)
     with open(os.path.join(sdk_dir, 'manifest.json'), 'w') as f:
         json.dump(manifest, f)
@@ -48,7 +49,7 @@ def generate(controller_pairs, platform):
 
     # Remove temp files
     os.remove(zip_file)
-    shutil.rmtree(sdk_dir)
+    shutil.rmtree(working_dir)
 
     return zip_file_bin
 
