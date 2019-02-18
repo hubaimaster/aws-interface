@@ -31,18 +31,12 @@ class Util:
         request.session['alert'] = alert
 
     @classmethod
-    def is_login(cls, request):
-        warnings.warn('is_login is deprecated. ask Namgyu for info')
-        return request.session.get('is_login', False)
-
-    @classmethod
-    def set_login(cls, request, is_login, bundle={}):
-        request.session['is_login'] = is_login
-        request.session['bundle'] = bundle
-
-    @classmethod
     def get_bundle(cls, request):
         return request.session.get('bundle', {})
+
+    @classmethod
+    def reset_bundle(cls, request, bundle={}):
+        request.session['bundle'] = bundle
 
     @classmethod
     def get_user_id(cls, request):
@@ -159,7 +153,7 @@ class AccessKey(View):
         bundle = dict()
         bundle['access_key'] = request.user.get_aws_access_key(password)
         bundle['secret_key'] = request.user.get_aws_secret_key(password)
-        Util.set_login(request, True, bundle=bundle)
+        Util.reset_bundle(request, bundle)
         Util.add_alert(request, 'AccessKey 를 변경하였습니다.')
         return redirect('apps')
 
@@ -220,7 +214,7 @@ class Login(View):
             bundle = dict()
             bundle['access_key'] = user.get_aws_access_key(password)
             bundle['secret_key'] = user.get_aws_secret_key(password)
-            Util.set_login(request, True, bundle=bundle)
+            Util.reset_bundle(request, bundle)
             login(request, user)
             return redirect(settings.LOGIN_REDIRECT_URL)
 
@@ -228,9 +222,7 @@ class Login(View):
 class Logout(View):
     @page_manage
     def get(self, request):
-        request.session['access_key'] = None
-        request.session['secret_key'] = None
-        Util.set_login(request, False)
+        Util.reset_bundle(request)
         logout(request)
         return redirect('index')
 
