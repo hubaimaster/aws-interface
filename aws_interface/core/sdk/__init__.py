@@ -68,7 +68,7 @@ def _generate_manifest(controller_pairs):
 
         recipe_manifest = {
             'rest_api_url': sc.get_rest_api_url(rc),
-            'cloud_apis': list(rc.get_cloud_apis),
+            'cloud_apis': list(rc.get_cloud_apis()),
         }
 
         manifest['recipe_types'].append(recipe_type)
