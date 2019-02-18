@@ -51,8 +51,8 @@ class Util:
         return context
 
     @classmethod
-    def get_api(cls, api_class, recipe_type, request, app_id):
-        recipe = Recipe.objects.filter(app_id=app_id, recipe_type=recipe_type).first()
+    def get_api(cls, api_class, request, app_id):
+        recipe = Recipe.objects.filter(app_id=app_id, recipe_type=api_class.RC_CLASS.RECIPE_TYPE).first()
         if recipe:
             recipe_json_string = recipe.json_string
         else:
@@ -261,11 +261,25 @@ class Apps(LoginRequiredMixin, View):
 class Overview(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
-        context = Util.get_context(request)
-        app = App.objects.get(id=app_id)
-        context['app_id'] = app_id
-        context['app_name'] = app.name
-        return render(request, 'dashboard/app/overview.html', context=context)
+        cmd = request.GET.get('cmd', None)
+        if cmd == 'download_sdk':
+            apis = []
+            for api_cls in api_list:
+                api = Util.get_api(api_cls, request, app_id)
+                #api.apply()
+                #Util.save_recipe(api.get_recipe_controller(), app_id)
+                apis.append(api)
+
+            sdk_bin = generate_sdk(apis, 'python3')
+            response = HttpResponse(sdk_bin, content_type='application/x-binary')
+            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
+            return response
+        else:
+            context = Util.get_context(request)
+            app = App.objects.get(id=app_id)
+            context['app_id'] = app_id
+            context['app_name'] = app.name
+            return render(request, 'dashboard/app/overview.html', context=context)
 
 
 class Guide(LoginRequiredMixin, View):
@@ -288,7 +302,7 @@ class Bill(LoginRequiredMixin, View):
 
         context = Util.get_context(request)
         context['app_id'] = app_id
-        api = Util.get_api(BillAPI, 'bill', request, app_id)
+        api = Util.get_api(BillAPI, request, app_id)
         context['cost'] = api.get_current_cost()
         context['usages'] = api.get_current_usage_costs()
         Util.set_cache(request, cache_key, context)
@@ -300,29 +314,21 @@ class Auth(LoginRequiredMixin, View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        api = Util.get_api(AuthAPI, 'auth', request, app_id)
-        cmd = request.GET.get('cmd', None)
-        if cmd == 'download_sdk':
-            api.apply()
-            sdk_bin = api.get_rest_api_sdk()
-            response = HttpResponse(sdk_bin, content_type='application/x-binary')
-            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('auth_sdk.zip')
-            return response
-        else:
-            context['user_groups'] = api.get_user_groups()
-            context['user_count'] = api.get_user_count()
-            context['session_count'] = api.get_session_count()
-            context['users'] = api.get_users()
-            context['email_login'] = api.get_email_login()
-            context['guest_login'] = api.get_guest_login()
-            context['rest_api_url'] = api.get_rest_api_url()
-            return render(request, 'dashboard/app/auth.html', context=context)
+        api = Util.get_api(AuthAPI, request, app_id)
+        context['user_groups'] = api.get_user_groups()
+        context['user_count'] = api.get_user_count()
+        context['session_count'] = api.get_session_count()
+        context['users'] = api.get_users()
+        context['email_login'] = api.get_email_login()
+        context['guest_login'] = api.get_guest_login()
+        context['rest_api_url'] = api.get_rest_api_url()
+        return render(request, 'dashboard/app/auth.html', context=context)
 
     @page_manage
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        api = Util.get_api(AuthAPI, 'auth', request, app_id)
+        api = Util.get_api(AuthAPI, request, app_id)
         cmd = request.POST['cmd']
 
         # Recipe
@@ -373,36 +379,28 @@ class Database(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
-        auth = Util.get_api(AuthAPI, 'auth', request, app_id)
-        database = Util.get_api(DatabaseAPI, 'database', request, app_id)
+        auth = Util.get_api(AuthAPI, request, app_id)
+        database = Util.get_api(DatabaseAPI, request, app_id)
         context['app_id'] = app_id
         cmd = request.GET.get('cmd', None)
 
-        if cmd == 'download_sdk':
-            database.apply()
-            Util.save_recipe(database.get_recipe_controller(), app_id)
-            sdk_bin = database.get_rest_api_sdk()
-            response = HttpResponse(sdk_bin, content_type='application/x-binary')
-            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('database_sdk.zip')
-            return response
-        else:
-            partitions = database.get_partitions()
-            partitions = Util.encode_dict(partitions)
-            for partition in partitions:
-                result = database.get_item_count(partition)
-                partitions[partition]['item_count'] = result['item']['count']
-            partitions = partitions.values()
+        partitions = database.get_partitions()
+        partitions = Util.encode_dict(partitions)
+        for partition in partitions:
+            result = database.get_item_count(partition)
+            partitions[partition]['item_count'] = result['item']['count']
+        partitions = partitions.values()
 
-            context['user_groups'] = auth.get_user_groups()
-            context['partitions'] = partitions
-            context['rest_api_url'] = database.get_rest_api_url()
-            return render(request, 'dashboard/app/database.html', context=context)
+        context['user_groups'] = auth.get_user_groups()
+        context['partitions'] = partitions
+        context['rest_api_url'] = database.get_rest_api_url()
+        return render(request, 'dashboard/app/database.html', context=context)
 
     @page_manage
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        database = Util.get_api(DatabaseAPI, 'database', request, app_id)
+        database = Util.get_api(DatabaseAPI, request, app_id)
         cmd = request.POST['cmd']
 
         if cmd == 'add_partition':
@@ -463,17 +461,10 @@ class Storage(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
-        auth = Util.get_api(AuthAPI, 'auth', request, app_id)
-        storage = Util.get_api(StorageAPI, 'storage', request, app_id)
+        auth = Util.get_api(AuthAPI, request, app_id)
+        storage = Util.get_api(StorageAPI, request, app_id)
         cmd = request.GET.get('cmd', None)
-        if cmd == 'download_sdk':
-            storage.apply()
-            Util.save_recipe(storage.get_recipe_controller(), app_id)
-            sdk_bin = storage.get_rest_api_sdk()
-            response = HttpResponse(sdk_bin, content_type='application/x-binary')
-            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
-            return response
-        elif cmd == 'download_file':
+        if cmd == 'download_file':
             file_path = request.GET['file_path']
             file_name = file_path.split('/').pop()
             file_bin_b64 = storage.download_file(file_path)
@@ -496,7 +487,7 @@ class Storage(LoginRequiredMixin, View):
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        storage = Util.get_api(StorageAPI, 'storage', request, app_id)
+        storage = Util.get_api(StorageAPI, request, app_id)
         cmd = request.POST['cmd']
         if cmd == 'create_folder':
             parent_path = request.POST['parent_path']
