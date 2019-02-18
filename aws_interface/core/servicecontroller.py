@@ -49,53 +49,6 @@ def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     return zip_file_bin
 
 
-def create_sdk_zipfile_bin(recipe_controller, rest_api_url):
-    packages = [
-        'core.sdk.java',
-        'core.sdk.javascript',
-        'core.sdk.python3',
-        'core.sdk.swift'
-    ]
-    output_filename = tempfile.mktemp()
-
-    # Make tmp_dir
-    tmp_dir = tempfile.mkdtemp()
-
-    for package in packages:
-        # Copy source files
-        sdk_name = package.split('.')[-1]
-        module = importlib.import_module(package)
-        module_path = os.path.dirname(module.__file__)
-        shutil.copytree(module_path, os.path.join(tmp_dir, sdk_name))
-        try:
-            os.remove(os.path.join(tmp_dir, sdk_name, '__init__.py'))
-            shutil.rmtree(os.path.join(tmp_dir, sdk_name, '__pycache__'))
-        except BaseException as ex:
-            print(ex)
-
-        # Write info.json
-        cloud_apis = recipe_controller.get_cloud_apis()
-        info = {
-            'rest_api_url': rest_api_url,
-            'cloud_apis': list(cloud_apis)
-        }
-
-        with open(os.path.join(tmp_dir, sdk_name, 'info.json'), 'w+') as fp:
-            json.dump(info, fp)
-
-    # Archive all files
-    shutil.make_archive(output_filename, 'zip', tmp_dir)
-    zip_file_name = '{}.zip'.format(output_filename)
-    zip_file = open(zip_file_name, 'rb')
-    zip_file_bin = zip_file.read()
-    zip_file.close()
-
-    # Remove temp files
-    os.remove(zip_file_name)
-    shutil.rmtree(tmp_dir)
-    return zip_file_bin
-
-
 def make_data(app_id, parmas, recipe_json, admin=True):
     recipe = json.loads(recipe_json)
     data = {
@@ -184,11 +137,6 @@ class ServiceController(metaclass=ABCMeta):
         func_name = '{}-{}'.format(recipe_type, self.app_id)
         api_url = api_client.get_rest_api_url(api_name, func_name)
         return api_url
-
-    def get_rest_api_sdk(self, recipe_controller):
-        rest_api_url = self.get_rest_api_url(recipe_controller)
-        sdk_bin = create_sdk_zipfile_bin(recipe_controller, rest_api_url)
-        return sdk_bin
 
     def apply(self, recipe_controller):
         """
