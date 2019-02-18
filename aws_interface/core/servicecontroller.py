@@ -62,21 +62,18 @@ def create_sdk_zipfile_bin(recipe_controller, rest_api_url):
     tmp_dir = tempfile.mkdtemp()
 
     for package in packages:
+        # Copy source files
         sdk_name = package.split('.')[-1]
         module = importlib.import_module(package)
         module_path = os.path.dirname(module.__file__)
-
-        # Copy module_path into temp/sdk_name folder
         shutil.copytree(module_path, os.path.join(tmp_dir, sdk_name))
-
-        # Remove __init__.py and __pycache__
         try:
             os.remove(os.path.join(tmp_dir, sdk_name, '__init__.py'))
             shutil.rmtree(os.path.join(tmp_dir, sdk_name, '__pycache__'))
         except BaseException as ex:
             print(ex)
 
-        # Write txt file included app_id
+        # Write info.json
         cloud_apis = recipe_controller.get_cloud_apis()
         info = {
             'rest_api_url': rest_api_url,
@@ -219,9 +216,9 @@ class BillServiceController(ServiceController):
         response = response[-1]
 
         total = response.get('Total', {})
-        blendedCost = total.get('BlendedCost', {})
-        amount = blendedCost.get('Amount', -1)
-        unit = blendedCost.get('Unit', None)
+        blended_cost = total.get('BlendedCost', {})
+        amount = blended_cost.get('Amount', -1)
+        unit = blended_cost.get('Unit', None)
         result = {'Amount': amount, 'Unit': unit}
         return result
 
