@@ -39,7 +39,7 @@ class API(metaclass=ABCMeta):  # Abstract class
 
 class BillAPI(API):
     def __init__(self, bundle, app_id, recipe_json_string=None):
-        super(BillAPI, self).__init__(self, bundle, app_id, recipe_json_string)
+        super(BillAPI, self).__init__(bundle, app_id, recipe_json_string)
         self.service_controller = BillServiceController(self.bundle, self.app_id)
         self.recipe_controller = BillRecipeController()
         if self.recipe_json_string:
@@ -58,7 +58,7 @@ class BillAPI(API):
 
 class AuthAPI(API):
     def __init__(self, bundle, app_id, recipe_json_string=None):
-        super(AuthAPI, self).__init__(self, bundle, app_id, recipe_json_string)
+        super(AuthAPI, self).__init__(bundle, app_id, recipe_json_string)
         self.service_controller = AuthServiceController(self.bundle, self.app_id)
         self.recipe_controller = AuthRecipeController()
         if self.recipe_json_string:
@@ -123,7 +123,7 @@ class AuthAPI(API):
 
 class DatabaseAPI(API):
     def __init__(self, bundle, app_id, recipe_json_string=None):
-        super(DatabaseAPI, self).__init__(self, bundle, app_id, recipe_json_string)
+        super(DatabaseAPI, self).__init__(bundle, app_id, recipe_json_string)
         self.service_controller = DatabaseServiceController(self.bundle, self.app_id)
         self.recipe_controller = DatabaseRecipeController()
         if self.recipe_json_string:
@@ -170,7 +170,7 @@ class DatabaseAPI(API):
 
 class StorageAPI(API):
     def __init__(self, bundle, app_id, recipe_json_string=None):
-        super(StorageAPI, self).__init__(self, bundle, app_id, recipe_json_string)
+        super(StorageAPI, self).__init__(bundle, app_id, recipe_json_string)
         self.service_controller = StorageServiceController(self.bundle, self.app_id)
         self.recipe_controller = StorageRecipeController()
         if self.recipe_json_string:
