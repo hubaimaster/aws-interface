@@ -135,7 +135,7 @@ class Index(LoginRequiredMixin, View):
         return redirect('apps')
 
 
-class AccessKey(View):
+class AccessKey(LoginRequiredMixin, View):
     @page_manage
     def get(self, request):
         context = Util.get_context(request)
@@ -219,7 +219,7 @@ class Login(View):
             return redirect(settings.LOGIN_REDIRECT_URL)
 
 
-class Logout(View):
+class Logout(LoginRequiredMixin, View):
     @page_manage
     def get(self, request):
         Util.reset_bundle(request)
@@ -255,7 +255,7 @@ class Apps(LoginRequiredMixin, View):
         return redirect('apps')
 
 
-class Overview(View):
+class Overview(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
@@ -265,7 +265,7 @@ class Overview(View):
         return render(request, 'dashboard/app/overview.html', context=context)
 
 
-class Guide(View):
+class Guide(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
@@ -275,7 +275,7 @@ class Guide(View):
         return render(request, 'dashboard/app/guide.html', context=context)
 
 
-class Bill(View):
+class Bill(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         cache_key = 'bill-context-' + app_id
@@ -292,7 +292,7 @@ class Bill(View):
         return render(request, 'dashboard/app/bill.html', context=context)
 
 
-class Auth(View):
+class Auth(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
@@ -366,7 +366,7 @@ class Auth(View):
         return redirect(request.path_info)  # Redirect back
 
 
-class Database(View):
+class Database(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
@@ -456,7 +456,7 @@ class Database(View):
         return redirect(request.path_info)  # Redirect back
 
 
-class Storage(View):
+class Storage(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
@@ -532,7 +532,7 @@ class Storage(View):
             return JsonResponse(result)
 
 
-class Logic(View):
+class Logic(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         context = Util.get_context(request)
