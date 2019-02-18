@@ -24,8 +24,6 @@ def get_params(event):
 
 def handler(event, context):
     params = event
-    print('params:', params)
-
     cloud_api_name = params.get('cloud_api_name', None)
     
     with open('./cloud/recipe.json', 'r') as f:
