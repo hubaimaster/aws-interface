@@ -20,7 +20,7 @@ def generate(controller_pairs, platform):
     Generate the sdk for the given recipe types.
 
     :param controller_pairs
-    List of tuples of (RecipeController, ServiceController) pairs
+    List of (RecipeController, ServiceController) pairs
 
     :param platform
 
