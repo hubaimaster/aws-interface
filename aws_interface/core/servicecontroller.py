@@ -125,14 +125,18 @@ def response_body(func):
 
 class ServiceController(metaclass=ABCMeta):
     def __init__(self, bundle, app_id):
-        self.bundle = bundle
-        self.app_id = app_id
-        self.common_init()
+        """
+        Initiate service controller. Make sure to call this from the
+        __init__ method of child classes.
 
-    @abstractmethod
-    def common_init(self):
-        # init object here .. assign boto3 session
-        pass
+        :param bundle:
+        Dict containing keys to initialize boto3 session. May include
+        access_key, secret_key, region_name
+
+        :param app_id:
+        """
+        self.boto3_session = get_boto3_session(bundle)
+        self.app_id = app_id
 
     def apply_cloud_api(self, recipe_controller):
         """
@@ -200,8 +204,8 @@ class ServiceController(metaclass=ABCMeta):
 
 
 class BillServiceController(ServiceController):
-    def common_init(self):
-        self.boto3_session = get_boto3_session(self.bundle)
+    def __init__(self, bundle, app_id):
+        super(BillServiceController, self).__init__(bundle, app_id)
         self.cost_explorer = CostExplorer(self.boto3_session)
 
     def common_apply(self, recipe_controller):
@@ -234,8 +238,8 @@ class BillServiceController(ServiceController):
 
 
 class AuthServiceController(ServiceController):
-    def common_init(self):
-        self.boto3_session = get_boto3_session(self.bundle)
+    def __init__(self, bundle, app_id):
+        super(AuthServiceController, self).__init__(bundle, app_id)
         self._init_table()
 
     def _init_table(self):
@@ -367,8 +371,8 @@ class AuthServiceController(ServiceController):
 
 
 class DatabaseServiceController(ServiceController):
-    def common_init(self):
-        self.boto3_session = get_boto3_session(self.bundle)
+    def __init__(self, bundle, app_id):
+        super(DatabaseServiceController, self).__init__(bundle, app_id)
         self._init_table()
 
     def _init_table(self):
@@ -461,8 +465,8 @@ class DatabaseServiceController(ServiceController):
 
 
 class StorageServiceController(ServiceController):
-    def common_init(self):
-        self.boto3_session = get_boto3_session(self.bundle)
+    def __init__(self, bundle, app_id):
+        super(StorageServiceController, self).__init__(bundle, app_id)
         self._init_bucket()
         self._init_table()
 
