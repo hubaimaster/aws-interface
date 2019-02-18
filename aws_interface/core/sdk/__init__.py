@@ -59,7 +59,7 @@ def _generate_manifest(controller_pairs):
     manifest = dict()
 
     # Initialize list of recipe types
-    manifest['recipe_types'] = list()
+    manifest['recipe_keys'] = list()
 
     # Populate manifest
     rc: RecipeController
@@ -72,7 +72,7 @@ def _generate_manifest(controller_pairs):
             'cloud_apis': list(rc.get_cloud_apis()),
         }
 
-        manifest['recipe_types'].append(recipe_type)
+        manifest['recipe_keys'].append(recipe_type)
         manifest[recipe_type] = recipe_manifest
 
     return manifest
