@@ -21,14 +21,14 @@ def examples():  # Call this function to for examples
 
 
 def get_api_list():
-    with open('info.json', 'r') as fp:
+    with open('manifest.json', 'r') as fp:
         json_data = json.load(fp)
         apis = json_data['cloud_apis']
         return apis
 
 
 def get_api_url():
-    with open('info.json', 'r') as fp:
+    with open('manifest.json', 'r') as fp:
         json_data = json.load(fp)
         url = json_data['rest_api_url']
         return url
