@@ -136,3 +136,9 @@ Further paragraphs come after blank lines.
 
 - Use a hanging indent
 ```
+
+#### Open source projects used
+
+- [django](https://github.com/django/django)
+- [argon-design-system](https://github.com/creativetimofficial/argon-design-system)
+
