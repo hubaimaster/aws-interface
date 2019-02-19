@@ -14,6 +14,7 @@ from core.api import *
 from botocore.errorfactory import ClientError
 from numbers import Number
 from decimal import Decimal
+from threading import Thread
 
 import json
 import base64
@@ -91,6 +92,26 @@ class Util:
                 return float(v)
         return {k: cast_number(v) for k, v in dict_obj.items()}
 
+    @classmethod
+    def init_apis(cls, request, app_id):
+        def _init_api():
+            print('Start init API...')
+            key = 'init_apis-{}'.format(app_id)
+            if cls.get_init_status(request, app_id) == 'progress':
+                return
+            request.session[key] = 'progress'
+            for api_cls in api_list:
+                api = Util.get_api(api_cls, request, app_id)
+                api.apply()
+                Util.save_recipe(api.get_recipe_controller(), app_id)
+            request.session[key] = 'completed'
+            print('Completed init API')
+        Thread(target=_init_api, args=()).start()
+
+    @classmethod
+    def get_init_status(cls, request, app_id):
+        key = 'init_apis-{}'.format(app_id)
+        return request.session.get(key, None)
 
 def page_manage(func):
     def wrap(*args, **kwargs):
@@ -262,12 +283,15 @@ class Overview(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         cmd = request.GET.get('cmd', None)
+        Util.init_apis(request, app_id)
+
         if cmd == 'download_sdk':
+            if not Util.get_init_status(request, app_id):
+                Util.add_alert(request, 'API 를 초기화 하고 있습니다. 상황에 따라 최대 3분 정도 소요될 수 있습니다.')
+                return redirect(request.path_info)
             apis = []
             for api_cls in api_list:
                 api = Util.get_api(api_cls, request, app_id)
-                #api.apply()
-                #Util.save_recipe(api.get_recipe_controller(), app_id)
                 apis.append(api)
 
             sdk_bin = generate_sdk(apis, 'python3')
@@ -337,12 +361,12 @@ class Auth(LoginRequiredMixin, View):
             succeed = api.delete_user_group(name)
             if not succeed:
                 Util.add_alert(request, '시스템 그룹은 삭제할 수 없습니다.')
-            api.apply()
+            #api.apply()
         elif cmd == 'put_group':
             name = request.POST['group_name']
             description = request.POST['group_description']
             api.put_user_group(name, description)
-            api.apply()
+            #api.apply()
         elif cmd == 'set_email_login':
             default_group = request.POST['email_default_group']
             enabled = request.POST['email_enabled']
@@ -351,7 +375,7 @@ class Auth(LoginRequiredMixin, View):
             else:
                 enabled = False
             api.set_email_login(enabled, default_group)
-            api.apply()
+            #api.apply()
         elif cmd == 'set_guest_login':
             default_group = request.POST['guest_default_group']
             enabled = request.POST['guest_enabled']
@@ -360,7 +384,7 @@ class Auth(LoginRequiredMixin, View):
             else:
                 enabled = False
             api.set_guest_login(enabled, default_group)
-            api.apply()
+            #api.apply()
 
         # Service
         elif cmd == 'put_user':
@@ -406,7 +430,7 @@ class Database(LoginRequiredMixin, View):
         if cmd == 'add_partition':
             partition_name = request.POST['partition_name']
             _ = database.put_partition(partition_name)
-            database.apply()
+            #database.apply()
         elif cmd == 'add_item':
             partition = request.POST['partition']
             read_groups = request.POST.getlist('read_groups[]')
