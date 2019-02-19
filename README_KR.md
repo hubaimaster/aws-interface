@@ -132,3 +132,9 @@ Further paragraphs come after blank lines.
 
 - Use a hanging indent
 ```
+
+#### 사용된 오픈소스 프로젝트
+
+- [django](https://github.com/django/django)
+- [argon-design-system](https://github.com/creativetimofficial/argon-design-system)
+
