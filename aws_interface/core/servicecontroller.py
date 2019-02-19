@@ -389,11 +389,12 @@ class DatabaseServiceController(ServiceController):
         return method.do(data, boto3)
 
     @lambda_method
-    def get_items(self, recipe, partition, reverse):
+    def get_items(self, recipe, partition, reverse, start_key):
         import cloud.database.get_items as method
         params = {
             'partition': partition,
             'reverse': reverse,
+            'start_key': start_key,
         }
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session

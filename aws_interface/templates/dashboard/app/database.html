@@ -274,6 +274,7 @@
   <script>
   var partition = null;
   var item_id = null;
+  var start_key = null;
 
   var read_groups = [];
   var write_groups = [];
@@ -297,29 +298,50 @@
       }, function (data) {
           var items = data['items'];
           var end_key = data['end_key'];
-          set_items(items);
+          start_key = end_key;
+          $("#item-table>tbody").empty();
+          append_items(items);
           get_item_count(p, function (data) {
               var ment = "총 " + data['item']["count"] + "개 항목 중 " + items.length + "개";
               $("#item_count").html(ment);
           });
       });
-
   }
-  function set_items(items) {
-      $("#item-table>tbody").empty();
+  function append_items(items) {
       for (var i = 0; i < items.length; i++){
           if (item_ids.includes(items[i]["id"]) == false) {
               item_ids.push(items[i]["id"]);
+              var iid = items[i]["id"];
+              var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\">" +
+                  "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +
+                  "<button onclick='delete_item(\"" + iid + "\");' class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+                  "</th></tr>";
+              $("#item-table").append(row);
           }
       }
-      for (var i = 0; i < item_ids.length; i++){
-          var iid = item_ids[i];
-          var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\">" +
-              "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +
-              "<button onclick='delete_item(\"" + iid + "\");' class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+      var more = "<tr style=\"display:table; width:100%; table-layout:fixed;\">" +
+              "<th style='vertical-align:middle;' onclick=\"append_more_items();\" scope=\"row\">항목 더 보기 +" +
               "</th></tr>";
-          $("#item-table").append(row);
-      }
+      $("#item-table").append(more);
+  }
+  function append_more_items() {
+      $("th[name='partition']").css({backgroundColor: 'white'});
+      $("#" + partition).css({backgroundColor: '#BBB'});
+      $.post("", {
+          cmd: "get_items",
+          partition: partition,
+          start_key: JSON.stringify(start_key),
+      }, function (data) {
+          var _items = data['items'];
+          var end_key = data['end_key'];
+          start_key = end_key;
+          append_items(_items);
+
+          get_item_count(partition, function (data) {
+              var ment = "총 " + data['item']["count"] + "개 항목 중 " + item_ids.length + "개";
+              $("#item_count").html(ment);
+          });
+      });
   }
   function set_item(_item_id) {
       item_fields = [];
@@ -366,6 +388,10 @@
 
   function add_partition(){
       var partition_name = $("#partition-name").val();
+      if (partition_name == null || partition_name.length == 0){
+          alert("파티션 이름을 입력해주세요");
+          return;
+      }
       $.post("", {
           cmd: "add_partition",
           partition_name: partition_name,

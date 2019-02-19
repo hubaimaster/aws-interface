@@ -153,8 +153,8 @@ class DatabaseAPI(API):
     def delete_item(self, item_id):
         return self.service_controller.delete_item(self.recipe_controller.to_json(), item_id)
 
-    def get_items(self, partition, reverse=True):  # New item will be on the top
-        return self.service_controller.get_items(self.recipe_controller.to_json(), partition, reverse)
+    def get_items(self, partition, reverse=True, start_key=None):  # New item will be on the top
+        return self.service_controller.get_items(self.recipe_controller.to_json(), partition, reverse, start_key)
 
     def get_item_count(self, partition):
         return self.service_controller.get_item_count(self.recipe_controller.to_json(), partition)

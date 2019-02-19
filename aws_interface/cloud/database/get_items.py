@@ -1,6 +1,6 @@
 from cloud.aws import *
 from cloud.response import Response
-
+import json
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -8,7 +8,7 @@ info = {
     'input_format': {
         'session_id': 'str',
         'partition': 'str',
-        'start_key': 'str',
+        'start_key': 'dict',
         'limit': 'int=100',
         'reverse': 'bool=False',
     },
@@ -31,6 +31,9 @@ def do(data, boto3):
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
     reverse = params.get('reverse', False)
+
+    if type(start_key) is str:
+        start_key = json.loads(start_key)
 
     table_name = 'database-{}'.format(app_id)
 

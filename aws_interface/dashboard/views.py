@@ -454,7 +454,8 @@ class Database(LoginRequiredMixin, View):
 
         elif cmd == 'get_items':
             partition = request.POST['partition']
-            result = database.get_items(partition)
+            start_key = request.POST.get('start_key', None)
+            result = database.get_items(partition, start_key=start_key)
             result = Util.encode_dict(result)
             return JsonResponse(result)
         elif cmd == 'get_item':
