@@ -96,12 +96,31 @@ class App(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
     user_id = models.CharField(max_length=255)
     name = models.CharField(max_length=255, blank=False, unique=True)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)  # should not be NULL!
 
 
 class Recipe(models.Model):
+    INIT_FAILED = 'FA'
+    INIT_NONE = 'NO'
+    INIT_PROGRESS = 'PR'
+    INIT_SUCCESS = 'SU'
+
+    INIT_STATUS_CHOICES = (
+        (INIT_NONE, 'Not initialized'),
+        (INIT_FAILED, 'Initialization failed'),
+        (INIT_PROGRESS, 'Initializing'),
+        (INIT_SUCCESS, 'Initialized'),
+    )
+
     id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
-    recipe_id = models.CharField(max_length=255)
     recipe_type = models.CharField(max_length=255)
-    app_id = models.CharField(max_length=255)
+    app_id = models.CharField(max_length=255)  # deprecated, use app
     json_string = models.TextField()
+
+    app = models.ForeignKey(App, null=True, on_delete=models.CASCADE)
+
+    init_status = models.CharField(max_length=2, choices=INIT_STATUS_CHOICES, default=INIT_NONE)
+
+    def __str__(self):
+        return 'Recipe: {:10} [{:20}] [{:20}]'.format(self.recipe_type, self.user.email, self.get_init_status_display())
