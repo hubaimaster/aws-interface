@@ -21,16 +21,16 @@ secrets_base = json.loads(open(SECRETS_BASE, 'rt').read())
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = secrets_base['SECRET_KEY']
+# SECRET_KEY = "THIS_IS_FOR_THE_PUBLIC_REMOVE_#_IF_YOU_WANT_TO_TEST"
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
