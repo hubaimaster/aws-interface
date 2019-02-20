@@ -71,9 +71,10 @@ class ServiceController(metaclass=ABCMeta):
 
     def apply_cloud_api(self, recipe_controller):
         """
-        Upload python scripts for the APIs specified in the
-        recipe to AWS Lambda in compressed format. The original python
-        scripts are located in cloud/<recipe_type>
+        Update AWS Lambda functions
+
+        Upload python scripts for the APIs specified in the recipe to AWS Lambda in compressed format.
+        The original python scripts are located in cloud/<recipe_type>
 
         :return:
         """
@@ -114,6 +115,17 @@ class ServiceController(metaclass=ABCMeta):
         print('[{}:{}] apply_cloud_api: {}'.format(self.app_id, recipe_type, 'COMPLETE' if success else 'FAIL'))
 
     def deploy_cloud_api(self, recipe_controller):
+        """
+        Update AWS API Gateway settings
+
+        Update settings in AWS API Gateway, to enable an http gateway to call the AWS Lambda functions
+        that were uploaded via apply_cloud_api().
+
+        Background: AWS API Gateway can be used to set up http endpoints so that client apps can call
+        functions in AWS Lambda, using http requests.
+
+        :return:
+        """
         recipe_type = recipe_controller.get_recipe()
         api_name = '{}-{}'.format(recipe_type, self.app_id)
         func_name = '{}-{}'.format(recipe_type, self.app_id)
