@@ -113,6 +113,7 @@ class Util:
         key = 'init_apis-{}'.format(app_id)
         return request.session.get(key, None)
 
+
 def page_manage(func):
     def wrap(*args, **kwargs):
         try:
