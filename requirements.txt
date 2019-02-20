@@ -1,5 +1,6 @@
 boto3
 django
 pyaes
+mod_wsgi-httpd
 mod-wsgi
 pytest
