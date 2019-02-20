@@ -23,9 +23,6 @@ class RecipeController(metaclass=ABCMeta):
 
     def load_json_string(self, json_string):
         self.data = json.loads(json_string)
-        # self.common_init() this should be named something like update()
-        # currently, there is no use for this
-        # consider redesigning the __init__ function to accept a data variable
 
     def get_recipe(self):
         return type(self).RECIPE
