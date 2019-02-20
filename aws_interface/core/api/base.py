@@ -8,18 +8,18 @@ class API(metaclass=ABCMeta):
     RC_CLASS = None
     SC_CLASS = None
 
-    def __init__(self, bundle, app_id, recipe_json_string=None):
+    def __init__(self, credentials, app_id, recipe_json_string=None):
         """
-        :param bundle:
+        :param credentials:
         :param app_id:
         :param recipe_json_string:
         """
-        self.bundle = bundle
+        self.credentials = credentials
         self.app_id = app_id
         self.recipe_json_string = recipe_json_string
 
         self.recipe_controller = type(self).RC_CLASS()
-        self.service_controller = type(self).SC_CLASS(bundle, app_id)
+        self.service_controller = type(self).SC_CLASS(credentials, app_id)
 
         if self.recipe_json_string:
             self.recipe_controller.load_json_string(self.recipe_json_string)
