@@ -35,7 +35,7 @@ class RecipeController(metaclass=ABCMeta):
             self.data['cloud_apis'] = {}
         try:
             info = importlib.import_module(module).info
-        except:
+        except AttributeError:
             print('{} module does not have an info variable'.format(name))
             info = {}
         self.data['cloud_apis'][name] = {
