@@ -39,11 +39,12 @@ class Util:
     def reset_bundle(cls, request, bundle={}):
         request.session['bundle'] = bundle
 
+    '''
+    DEPRECATED
     @classmethod
     def get_user_id(cls, request):
-        # deprecated
-        warnings.warn('get_user_id is deprecated. ask Namgyu for info')
         return request.user.id
+    '''
 
     @classmethod
     def get_context(cls, request):
