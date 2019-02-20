@@ -28,6 +28,20 @@ class RecipeController(metaclass=ABCMeta):
         return type(self).RECIPE
 
     def put_cloud_api(self, name, module, permissions=['all']):  # 'cloud.auth.login'
+        """
+        Activate cloud api (add field within recipe data dict)
+
+        :param name:
+        E.g., 'login'
+
+        :param module:
+        E.g., 'cloud.auth.login'
+
+        :param permissions:
+        List of groups who has API call permission
+
+        :return:
+        """
         if 'cloud_apis' not in self.data:
             self.data['cloud_apis'] = {}
         try:
