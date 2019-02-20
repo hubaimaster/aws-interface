@@ -14,8 +14,7 @@ import os
 from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(BASE_DIR)
-SECRETS_DIR = os.path.join(ROOT_DIR, 'secret')
+SECRETS_DIR = os.path.join(BASE_DIR, 'secret')
 SECRETS_BASE = os.path.join(SECRETS_DIR, 'base.json')
 
 try:
