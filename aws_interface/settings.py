@@ -18,7 +18,7 @@ SECRETS_DIR = os.path.join(BASE_DIR, 'secret')
 SECRETS_BASE = os.path.join(SECRETS_DIR, 'base.json')
 
 try:
-    secrets_base = json.loads(open(SECRETS_BASE, 'rt').read())
+    secrets_base = json.load(open(SECRETS_BASE, 'rt'))
 except FileNotFoundError:
     raise ImproperlyConfigured('Could not find secret file {}'.format(SECRETS_BASE))
 
