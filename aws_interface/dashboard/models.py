@@ -4,7 +4,6 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 import uuid
 from contextlib import contextmanager
 import cloud.shortuuid as shortuuid
-from core import recipe_controller
 import core.api
 
 
@@ -104,7 +103,7 @@ class App(models.Model):
         unique_together = ('name', 'user')
 
     def assign_all_recipes(self):
-        for recipe in recipe_controller.recipes:
+        for recipe in core.api.recipe_list:
             self.recipe_set.create(name=recipe)
 
     def init_recipes(self):
