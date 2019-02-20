@@ -1,5 +1,6 @@
 .idea/
 secret
+secret.tar
 
 # macOS
 .DS_Store
