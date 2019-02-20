@@ -572,6 +572,7 @@ class IAM:
 
     def create_role_and_attach_policies(self, role_name):
         policy_arns = [
+            'arn:aws:iam::aws:policy/AWSLambdaRole',
             'arn:aws:iam::aws:policy/AWSLambdaExecute',
             'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
             'arn:aws:iam::aws:policy/AmazonS3FullAccess',
