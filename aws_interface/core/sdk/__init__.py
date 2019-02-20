@@ -65,7 +65,7 @@ def _generate_manifest(controller_pairs):
     rc: RecipeController
     sc: ServiceController
     for rc, sc in controller_pairs:
-        recipe_type = rc.get_recipe_type()
+        recipe_type = rc.get_recipe()
 
         recipe_manifest = {
             'rest_api_url': sc.get_rest_api_url(rc),
