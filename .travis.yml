@@ -12,3 +12,4 @@ before_install:
   -in aws_interface/secret.tar.enc -out aws_interface/secret.tar -d
 - cd aws_interface
 - tar -xvf secret.tar
+- cd ..
