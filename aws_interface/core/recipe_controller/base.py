@@ -27,8 +27,8 @@ class RecipeController(metaclass=ABCMeta):
         # currently, there is no use for this
         # consider redesigning the __init__ function to accept a data variable
 
-    def get_recipe_type(self):
-        return type(self).RECIPE_TYPE
+    def get_recipe(self):
+        return type(self).RECIPE
 
     def put_cloud_api(self, name, module, permissions=['all']):  # 'cloud.auth.login'
         if 'cloud_apis' not in self.data:
