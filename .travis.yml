@@ -2,10 +2,13 @@ language: python
 python:
 - '3.6'
 install: pip install -r requirements.txt
+
 script:
 - python aws_interface/manage.py test
+
 before_install:
+
 - openssl aes-256-cbc -K $encrypted_2c712f5ad90c_key -iv $encrypted_2c712f5ad90c_iv
-  -in secret.tar.enc -out secret.tar
-  -tar -xvf secret.tar
-  -d
+  -in secret.tar.enc -out secret.tar -d
+
+- tar -xvf secret.tar
