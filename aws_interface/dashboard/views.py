@@ -269,7 +269,7 @@ class Apps(LoginRequiredMixin, View):
     @page_manage
     def post(self, request): # create app
         name = request.POST['name']
-        user_id = Util.get_user_id(request)
+        user_id = request.user.id
         app = App.objects.filter(name=name)
         if app:
             Util.add_alert(request, '같은 이름의 어플리케이션이 존재합니다')
