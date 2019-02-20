@@ -127,4 +127,7 @@ class Recipe(models.Model):
     init_status = models.CharField(max_length=2, choices=INIT_STATUS_CHOICES, default=INIT_NONE)
 
     def __str__(self):
-        return 'Recipe: {:10} [{:20}] [{:20}]'.format(self.recipe_type, self.user.email, self.get_init_status_display())
+        tag = self.name.title() + ' Recipe'
+        owner = '{}:{}'.format(self.app.user.email, self.app.name)
+        init = self.get_init_status_display()
+        return '{:10} [{:30}] [{:20}]'.format(tag, owner, init)
