@@ -1,5 +1,6 @@
 .idea/
 test*
+/.secrets
 
 # macOS
 .DS_Store
