@@ -165,7 +165,6 @@ class Recipe(models.Model):
         yield api
         self.save_recipe(api)
 
-
     def init(self, credentials):
         api = self.get_api(credentials)
         api.apply()  # wtf? >> ask developers plz. no time to explain
