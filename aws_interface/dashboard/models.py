@@ -1,12 +1,12 @@
+from threading import Thread
+from contextlib import contextmanager
+import uuid
+import traceback
 from django.db import models, transaction
 from dashboard.security.crypto import AESCipher
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-import uuid
-from contextlib import contextmanager
 import cloud.shortuuid as shortuuid
 import core.api
-from threading import Thread
-import traceback
 
 
 class UserManager(BaseUserManager):
@@ -110,14 +110,36 @@ class App(models.Model):
         for recipe in core.api.recipe_list:
             self.recipe_set.create(name=recipe)
 
+    def all_applied(self):
+        """
+        Check if all recipes are applied
+        :return:
+        """
+        recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
+        return len(recipes) == 0
+
+    def generate_sdk(self, credentials):
+        """
+        :return:
+        None if recipes are not applied yet
+        """
+        if not self.all_applied():
+            return None
+        else:
+            recipes = self.recipe_set.all()
+            apis = []
+            for recipe in recipes:
+                apis.append(recipe.get_api(credentials))
+            return core.api.generate_sdk(apis)
+
+
     def apply_recipes(self, credentials):
         """
         Start a thread to apply all recipes.
         :return:
         If all recipes were already apply, return True.
         """
-        recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
-        if len(recipes) == 0:
+        if self.all_applied():
             return True
 
         run = False
@@ -127,6 +149,7 @@ class App(models.Model):
                 App.objects.filter(id=self.id).update(applying_in_background=False)
                 run = True
         if run:
+            recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
             def _apply_api():
                 for recipe in recipes:
                     try:
