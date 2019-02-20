@@ -77,7 +77,7 @@ class ServiceController(metaclass=ABCMeta):
 
         :return:
         """
-        recipe_type = recipe_controller.get_recipe_type()
+        recipe_type = recipe_controller.get_recipe()
         print('[{}:{}] apply_cloud_api: START'.format(self.app_id, recipe_type))
 
         role_name = '{}-{}'.format(recipe_type, self.app_id)
@@ -114,7 +114,7 @@ class ServiceController(metaclass=ABCMeta):
         print('[{}:{}] apply_cloud_api: {}'.format(self.app_id, recipe_type, 'COMPLETE' if success else 'FAIL'))
 
     def deploy_cloud_api(self, recipe_controller):
-        recipe_type = recipe_controller.get_recipe_type()
+        recipe_type = recipe_controller.get_recipe()
         api_name = '{}-{}'.format(recipe_type, self.app_id)
         func_name = '{}-{}'.format(recipe_type, self.app_id)
         print('[{}:{}] deploy_cloud_api: START'.format(self.app_id, recipe_type))
@@ -124,7 +124,7 @@ class ServiceController(metaclass=ABCMeta):
 
     def get_rest_api_url(self, recipe_controller):
         api_client = APIGateway(self.boto3_session)
-        recipe_type = recipe_controller.get_recipe_type()
+        recipe_type = recipe_controller.get_recipe()
         api_name = '{}-{}'.format(recipe_type, self.app_id)
         func_name = '{}-{}'.format(recipe_type, self.app_id)
         api_url = api_client.get_rest_api_url(api_name, func_name)

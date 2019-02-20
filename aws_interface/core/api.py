@@ -44,7 +44,7 @@ class API(metaclass=ABCMeta):  # Abstract class
         return self.service_controller.get_rest_api_url(self.recipe_controller)
 
     @classmethod
-    def get_recipe_type(cls):
+    def get_recipe(cls):
         return cls.RC_CLASS.RECIPE
 
 

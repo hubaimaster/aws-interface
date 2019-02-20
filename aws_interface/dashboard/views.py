@@ -54,7 +54,7 @@ class Util:
 
     @classmethod
     def get_api(cls, api_class, request, app_id):
-        recipe = Recipe.objects.filter(app_id=app_id, recipe_type=api_class.RC_CLASS.RECIPE_TYPE).first()
+        recipe = Recipe.objects.filter(app_id=app_id, recipe_type=api_class.get_recipe()).first()
         if recipe:
             recipe_json_string = recipe.json_string
         else:
@@ -64,12 +64,12 @@ class Util:
 
     @classmethod
     def save_recipe(cls, recipe_controller, app_id):
-        recipe_obj = Recipe.objects.filter(app_id=app_id, recipe_type=recipe_controller.get_recipe_type()).first()
+        recipe_obj = Recipe.objects.filter(app_id=app_id, recipe_type=recipe_controller.get_recipe()).first()
         if recipe_obj is None:
             recipe_obj = Recipe()
         recipe_obj.app_id = app_id
         recipe_obj.json_string = recipe_controller.to_json()
-        recipe_obj.recipe_type = recipe_controller.get_recipe_type()
+        recipe_obj.recipe_type = recipe_controller.get_recipe()
         recipe_obj.save()
 
     @classmethod
