@@ -45,7 +45,7 @@ class API(metaclass=ABCMeta):  # Abstract class
 
     @classmethod
     def get_recipe_type(cls):
-        return cls.RC_CLASS.RECIPE_TYPE
+        return cls.RC_CLASS.RECIPE
 
 
 class BillAPI(API):

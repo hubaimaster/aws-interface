@@ -2,7 +2,7 @@ from .base import RecipeController
 
 
 class StorageRecipeController(RecipeController):
-    RECIPE_TYPE = 'storage'
+    RECIPE = 'storage'
 
     def __init__(self):
         super(StorageRecipeController, self).__init__()

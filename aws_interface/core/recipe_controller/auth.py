@@ -2,7 +2,7 @@ from .base import RecipeController
 
 
 class AuthRecipeController(RecipeController):
-    RECIPE_TYPE = 'auth'
+    RECIPE = 'auth'
 
     def __init__(self):
         super(AuthRecipeController, self).__init__()

@@ -2,7 +2,7 @@ from .base import RecipeController
 
 
 class DatabaseRecipeController(RecipeController):
-    RECIPE_TYPE = 'database'
+    RECIPE = 'database'
 
     def __init__(self):
         super(DatabaseRecipeController, self).__init__()

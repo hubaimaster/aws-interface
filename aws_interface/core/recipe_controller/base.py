@@ -5,9 +5,9 @@ from abc import ABCMeta
 
 class RecipeController(metaclass=ABCMeta):
     """
-    Make sure to set RECIPE_TYPE when you inherit this class.
+    Make sure to set RECIPE when you inherit this class.
     """
-    RECIPE_TYPE = None
+    RECIPE = None
 
     def __init__(self):
         """
@@ -15,8 +15,8 @@ class RecipeController(metaclass=ABCMeta):
         CALL THIS BASE __init__ FUNCTION.
         """
         self.data = dict()
-        assert (type(self).RECIPE_TYPE is not None)
-        self.data['recipe_type'] = type(self).RECIPE_TYPE
+        assert (type(self).RECIPE is not None)
+        self.data['recipe_type'] = type(self).RECIPE
 
     def to_json(self):
         return json.dumps(self.data)
