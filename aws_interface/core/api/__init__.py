@@ -6,6 +6,7 @@ from .storage import StorageAPI
 from .sdk import generate_sdk
 
 
+from core.recipe_controller import recipe_list
 api_list = [
     BillAPI, AuthAPI, DatabaseAPI, StorageAPI
 ]
