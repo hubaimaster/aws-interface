@@ -116,6 +116,7 @@ class ServiceController(metaclass=ABCMeta):
         recipe = recipe_controller.to_json()
         zip_file = create_lambda_zipfile_bin(self.app_id, recipe, module_path)
 
+        success = True
         try:
             lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
         except BaseException as ex:
@@ -123,12 +124,13 @@ class ServiceController(metaclass=ABCMeta):
             # print('Function might already exist, Try updating function code.')
             try:
                 lambda_client.update_function_code(name, zip_file)
+                print('[{}:{}] apply_cloud_api: {}'.format(self.app_id, recipe_type, 'RETRY'))
             except BaseException as ex:
-                print('[{}:{}] apply_cloud_api: ERROR'.format(self.app_id, recipe_type))
+                success = False
                 # print(ex)
                 # print('Update function failed')
 
-        print('[{}:{}] apply_cloud_api: COMPLETE'.format(self.app_id, recipe_type))
+        print('[{}:{}] apply_cloud_api: {}'.format(self.app_id, recipe_type, 'COMPLETE' if success else 'FAIL'))
 
     def deploy_cloud_api(self, recipe_controller):
         recipe_type = recipe_controller.get_recipe_type()

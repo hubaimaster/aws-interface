@@ -103,7 +103,7 @@ class Util:
             print('[{}] init_apis: START'.format(app_id))
             request.session[key] = 'progress'
             for api_cls in api_list:
-                print('[{}] init_apis: Initializing {}'.format(app_id, api_cls.get_recipe_type()))
+                print('[{}] init_apis: INITIALIZING {}'.format(app_id, api_cls.get_recipe_type().upper()))
                 api = Util.get_api(api_cls, request, app_id)
                 api.apply()
                 Util.save_recipe(api.get_recipe_controller(), app_id)
