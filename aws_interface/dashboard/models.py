@@ -1,10 +1,12 @@
-from django.db import models
+from django.db import models, transaction
 from dashboard.security.crypto import AESCipher
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import uuid
 from contextlib import contextmanager
 import cloud.shortuuid as shortuuid
 import core.api
+from threading import Thread
+import traceback
 
 
 class UserManager(BaseUserManager):
@@ -99,6 +101,8 @@ class App(models.Model):
     name = models.CharField(max_length=255, blank=False, unique=True)
     user = models.ForeignKey(User, null=True)  # should not be NULL from now on
 
+    applying_in_background = models.BooleanField(default=False)
+
     class Meta:
         unique_together = ('name', 'user')
 
@@ -106,25 +110,55 @@ class App(models.Model):
         for recipe in core.api.recipe_list:
             self.recipe_set.create(name=recipe)
 
-    def init_recipes(self):
+    def apply_recipes(self, credentials):
         """
-        Start a thread to initialize all recipes.
+        Start a thread to apply all recipes.
         :return:
-        If all recipes were already initialized, return True.
+        If all recipes were already apply, return True.
         """
+        recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
+        if len(recipes) == 0:
+            return True
+
+        run = False
+        with transaction.atomic():
+            app = App.objects.get(id=self.id)
+            if not app.applying_in_background:
+                App.objects.filter(id=self.id).update(applying_in_background=False)
+                run = True
+        if run:
+            def _apply_api():
+                for recipe in recipes:
+                    try:
+                        print('APPLY API START: {}'.format(str(recipe)))
+                        recipe.apply(credentials)
+                        print('APPLY API END:   {}'.format(str(recipe)))
+                        # in case Recipe in DB has changed
+                        self.recipe_set.filter(id=recipe.id).update(apply_status=Recipe.APPLY_SUCCESS)
+                    except Exception as e:
+                        print('APPLY API ERROR: {}'.format(str(recipe)))
+                        # in case Recipe in DB has changed
+                        self.recipe_set.filter(id=recipe.id).update(apply_status=Recipe.APPLY_FAILED)
+                        print(traceback.format_exc())
+                        print(e)
+                # in case App in DB has changed
+                App.objects.all().filter(id=self.id).update(applying_in_background=False)
+            Thread(target=_apply_api, args=()).start()
+        return False
 
 
 class Recipe(models.Model):
-    INIT_FAILED = 'FA'
-    INIT_NONE = 'NO'
-    INIT_PROGRESS = 'PR'
-    INIT_SUCCESS = 'SU'
+    APPLY_FAILED = 'FA'
+    APPLY_NONE = 'NO'
+    APPLY_PROGRESS = 'PR'
+    APPLY_WAITING = 'WA'
+    APPLY_SUCCESS = 'SU'
 
-    INIT_STATUS_CHOICES = (
-        (INIT_NONE, 'Not initialized'),
-        (INIT_FAILED, 'Initialization failed'),
-        (INIT_PROGRESS, 'Initializing'),
-        (INIT_SUCCESS, 'Initialized'),
+    APPLY_STATUS_CHOICES = (
+        (APPLY_NONE, 'Not applied'),
+        (APPLY_FAILED, 'Apply failed'),
+        (APPLY_PROGRESS, 'Applying'),
+        (APPLY_SUCCESS, 'Applied'),
     )
 
     id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
@@ -132,12 +166,12 @@ class Recipe(models.Model):
     name = models.CharField(max_length=255, editable=False)
     json_string = models.TextField(default='')
     app = models.ForeignKey(App, null=True)  # should not be NULL from now on
-    init_status = models.CharField(max_length=2, choices=INIT_STATUS_CHOICES, default=INIT_NONE)
+    apply_status = models.CharField(max_length=2, choices=APPLY_STATUS_CHOICES, default=APPLY_NONE)
 
     def __str__(self):
         tag = self.name.title() + ' Recipe'
         owner = '{}:{}'.format(self.app.user.email, self.app.name)
-        init = self.get_init_status_display()
+        init = self.get_apply_status_display()
         return '{:10} [{:30}] [{:20}]'.format(tag, owner, init)
 
     def get_api(self, credentials):
@@ -164,6 +198,9 @@ class Recipe(models.Model):
         api = self.get_api(credentials)
         yield api
         self.save_recipe(api)
+
+    def apply(self, credentials):
+        self.get_api(credentials).apply()
 
     def init(self, credentials):
         api = self.get_api(credentials)
