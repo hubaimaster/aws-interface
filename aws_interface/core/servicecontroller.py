@@ -97,6 +97,8 @@ class ServiceController(metaclass=ABCMeta):
         :return:
         """
         recipe_type = recipe_controller.get_recipe_type()
+        print('[{}:{}] apply_cloud_api: START'.format(self.app_id, recipe_type))
+
         role_name = '{}-{}'.format(recipe_type, self.app_id)
         lambda_client = Lambda(self.boto3_session)
         iam = IAM(self.boto3_session)
@@ -117,20 +119,25 @@ class ServiceController(metaclass=ABCMeta):
         try:
             lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
         except BaseException as ex:
-            print(ex)
-            print('Function might already exist, Try updating function code.')
+            # print(ex)
+            # print('Function might already exist, Try updating function code.')
             try:
                 lambda_client.update_function_code(name, zip_file)
             except BaseException as ex:
-                print(ex)
-                print('Update function failed')
+                print('[{}:{}] apply_cloud_api: ERROR'.format(self.app_id, recipe_type))
+                # print(ex)
+                # print('Update function failed')
+
+        print('[{}:{}] apply_cloud_api: COMPLETE'.format(self.app_id, recipe_type))
 
     def deploy_cloud_api(self, recipe_controller):
         recipe_type = recipe_controller.get_recipe_type()
         api_name = '{}-{}'.format(recipe_type, self.app_id)
         func_name = '{}-{}'.format(recipe_type, self.app_id)
+        print('[{}:{}] deploy_cloud_api: START'.format(self.app_id, recipe_type))
         api_gateway = APIGateway(self.boto3_session)
         api_gateway.connect_with_lambda(api_name, func_name)
+        print('[{}:{}] deploy_cloud_api: COMPLETE'.format(self.app_id, recipe_type))
 
     def get_rest_api_url(self, recipe_controller):
         api_client = APIGateway(self.boto3_session)
