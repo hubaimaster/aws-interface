@@ -10,5 +10,6 @@ before_install:
 
 - openssl aes-256-cbc -K $encrypted_2c712f5ad90c_key -iv $encrypted_2c712f5ad90c_iv
   -in aws_interface/secret.tar.enc -out aws_interface/secret.tar -d
-
-- tar -xvf aws_interface/secret.tar
+- cd aws_interface
+- tar -xvf secret.tar
+- cd ..
