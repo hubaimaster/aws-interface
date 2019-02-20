@@ -1,5 +1,6 @@
 ![Language](https://img.shields.io/badge/Language-Python3.6-blue.svg)
 ![Language](https://img.shields.io/badge/NaverFest-Finalist-brightgreen.svg)
+[![Build Status](https://travis-ci.org/hubaimaster/aws-interface.svg?branch=master)](https://travis-ci.org/hubaimaster/aws-interface)
 
 **[WE R Naver D2 Fest Finalists!](https://github.com/D2CampusFest/6th)**
 
