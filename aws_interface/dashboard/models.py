@@ -2,8 +2,10 @@ from django.db import models
 from dashboard.security.crypto import AESCipher
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import uuid
+from contextlib import contextmanager
 import cloud.shortuuid as shortuuid
 from core import recipe_controller
+import core.api
 
 
 class UserManager(BaseUserManager):
@@ -105,6 +107,13 @@ class App(models.Model):
         for recipe in recipe_controller.recipes:
             self.recipe_set.create(name=recipe)
 
+    def init_recipes(self):
+        """
+        Start a thread to initialize all recipes.
+        :return:
+        If all recipes were already initialized, return True.
+        """
+
 
 class Recipe(models.Model):
     INIT_FAILED = 'FA'
@@ -121,7 +130,7 @@ class Recipe(models.Model):
 
     id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, editable=False)
     json_string = models.TextField(default='')
     app = models.ForeignKey(App, null=True)  # should not be NULL from now on
     init_status = models.CharField(max_length=2, choices=INIT_STATUS_CHOICES, default=INIT_NONE)
@@ -131,3 +140,33 @@ class Recipe(models.Model):
         owner = '{}:{}'.format(self.app.user.email, self.app.name)
         init = self.get_init_status_display()
         return '{:10} [{:30}] [{:20}]'.format(tag, owner, init)
+
+    def get_api(self, credentials):
+        api_cls = core.api.api_dict[self.name]
+        return api_cls(credentials, self.app.id, self.json_string)
+
+    def save_recipe(self, api: core.api.API):
+        self.json_string = api.get_recipe_controller().to_json()
+        self.save()
+
+    @contextmanager
+    def api(self, credentials):
+        """
+        You can do this:
+            with recipe.api() as api:
+                use(api)
+        Instead of this:
+            api = recipe.api()
+            use(api)
+            recipe.save_recipe(api)
+        :param credentials:
+        :return:
+        """
+        api = self.get_api(credentials)
+        yield api
+        self.save_recipe(api)
+
+
+    def init(self, credentials):
+        api = self.get_api(credentials)
+        api.apply()  # wtf? >> ask developers plz. no time to explain
