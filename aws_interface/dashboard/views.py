@@ -95,23 +95,26 @@ class Util:
     @classmethod
     def init_apis(cls, request, app_id):
         def _init_api():
-            print('Start init API...')
             key = 'init_apis-{}'.format(app_id)
             if cls.get_init_status(request, app_id) == 'progress':
+                print('[{}] init_apis: IGNORE (IN PROGRESS)'.format(app_id))
                 return
+            print('[{}] init_apis: START'.format(app_id))
             request.session[key] = 'progress'
             for api_cls in api_list:
+                print('[{}] init_apis: Initializing {}'.format(app_id, api_cls.get_recipe_type()))
                 api = Util.get_api(api_cls, request, app_id)
                 api.apply()
                 Util.save_recipe(api.get_recipe_controller(), app_id)
             request.session[key] = 'completed'
-            print('Completed init API')
+            print('[{}] init_apis: COMPLETE'.format(app_id))
         Thread(target=_init_api, args=()).start()
 
     @classmethod
     def get_init_status(cls, request, app_id):
         key = 'init_apis-{}'.format(app_id)
         return request.session.get(key, None)
+
 
 def page_manage(func):
     def wrap(*args, **kwargs):
