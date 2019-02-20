@@ -1,6 +1,6 @@
 .idea/
-secret
-secret.tar
+aws_interface/secret
+aws_interface/secret.tar
 
 # macOS
 .DS_Store
