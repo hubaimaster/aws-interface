@@ -3,6 +3,7 @@ from dashboard.security.crypto import AESCipher
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import uuid
 import cloud.shortuuid as shortuuid
+from core import recipe_controller
 
 
 class UserManager(BaseUserManager):
@@ -94,9 +95,15 @@ class User(AbstractUser):
 class App(models.Model):
     id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
-    user_id = models.CharField(max_length=255)
     name = models.CharField(max_length=255, blank=False, unique=True)
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)  # should not be NULL!
+    user = models.ForeignKey(User, null=True)  # should not be NULL from now on
+
+    class Meta:
+        unique_together = ('name', 'user')
+
+    def assign_all_recipes(self):
+        for recipe in recipe_controller.recipes:
+            self.recipe_set.create(name=recipe)
 
 
 class Recipe(models.Model):
@@ -114,12 +121,9 @@ class Recipe(models.Model):
 
     id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
-    recipe_type = models.CharField(max_length=255)
-    app_id = models.CharField(max_length=255)  # deprecated, use app
-    json_string = models.TextField()
-
-    app = models.ForeignKey(App, null=True, on_delete=models.CASCADE)
-
+    name = models.CharField(max_length=255)
+    json_string = models.TextField(default='')
+    app = models.ForeignKey(App, null=True)  # should not be NULL from now on
     init_status = models.CharField(max_length=2, choices=INIT_STATUS_CHOICES, default=INIT_NONE)
 
     def __str__(self):
