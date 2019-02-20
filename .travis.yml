@@ -7,4 +7,5 @@ install: "sudo apt-get install httpd-devel"
 install: "pip install --upgrade setuptools"
 install: "pip install -r requirements.txt"
 # command to run tests
-script: pytest test/main.py
+script:
+   - python aws_interface/manage.py test
