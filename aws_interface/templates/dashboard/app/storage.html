@@ -244,13 +244,7 @@
                         <td>{{ item.read_groups }}</td>
                         <td>{{ item.write_groups }}</td>
                         <td>
-                            {% if item.type == 'file' %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger">수정</button>
-                            <button onclick="delete_file('{{ item.path }}')" class="btn btn-sm btn-danger">제거</button>
-                            {% elif item.type == 'folder' %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger">수정</button>
-                            <button onclick="delete_folder('{{ item.path }}')" class="btn btn-sm btn-danger">제거</button>
-                            {% endif %}
+                            <button onclick="delete_path('{{ item.path }}')" class="btn btn-sm btn-danger">제거</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -275,8 +269,6 @@
 
   <script>
 
-    var prev_path = "/";
-    var current_path = "/";
     var folder_read_groups = [];
     var folder_write_groups = [];
 
@@ -290,48 +282,6 @@
       file_write_groups.push('{{ user_group.name }}');
     {% endfor %}
 
-    function render_folder(folder_path) {
-        prev_path = folder_path.split("/");
-        prev_path.pop();
-        prev_path = prev_path.join("/");
-        if (!prev_path.startsWith("/")){
-            prev_path = "/" + prev_path;
-        }
-        current_path = folder_path
-        $("#dir-table>tbody").empty();
-        $("#path-name").html("<a href='#' onclick=\"render_folder('" + prev_path + "')\">" + prev_path + "</a> .. " + folder_path);
-        $("#folder-parent-path").val(current_path);
-        $("#file-parent-path").val(current_path);
-        $.post("", {
-            cmd: "get_folder_list",
-            folder_path: folder_path,
-        }, function (data) {
-            var items = data["items"];
-            for (var i = 0; i < items.length; i++){
-                var item = items[i];
-                var func = "";
-                if (item["type"] == "folder"){
-                    var path = item["path"];
-                    func = "render_folder('" + path + "');";
-                }else if (item["type"] == "file"){
-                    var path = item["path"];
-                    func = "download_file('" + path + "');";
-                }
-                var row =   "<tr>" +
-                                "<th scope=\"row\"><a onclick=\"" + func + "\" href=''\>" + item["name"] + "</a></th>" +
-                                "<td>" + item["type"] + "</td>" +
-                                "<td>" + item["creationDate"] + "</td>" +
-                                "<td>" + item["read_groups"] + "</td>" +
-                                "<td>" + item["write_groups"] + "</td>" +
-                                "<td>" +
-                                    "<button type=\"submit\" class=\"btn btn-sm btn-outline-danger\">수정</button>" +
-                                    "<button type=\"submit\" class=\"btn btn-sm btn-danger\">제거</button>" +
-                                "</td>\n" +
-                            "</tr>";
-                $("#dir-table>tbody").append(row);
-            }
-        });
-    }
     function create_folder(parent_path, folder_name, read_groups, write_groups) {
         $.post("", {
             cmd: "create_folder",
@@ -446,19 +396,10 @@
         render_folder_write_groups();
     }
 
-    function delete_file(file_path){
+    function delete_path(path){
         $.post("", {
-            cmd: 'delete_file',
-            file_path: file_path,
-        }, function (data) {
-            window.location.reload();
-        });
-    }
-
-    function delete_folder(folder_path){
-        $.post("", {
-            cmd: 'delete_folder',
-            folder_path: folder_path,
+            cmd: 'delete_path',
+            path: path,
         }, function (data) {
             window.location.reload();
         });
