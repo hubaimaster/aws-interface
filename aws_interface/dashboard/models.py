@@ -118,7 +118,7 @@ class App(models.Model):
         recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
         return len(recipes) == 0
 
-    def generate_sdk(self, credentials):
+    def generate_sdk(self, credentials, platform):
         """
         :return:
         None if recipes are not applied yet
@@ -130,8 +130,7 @@ class App(models.Model):
             apis = []
             for recipe in recipes:
                 apis.append(recipe.get_api(credentials))
-            return core.api.generate_sdk(apis)
-
+            return core.api.generate_sdk(apis, platform)
 
     def apply_recipes(self, credentials):
         """
