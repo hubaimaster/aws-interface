@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 SECRETS_DIR = os.path.join(ROOT_DIR, 'secret')
 SECRETS_BASE = os.path.join(SECRETS_DIR, 'base.json')
-secrets_base = json.loads(open(SECRETS_BASE, 'rt').read())
+secrets_base = json.load(open(SECRETS_BASE, 'rt'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = secrets_base['SECRET_KEY']
