@@ -123,8 +123,8 @@ class ServiceController(metaclass=ABCMeta):
             # print(ex)
             # print('Function might already exist, Try updating function code.')
             try:
-                lambda_client.update_function_code(name, zip_file)
                 print('[{}:{}] apply_cloud_api: {}'.format(self.app_id, recipe_type, 'RETRY'))
+                lambda_client.update_function_code(name, zip_file)
             except BaseException as ex:
                 success = False
                 # print(ex)
