@@ -20,6 +20,7 @@ class API(metaclass=ABCMeta):
 
         self.recipe_controller = type(self).RC_CLASS()
         self.service_controller = type(self).SC_CLASS(credentials, app_id)
+        self.recipe = type(self).RC_CLASS.RECIPE
 
         if self.recipe_json_string:
             self.recipe_controller.load_json_string(self.recipe_json_string)
