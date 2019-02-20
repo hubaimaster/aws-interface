@@ -11,13 +11,17 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 import json
 import os
+from django.core.exceptions import ImproperlyConfigured
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 SECRETS_DIR = os.path.join(ROOT_DIR, 'secret')
 SECRETS_BASE = os.path.join(SECRETS_DIR, 'base.json')
-secrets_base = json.loads(open(SECRETS_BASE, 'rt').read())
+
+try:
+    secrets_base = json.loads(open(SECRETS_BASE, 'rt').read())
+except FileNotFoundError:
+    raise ImproperlyConfigured('Could not find secret file {}'.format(SECRETS_BASE))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = secrets_base['SECRET_KEY']
