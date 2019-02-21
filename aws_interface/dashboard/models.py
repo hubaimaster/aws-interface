@@ -1,3 +1,4 @@
+import time
 from threading import Thread
 from contextlib import contextmanager
 import uuid
@@ -132,7 +133,7 @@ class App(models.Model):
                 apis.append(recipe.get_api(credentials))
             return core.api.generate_sdk(apis, platform)
 
-    def apply_recipes(self, credentials):
+    def apply_recipes(self, credentials, initial=False):
         """
         Start a thread to apply all recipes.
         :return:
@@ -145,7 +146,7 @@ class App(models.Model):
         with transaction.atomic():
             app = App.objects.get(id=self.id)
             if not app.applying_in_background:
-                App.objects.filter(id=self.id).update(applying_in_background=False)
+                App.objects.filter(id=self.id).update(applying_in_background=True)
                 run = True
         if run:
             recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
