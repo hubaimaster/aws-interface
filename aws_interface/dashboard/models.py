@@ -169,7 +169,7 @@ class App(models.Model):
                     recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
                     if recipes.count() != 0:
                         print("{} APPLY'S LEFT: RETRYING SOON...".format(recipes.count()))
-                        time.sleep(10)
+                        time.sleep(35)
                     else:
                         print("APPLY COMPLETE")
                         break
