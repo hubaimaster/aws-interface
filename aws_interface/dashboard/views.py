@@ -117,6 +117,17 @@ class Util:
         key = 'init_apis-{}'.format(app_id)
         return request.session.get(key, None)
 
+    @classmethod
+    def is_valid_access_key(cls, aws_access_key, aws_secret_key):
+        if not aws_access_key:
+            return False
+        if not aws_secret_key:
+            return False
+        if len(aws_access_key) < 4:
+            return False
+        if len(aws_secret_key) < 4:
+            return False
+        return True
 
 def page_manage(func):
     def wrap(*args, **kwargs):
@@ -175,7 +186,15 @@ class AccessKey(LoginRequiredMixin, View):
         password = request.POST['password']
         access_key = request.POST['access_key']
         secret_key = request.POST['secret_key']
-        # Check AccessKey.. TODO
+
+        if not request.user.check_password(password):
+            Util.add_alert(request, '비밀번호가 틀렸습니다.')
+            return redirect('apps')
+
+        if not Util.is_valid_access_key(access_key, secret_key):
+            Util.add_alert(request, '유효한 AccessKey 를 입력해주세요.')
+            return redirect('apps')
+
         request.user.set_aws_credentials(password, access_key, secret_key)
         request.user.save()
 
@@ -211,7 +230,7 @@ class Register(View):
         elif len(password) < 7:
             Util.add_alert(request, '비밀번호는 7자 이상입니다.')
             return redirect('register')
-        elif not aws_access_key or not aws_secret_key or len(aws_access_key) < 4 or len(aws_secret_key) < 4:
+        elif not Util.is_valid_access_key(aws_access_key, aws_secret_key):
             Util.add_alert(request, '유효한 AccessKey 를 입력해주세요.')
             return redirect('register')
         else:
@@ -274,6 +293,9 @@ class Apps(LoginRequiredMixin, View):
     @page_manage
     def post(self, request): # create app
         name = request.POST['name']
+        if not name or len(name) < 3:
+            Util.add_alert(request, '이름은 3글자 이상입니다')
+            return redirect('apps')
         user_id = request.user.id
         app = App.objects.filter(name=name)
         if app:
