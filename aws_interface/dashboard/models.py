@@ -169,6 +169,9 @@ class App(models.Model):
             Thread(target=_apply_api, args=()).start()
         return False
 
+    def __str__(self):
+        return self.name
+
 
 class Recipe(models.Model):
     APPLY_FAILED = 'FA'
