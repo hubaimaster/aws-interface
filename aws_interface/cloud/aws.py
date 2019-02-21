@@ -102,13 +102,13 @@ class APIGateway:
         post_source_arn = self.get_source_arn(uri_data, 'POST')
         #get_source_arn = self.get_source_arn(uri_data, 'GET')
 
-        print('add_permission post')
+        print('put_permission post'.center(80, '-'))
         self.put_permission(lambda_func_name, post_source_arn)
 
         #print('add_permission get')
         #self.put_permission(lambda_func_name, get_source_arn)
 
-        print('create_deployment')
+        print('create_deployment'.center(80, '-'))
         api_client.create_deployment(
             restApiId=rest_api_id,
             stageName=stage_name,
