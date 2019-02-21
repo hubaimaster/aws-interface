@@ -633,6 +633,7 @@ class IAM:
         account_id = self.resource.CurrentUser().arn.split(':')[4]
         return account_id
 
+
 class CostExplorer:
     def __init__(self, boto3_session):
         self.client = boto3_session.client('ce', 'us-east-1')
