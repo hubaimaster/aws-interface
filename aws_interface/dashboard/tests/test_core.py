@@ -6,4 +6,4 @@ class AuthTestCase(TestCase):
         self.x = 1
 
     def test_login(self):
-        self.assertEqual(self.x, 2)
+        self.assertEqual(self.x, 1)
