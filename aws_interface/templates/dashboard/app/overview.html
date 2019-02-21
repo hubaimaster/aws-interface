@@ -19,10 +19,10 @@
             <h2 class="text-white">AWS-Interface 에 오신걸 환영합니다</h2>
 	          <p class="text-white mt-0 mb-5">간단한 설정을 통해 강력한 백엔드 서비스를 순식간에 생성할 수 있습니다.</p>
 	          <a href="{% url 'guide' app_id %}" class="btn btn-success mt-2">가이드 문서 확인</a>
-	          <a href="https://github.com/hubaimaster/aws-interface" target="_blank" class="btn btn-neutral btn-icon mt-2">
-		          <span class="nav-link-inner--text">View on Github</span>
+	          <a href="{% url 'overview' app_id %}?cmd=download_sdk" class="btn btn-info mt-2">SDK 내려받기</a>
+	          <a href="https://github.com/hubaimaster/aws-interface" target="_blank" class="btn btn-dark btn-icon mt-2">
+		          <i class="fab fa-github mr-2"></i> <span class="nav-link-inner--text">Github에서 보기</span>
 	          </a>
-	          <a href="{% url 'overview' app_id %}?cmd=download_sdk" class="btn btn-info mt-2">{% trans 'Download SDK' %}</a>
           </div>
         </div>
       </div>
