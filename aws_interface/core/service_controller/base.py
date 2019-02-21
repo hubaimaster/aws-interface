@@ -8,30 +8,28 @@ from cloud.aws import *
 
 def create_lambda_zipfile_bin(app_id, recipe, dir_name, root_name='cloud'):
     output_filename = tempfile.mktemp()
-    # Make tmp_dir
-    tmp_dir = tempfile.mkdtemp()
 
-    # Copy lambda dir into temp/root_name folder
-    shutil.copytree(dir_name, '{}/{}'.format(tmp_dir, root_name))
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        # Copy lambda dir into temp/root_name folder
+        shutil.copytree(dir_name, '{}/{}'.format(tmp_dir, root_name))
 
-    # Copy recipe from recipe_controller
-    with open(os.path.join(tmp_dir, root_name, 'recipe.json'), 'w+') as file:
-        file.write(recipe)
+        # Copy recipe from recipe_controller
+        with open(os.path.join(tmp_dir, root_name, 'recipe.json'), 'w+') as file:
+            file.write(recipe)
 
-    # Write txt file included app_id
-    with open(os.path.join(tmp_dir, root_name, 'app_id.txt'), 'w+') as file:
-        file.write(app_id)
+        # Write txt file included app_id
+        with open(os.path.join(tmp_dir, root_name, 'app_id.txt'), 'w+') as file:
+            file.write(app_id)
 
-    # Archive all files
-    shutil.make_archive(output_filename, 'zip', tmp_dir)
-    zip_file_name = '{}.zip'.format(output_filename)
-    zip_file = open(zip_file_name, 'rb')
-    zip_file_bin = zip_file.read()
-    zip_file.close()
+        # Archive all files
+        shutil.make_archive(output_filename, 'zip', tmp_dir)
+        zip_file_name = '{}.zip'.format(output_filename)
+        zip_file = open(zip_file_name, 'rb')
+        zip_file_bin = zip_file.read()
+        zip_file.close()
 
     # Remove temp files
     os.remove(zip_file_name)
-    shutil.rmtree(tmp_dir)
     return zip_file_bin
 
 
