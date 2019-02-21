@@ -133,7 +133,7 @@ class App(models.Model):
                 apis.append(recipe.get_api(credentials))
             return core.api.generate_sdk(apis, platform)
 
-    def apply_recipes(self, credentials, initial=False):
+    def apply_recipes(self, credentials):
         """
         Start a thread to apply all recipes.
         :return:
