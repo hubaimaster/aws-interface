@@ -99,7 +99,7 @@ class App(models.Model):
     id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
     name = models.CharField(max_length=255, blank=False, unique=True)
-    user = models.ForeignKey(User, null=True)  # should not be NULL from now on
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)  # should not be NULL from now on
 
     applying_in_background = models.BooleanField(default=False)
 
@@ -116,7 +116,7 @@ class App(models.Model):
         :return:
         """
         recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
-        return len(recipes) == 0
+        return recipes.count() == 0
 
     def generate_sdk(self, credentials, platform):
         """
@@ -187,7 +187,7 @@ class Recipe(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
     name = models.CharField(max_length=255, editable=False)
     json_string = models.TextField(default='')
-    app = models.ForeignKey(App, null=True)  # should not be NULL from now on
+    app = models.ForeignKey(App, null=True, on_delete=models.CASCADE)  # should not be NULL from now on
     apply_status = models.CharField(max_length=2, choices=APPLY_STATUS_CHOICES, default=APPLY_NONE)
 
     def __str__(self):
@@ -223,7 +223,3 @@ class Recipe(models.Model):
 
     def apply(self, credentials):
         self.get_api(credentials).apply()
-
-    def init(self, credentials):
-        api = self.get_api(credentials)
-        api.apply()  # wtf? >> ask developers plz. no time to explain
