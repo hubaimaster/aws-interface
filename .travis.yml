@@ -4,7 +4,6 @@ python:
 install: pip install -r requirements.txt
 
 script:
-- python aws_interface/manage.py test
 
 before_install:
 
