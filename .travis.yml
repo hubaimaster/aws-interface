@@ -4,6 +4,7 @@ python:
 install: pip install -r requirements.txt
 
 script:
+- python aws_interface/manage.py migrate —run-syncdb
 - python aws_interface/manage.py test
 
 before_install:
@@ -13,4 +14,3 @@ before_install:
 - cd aws_interface
 - tar -xvf secret.tar
 - cd ..
-- python aws_interface/manage.py migrate —run-syncdb
