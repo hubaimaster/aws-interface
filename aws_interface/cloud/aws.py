@@ -178,7 +178,7 @@ class APIGateway:
 
         remove = False
         put = False
-        for _ in range(5):
+        for _ in range(4):
             if not remove:
                 try:
                     _ = self.lambda_client.remove_permission(
