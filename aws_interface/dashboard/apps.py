@@ -20,6 +20,6 @@ class DashboardConfig(AppConfig):
     name = 'dashboard'
 
     def ready(self):
-        # reset_background_apply()
+        reset_background_apply()
         return
 
