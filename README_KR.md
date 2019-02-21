@@ -94,7 +94,7 @@ AWS 인터페이스를 이용하기 위해서는 AWS 계정에 접속할 수 있
 ```
 # activate virtual environment
 cd aws_interface
-python3 manage.py migrate
+python3 manage.py migrate --run-syncdb
 python3 manage.py runserver
 # open 127.0.0.1:8000 on your browser
 ```
