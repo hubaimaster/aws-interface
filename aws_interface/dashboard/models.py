@@ -198,7 +198,7 @@ class Recipe(models.Model):
         tag = self.name.title() + ' Recipe'
         owner = '{}:{}'.format(self.app.user.email, self.app.name)
         init = self.get_apply_status_display()
-        return '{:10} [{:30}] [{:20}]'.format(tag, owner, init)
+        return '{:20} [{:20}] [{:20}]'.format(tag, owner, init)
 
     def get_api(self, credentials):
         api_cls = core.api.api_dict[self.name]
