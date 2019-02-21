@@ -243,8 +243,8 @@ class Overview(LoginRequiredMixin, View):
     def get(self, request, app_id):
         cmd = request.GET.get('cmd', None)
         app = App.objects.get(id=app_id)
-        app.apply_recipes()  # apply if there was a problem with previous apply
         credentials = Util.get_credentials(request)
+        app.apply_recipes(credentials)  # apply if there was a problem with previous apply
 
         if cmd == 'download_sdk':
             sdk_bin = app.generate_sdk(credentials, 'python3')
