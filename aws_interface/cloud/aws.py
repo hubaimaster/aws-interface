@@ -182,6 +182,11 @@ class APIGateway:
                 FunctionName=lambda_func_name,
                 StatementId=statement_id,
             )
+        except Exception:
+            print('Failed to remove permissions for {}'.format(lambda_func_name))
+            pass
+
+        try:
             self.lambda_client.add_permission(
                 FunctionName=lambda_func_name,
                 StatementId=statement_id,
@@ -190,7 +195,7 @@ class APIGateway:
                 SourceArn=source_arn
             )
         except Exception:
-            raise Exception('Failed to put permissions {}'.format(lambda_func_name))
+            raise Exception('Failed to put permissions for {}'.format(lambda_func_name))
 
     def get_method(self, rest_api_id, resource_id, method_type='POST'):
         response = self.apigateway_client.get_method(
