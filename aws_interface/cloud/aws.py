@@ -192,7 +192,7 @@ class APIGateway:
             )
         except BaseException as ex:
             print(ex)
-            sleep(3.0)
+            sleep(4)
             if count < 5:
                 self.put_permission(lambda_func_name, source_arn, count + 1)
 
@@ -625,11 +625,7 @@ class IAM:
                 PolicyArn=policy_arn
             )
         except Exception as e:
-            print('Fail to attach policy'.center(80, '-'))
-            print(traceback.format_exc())
-            print(e)
-            print('-' * 80)
-
+            print('Failed to attach policy: {}'.format(role_name))
             return None
         return response
 
