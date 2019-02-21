@@ -3,8 +3,8 @@ import json
 import os
 import shutil
 import tempfile
-from core.recipecontroller import RecipeController
-from core.servicecontroller import ServiceController
+from core.recipe_controller import RecipeController
+from core.service_controller import ServiceController
 
 
 PLATFORMS = (
