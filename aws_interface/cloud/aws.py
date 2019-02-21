@@ -1,6 +1,8 @@
 import json
 import time
 import tempfile
+import traceback
+
 import botocore
 from boto3.dynamodb.conditions import Key
 from time import sleep
@@ -622,8 +624,12 @@ class IAM:
                 RoleName=role_name,
                 PolicyArn=policy_arn
             )
-        except:
-            print('Fail to attach policy')
+        except Exception as e:
+            print('Fail to attach policy'.center(80, '-'))
+            print(traceback.format_exc())
+            print(e)
+            print('-' * 80)
+
             return None
         return response
 
