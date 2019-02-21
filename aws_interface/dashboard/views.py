@@ -531,7 +531,7 @@ class Storage(LoginRequiredMixin, View):
                 folder_name = request.POST['folder_name']
                 read_groups = request.POST.getlist('read_groups[]')
                 write_groups = request.POST.getlist('write_groups[]')
-                result = storage.create_folder(parent_path, folder_name, read_groups, write_groups)
+                result = storage_api.create_folder(parent_path, folder_name, read_groups, write_groups)
                 return JsonResponse(result)
             elif cmd == 'upload_file':
                 parent_path = request.POST['parent_path']
@@ -540,22 +540,22 @@ class Storage(LoginRequiredMixin, View):
                 read_groups = json.loads(request.POST.get('read_groups'))
                 write_groups = json.loads(request.POST.get('write_groups'))
 
-                result = storage.upload_file(parent_path, file_name, file_bin, read_groups, write_groups)
+                result = storage_api.upload_file(parent_path, file_name, file_bin, read_groups, write_groups)
                 return JsonResponse(result)
             elif cmd == 'get_folder_list':
                 folder_path = request.POST['folder_path']
                 start_key = request.POST.get('start_key', None)
-                result = storage.get_folder_list(folder_path, start_key)
+                result = storage_api.get_folder_list(folder_path, start_key)
                 return JsonResponse(result)
             elif cmd == 'download_file':
                 file_path = request.POST['file_path']
-                file_bin = storage.download_file(file_path)
+                file_bin = storage_api.download_file(file_path)
                 response = HttpResponse(file_bin, content_type='application/x-binary')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
                 return response
             elif cmd == 'delete_path':
                 path = request.POST['path']
-                result = storage.delete_path(path)
+                result = storage_api.delete_path(path)
                 return JsonResponse(result)
 
 class Logic(LoginRequiredMixin, View):
