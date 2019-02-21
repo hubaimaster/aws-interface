@@ -11,6 +11,5 @@ class StorageRecipeController(RecipeController):
     def _init_cloud_api(self):
         self.put_cloud_api('create_folder', 'cloud.storage.create_folder')
         self.put_cloud_api('upload_file', 'cloud.storage.upload_file')
-        self.put_cloud_api('delete_folder', 'cloud.storage.delete_folder')
-        self.put_cloud_api('delete_file', 'cloud.storage.delete_file')
+        self.put_cloud_api('delete_path', 'cloud.storage.delete_path')
         self.put_cloud_api('download_file', 'cloud.storage.download_file')

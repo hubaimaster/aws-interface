@@ -17,6 +17,7 @@ from decimal import Decimal
 
 import json
 import base64
+import os
 
 
 class Util:
@@ -65,6 +66,43 @@ class Util:
                 return float(v)
         return {k: cast_number(v) for k, v in dict_obj.items()}
 
+<<<<<<< HEAD
+=======
+    @classmethod
+    def init_apis(cls, request, app_id):
+        def _init_api():
+            key = 'init_apis-{}'.format(app_id)
+            if cls.get_init_status(request, app_id) == 'progress':
+                print('[{}] init_apis: IGNORE (IN PROGRESS)'.format(app_id))
+                return
+            print('[{}] init_apis: START'.format(app_id))
+            request.session[key] = 'progress'
+            for api_cls in api_list:
+                print('[{}] init_apis: INITIALIZING {}'.format(app_id, api_cls.get_recipe().upper()))
+                api = Util.get_api(api_cls, request, app_id)
+                api.apply()
+                Util.save_recipe(api.get_recipe_controller(), app_id)
+            request.session[key] = 'completed'
+            print('[{}] init_apis: COMPLETE'.format(app_id))
+        Thread(target=_init_api, args=()).start()
+
+    @classmethod
+    def get_init_status(cls, request, app_id):
+        key = 'init_apis-{}'.format(app_id)
+        return request.session.get(key, None)
+
+    @classmethod
+    def is_valid_access_key(cls, aws_access_key, aws_secret_key):
+        if not aws_access_key:
+            return False
+        if not aws_secret_key:
+            return False
+        if len(aws_access_key) < 4:
+            return False
+        if len(aws_secret_key) < 4:
+            return False
+        return True
+>>>>>>> 93fc00d62d75ec6db7e0168b6ac8aadbfd73832e
 
 def page_manage(func):
     def wrap(*args, **kwargs):
@@ -123,7 +161,15 @@ class AccessKey(LoginRequiredMixin, View):
         password = request.POST['password']
         access_key = request.POST['access_key']
         secret_key = request.POST['secret_key']
-        # Check AccessKey.. TODO
+
+        if not request.user.check_password(password):
+            Util.add_alert(request, '비밀번호가 틀렸습니다.')
+            return redirect('apps')
+
+        if not Util.is_valid_access_key(access_key, secret_key):
+            Util.add_alert(request, '유효한 AccessKey 를 입력해주세요.')
+            return redirect('apps')
+
         request.user.set_aws_credentials(password, access_key, secret_key)
         request.user.save()
 
@@ -158,6 +204,9 @@ class Register(View):
             return redirect('register')
         elif len(password) < 7:
             Util.add_alert(request, '비밀번호는 7자 이상입니다.')
+            return redirect('register')
+        elif not Util.is_valid_access_key(aws_access_key, aws_secret_key):
+            Util.add_alert(request, '유효한 AccessKey 를 입력해주세요.')
             return redirect('register')
         else:
             get_user_model().objects.create_user(
@@ -219,6 +268,9 @@ class Apps(LoginRequiredMixin, View):
     @page_manage
     def post(self, request): # create app
         name = request.POST['name']
+        if not name or len(name) < 3:
+            Util.add_alert(request, '이름은 3글자 이상입니다')
+            return redirect('apps')
         user_id = request.user.id
         app = App.objects.filter(name=name)
         if app:
@@ -504,7 +556,7 @@ class Storage(LoginRequiredMixin, View):
                 folder_name = request.POST['folder_name']
                 read_groups = request.POST.getlist('read_groups[]')
                 write_groups = request.POST.getlist('write_groups[]')
-                result = storage_api.create_folder(parent_path, folder_name, read_groups, write_groups)
+                result = storage.create_folder(parent_path, folder_name, read_groups, write_groups)
                 return JsonResponse(result)
             elif cmd == 'upload_file':
                 parent_path = request.POST['parent_path']
@@ -513,28 +565,23 @@ class Storage(LoginRequiredMixin, View):
                 read_groups = json.loads(request.POST.get('read_groups'))
                 write_groups = json.loads(request.POST.get('write_groups'))
 
-                result = storage_api.upload_file(parent_path, file_name, file_bin, read_groups, write_groups)
+                result = storage.upload_file(parent_path, file_name, file_bin, read_groups, write_groups)
                 return JsonResponse(result)
             elif cmd == 'get_folder_list':
                 folder_path = request.POST['folder_path']
                 start_key = request.POST.get('start_key', None)
-                result = storage_api.get_folder_list(folder_path, start_key)
+                result = storage.get_folder_list(folder_path, start_key)
                 return JsonResponse(result)
             elif cmd == 'download_file':
                 file_path = request.POST['file_path']
-                file_bin = storage_api.download_file(file_path)
+                file_bin = storage.download_file(file_path)
                 response = HttpResponse(file_bin, content_type='application/x-binary')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
                 return response
-            elif cmd == 'delete_file':
-                file_path = request.POST['file_path']
-                result = storage_api.delete_file(file_path)
+            elif cmd == 'delete_path':
+                path = request.POST['path']
+                result = storage.delete_path(path)
                 return JsonResponse(result)
-            elif cmd == 'delete_folder':
-                folder_path = request.POST['folder_path']
-                result = storage_api.delete_folder(folder_path)
-                return JsonResponse(result)
-
 
 class Logic(LoginRequiredMixin, View):
     @page_manage

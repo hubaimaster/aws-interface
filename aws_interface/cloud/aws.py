@@ -6,6 +6,7 @@ import traceback
 import botocore
 from boto3.dynamodb.conditions import Key
 from time import sleep
+from sys import maxsize
 import cloud.shortuuid as shortuuid
 
 
@@ -388,10 +389,12 @@ class DynamoDB:
         })
         return item
 
-    def get_items(self, table_name, partition, exclusive_start_key=None, limit=100, reverse=False):
+    def get_items(self, table_name, partition, exclusive_start_key=None, limit=None, reverse=False):
         scan_index_forward = not reverse
         index_name = 'partition-creationDate'
         table = self.resource.Table(table_name)
+        if not limit:
+            limit = maxsize
         if exclusive_start_key:
             response = table.query(
                 IndexName=index_name,

@@ -50,20 +50,10 @@ class StorageServiceController(ServiceController):
         return method.do(data, boto3)
 
     @lambda_method
-    def delete_folder(self, recipe, folder_path):
-        import cloud.storage.delete_folder as method
+    def delete_path(self, recipe, path):
+        import cloud.storage.delete_path as method
         params = {
-            'folder_path': folder_path,
-        }
-        data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
-
-    @lambda_method
-    def delete_file(self, recipe, file_path):
-        import cloud.storage.delete_file as method
-        params = {
-            'file_path': file_path,
+            'path': path,
         }
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session
