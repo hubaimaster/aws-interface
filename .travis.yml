@@ -3,7 +3,7 @@ python:
 - '3.6'
 install: pip install -r requirements.txt
 
-sciprt:
+script:
 - python aws_interface/manage.py test
 
 before_install:
