@@ -8,8 +8,15 @@ def reset_background_apply():
     initialized, indicate that the initialization has failed.
     :return:
     """
-    if 'makemigrations' in sys.argv or 'migrate' in sys.argv:
-        return True
+    exempt_commands = [
+        'makemigrations',
+        'migrate',
+        'test',
+    ]
+
+    for command in exempt_commands:
+        if command in sys.argv:
+            return True
 
     from .models import Recipe, App
     Recipe.objects.all().filter(apply_status=Recipe.APPLY_PROGRESS).update(apply_status=Recipe.APPLY_FAILED)
