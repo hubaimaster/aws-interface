@@ -149,22 +149,30 @@ class App(models.Model):
                 App.objects.filter(id=self.id).update(applying_in_background=True)
                 run = True
         if run:
-            recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
             def _apply_api():
-                for recipe in recipes:
-                    try:
-                        print('APPLY API START: {}'.format(str(recipe)))
-                        recipe.apply(credentials)
-                        print('APPLY API END:   {}'.format(str(recipe)))
-                        # in case Recipe in DB has changed
-                        self.recipe_set.filter(id=recipe.id).update(apply_status=Recipe.APPLY_SUCCESS)
-                    except Exception as e:
-                        print('APPLY API ERROR: {}'.format(str(recipe)))
-                        # in case Recipe in DB has changed
-                        self.recipe_set.filter(id=recipe.id).update(apply_status=Recipe.APPLY_FAILED)
-                        print(traceback.format_exc())
-                        print(e)
-                # in case App in DB has changed
+                for _ in range(5):
+                    recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
+                    for recipe in recipes:
+                        try:
+                            print('APPLY API START: {}'.format(str(recipe)))
+                            recipe.apply(credentials)
+                            print('APPLY API END:   {}'.format(str(recipe)))
+                            # in case Recipe in DB has changed
+                            self.recipe_set.filter(id=recipe.id).update(apply_status=Recipe.APPLY_SUCCESS)
+                        except Exception as e:
+                            print('APPLY API ERROR: {}'.format(str(recipe)))
+                            # in case Recipe in DB has changed
+                            self.recipe_set.filter(id=recipe.id).update(apply_status=Recipe.APPLY_FAILED)
+                            print(traceback.format_exc())
+                            print(e)
+                    # in case App in DB has changed
+                    recipes = self.recipe_set.filter(apply_status__in=(Recipe.APPLY_NONE, Recipe.APPLY_FAILED))
+                    if recipes.count() != 0:
+                        print("{} APPLY'S LEFT: RETRYING SOON...".format(recipes.count()))
+                        time.sleep(10)
+                    else:
+                        print("APPLY COMPLETE")
+                        break
                 App.objects.all().filter(id=self.id).update(applying_in_background=False)
             Thread(target=_apply_api, args=()).start()
         return False
