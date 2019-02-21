@@ -13,3 +13,4 @@ before_install:
 - cd aws_interface
 - tar -xvf secret.tar
 - cd ..
+- python aws_interface/manage.py migrate —run-syncdb
