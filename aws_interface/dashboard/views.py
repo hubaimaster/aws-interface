@@ -211,6 +211,9 @@ class Register(View):
         elif len(password) < 7:
             Util.add_alert(request, '비밀번호는 7자 이상입니다.')
             return redirect('register')
+        elif not aws_access_key or not aws_secret_key or len(aws_access_key) < 4 or len(aws_secret_key) < 4:
+            Util.add_alert(request, '유효한 AccessKey 를 입력해주세요.')
+            return redirect('register')
         else:
             get_user_model().objects.create_user(
                 email, password,
