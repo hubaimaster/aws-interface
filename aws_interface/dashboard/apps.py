@@ -1,5 +1,5 @@
+import sys
 from django.apps import AppConfig
-from .models import Recipe, App
 
 
 def reset_background_apply():
@@ -8,7 +8,11 @@ def reset_background_apply():
     initialized, indicate that the initialization has failed.
     :return:
     """
-    Recipe.objects.all().filter(apply_status=Recipe.INIT_PROGRESS).update(apply_status=Recipe.INIT_FAILED)
+    if 'makemigrations' in sys.argv or 'migrate' in sys.argv:
+        return True
+
+    from .models import Recipe, App
+    Recipe.objects.all().filter(apply_status=Recipe.APPLY_PROGRESS).update(apply_status=Recipe.APPLY_FAILED)
     App.objects.all().update(applying_in_background=False)
 
 
