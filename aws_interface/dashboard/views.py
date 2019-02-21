@@ -232,7 +232,6 @@ class Apps(LoginRequiredMixin, View):
         credentials = Util.get_credentials(request)
         app.assign_all_recipes()
         app.apply_recipes(credentials)
-        app.save()
 
         Util.add_alert(request, '새로운 어플리케이션이 생성되었습니다')
         return redirect('apps')
