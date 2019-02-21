@@ -173,28 +173,39 @@ class APIGateway:
         arn = arn.format(**uri_data)
         return arn
 
-    def put_permission(self, lambda_func_name, source_arn, count=0):
+    def put_permission(self, lambda_func_name, source_arn):
         statement_id = 'state{}'.format(lambda_func_name)
-        try:
-            _ = self.lambda_client.remove_permission(
-                FunctionName=lambda_func_name,
-                StatementId=statement_id,
-            )
-        except BaseException as ex:
-            print(ex)
-        try:
-            self.lambda_client.add_permission(
-                FunctionName=lambda_func_name,
-                StatementId=statement_id,
-                Action="lambda:InvokeFunction",
-                Principal="apigateway.amazonaws.com",
-                SourceArn=source_arn
-            )
-        except BaseException as ex:
-            print(ex)
-            sleep(4)
-            if count < 5:
-                self.put_permission(lambda_func_name, source_arn, count + 1)
+
+        remove = False
+        put = False
+        for _ in range(5):
+            if not remove:
+                try:
+                    _ = self.lambda_client.remove_permission(
+                        FunctionName=lambda_func_name,
+                        StatementId=statement_id,
+                    )
+                    remove = True
+                except Exception:
+                    pass
+            if not put:
+                try:
+                    self.lambda_client.add_permission(
+                        FunctionName=lambda_func_name,
+                        StatementId=statement_id,
+                        Action="lambda:InvokeFunction",
+                        Principal="apigateway.amazonaws.com",
+                        SourceArn=source_arn
+                    )
+                    put = True
+                except BaseException as ex:
+                    pass
+
+            if remove and put:
+                break
+
+        print('Remove permission for {}: {}'.format(lambda_func_name, 'SUCCESS' if remove else 'FAIL'))
+        print('Put permission for    {}: {}'.format(lambda_func_name, 'SUCCESS' if put else 'FAIL'))
 
     def get_method(self, rest_api_id, resource_id, method_type='POST'):
         response = self.apigateway_client.get_method(
