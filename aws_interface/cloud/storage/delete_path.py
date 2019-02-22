@@ -49,8 +49,9 @@ def do(data, boto3):
                 for __item in items:
                     delete_item(__item)
             elif _item['type'] == 'file':
-                file_key = item['file_key']
-                s3.delete_file_bin(bucket_name, file_key)
+                file_key = item.get('file_key', None)
+                if file_key:
+                    s3.delete_file_bin(bucket_name, file_key)
         else:
             body['success'] = False
             body['message'] = 'permission denied'
