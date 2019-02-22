@@ -5,7 +5,7 @@ import json
 
 
 if __name__ == '__main__':
-    base_dir = _(_(os.path.abspath(__file__)))
+    base_dir = _(os.path.abspath(__file__))
     secret_dir = os.path.join(base_dir, 'secret')
     os.makedirs(secret_dir, exist_ok=True)
 
