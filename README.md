@@ -1,5 +1,6 @@
-![Language](https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/assets/img/brand/blue.png)
-
+<div align="center">
+  <img src="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/assets/img/brand/blue.png">
+</div>
 ![Language](https://img.shields.io/badge/Language-Python3.6-blue.svg)
 ![Language](https://img.shields.io/badge/NaverFest-Finalist-brightgreen.svg)
 [![Build Status](https://travis-ci.org/hubaimaster/aws-interface.svg?branch=master)](https://travis-ci.org/hubaimaster/aws-interface)
