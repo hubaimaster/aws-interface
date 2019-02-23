@@ -538,7 +538,6 @@ class Storage(LoginRequiredMixin, View):
                 file_name = request.POST['file_name']
                 read_groups = json.loads(request.POST.get('read_groups'))
                 write_groups = json.loads(request.POST.get('write_groups'))
-
                 result = storage_api.upload_file(parent_path, file_name, file_bin, read_groups, write_groups)
                 return JsonResponse(result)
             elif cmd == 'get_folder_list':
