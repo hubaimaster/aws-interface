@@ -4,6 +4,7 @@
 
 **[WE R Naver D2 Fest Finalists!](https://github.com/D2CampusFest/6th)**
 
+(https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/assets/img/brand/blue.png)
 # AWS-Interface
 
 AWS-Interface lets you jump start your next big idea with a powerful and flexible backend. Amazon's web services were meant to be easy and simple—but they're simply not ☹️. There are often too many services for us mere mortals to track. With AWS Interface, we take away the nitty-gritty and let you focus on your ideas and your business.
