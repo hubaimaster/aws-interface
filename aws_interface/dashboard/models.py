@@ -214,6 +214,7 @@ class Recipe(models.Model):
 
     def save_recipe(self, api: core.api.API):
         self.json_string = api.get_recipe_controller().to_json()
+        self.apply_status = 'NO'
         self.save()
 
     @contextmanager

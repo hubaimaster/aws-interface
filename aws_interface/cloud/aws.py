@@ -89,25 +89,35 @@ class APIGateway:
         }
         uri = self.get_uri(uri_data)
 
+        integration_response_param = {
+            'method.response.header.Access-Control-Allow-Headers': '\'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With\'',
+            'method.response.header.Access-Control-Allow-Methods': '\'POST,OPTIONS\'',
+            'method.response.header.Access-Control-Allow-Origin': '\'*\''
+        }
+        method_response_param = {
+            'method.response.header.Access-Control-Allow-Headers': False,
+            'method.response.header.Access-Control-Allow-Origin': False,
+            'method.response.header.Access-Control-Allow-Methods': False,
+            'method.response.header.X-Requested-With': False,
+        }
+
         # create integration
         self.put_integration(rest_api_id, resource_id, 'POST', uri)
-        #self.put_integration(rest_api_id, resource_id, 'GET', uri)
-
         self.put_integration_response(rest_api_id, resource_id, 'POST')
-        #self.put_integration_response(rest_api_id, resource_id, 'GET')
-
-        self.put_method_response(rest_api_id, resource_id, 'POST')
-        #self.put_method_response(rest_api_id, resource_id, 'GET')
+        self.put_method_response(rest_api_id, resource_id, 'POST', method_response_param)
 
         uri_data['aws-api-id'] = rest_api_id
         post_source_arn = self.get_source_arn(uri_data, 'POST')
-        #get_source_arn = self.get_source_arn(uri_data, 'GET')
 
         print('put_permission post'.center(80, '-'))
         self.put_permission(lambda_func_name, post_source_arn)
 
-        #print('add_permission get')
-        #self.put_permission(lambda_func_name, get_source_arn)
+        # CORS OPTION
+
+        self.put_method(rest_api_id, resource_id, 'OPTIONS')
+        self.put_method_response(rest_api_id, resource_id, 'OPTIONS', method_response_param)
+        self.put_integration(rest_api_id, resource_id, 'OPTIONS', uri)
+        self.put_integration_response(rest_api_id, resource_id, 'OPTIONS', integration_response_param)
 
         print('create_deployment'.center(80, '-'))
         api_client.create_deployment(
@@ -129,13 +139,14 @@ class APIGateway:
             return None
         return response
 
-    def put_method_response(self, rest_api_id, resource_id, method_type):
+    def put_method_response(self, rest_api_id, resource_id, method_type, response_parameters=dict()):
         try:
             response = self.apigateway_client.put_method_response(
                 restApiId=rest_api_id,
                 resourceId=resource_id,
                 httpMethod=method_type,
                 statusCode="200",
+                responseParameters=response_parameters,
             )
         except BaseException as ex:
             response = None
@@ -155,16 +166,20 @@ class APIGateway:
             type="AWS",
             integrationHttpMethod=method_type,
             uri=uri,
+            requestTemplates={
+                'application/json': '{"statusCode": 200}'
+            },
         )
         return integration_resp
 
-    def put_integration_response(self, rest_api_id, resource_id, method_type):
+    def put_integration_response(self, rest_api_id, resource_id, method_type, response_parameters=dict()):
         response = self.apigateway_client.put_integration_response(
             restApiId=rest_api_id,
             resourceId=resource_id,
             httpMethod=method_type,
             statusCode="200",
-            selectionPattern=".*"
+            selectionPattern=".*",
+            responseParameters=response_parameters,
         )
         return response
 

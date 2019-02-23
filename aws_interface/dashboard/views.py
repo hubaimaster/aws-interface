@@ -272,7 +272,7 @@ class Overview(LoginRequiredMixin, View):
         app.apply_recipes(credentials)  # apply if there was a problem with previous apply
 
         if cmd == 'download_sdk':
-            sdk_bin = app.generate_sdk(credentials, 'python3')
+            sdk_bin = app.generate_sdk(credentials, 'javascript')
 
             if sdk_bin is None:
                 Util.add_alert(request, 'API 를 초기화 하고 있습니다. 상황에 따라 최대 3분 정도 소요될 수 있습니다.')
@@ -362,6 +362,7 @@ class Auth(LoginRequiredMixin, View):
                 name = request.POST['group_name']
                 description = request.POST['group_description']
                 api.put_user_group(name, description)
+                api.apply()
             elif cmd == 'set_email_login':
                 default_group = request.POST['email_default_group']
                 enabled = request.POST['email_enabled']
@@ -549,7 +550,6 @@ class Storage(LoginRequiredMixin, View):
                 file_path = request.POST['file_path']
                 file_bin = storage_api.download_file(file_path)
                 response = HttpResponse(file_bin, content_type='application/x-binary')
-                response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename('storage_sdk.zip')
                 return response
             elif cmd == 'delete_path':
                 path = request.POST['path']
