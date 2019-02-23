@@ -1,11 +1,13 @@
+![Language](https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/assets/img/brand/blue.png)
+
 ![Language](https://img.shields.io/badge/Language-Python3.6-blue.svg)
 ![Language](https://img.shields.io/badge/NaverFest-Finalist-brightgreen.svg)
 [![Build Status](https://travis-ci.org/hubaimaster/aws-interface.svg?branch=master)](https://travis-ci.org/hubaimaster/aws-interface)
 
 **[WE R Naver D2 Fest Finalists!](https://github.com/D2CampusFest/6th)**
 
-![Language](https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/assets/img/brand/blue.png)
-# 
+
+# AWS Interface
 AWS-Interface lets you jump start your next big idea with a powerful and flexible backend. Amazon's web services were meant to be easy and simple—but they're simply not ☹️. There are often too many services for us mere mortals to track. With AWS Interface, we take away the nitty-gritty and let you focus on your ideas and your business.
 
 Here's how it works: register your AWS IAM credentials for us to work with. Then, select the Recipes that you need for your backend service and tweak them through our website. That's it! We've built an infinitely scalable backend for your service via AWS services, and an auto-generated SDK for the frontend platform of your choice.\
