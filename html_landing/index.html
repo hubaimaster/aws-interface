@@ -56,7 +56,7 @@
               </a>
               <div class="dropdown-menu dropdown-menu-xl">
                 <div class="dropdown-menu-inner">
-                  <a id="start-now-head" class="media d-flex align-items-center">
+                  <a target="_blank" href="https://console.aws-interface.com" class="media d-flex align-items-center">
                     <div class="icon icon-shape bg-gradient-primary rounded-circle text-white">
                       <i class="ni ni-spaceship"></i>
                     </div>
@@ -65,7 +65,7 @@
                       <p class="description d-none d-md-inline-block mb-0">AWSInterface 콘솔에 접속합니다.</p>
                     </div>
                   </a>
-                  <a id="start-get-info" class="media d-flex align-items-center">
+                  <a target="_blank" href="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/awsi_concept.pdf" class="media d-flex align-items-center">
                     <div class="icon icon-shape bg-gradient-success rounded-circle text-white">
                       <i class="ni ni-palette"></i>
                     </div>
@@ -83,7 +83,6 @@
                 <span class="nav-link-inner--text">튜토리얼</span>
               </a>
               <div class="dropdown-menu">
-                <a id="tuto-sns" class="dropdown-item">소셜 네트워크 서비스 개발</a>
                 <a id="tuto-board" class="dropdown-item">간단한 공용 게시판 개발</a>
               </div>
             </li>
@@ -129,7 +128,7 @@
                 </h1>
                 <p class="lead  text-white">AWSInterface 를 사용하면 Amazon Web Service 에 대한 깊은 이해 없이도 몇번의 클릭만으로 간단하게 API를 구성하고, 여러 시스템에서 동작하는 SDK를 배포할 수 있습니다.</p>
                 <div class="btn-wrapper">
-                  <a id="start-now" class="btn btn-info btn-icon mb-3 mb-sm-0">
+                  <a href="https://console.aws-interface.com" class="btn btn-info btn-icon mb-3 mb-sm-0">
                     <span class="btn-inner--icon" style="color: white;"><i class="ni ni-spaceship"></i></span>
                     <span class="btn-inner--text" style="color: white;">지금 바로 시작하기</span>
                   </a>
@@ -159,13 +158,12 @@
                     <div class="icon icon-shape icon-shape-primary rounded-circle mb-4">
                       <i class="ni ni-check-bold"></i>
                     </div>
-                    <h6 class="text-primary text-uppercase">백엔드 서비스 구성하기</h6>
-                    <p class="description mt-3">대시보드에서 원하는 서비스 구성을 작성하고 저장합니다.
-                      게시물이나 그 외 모델을 작성하고 접근 권한을 설정합니다.
-                      또 회원가입 사용 여부와 회원가입 시 어떤 정보를 입력 받을지 그리고 비밀번호 형식과 인증 방식등을 정할 수 있습니다.
-                      서비스 구성을 완료하면 호출가능한 API가 생성됩니다.</p>
-
-                    <a href="#" class="btn btn-primary mt-4">더 알아보기</a>
+                    <h6 class="text-primary text-uppercase">AWSI 가입하기</h6>
+                    <p class="description mt-3">지금바로 시작하기를 누르고 AWS IAM 키를 제공하여
+                    AWS Interface 를 시작합니다. 가입 후 가이드 문서를 참조하여 간단한 사용 방법과
+                    작동 방식에 대해 알아봅니다.</p>
+                    <br><br>
+                    <a target="_blank" href="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/start_awsi.pdf" class="btn btn-primary mt-4">더 알아보기</a>
                   </div>
                 </div>
               </div>
@@ -175,12 +173,12 @@
                     <div class="icon icon-shape icon-shape-success rounded-circle mb-4">
                       <i class="ni ni-istanbul"></i>
                     </div>
-                    <h6 class="text-success text-uppercase">백엔드 서비스 SDK 내려받기</h6>
-                    <p class="description mt-3">앞서 구성한 백엔드 서비스의 API를 클라이언트에서 호출할 수 있도록
-                      자동 생성된 개발 환경별 SDK를 내려받습니다.
-                      자동 생성된 SDK는 HTTPS 프로토콜을 통해 백엔드 서비스의 API를 호출합니다.</p>
-                    </br>
-                    <a href="#" class="btn btn-success mt-4">더 알아보기</a>
+                    <h6 class="text-success text-uppercase">서비스 구성하기</h6>
+                    <p class="description mt-3">대시보드에서 원하는 서비스 구성을 작성하고 저장합니다.
+                      게시물이나 그 외 모델을 작성하고 접근 권한을 설정합니다.
+                      또 회원가입 사용 여부와 회원가입 시 어떤 정보를 입력 받을지 그리고 비밀번호 형식과 인증 방식등을 정할 수 있습니다.
+                      서비스 구성을 완료하면 호출가능한 API가 생성됩니다.</p>
+                    <a target="_blank" href="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/awsi_concept.pdf" class="btn btn-success mt-4">더 알아보기</a>
                   </div>
                 </div>
               </div>
@@ -190,8 +188,10 @@
                     <div class="icon icon-shape icon-shape-warning rounded-circle mb-4">
                       <i class="ni ni-planet"></i>
                     </div>
-                    <h6 class="text-warning text-uppercase">백엔드 서비스 SDK 연결하기</h6>
-                    <p class="description mt-3">내려받은 SDK를 클라이언트 소스코드에 추가하여 대시보드에서 만든 서비스에 접근할수 있도록 합니다. 대시보드에서 서비스를 수정하면 해당 버전에 맞는 SDK를 다시 내려받고 업데이트 하는것을 권장합니다.</p>
+                    <h6 class="text-warning text-uppercase">백엔드 서비스 SDK 내려받기</h6>
+                    <p class="description mt-3">앞서 구성한 백엔드 서비스의 API를 클라이언트에서 호출할 수 있도록
+                      자동 생성된 개발 환경별 SDK를 내려받습니다.
+                      자동 생성된 SDK는 HTTPS 프로토콜을 통해 백엔드 서비스의 API를 호출합니다.</p>
                     </br>
                     <a href="#" class="btn btn-warning mt-4">더 알아보기</a>
                   </div>
@@ -214,7 +214,7 @@
                 <i class="ni ni-settings-gear-65"></i>
               </div>
               <h3>주요기능</h3>
-              <p>AWSInterface는 서비스 구성과 API 생성 그리고 SDK 배포 뿐 아니라</br>서비스 버전관리와 모니터링 기능을 포함하고 있습니다.</p>
+              <p>AWSInterface는 서비스 구성과 API 생성 그리고 SDK 배포 뿐 아니라</br>서비스 관리와 모니터링 기능을 포함하고 있습니다.</p>
               <ul class="list-unstyled mt-5">
                 <li class="py-2">
                   <div class="d-flex align-items-center">
@@ -236,7 +236,7 @@
                       </div>
                     </div>
                     <div>
-                      <h6 class="mb-0">버전별 서비스 구성과 SDK를 관리합니다.</h6>
+                      <h6 class="mb-0">서비스 구성과 SDK를 관리합니다.</h6>
                     </div>
                   </div>
                 </li>
@@ -310,9 +310,8 @@
                     <p>AWS의 DynamoDB 나 Lambda 와 같은 서비스를 사용하기 위해서는
                      높은 수준의 배경지식이 필요합니다. 하지만 AWSInterface는 고수준으로 추상화된 인터페이스를 제공하여,
                      AWS 서비스에 대한 별도의 이해 없이도 어플리케이션을 구성할 수 있게 도와줍니다. </p>
-                    <a href="#" class="text-warning">더 알아보기</a>
                   </div>
-                </div>
+                </div></div>
               </div>
             </div>
           </div>
@@ -439,18 +438,6 @@
 
   <!-- Custom JS -->
   <script>
-  $("#start-now-head").click(function(){
-    window.location.href = "https://console.aws-interface.com";
-  });
-  $("#start-get-info").click(function(){
-    alert("곧 지원될 예정입니다.");
-  });
-  $("#start-now").click(function(){
-    window.location.href = "https://console.aws-interface.com";
-  });
-  $("#tuto-sns").click(function(){
-    alert("곧 지원될 예정입니다.");
-  });
   $("#tuto-board").click(function(){
     alert("곧 지원될 예정입니다.");
   });
