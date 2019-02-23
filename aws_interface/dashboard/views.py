@@ -1,4 +1,3 @@
-import os
 import warnings
 
 from django.shortcuts import render, redirect, HttpResponse
@@ -557,6 +556,7 @@ class Storage(LoginRequiredMixin, View):
                 path = request.POST['path']
                 result = storage_api.delete_path(path)
                 return JsonResponse(result)
+
 
 class Logic(LoginRequiredMixin, View):
     @page_manage
