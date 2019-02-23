@@ -44,12 +44,12 @@ def do(data, boto3):
 
     filtered = []
     for item in items:
-        read_permission = item.get('read_permissions', [])
+        read_permission = item.get('read_groups', [])
         if 'all' in read_permission or user_group in read_permission:
             # Remove system key
             item.pop('partition', None)
-            item.pop('read_permissions', None)
-            item.pop('write_permissions', None)
+            item.pop('read_groups', None)
+            item.pop('write_groups', None)
             filtered.append(item)
 
         body['items'] = filtered

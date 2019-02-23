@@ -31,8 +31,8 @@ def do(data, boto3):
     dynamo = DynamoDB(boto3)
 
     item = dynamo.get_item(table_name, item_id)
-    write_permissions = item.get('Item', {}).get('write_permissions', [])
-    if 'all' in write_permissions or user_group in write_permissions:
+    write_groups = item.get('Item', {}).get('write_groups', [])
+    if 'all' in write_groups or user_group in write_groups:
         _ = dynamo.delete_item(table_name, item_id)
         body['success'] = True
     else:

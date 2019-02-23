@@ -36,8 +36,8 @@ def do(data, boto3):
 
     result = dynamo.get_item(table_name, item_id)
     item = result.get('Item', {})
-    write_permissions = item.get('write_permissions', [])
-    if 'all' in write_permissions or user_group in write_permissions:
+    write_groups = item.get('write_groups', [])
+    if 'all' in write_groups or user_group in write_groups:
         item[field_name] = field_value
         if field_value is None:
             item.pop(field_name)

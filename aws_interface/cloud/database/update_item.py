@@ -9,8 +9,8 @@ info = {
         'session_id': 'str',
         'item_id': 'str',
         'item': 'map',
-        'read_permissions': 'list',
-        'write_permissions': 'list',
+        'read_groups': 'list',
+        'write_groups': 'list',
     },
     'output_format': {
         'success': 'bool',
@@ -29,11 +29,11 @@ def do(data, boto3):
 
     item_id = params.get('item_id', None)
     new_item = params.get('item', {})
-    read_permissions = params.get('read_permissions', [])
-    write_permissions = params.get('write_permissions', [])
+    read_groups = params.get('read_groups', [])
+    write_groups = params.get('write_groups', [])
 
-    new_item['read_permissions'] = read_permissions
-    new_item['write_permissions'] = write_permissions
+    new_item['read_groups'] = read_groups
+    new_item['write_groups'] = write_groups
 
     table_name = 'database-{}'.format(app_id)
 
@@ -42,8 +42,8 @@ def do(data, boto3):
     result = dynamo.get_item(table_name, item_id)
     item = result.get('Item', {})
 
-    write_permissions = item.get('write_permissions', [])
-    if 'all' in write_permissions or user_group in write_permissions:
+    write_groups = item.get('write_groups', [])
+    if 'all' in write_groups or user_group in write_groups:
         dynamo.update_item(table_name, item_id, new_item)
         body['success'] = True
     else:

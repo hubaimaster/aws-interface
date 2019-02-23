@@ -7,10 +7,10 @@ from cloud.response import Response
 info = {
     'input_format': {
         'session_id': 'str',
-        'item': 'str',
+        'item': 'dict',
         'partition': 'str',
-        'read_permissions': 'list',
-        'write_permissions': 'list',
+        'read_groups': 'list',
+        'write_groups': 'list',
     },
     'output_format': {
         'success': 'bool'
@@ -29,11 +29,11 @@ def do(data, boto3):
 
     partition = params.get('partition', None)
     item = params.get('item', {})
-    read_permissions = params.get('read_permissions', [])
-    write_permissions = params.get('write_permissions', [])
+    read_groups = params.get('read_groups', [])
+    write_groups = params.get('write_groups', [])
 
-    item['read_permissions'] = read_permissions
-    item['write_permissions'] = write_permissions
+    item['read_groups'] = read_groups
+    item['write_groups'] = write_groups
     item['owner'] = user_id
 
     table_name = 'database-{}'.format(app_id)

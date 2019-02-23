@@ -21,26 +21,26 @@ class DatabaseServiceController(ServiceController):
         return
 
     @lambda_method
-    def create_item(self, recipe, partition, item, read_permissions, write_permissions):
+    def create_item(self, recipe, partition, item, read_groups, write_groups):
         import cloud.database.create_item as method
         params = {
             'partition': partition,
             'item': item,
-            'read_permissions': read_permissions,
-            'write_permissions': write_permissions,
+            'read_groups': read_groups,
+            'write_groups': write_groups,
         }
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session
         return method.do(data, boto3)
 
     @lambda_method
-    def update_item(self, recipe, item_id, item, read_permissions, write_permissions):
+    def update_item(self, recipe, item_id, item, read_groups, write_groups):
         import cloud.database.update_item as method
         params = {
             'item_id': item_id,
             'item': item,
-            'read_permissions': read_permissions,
-            'write_permissions': write_permissions,
+            'read_groups': read_groups,
+            'write_groups': write_groups,
         }
         data = make_data(self.app_id, params, recipe)
         boto3 = self.boto3_session
