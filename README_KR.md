@@ -1,5 +1,10 @@
+<div align="center">
+  <img src="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/assets/img/brand/blue.png"><br><br>
+</div>
+
 ![Language](https://img.shields.io/badge/Language-Python3.6-blue.svg)
 ![Language](https://img.shields.io/badge/NaverFest-Finalist-brightgreen.svg)
+[![Build Status](https://travis-ci.org/hubaimaster/aws-interface.svg?branch=master)](https://travis-ci.org/hubaimaster/aws-interface)
 
 **[Naver D2 Fest 결승 진출!! 끼요오오옷ㅅㅅ](https://github.com/D2CampusFest/6th)**
 
