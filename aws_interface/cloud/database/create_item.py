@@ -34,6 +34,8 @@ def do(data, boto3):
 
     read_groups.append('admin')
     write_groups.append('admin')
+    read_groups = list(set(read_groups))
+    write_groups = list(set(write_groups))
 
     item['read_groups'] = read_groups
     item['write_groups'] = write_groups

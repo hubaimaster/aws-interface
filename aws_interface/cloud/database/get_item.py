@@ -1,6 +1,6 @@
 from cloud.aws import *
 from cloud.response import Response
-
+from cloud.database.util import has_read_permission
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -32,12 +32,9 @@ def do(data, boto3):
 
     item = dynamo.get_item(table_name, item_id)
     item = item.get('Item', {})
-    read_permission = item.get('read_groups', [])
-    if 'all' in read_permission or user_group in read_permission:
+
+    if has_read_permission(user, item):
         # Remove system key
-        item.pop('partition', None)
-        item.pop('read_groups', None)
-        item.pop('write_groups', None)
         body['item'] = item
         body['success'] = True
     else:

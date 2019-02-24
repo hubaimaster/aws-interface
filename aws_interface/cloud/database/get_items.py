@@ -1,5 +1,6 @@
 from cloud.aws import *
 from cloud.response import Response
+from cloud.database.util import has_read_permission
 import json
 
 # Define the input output format of the function.
@@ -26,7 +27,6 @@ def do(data, boto3):
     app_id = data['app_id']
     user = data['user']
 
-    user_group = user.get('group', None)
     partition = params.get('partition', None)
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
@@ -44,14 +44,9 @@ def do(data, boto3):
 
     filtered = []
     for item in items:
-        read_permission = item.get('read_groups', [])
-        if user_group in read_permission:
-            # Remove system key
-            item.pop('partition', None)
-            item.pop('read_groups', None)
-            item.pop('write_groups', None)
+        if has_read_permission(user, item):
             filtered.append(item)
 
-        body['items'] = filtered
+    body['items'] = filtered
     body['end_key'] = end_key
     return Response(body)

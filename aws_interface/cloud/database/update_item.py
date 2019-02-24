@@ -1,6 +1,6 @@
 from cloud.aws import *
 from cloud.response import Response
-
+from cloud.database.util import has_write_permission
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -25,8 +25,6 @@ def do(data, boto3):
     app_id = data['app_id']
     user = data['user']
 
-    user_group = user.get('group', None)
-
     item_id = params.get('item_id', None)
     new_item = params.get('item', {})
     read_groups = params.get('read_groups', [])
@@ -42,8 +40,7 @@ def do(data, boto3):
     result = dynamo.get_item(table_name, item_id)
     item = result.get('Item', {})
 
-    write_groups = item.get('write_groups', [])
-    if 'all' in write_groups or user_group in write_groups:
+    if has_write_permission(user, item):
         dynamo.update_item(table_name, item_id, new_item)
         body['success'] = True
     else:
