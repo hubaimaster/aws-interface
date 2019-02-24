@@ -42,4 +42,5 @@ def do(data, boto3):
     dynamo.put_item(table_name, partition, item)
 
     body['success'] = True
+    body['item_id'] = item.get('id', None)
     return Response(body)
