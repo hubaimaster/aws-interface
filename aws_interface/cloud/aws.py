@@ -75,7 +75,6 @@ class APIGateway:
             )['id']
 
         self.put_method(rest_api_id, resource_id, 'POST')
-        #self.put_method(rest_api_id, resource_id, 'GET')
 
         lambda_version = aws_lambda.meta.service_model.api_version
 
@@ -113,7 +112,6 @@ class APIGateway:
         self.put_permission(lambda_func_name, post_source_arn)
 
         # CORS OPTION
-
         self.put_method(rest_api_id, resource_id, 'OPTIONS')
         self.put_method_response(rest_api_id, resource_id, 'OPTIONS', method_response_param)
         self.put_integration(rest_api_id, resource_id, 'OPTIONS', uri)

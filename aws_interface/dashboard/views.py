@@ -272,7 +272,7 @@ class Overview(LoginRequiredMixin, View):
         app.apply_recipes(credentials)  # apply if there was a problem with previous apply
 
         if cmd == 'download_sdk':
-            sdk_bin = app.generate_sdk(credentials, 'python')
+            sdk_bin = app.generate_sdk(credentials, 'python3')
 
             if sdk_bin is None:
                 Util.add_alert(request, 'API 를 초기화 하고 있습니다. 상황에 따라 최대 3분 정도 소요될 수 있습니다.')
