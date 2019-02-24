@@ -25,6 +25,6 @@ def do(data, boto3):
     table_name = 'auth-{}'.format(app_id)
 
     dynamo = DynamoDB(boto3)
-    dynamo.delete_item(table_name, 'session', session_id)
+    dynamo.delete_item(table_name, session_id)
     body['message'] = '로그아웃 되었습니다.'
     return Response(body)

@@ -13,25 +13,6 @@ class Client():
     def _recipe_keys(self):
         return self.manifest['recipe_keys']
 
-    def examples(self):
-        print('Usage examples')
-        for recipe_key in self._recipe_keys:
-            print('Recipe: {}'.format(recipe_key).upper().center(80, '#'))
-            apis = self._get_api_list(recipe_key)
-            for api in apis:
-                print('API Name: {}'.format(api['name']).center(80, '-'))
-
-                api_info = api.get('info', {})
-                sdk_dict = api_info.get('input_format')
-                rest_dict = api_info
-                sdk_example = "call_api('{}', '{}', {})".format(recipe_key, api['name'], json.dumps(sdk_dict, indent=4))
-                rest_example = json.dumps(rest_dict, indent=4)
-
-                print('[SDK Function Call Format]')
-                print(sdk_example)
-                print('[REST API Format]')
-                print(rest_example)
-
     def _get_recipe_manifest(self, recipe_key):
         if recipe_key not in self._recipe_keys:
             raise Exception('recipe_key must be in {}'.format(self._recipe_keys))
@@ -56,7 +37,7 @@ class Client():
             data['session_id'] = self.session_id
         data = json.dumps(data)
         resp = _post(url, data)
-        return resp.json()
+        return resp.json().get('body', {'error': '404', 'message': 'NO RESPONSE'})
 
     def _auth(self, api_name, data):
         return self._call_api('auth', api_name, data)
@@ -80,7 +61,7 @@ class Client():
             'email': email,
             'password': password
         })
-        self.session_id = response.get('item', {}).get('session_id', None)
+        self.session_id = response.get('session_id', None)
         return response
 
     def auth_get_user(self, user_id):
@@ -106,7 +87,7 @@ class Client():
         if guest_id:
             data['guest_id'] = guest_id
         response = self._auth('guest', data)
-        self.session_id = response.get('item', {}).get('session_id', None)
+        self.session_id = response.get('session_id', None)
         return response
 
     # def auth_delete_user(self):
@@ -199,5 +180,22 @@ def _post(url, data):
     return response
 
 
+def example():
+    email = 'email@example.com'
+    password = 'password'
+    client = Client()
+
+    response = client.auth_register(email, password)
+    print('auth_register response: {}'.format(response))
+
+    response = client.auth_login(email, password)
+    print('auth_login response: {}'.format(response))
+
+    response = client.database_create_item({
+        'type': 'test',
+    }, 'test', ['owner'], ['owner'])
+    print('database_create_item response: {}'.format(response))
+
+
 if __name__ == '__main__':  # SHOW EXAMPLE
-    Client().examples()
+    example()
