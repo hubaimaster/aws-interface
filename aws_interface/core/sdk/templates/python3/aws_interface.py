@@ -80,6 +80,7 @@ class Client():
         response = self._auth('logout', {
             'session_id': self.session_id
         })
+        self.session_id = None
         return response
 
     def auth_guest(self, guest_id=None):
