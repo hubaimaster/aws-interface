@@ -329,6 +329,7 @@ class Auth(LoginRequiredMixin, View):
         context['app_id'] = app_id
         app = App.objects.get(id=app_id)
         credentials = Util.get_credentials(request)
+        app.apply_recipes(credentials)
 
         auth = app.recipe_set.get(name='auth')
         with auth.api(credentials) as api:
@@ -399,6 +400,7 @@ class Database(LoginRequiredMixin, View):
         context['app_id'] = app_id
         app = App.objects.get(id=app_id)
         credentials = Util.get_credentials(request)
+        app.apply_recipes(credentials)
 
         auth = app.recipe_set.get(name='auth')
         database = app.recipe_set.get(name='database')
@@ -489,6 +491,7 @@ class Storage(LoginRequiredMixin, View):
         context['app_id'] = app_id
         app = App.objects.get(id=app_id)
         credentials = Util.get_credentials(request)
+        app.apply_recipes(credentials)
 
         auth = app.recipe_set.get(name='auth')
         storage = app.recipe_set.get(name='storage')
