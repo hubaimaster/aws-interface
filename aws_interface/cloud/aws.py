@@ -164,9 +164,6 @@ class APIGateway:
             type="AWS",
             integrationHttpMethod=method_type,
             uri=uri,
-            requestTemplates={
-                'application/json': '{"statusCode": 200}'
-            },
         )
         return integration_resp
 
