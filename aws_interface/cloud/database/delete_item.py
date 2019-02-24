@@ -23,16 +23,22 @@ def do(data, boto3):
     app_id = data['app_id']
     user = data['user']
 
-    user_group = user.get('group', None)
+    def has_write_permission(user, item):
+        group = user.get('group', None)
+        user_id = user.get('id', None)
+        groups = item.get('write_groups', [])
+        if group in groups:
+            return True
+        elif 'owner' in groups and user_id == item.get('owner'):
+            return True
+        return False
+
     item_id = params.get('item_id', None)
-
     table_name = 'database-{}'.format(app_id)
-
     dynamo = DynamoDB(boto3)
 
-    item = dynamo.get_item(table_name, item_id)
-    write_groups = item.get('Item', {}).get('write_groups', [])
-    if 'all' in write_groups or user_group in write_groups:
+    item = dynamo.get_item(table_name, item_id).get('Item')
+    if has_write_permission(user, item):
         _ = dynamo.delete_item(table_name, item_id)
         body['success'] = True
     else:

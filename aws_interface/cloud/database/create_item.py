@@ -32,6 +32,9 @@ def do(data, boto3):
     read_groups = params.get('read_groups', [])
     write_groups = params.get('write_groups', [])
 
+    read_groups.append('admin')
+    write_groups.append('admin')
+    
     item['read_groups'] = read_groups
     item['write_groups'] = write_groups
     item['owner'] = user_id
