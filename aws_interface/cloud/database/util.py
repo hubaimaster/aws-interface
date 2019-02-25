@@ -1,7 +1,7 @@
 def has_read_permission(user, item):
     group = user.get('group', None)
     user_id = user.get('id', None)
-    groups = item.get('read_groups', [])
+    groups = item.get('read_groups', ['admin'])
     if group in groups:
         return True
     elif 'owner' in groups and user_id == item.get('owner'):
@@ -12,7 +12,7 @@ def has_read_permission(user, item):
 def has_write_permission(user, item):
     group = user.get('group', None)
     user_id = user.get('id', None)
-    groups = item.get('write_groups', [])
+    groups = item.get('write_groups', ['admin'])
     if group in groups:
         return True
     elif 'owner' in groups and user_id == item.get('owner'):
