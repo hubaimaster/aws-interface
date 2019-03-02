@@ -18,13 +18,13 @@ class DatabaseAPI(API):
         return self.recipe_controller.delete_partition(partition_name)
 
     # Service
-    def create_item(self, partition, item, read_permissions=['all'], write_permissions=['all']):
+    def create_item(self, partition, item, read_groups=['admin'], write_groups=['admin']):
         return self.service_controller.create_item(self.recipe_controller.to_json(),
-                                                   partition, item, read_permissions, write_permissions)
+                                                   partition, item, read_groups, write_groups)
 
-    def update_item(self, item_id, item, read_permissions=['all'], write_permissions=['all']):
+    def update_item(self, item_id, item, read_groups=['admin'], write_groups=['admin']):
         return self.service_controller.update_item(self.recipe_controller.to_json(),
-                                                   item_id, item, read_permissions, write_permissions)
+                                                   item_id, item, read_groups, write_groups)
 
     def put_item_field(self, item_id, field_name, field_value):
         return self.service_controller.put_item_field(self.recipe_controller.to_json(),
