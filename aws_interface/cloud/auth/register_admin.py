@@ -12,6 +12,7 @@ info = {
         'extra': 'map'
     },
     'output_format': {
+        'success': 'bool',
         'message': 'str',
     }
 }
@@ -19,7 +20,6 @@ info = {
 
 def do(data, boto3):
     body = {}
-    recipe = data['recipe']
     params = data['params']
     app_id = data['app_id']
 
@@ -32,25 +32,14 @@ def do(data, boto3):
 
     table_name = 'auth-{}'.format(app_id)  # Should be auth-143..
     partition = 'user'
-    login_conf = recipe['login_method']['email_login']
-    default_group_name = login_conf['default_group_name']
-    enabled = login_conf['enabled']
-    if enabled == 'true':
-        enabled = True
-    elif enabled == 'false':
-        enabled = False
-
-    if not enabled:
-        body['error'] = '4'
-        body['message'] = '이메일 로그인이 비활성화 상태입니다.'
-        return Response(body)
+    default_group_name = 'admin'
 
     dynamo = DynamoDB(boto3)
     resp = dynamo.get_items_with_index(table_name, 'partition-email', 'partition', 'user', 'email', email)
     users = resp['Items']
     if len(users) > 0:
         body['message'] = '이미 가입된 회원이 존재합니다.'
-        body['error'] = '1'
+        body['success'] = False
         return Response(body)
     else:
         item = {
@@ -63,4 +52,5 @@ def do(data, boto3):
         }
         dynamo.put_item(table_name, partition, item)
         body['message'] = '회원가입에 성공하였습니다.'
+        body['success'] = True
         return Response(body)

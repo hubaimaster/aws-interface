@@ -62,3 +62,6 @@ class AuthAPI(API):
 
     def get_session_count(self):  # it will connect for dashboard
         return self.service_controller.get_session_count(self.recipe_controller.to_json())
+
+    def create_admin(self, email, password, extra):
+        return self.service_controller.create_admin(self.recipe_controller.to_json(), email, password, extra)
