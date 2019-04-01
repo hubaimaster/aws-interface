@@ -86,6 +86,15 @@ class AuthServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
+    def delete_sessions(self, recipe, session_ids):
+        import cloud.auth.delete_sessions as method
+        params = {
+            'session_ids': session_ids
+        }
+        data = make_data(self.app_id, params, recipe)
+        return method.do(data, self.resource)
+
+    @lambda_method
     def get_session(self, recipe, session_id):
         import cloud.auth.get_session as method
         params = {

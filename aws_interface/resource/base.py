@@ -61,6 +61,9 @@ class Resource(metaclass=ABCMeta):
     def db_delete_item(self, item_id):
         raise NotImplementedError
 
+    def db_delete_item_batch(self, item_ids):
+        raise NotImplementedError
+
     def db_get_item(self, item_id):
         raise NotImplementedError
 

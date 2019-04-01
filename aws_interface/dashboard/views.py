@@ -478,6 +478,9 @@ class Auth(LoginRequiredMixin, View):
             elif cmd == 'delete_user':
                 user_id = request.POST['user_id']
                 api.delete_user(user_id)
+            elif cmd == 'delete_sessions':
+                session_ids = request.POST.getlist('session_ids[]')
+                api.delete_sessions(session_ids)
 
         return redirect(request.path_info)  # Redirect back
 

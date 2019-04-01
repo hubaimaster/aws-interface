@@ -35,7 +35,6 @@
                   <tr>
                     <th scope="col">
                         <button scope="row" data-toggle="modal" data-target="#modal-add-partition" class="btn btn-sm">
-                            <span class="badge badge-default">서비스</span>
                             파티션 추가 +
                         </button>
                         <div style="text-align: right; float: right;">
@@ -116,7 +115,6 @@
                   <tr>
                     <th scope="col">
                         <button id="open-add-item-modal" scope="row" class="btn btn-sm">
-                            <span class="badge badge-default">서비스</span>
                             아이템 추가 +
                         </button>
                         <text id="item_count"></text>
@@ -227,7 +225,6 @@
                   <tr>
                     <th scope="col">
                         <button id="open-add-field-modal" scope="row" class="btn btn-sm">
-                            <span class="badge badge-default">서비스</span>
                             필드 추가 +
                         </button>
                         <div style="text-align: right; float: right;">
@@ -296,7 +293,7 @@
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style="display: block; height: 400px; overflow-y: auto;">
 
                 </tbody>
               </table>
@@ -427,7 +424,7 @@
               value_type = 'L';
               value = JSON.stringify(value);
           }
-          var row = "<tr><th name=\"field\" id=\"" +
+          var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\"><th name=\"field\" id=\"" +
               key + "\" scope=\"row\">" +
               "<div class=\"row\">" +
               "<div class=\"col-md-10\">" +

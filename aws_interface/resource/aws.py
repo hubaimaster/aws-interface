@@ -182,6 +182,13 @@ class AWSResource(Resource):
         result = dynamo.delete_item(self.app_id, item_id)
         return bool(result)
 
+    def db_delete_item_batch(self, item_ids):
+        result = True
+        dynamo = DynamoDB(self.boto3_session)
+        for item_id in item_ids:
+            result &= bool(dynamo.delete_item(self.app_id, item_id))
+        return result
+
     def db_get_item(self, item_id):
         dynamo = DynamoDB(self.boto3_session)
         item = dynamo.get_item(self.app_id, item_id)

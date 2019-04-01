@@ -54,6 +54,9 @@ class AuthAPI(API):
     def delete_session(self, session_id):  # use as logout
         return self.service_controller.delete_session(self.recipe_controller.to_json(), session_id)
 
+    def delete_sessions(self, session_ids):  # use as logout
+        return self.service_controller.delete_sessions(self.recipe_controller.to_json(), session_ids)
+
     def get_session(self, session_id):  # use as login check
         return self.service_controller.get_session(self.recipe_controller.to_json(), session_id)
 

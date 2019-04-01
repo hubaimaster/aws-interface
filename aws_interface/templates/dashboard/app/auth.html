@@ -62,7 +62,7 @@
               <div class="row align-items-center">
                 <div class="col">
                   <h3 class="mb-0">
-                      <span class="badge badge-primary">레시피</span>
+                      <span class="badge badge-primary">설정</span>
                       회원 그룹
                   </h3>
                 </div>
@@ -156,7 +156,7 @@
               <div class="row align-items-center">
                 <div class="col">
                   <h3 class="mb-0">
-                      <span class="badge badge-primary">레시피</span>
+                      <span class="badge badge-primary">설정</span>
                       로그인 방법
                   </h3>
                 </div>
@@ -246,7 +246,6 @@
               <div class="row align-items-center">
                 <div class="col">
                   <h3 class="mb-0">
-                      <span class="badge badge-default">서비스</span>
                       가입된 회원
                   </h3>
                 </div>
@@ -356,7 +355,6 @@
               <div class="row align-items-center">
                 <div class="col">
                   <h3 class="mb-0">
-                      <span class="badge badge-default">서비스</span>
                       접속 중인 세션
                   </h3>
                 </div>
@@ -367,20 +365,13 @@
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item">선택 삭제</a>
-                                    <div class="dropdown-divider"></div>
-
-                                    <a class="dropdown-item left" aria-disabled="true">
-                                         <div class="custom-control custom-checkbox mt--1">
-                                            <input class="custom-control-input" type="checkbox" name="checkbox-field" id="field-check-all">
-                                        </div>
-                                    </a>
+                                    <a class="dropdown-item" onclick="delete_checked_sessions();">선택 삭제</a>
                                 </div>
                             </div>
                 </div>
               </div>
             </div>
-            <div class="table-responsive" style="height: 400px; overflow-y: auto;">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
               <!-- Projects table -->
               <table class="table align-items-center table-flush">
                 <thead class="thead-light">
@@ -414,8 +405,8 @@
                     </td>
                     <td>
                         <div class="custom-control custom-checkbox mt--4">
-                            <input class="custom-control-input" type="checkbox" name="checkbox-session" id="checkbox-{{ session.id }}">
-                            <label class="custom-control-label" for="checkbox-{{ session.id }}"></label>
+                            <input class="custom-control-input" type="checkbox" name="checkbox-session" id="{{ session.id }}">
+                            <label class="custom-control-label" for="{{ session.id }}"></label>
                         </div>
                     </td>
                   </tr>
@@ -465,6 +456,29 @@
 
       });
   }
+  function delete_sessions(session_ids) {
+      $.LoadingOverlay('show', {
+          text:'Deleting sessions...'
+      });
+      $.post("", {
+          cmd: "delete_sessions",
+          'session_ids[]': session_ids,
+      }, function (data) {
+          $.LoadingOverlay('hide');
+          window.location.reload();
+      });
+  }
+  function delete_checked_sessions(){
+      var session_ids = [];
+      var checkboxs = $("input[name='checkbox-session']");
+      for (var i = 0; i < checkboxs.length; i++){
+          if (checkboxs[i].checked){
+              session_ids.push(checkboxs[i].id);
+          }
+      }
+      delete_sessions(session_ids);
+  }
+
   window.onload = function(){
     $("#email_default_group").change(function () {
         set_email_login()
