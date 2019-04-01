@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 import cloud.shortuuid as shortuuid
 import base64
@@ -22,7 +22,7 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
     params = data['params']
     app_id = data['app_id']
@@ -39,9 +39,6 @@ def do(data, boto3):
 
     file_bin = base64.b64decode(file_b64)
 
-    table_name = 'storage-{}'.format(app_id)
-    bucket_name = 'storage-{}'.format(app_id)
-
     split_file_name = '{}_{}'.format(file_name, index)
 
     parent_path = 'dummy'
@@ -52,8 +49,7 @@ def do(data, boto3):
 
     file_key = '{}-{}'.format(shortuuid.uuid(), split_file_name)
 
-    s3 = S3(boto3)
-    s3.upload_file_bin(bucket_name, file_key, file_bin)
+    resource.file_upload_base64(file_key, file_bin)
 
     item = {
         'owner': user_id,
@@ -69,14 +65,6 @@ def do(data, boto3):
     }
     print(item)
 
-    dynamo = DynamoDB(boto3)
-
-    folder = dynamo.get_item(table_name, file_path)
-    if folder.get('Item'):
-        body['success'] = False
-        body['message'] = 'file_path: {} exists'.format(file_path)
-        return Response(body)
-
-    dynamo.put_item(table_name, parent_path, item, item_id=file_path)
+    resource.db_put_item('storage-files', item, file_path)
     body['success'] = True
     return Response(body)

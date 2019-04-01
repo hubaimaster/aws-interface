@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 
 # Define the input output format of the function.
@@ -14,10 +14,9 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
     params = data['params']
-    app_id = data['app_id']
     user = data['user']
 
     user_id = user.get('id', None)
@@ -32,26 +31,14 @@ def do(data, boto3):
         return user_group in write_groups
 
     _path = params.get('path')
-
-    table_name = 'storage-{}'.format(app_id)
-    bucket_name = 'storage-{}'.format(app_id)
-
-    dynamo = DynamoDB(boto3)
-    s3 = S3(boto3)
-    item = dynamo.get_item(table_name, _path).get('Item')
+    item = resource.db_get_item(_path)
 
     def delete_item(_item):
         if has_permission(_item):
-            dynamo.delete_item(table_name, _path)
-            if _item['type'] == 'folder':
-                items = dynamo.get_items(table_name, _path).get('Items', [])
-                print(items)
-                for __item in items:
-                    delete_item(__item)
-            elif _item['type'] == 'file':
-                file_key = item.get('file_key', None)
-                if file_key:
-                    s3.delete_file_bin(bucket_name, file_key)
+            resource.db_delete_item(_path)
+            file_key = item.get('file_key', None)
+            if file_key:
+                resource.file_delete_base64(file_key)
         else:
             body['success'] = False
             body['message'] = 'permission denied'

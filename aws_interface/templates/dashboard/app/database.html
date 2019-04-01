@@ -6,6 +6,7 @@
     <!-- Top navbar -->
     {% include 'dashboard/app/top-navbar.html' %}
     <!-- Header -->
+    <input id="view-tag" value="database" hidden>
     <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
       <div class="container-fluid">
         <div class="header-body">
@@ -15,17 +16,6 @@
             </div>
             <div class="alert alert-default" role="alert">
                 <strong>Auth </strong> 에 의존합니다.
-            </div>
-
-            <div class="alert alert-neutral" role="alert">
-                <div class="row">
-                    <div class="col">
-                        <strong>{{ rest_api_url }}</strong> 의 POST Method 를 호출 할 수 있습니다.
-                    </div>
-                    <div class="col-auto">
-
-                    </div>
-                </div>
             </div>
 
         </div>
@@ -38,16 +28,34 @@
           <div class="card shadow">
 
             <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xl-3" style="padding-right: 0;">
+            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding-right: 0;">
               <!-- Projects table -->
               <table class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">
                         <button scope="row" data-toggle="modal" data-target="#modal-add-partition" class="btn btn-sm">
-                            <span class="badge badge-primary">레시피</span>
+                            <span class="badge badge-default">서비스</span>
                             파티션 추가 +
                         </button>
+                        <div style="text-align: right; float: right;">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item">선택 삭제</a>
+                                    <div class="dropdown-divider"></div>
+
+                                    <a class="dropdown-item" aria-disabled="true">
+                                         <div class="custom-control custom-checkbox mt--1">
+                                            <input class="custom-control-input" type="checkbox" name="checkbox-partition" id="partition-check-all">
+                                            <label class="custom-control-label" for="partition-check-all" style="width:100%;">전체 선택</label>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="modal-add-partition" tabindex="-1" role="dialog" aria-labelledby="modal-add-partition" aria-hidden="true">
                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                               <div class="modal-content">
@@ -88,7 +96,12 @@
                   <tr>
                     <th id="{{ partition.name }}" name="partition" scope="row" onclick="set_partition('{{ partition.name }}');">
                       {{ partition.name }}
-                        <button onclick="delete_partition('{{ partition.name }}');" style='font-size:7pt; margin-left:16px;'>삭제</button>
+                        <div style="text-align: right; float: right;">
+                            <div class="custom-control custom-checkbox mt--3">
+                                <input class="custom-control-input" type="checkbox" name="checkbox-partition" id="partition-{{ partition.name }}">
+                                <label class="custom-control-label" for="partition-{{ partition.name }}"></label>
+                            </div>
+                        </div>
                     </th>
                   </tr>
                   {% endfor %}
@@ -96,7 +109,7 @@
               </table>
             </div>
 
-              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xl-3" style="padding: 0;">
+              <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding: 0;">
               <!-- Projects table -->
               <table style="display:table; width:100%; table-layout:fixed;" id="item-table" class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
@@ -107,7 +120,24 @@
                             아이템 추가 +
                         </button>
                         <text id="item_count"></text>
+                        <div style="text-align: right; float: right;">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item">선택 삭제</a>
+                                    <div class="dropdown-divider"></div>
 
+                                    <a class="dropdown-item" aria-disabled="true">
+                                         <div class="custom-control custom-checkbox mt--1">
+                                            <input class="custom-control-input" type="checkbox" name="checkbox-item" id="item-check-all">
+                                            <label class="custom-control-label" for="item-check-all" style="width:100%;">전체 선택</label>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                               <div class="modal-content">
@@ -137,7 +167,7 @@
                                                       </button>
                                                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                         {% for group in user_groups %}
-                                                        <a class="dropdown-item" onclick="put_read_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                        <a class="dropdown-item" onclick="put_read_group('{{ group.name }}');">{{ group.name }}</a>
                                                         {% endfor %}
                                                         <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -157,7 +187,7 @@
                                                       </button>
                                                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                         {% for group in user_groups %}
-                                                        <a class="dropdown-item" onclick="put_write_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                        <a class="dropdown-item" onclick="put_write_group('{{ group.name }}');">{{ group.name }}</a>
                                                         {% endfor %}
                                                         <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -190,7 +220,7 @@
               </table>
             </div>
 
-             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 col-xl-6" style="padding-left: 0;">
+             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding-left: 0;">
               <!-- Projects table -->
               <table id="field-table" class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
@@ -200,6 +230,24 @@
                             <span class="badge badge-default">서비스</span>
                             필드 추가 +
                         </button>
+                        <div style="text-align: right; float: right;">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item">선택 삭제</a>
+                                    <div class="dropdown-divider"></div>
+
+                                    <a class="dropdown-item left" aria-disabled="true">
+                                         <div class="custom-control custom-checkbox mt--1">
+                                            <input class="custom-control-input" type="checkbox" name="checkbox-field" id="field-check-all">
+                                            <label class="custom-control-label" for="field-check-all" style="width:100%;">전체 선택</label>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="modal-add-field" tabindex="-1" role="dialog" aria-labelledby="modal-add-field" aria-hidden="true">
                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                               <div class="modal-content">
@@ -227,7 +275,8 @@
                                               </div>
                                               <div class="form-group">
                                                 <label class="form-control-label" for="field-value">값</label>
-                                                <input id="field-value" type="text" class="form-control form-control-alternative" placeholder="필드 값">
+                                                <textarea rows="5" id="field-value" type="text" class="form-control form-control-alternative" placeholder="필드 값">
+                                                </textarea>
                                               </div>
                                             </div>
                                           </div>
@@ -302,7 +351,7 @@
           $("#item-table>tbody").empty();
           append_items(items);
           get_item_count(p, function (data) {
-              var ment = "총 " + data['item']["count"] + "개 항목 중 " + items.length + "개";
+              var ment = data['item']["count"] + "/" + items.length ;
               $("#item_count").html(ment);
           });
       });
@@ -313,8 +362,14 @@
               item_ids.push(items[i]["id"]);
               var iid = items[i]["id"];
               var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\">" +
-                  "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +
-                  "<button onclick='delete_item(\"" + iid + "\");' class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+                  "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" +
+                  "<text>"  + iid + "</text>" +
+                  "<div style=\"text-align: right; float: right;\">" +
+                  "<div class=\"custom-control custom-checkbox mt--3\">" +
+                  "<input class=\"custom-control-input\" type=\"checkbox\" name=\"checkbox-item\" id=\"item-" + iid + "\">" +
+                  "<label class=\"custom-control-label\" for=\"item-" + iid + "\"></label>\n" +
+                  "</div>" +
+                  "</div>" +
                   "</th></tr>";
               $("#item-table").append(row);
           }
@@ -339,7 +394,7 @@
           append_items(_items);
 
           get_item_count(partition, function (data) {
-              var ment = "총 " + data['item']["count"] + "개 항목 중 " + item_ids.length + "개";
+              var ment = data['item']["count"] + "/" + item_ids.length;
               $("#item_count").html(ment);
           });
       });
@@ -373,8 +428,24 @@
               value = JSON.stringify(value);
           }
           var row = "<tr><th name=\"field\" id=\"" +
-              key + "\" scope=\"row\"><a onclick=\"set_field('" + key + "', '" + value + "','" + value_type + "');\">" + key + " : " + value + "</a>" +
-              "<button onclick='delete_field(\"" + key + "\");' class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+              key + "\" scope=\"row\">" +
+              "<div class=\"row\">" +
+              "<div class=\"col-md-10\">" +
+              "<a style='color:cornflowerblue; cursor:pointer;' onclick=\"set_field('" + key + "', '" + value + "','" + value_type + "');\">" +
+              "<label>" + key + "</label>&nbsp" +
+              "<button class=\"btn btn-sm\">수정</button>" +
+              "</a>" +
+              "<textarea readonly class=\"form-control form-control-alternative\" style='width:100%;'>" + value + "</textarea>" +
+              "</div>" +
+              "<div class=\"col-md-2\">" +
+              "<div style=\"text-align: right; float: right;\">" +
+              "<div class=\"custom-control custom-checkbox mt--3\">\n" +
+              "<input class=\"custom-control-input\" type=\"checkbox\" name=\"checkbox-field\" id=\"field-" + key + "\">\n" +
+              "<label class=\"custom-control-label\" for=\"field-" + key + "\"></label>\n" +
+              "</div>" +
+              "</div>" +
+              "</div>" +
+              "</div>" +
               "</th></tr>";
           $("#field-table").append(row);
       });
@@ -495,7 +566,7 @@
     }
     function put_read_group(group_name) {
         if (read_groups.includes(group_name)){
-            alert("이미 해당 그룹이 존재합니다");
+            //alert("이미 해당 그룹이 존재합니다");
         }else{
             read_groups.push(group_name);
             render_read_groups();
@@ -545,6 +616,15 @@
             $("#field-value").val(null);
             $("#field-type").val('S');
             $("#modal-add-field").modal('show');
+        });
+        $("#partition-check-all").click(function () {
+            $("input[name='checkbox-partition']").prop('checked', this.checked);
+        });
+        $("#item-check-all").click(function () {
+            $("input[name='checkbox-item']").prop('checked', this.checked);
+        });
+        $("#field-check-all").click(function () {
+            $("input[name='checkbox-field']").prop('checked', this.checked);
         });
         render_read_groups();
         render_write_groups();

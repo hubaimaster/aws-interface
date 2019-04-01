@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 from cloud.database.util import has_write_permission
 
@@ -18,11 +18,9 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
-    app_id = data['app_id']
     user = data['user']
 
     item_id = params.get('item_id', None)
@@ -33,15 +31,10 @@ def do(data, boto3):
     new_item['read_groups'] = read_groups
     new_item['write_groups'] = write_groups
 
-    table_name = 'database-{}'.format(app_id)
-
-    dynamo = DynamoDB(boto3)
-
-    result = dynamo.get_item(table_name, item_id)
-    item = result.get('Item', {})
+    item = resource.db_get_item(item_id)
 
     if has_write_permission(user, item):
-        dynamo.update_item(table_name, item_id, new_item)
+        resource.db_update_item(item_id, new_item)
         body['success'] = True
     else:
         body['success'] = False

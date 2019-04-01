@@ -19,6 +19,8 @@
   <link href="{%  static 'assets/vendor/@fortawesome/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
   <!-- Argon CSS -->
   <link type="text/css" href="{% static 'assets/css/argon.css' %}" rel="stylesheet">
+  <!-- Notify CSS -->
+  <link href="{% static 'assets/css/notify-metro.css' %}" rel="stylesheet" />
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134607667-1"></script>
@@ -42,7 +44,7 @@
       </button>
       <!-- Brand -->
       <a class="navbar-brand pt-0" href="{%  url 'apps' %}">
-        <img src="{%  static 'assets/img/brand/blue.png' %}" class="navbar-brand-img" alt="...">
+        <img src="{%  static 'assets/img/brand/blue-beta.png' %}" class="navbar-brand-img" alt="...">
       </a>
       <!-- User -->
       <ul class="nav align-items-center d-md-none">
@@ -179,6 +181,23 @@
   <script src="{%  static 'assets/vendor/chart.js/dist/Chart.extension.js' %}"></script>
   <!-- Argon JS -->
   <script src="{%  static 'assets/js/argon.js' %}"></script>
+  <!-- Notify JS -->
+  <script src="{% static 'assets/js/notify.js' %}"></script>
+  <script src="{% static 'assets/js/notify-metro.js' %}"></script>
+
+  <script>
+      function notifyInfo(text, status) {
+        $.notify({
+            text: text,
+            status: status,
+        }, {
+            style: 'metro',
+            className: 'info',
+            autoHide: false,
+            clickToHide: true
+        });
+    }
+  </script>
 
   <script>
      // CSRF

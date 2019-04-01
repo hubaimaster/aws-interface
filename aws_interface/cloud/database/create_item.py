@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 
 
@@ -18,11 +18,9 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
-    app_id = data['app_id']
     user = data['user']
 
     user_id = user.get('id', None)
@@ -41,10 +39,7 @@ def do(data, boto3):
     item['write_groups'] = write_groups
     item['owner'] = user_id
 
-    table_name = 'database-{}'.format(app_id)
-
-    dynamo = DynamoDB(boto3)
-    dynamo.put_item(table_name, partition, item)
+    resource.db_put_item(partition, item)
 
     body['success'] = True
     body['item_id'] = item.get('id', None)

@@ -13,6 +13,7 @@ from dashboard.models import *
 from botocore.errorfactory import ClientError
 from numbers import Number
 from decimal import Decimal
+from resource import get_resource_allocator
 
 import json
 import base64
@@ -76,6 +77,90 @@ class Util:
         if len(aws_secret_key) < 4:
             return False
         return True
+
+    @classmethod
+    def create_app(cls, request):
+        name = request.POST['name']
+        if not name or len(name) < 3:
+            Util.add_alert(request, '이름은 3글자 이상입니다')
+            return redirect('apps')
+        user_id = request.user.id
+        app = App.objects.filter(user=request.user.id, name=name)
+        if app:
+            Util.add_alert(request, '같은 이름의 어플리케이션이 존재합니다')
+            return redirect('apps')
+        app = App()
+        app.name = name
+        app.user_id = user_id
+        app.save()
+        Util.add_alert(request, '새로운 어플리케이션이 생성되었습니다')
+
+    @classmethod
+    def init_recipes(cls, app):
+        from core.recipe_controller import rc_dict
+        for name, recipe_cls in rc_dict.items():
+            default_json_string = recipe_cls().to_json()
+            try:
+                recipe = Recipe.objects.get(app=app, name=name)
+                if not recipe.json_string:
+                    recipe.json_string = default_json_string
+                    recipe.save()
+            except ObjectDoesNotExist as _:
+                recipe = Recipe(app=app, name=name)
+                recipe.json_string = default_json_string
+                recipe.save()
+                continue
+
+    @classmethod
+    def get_recipe(cls, app, name):
+        try:
+            item = Recipe.objects.get(app=app, name=name)
+            return item
+        except ObjectDoesNotExist as _:
+            recipe = Recipe(app=app, name=name)
+            recipe.save()
+            return recipe
+
+    @classmethod
+    def deploy_resource(cls, credentials, app):
+        recipes = []
+        cls.init_recipes(app)
+        items = Recipe.objects.filter(app=app)
+        for item in items:
+            if item.json_string:
+                recipe = json.loads(item.json_string)
+                recipes.append(recipe)
+            else:
+                print('item.json_string is empty')
+        allocator = get_resource_allocator(app.vendor, credentials, app.id, recipes)
+        allocator.create()
+
+    @classmethod
+    def terminate_resource(cls, credentials, app):
+        recipes = []
+        items = Recipe.objects.filter(app=app)
+        for item in items:
+            if item.json_string:
+                recipe = json.loads(item.json_string)
+                recipes.append(recipe)
+            else:
+                print('item.json_string is empty')
+        allocator = get_resource_allocator(app.vendor, credentials, app.id, recipes)
+        allocator.terminate()
+        app.delete()
+
+    @classmethod
+    def generate_sdk(cls, credentials, app, platform):
+        recipes = []
+        items = Recipe.objects.filter(app=app)
+        for item in items:
+            if item.json_string:
+                recipe = json.loads(item.json_string)
+                recipes.append(recipe)
+            else:
+                print('item.json_string is empty')
+        allocator = get_resource_allocator(app.vendor, credentials, app.id, recipes)
+        return allocator.generate_sdk(platform)
 
 
 def page_manage(func):
@@ -183,10 +268,15 @@ class Register(View):
             Util.add_alert(request, '유효한 AccessKey 를 입력해주세요.')
             return redirect('register')
         else:
+            credentials = {
+                'aws': {
+                    'access_key': aws_access_key,
+                    'secret_key': aws_secret_key
+                },
+            }
             get_user_model().objects.create_user(
                 email, password,
-                aws_access_key=aws_access_key,
-                aws_secret_key=aws_secret_key,
+                credentials=credentials,
             )
             Util.add_alert(request, '회원가입에 성공하였습니다.')
             return redirect('index')
@@ -211,9 +301,7 @@ class Login(View):
             Util.add_alert(request, '로그인 정보가 틀렸습니다')
             return redirect('login')
         else:
-            credentials = dict()
-            credentials['access_key'] = user.get_aws_access_key(password)
-            credentials['secret_key'] = user.get_aws_secret_key(password)
+            credentials = user.get_credentials(password)
             Util.reset_credentials(request, credentials)
             login(request, user)
             return redirect(settings.LOGIN_REDIRECT_URL)
@@ -240,39 +328,33 @@ class Apps(LoginRequiredMixin, View):
         return render(request, 'dashboard/apps.html', context=context)
 
     @page_manage
-    def post(self, request): # create app
-        name = request.POST['name']
-        if not name or len(name) < 3:
-            Util.add_alert(request, '이름은 3글자 이상입니다')
+    def post(self, request):
+        cmd = request.POST.get('cmd', None)
+        if cmd == 'create_app':
+            Util.create_app(request)
             return redirect('apps')
-        user_id = request.user.id
-        app = App.objects.filter(name=name)
-        if app:
-            Util.add_alert(request, '같은 이름의 어플리케이션이 존재합니다')
+        elif cmd == 'remove_app':
+            app_id = request.POST['app_id']
+            apps = App.objects.filter(id=app_id, user=request.user)
+            if apps:
+                app = apps[0]
+                credentials = Util.get_credentials(request)
+                Util.terminate_resource(credentials, app)
+                Util.add_alert(request, 'Application removed')
+            else:
+                Util.add_alert(request, 'Failed to remove application')
             return redirect('apps')
-        app = App()
-        app.name = name
-        app.user_id = user_id
-        app.save()
-
-        credentials = Util.get_credentials(request)
-        app.assign_all_recipes()
-        app.apply_recipes(credentials)
-
-        Util.add_alert(request, '새로운 어플리케이션이 생성되었습니다')
-        return redirect('apps')
 
 
 class Overview(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         cmd = request.GET.get('cmd', None)
-        app = App.objects.get(id=app_id)
+        app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
-        app.apply_recipes(credentials)  # apply if there was a problem with previous apply
-
+        Util.deploy_resource(credentials, app)
         if cmd == 'download_sdk':
-            sdk_bin = app.generate_sdk(credentials, 'python3')
+            sdk_bin = Util.generate_sdk(credentials, app, 'python3')
 
             if sdk_bin is None:
                 Util.add_alert(request, 'API 를 초기화 하고 있습니다. 상황에 따라 최대 3분 정도 소요될 수 있습니다.')
@@ -285,9 +367,19 @@ class Overview(LoginRequiredMixin, View):
             context = Util.get_context(request)
             context['app_id'] = app_id
 
-            app = App.objects.get(id=app_id)
+            app = App.objects.get(id=app_id, user=request.user)
             context['app_name'] = app.name
             return render(request, 'dashboard/app/overview.html', context=context)
+
+    @page_manage
+    def post(self, request, app_id):
+        context = Util.get_context(request)
+        context['app_id'] = app_id
+        app = App.objects.get(id=app_id, user=request.user)
+        credentials = Util.get_credentials(request)
+        cmd = request.POST['cmd']
+        if cmd == 'deploy_resource':
+            Util.deploy_resource(credentials, app)
 
 
 class Guide(LoginRequiredMixin, View):
@@ -296,7 +388,7 @@ class Guide(LoginRequiredMixin, View):
         context = Util.get_context(request)
         context['app_id'] = app_id
 
-        app = App.objects.get(id=app_id)
+        app = App.objects.get(id=app_id, user=request.user)
         context['app_name'] = app.name
         return render(request, 'dashboard/app/guide.html', context=context)
 
@@ -311,10 +403,10 @@ class Bill(LoginRequiredMixin, View):
 
         context = Util.get_context(request)
         context['app_id'] = app_id
-        app = App.objects.get(id=app_id)
+        app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
 
-        bill = app.recipe_set.get(name='bill')
+        bill = Util.get_recipe(app, 'bill')
         with bill.api(credentials) as api:
             context['cost'] = api.get_current_cost()
             context['usages'] = api.get_current_usage_costs()
@@ -327,32 +419,30 @@ class Auth(LoginRequiredMixin, View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        app = App.objects.get(id=app_id)
+        app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
-        app.apply_recipes(credentials)
 
-        auth = app.recipe_set.get(name='auth')
+        auth = Util.get_recipe(app, 'auth')
         with auth.api(credentials) as api:
             context['user_groups'] = api.get_user_groups()
             context['user_count'] = api.get_user_count()
             context['session_count'] = api.get_session_count()
             context['users'] = api.get_users()
+            context['sessions'] = api.get_sessions()
             context['email_login'] = api.get_email_login()
             context['guest_login'] = api.get_guest_login()
-            context['rest_api_url'] = api.get_rest_api_url()
         return render(request, 'dashboard/app/auth.html', context=context)
 
     @page_manage
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        app = App.objects.get(id=app_id)
+        app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
 
         auth = app.recipe_set.get(name='auth')
         with auth.api(credentials) as api:
             cmd = request.POST['cmd']
-
             # Recipe
             if cmd == 'delete_group':
                 name = request.POST['group_name']
@@ -363,7 +453,6 @@ class Auth(LoginRequiredMixin, View):
                 name = request.POST['group_name']
                 description = request.POST['group_description']
                 api.put_user_group(name, description)
-                api.apply()
             elif cmd == 'set_email_login':
                 default_group = request.POST['email_default_group']
                 enabled = request.POST['email_enabled']
@@ -398,25 +487,26 @@ class Database(LoginRequiredMixin, View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        app = App.objects.get(id=app_id)
+        app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
-        app.apply_recipes(credentials)
 
-        auth = app.recipe_set.get(name='auth')
-        database = app.recipe_set.get(name='database')
+        auth = Util.get_recipe(app, 'auth')
+        database = Util.get_recipe(app, 'database')
 
-        cmd = request.GET.get('cmd', None)
         with auth.api(credentials) as auth_api, database.api(credentials) as database_api:
-            partitions = database_api.get_partitions()
-            partitions = Util.encode_dict(partitions)
+            partitions = database_api.get_partitions().get('items', [])
+            partition_dict = {}
             for partition in partitions:
-                result = database_api.get_item_count(partition)
-                partitions[partition]['item_count'] = result['item']['count']
-            partitions = partitions.values()
+                name = partition['name']
+                result = database_api.get_item_count(name)
+                partition_dict[name] = {
+                    'name': name,
+                    'item_count': result['item']['count']
+                }
+            partitions = partition_dict.values()
 
             context['user_groups'] = auth_api.get_user_groups()
             context['partitions'] = partitions
-            context['rest_api_url'] = database_api.get_rest_api_url()
 
         return render(request, 'dashboard/app/database.html', context=context)
 
@@ -424,7 +514,7 @@ class Database(LoginRequiredMixin, View):
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        app = App.objects.get(id=app_id)
+        app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
 
         database = app.recipe_set.get(name='database')
@@ -434,7 +524,7 @@ class Database(LoginRequiredMixin, View):
             cmd = request.POST['cmd']
             if cmd == 'add_partition':
                 partition_name = request.POST['partition_name']
-                _ = database_api.put_partition(partition_name)
+                _ = database_api.create_partition(partition_name)
             elif cmd == 'add_item':
                 partition = request.POST['partition']
                 read_groups = request.POST.getlist('read_groups[]')
@@ -489,12 +579,11 @@ class Storage(LoginRequiredMixin, View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        app = App.objects.get(id=app_id)
+        app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
-        app.apply_recipes(credentials)
 
-        auth = app.recipe_set.get(name='auth')
-        storage = app.recipe_set.get(name='storage')
+        auth = Util.get_recipe(app, 'auth')
+        storage = Util.get_recipe(app, 'storage')
 
         with auth.api(credentials) as auth_api, storage.api(credentials) as storage_api:
             cmd = request.GET.get('cmd', None)
@@ -513,7 +602,7 @@ class Storage(LoginRequiredMixin, View):
                 context['app_id'] = app_id
                 context['folder_path'] = folder_path
                 context['user_groups'] = auth_api.get_user_groups()
-                context['rest_api_url'] = storage_api.get_rest_api_url()
+                context['rest_api_url'] = storage_api._get_rest_api_url()
                 context['folder_list'] = storage_api.get_folder_list(folder_path, start_key)
 
         return render(request, 'dashboard/app/storage.html', context=context)
@@ -522,7 +611,7 @@ class Storage(LoginRequiredMixin, View):
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        app = App.objects.get(id=app_id)
+        app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
 
         storage = app.recipe_set.get(name='storage')

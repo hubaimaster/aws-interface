@@ -1,10 +1,8 @@
-import importlib
+
 import json
 import os
 import shutil
 import tempfile
-from core.recipe_controller import RecipeController
-from core.service_controller import ServiceController
 
 
 PLATFORMS = (
@@ -15,12 +13,12 @@ PLATFORMS = (
 )
 
 
-def generate(controller_pairs, platform):
+def generate(resource, platform):
     """
     Generate the sdk for the given recipe types.
 
-    :param controller_pairs
-    List of (RecipeController, ServiceController) pairs
+    :param resource
+    Instance of Resource class
 
     :param platform
 
@@ -37,7 +35,7 @@ def generate(controller_pairs, platform):
     sdk_dir = os.path.join(working_dir, 'sdk')
 
     shutil.copytree(template_dir, sdk_dir)
-    manifest = _generate_manifest(controller_pairs)
+    manifest = _generate_manifest(resource)
     with open(os.path.join(sdk_dir, 'manifest.json'), 'w') as f:
         json.dump(manifest, f)
 
@@ -55,27 +53,24 @@ def generate(controller_pairs, platform):
     return zip_file_bin
 
 
-def _generate_manifest(controller_pairs):
+def _generate_manifest(resource):
     manifest = dict()
+
+    rest_api_url = resource.get_rest_api_url()
+    recipes = resource.get_recipes()
 
     # Initialize list of recipe types
     manifest['recipe_keys'] = list()
 
     # Populate manifest
-    rc: RecipeController
-    sc: ServiceController
-    for rc, sc in controller_pairs:
-        recipe_type = rc.RECIPE
+    rc: dict
+    for rc in recipes:
+        recipe_type = rc.get('recipe_type')
 
         recipe_manifest = {
-            'rest_api_url': sc.get_rest_api_url(rc),
-            'cloud_apis': list(rc.get_cloud_apis()),
+            'rest_api_url': rest_api_url,
+            'cloud_apis': list(rc.get('cloud_apis', {})),
         }
-
         manifest['recipe_keys'].append(recipe_type)
         manifest[recipe_type] = recipe_manifest
-
     return manifest
-
-
-

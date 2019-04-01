@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.crypto import *
 from cloud.response import Response
 import cloud.shortuuid as shortuuid
@@ -18,16 +18,13 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
     recipe = data['recipe']
     params = data['params']
-    app_id = data['app_id']
 
     email = params.get('email', None)
     password = params.get('password', None)
-
-    table_name = 'auth-{}'.format(app_id)
 
     login_conf = recipe['login_method']['email_login']
     enabled = login_conf['enabled']
@@ -41,9 +38,10 @@ def do(data, boto3):
         body['message'] = '이메일 로그인이 비활성화 상태입니다.'
         return Response(body)
 
-    dynamo = DynamoDB(boto3)
-    result = dynamo.get_items_with_index(table_name, 'partition-email', 'partition', 'user', 'email', email)
-    items = result.get('Items', [])
+    instructions = [
+        (None, ('eq', 'email', email))
+    ]
+    items, end_key = resource.db_query('user', instructions)
     if len(items) > 0:
         user = items[0]
         password_hash = user['passwordHash']
@@ -53,8 +51,9 @@ def do(data, boto3):
             session_id = shortuuid.uuid()
             session_item = {
                 'userId': user_id,
+                'sessionType': 'member',
             }
-            dynamo.put_item(table_name, 'session', session_item, item_id=session_id)
+            success = resource.db_put_item('session', session_item, session_id)
             body['session_id'] = session_id
             body['message'] = '로그인 성공'
         else:

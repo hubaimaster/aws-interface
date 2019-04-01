@@ -2,7 +2,7 @@ import requests
 import json
 
 
-class Client():
+class Client:
     def __init__(self):
         self.session_id = None
         self.guest_id = None
@@ -33,6 +33,7 @@ class Client():
             data = {}
         url = self._get_api_url(recipe_key)
         data['cloud_api_name'] = api_name
+        data['recipe_key'] = recipe_key
         if self.session_id:
             data['session_id'] = self.session_id
         data = json.dumps(data)

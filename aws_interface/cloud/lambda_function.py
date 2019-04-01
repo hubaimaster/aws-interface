@@ -4,6 +4,9 @@ import json
 import importlib
 import boto3
 import cloud.auth.get_me as get_me
+from resource import get_resource
+
+import sys
 
 
 def get_params(event):
@@ -23,15 +26,23 @@ def get_params(event):
 
 
 def handler(event, context):
+    import timeit
+    start = timeit.default_timer()
+
     params = event
+    recipe_key = params.get('recipe_key', None)
     cloud_api_name = params.get('cloud_api_name', None)
-    
-    with open('./cloud/recipe.json', 'r') as f:
-        recipe = json.load(f)
+
+    with open('./cloud/recipes.json', 'r') as f:
+        recipes = json.load(f)
       
     with open('./cloud/app_id.txt', 'r') as file:
         app_id = file.read()
-        
+
+    with open('./cloud/vendor.txt', 'r') as file:
+        vendor = file.read().strip()
+
+    recipe = recipes[recipe_key]
     cloud_apis = recipe.get('cloud_apis', {})
     cloud_api = cloud_apis.get(cloud_api_name, {})
     module_name = cloud_api.get('module')
@@ -44,14 +55,21 @@ def handler(event, context):
         'admin': False,
     }
 
-    user = get_me.do(data, boto3).get('body', {}).get('item', None)
+    """ <<< This code should be changed on the other machine of vendor """
+    boto_session = boto3.Session()
+    resource = get_resource(vendor, None, app_id, boto_session)
+    """ >>> """
+
+    user = get_me.do(data, resource).get('body', {}).get('item', None)
     data['user'] = user
 
     module = importlib.import_module(module_name)
+    sys.modules[module_name] = module
+
     if 'all' in permissions:
-        module_response = module.do(data, boto3)
+        module_response = module.do(data, resource)
     elif user.get('group', None) in permissions:
-        module_response = module.do(data, boto3)
+        module_response = module.do(data, resource)
     else:
         module_response = {
             'statusCode': 201,
@@ -65,4 +83,7 @@ def handler(event, context):
         'headers': module_response.get('header', {}),
         'body': module_response.get('body', {}),
     }
+
+    stop = timeit.default_timer()
+    print('Run time:', stop - start)
     return response

@@ -5,5 +5,5 @@ info = {
 
 }
 
-def do(data, boto3):
+def do(data, resource):
     return

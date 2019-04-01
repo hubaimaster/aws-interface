@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 import base64
 
@@ -16,7 +16,7 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
     recipe = data['recipe']
     params = data['params']
@@ -36,17 +36,14 @@ def do(data, boto3):
 
     file_path = params.get('file_path')
 
-    table_name = 'storage-{}'.format(app_id)
     bucket_name = 'storage-{}'.format(app_id)
 
-    s3 = S3(boto3)
-    dynamo = DynamoDB(boto3)
-    item = dynamo.get_item(table_name, file_path).get('Item')
+    item = resource.db_get_item(file_path)
     if item:
         if has_permission(item):
             if item['type'] == 'file':
                 file_key = item['file_key']
-                file_bin = s3.download_file_bin(bucket_name, file_key)
+                file_bin = resource.file_download_base64(file_key)
                 body = base64.b64encode(file_bin).decode('utf-8')
                 response = Response(body, 'application/x-binary')
                 response['isBase64Encoded'] = True

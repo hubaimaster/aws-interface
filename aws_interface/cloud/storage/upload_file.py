@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 import cloud.shortuuid as shortuuid
 
@@ -19,9 +19,8 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
     app_id = data['app_id']
     user = data['user']
@@ -35,7 +34,6 @@ def do(data, boto3):
     write_groups = params.get('write_groups', [])
 
     table_name = 'storage-{}'.format(app_id)
-    bucket_name = 'storage-{}'.format(app_id)
 
     file_path = str(parent_path)
     if not file_path.endswith('/'):
@@ -44,8 +42,8 @@ def do(data, boto3):
 
     file_key = '{}-{}'.format(shortuuid.uuid(), file_name)
 
-    s3 = S3(boto3)
-    s3.upload_file_bin(bucket_name, file_key, file_bin)
+    # TODO ALL THIS LIKE LOGIC IS NOT COMPLETED
+    resource.file_upload_base64(file_key, file_bin)
 
     item = {
         'owner': user_id,
@@ -57,16 +55,6 @@ def do(data, boto3):
         'write_groups': write_groups,
         'type': 'file',
     }
-    print(item)
-
-    dynamo = DynamoDB(boto3)
-
-    folder = dynamo.get_item(table_name, file_path)
-    if folder.get('Item'):
-        body['success'] = False
-        body['message'] = 'file_path: {} exists'.format(file_path)
-        return Response(body)
-
-    dynamo.put_item(table_name, parent_path, item, item_id=file_path)
+    resource.db_put_item('storage-files', item, file_path)
     body['success'] = True
     return Response(body)

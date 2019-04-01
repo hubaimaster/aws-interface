@@ -1,24 +1,12 @@
 from .base import ServiceController
 from .utils import lambda_method, make_data
 
-from cloud.aws import *
-
 
 class DatabaseServiceController(ServiceController):
     RECIPE = 'database'
 
-    def __init__(self, bundle, app_id):
-        super(DatabaseServiceController, self).__init__(bundle, app_id)
-        self._init_table()
-
-    def _init_table(self):
-        dynamodb = DynamoDB(self.boto3_session)
-        table_name = 'database-{}'.format(self.app_id)
-        dynamodb.init_table(table_name)
-        return
-
-    def common_apply(self, recipe_controller):
-        return
+    def __init__(self, resource, app_id):
+        super(DatabaseServiceController, self).__init__(resource, app_id)
 
     @lambda_method
     def create_item(self, recipe, partition, item, read_groups, write_groups):
@@ -30,8 +18,7 @@ class DatabaseServiceController(ServiceController):
             'write_groups': write_groups,
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def update_item(self, recipe, item_id, item, read_groups, write_groups):
@@ -43,8 +30,7 @@ class DatabaseServiceController(ServiceController):
             'write_groups': write_groups,
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def put_item_field(self, recipe, item_id, field_name, field_value):
@@ -55,8 +41,7 @@ class DatabaseServiceController(ServiceController):
             'field_value': field_value,
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def get_item(self, recipe, item_id):
@@ -65,8 +50,7 @@ class DatabaseServiceController(ServiceController):
             'item_id': item_id,
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def delete_item(self, recipe, item_id):
@@ -75,8 +59,7 @@ class DatabaseServiceController(ServiceController):
             'item_id': item_id,
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def get_items(self, recipe, partition, reverse, start_key):
@@ -87,8 +70,7 @@ class DatabaseServiceController(ServiceController):
             'start_key': start_key,
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def get_item_count(self, recipe, partition):
@@ -97,5 +79,30 @@ class DatabaseServiceController(ServiceController):
             'partition': partition,
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def create_partition(self, recipe, partition):
+        import cloud.database.create_partition as method
+        params = {
+            'partition': partition,
+        }
+        data = make_data(self.app_id, params, recipe)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def delete_partition(self, recipe, partition):
+        import cloud.database.delete_partition as method
+        params = {
+            'partition': partition,
+        }
+        data = make_data(self.app_id, params, recipe)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_partitions(self, recipe):
+        import cloud.database.get_partitions as method
+        params = {
+        }
+        data = make_data(self.app_id, params, recipe)
+        return method.do(data, self.resource)

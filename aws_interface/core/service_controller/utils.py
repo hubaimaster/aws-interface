@@ -23,3 +23,4 @@ def lambda_method(func):
         result = func(*args, **kwargs)
         return result.get('body', {})
     return wrap
+

@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 from cloud.database.util import has_read_permission
 import json
@@ -20,11 +20,9 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
-    app_id = data['app_id']
     user = data['user']
 
     partition = params.get('partition', None)
@@ -35,16 +33,14 @@ def do(data, boto3):
     if type(start_key) is str:
         start_key = json.loads(start_key)
 
-    table_name = 'database-{}'.format(app_id)
-
-    dynamo = DynamoDB(boto3)
-    result = dynamo.get_items(table_name, partition, start_key, limit, reverse)
-    end_key = result.get('LastEvaluatedKey', None)
-    items = result.get('Items', [])
+    items, end_key = resource.db_get_items(partition, start_key, limit, reverse)
 
     filtered = []
     for item in items:
         if has_read_permission(user, item):
+            item.pop('read_groups')
+            item.pop('write_groups')
+            item.pop('partition')
             filtered.append(item)
 
     body['items'] = filtered

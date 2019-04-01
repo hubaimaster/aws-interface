@@ -7,23 +7,13 @@
     <!-- Top navbar -->
     {% include 'dashboard/app/top-navbar.html' %}
     <!-- Header -->
+    <input id="view-tag" value="auth" hidden>
     <div class="header bg-gradient-primary pb-7 pt-5 pt-md-8">
       <div class="container-fluid">
         <div class="header-body">
 
             <div class="alert alert-primary" role="alert">
                 <strong>AWS DynamoDB, AWS Lambda, AWS APIGateway</strong>  를 사용합니다.
-            </div>
-
-            <div class="alert alert-neutral" role="alert">
-                <div class="row">
-                    <div class="col">
-                        <strong>{{ rest_api_url }}</strong> 의 POST Method 를 호출 할 수 있습니다.
-                    </div>
-                    <div class="col-auto">
-
-                    </div>
-                </div>
             </div>
 
 
@@ -54,9 +44,6 @@
                       <h5 class="card-title text-uppercase text-muted mb-0">접속 중인 세션 수</h5>
                       <span class="h2 font-weight-bold mb-0">{{ session_count.item.count }} 개</span>
                     </div>
-                    <div class="col-auto">
-                        <a target="_blank" href="" class="btn btn-sm btn-primary">자세히 보기</a>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -80,7 +67,7 @@
                   </h3>
                 </div>
                 <div class="col text-right">
-                  <a data-toggle="modal" data-target="#modal-put-group" class="btn btn-sm btn-primary">
+                  <a id="create-group-modal" data-toggle="modal" data-target="#modal-put-group" class="btn btn-sm btn-primary">
                       <span class="btn-inner--text" style="color: white;">그룹 생성</span>
                   </a>
                 </div>
@@ -101,11 +88,11 @@
                                     <div class="col-lg-12">
                                       <div class="form-group">
                                         <label class="form-control-label" for="input-username">이름</label>
-                                        <input name="group_name" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 이름">
+                                        <input id="group-name" name="group_name" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 이름">
                                       </div>
                                         <div class="form-group">
                                         <label class="form-control-label" for="input-username">설명</label>
-                                        <input name="group_description" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 설명">
+                                        <input id="group-description" name="group_description" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 설명">
                                       </div>
                                     </div>
                                   </div>
@@ -116,7 +103,7 @@
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                              <button type="submit" class="btn btn-primary">확인</button>
+                              <button id="create-group" type="submit" class="btn btn-primary">확인</button>
                             </div>
                         </form>
                       </div>
@@ -138,10 +125,10 @@
                 <tbody>
                 {% for group in user_groups %}
                   <tr>
-                    <th scope="row">
+                    <th name="group-name" scope="row">
                       {{ group.name }}
                     </th>
-                    <td>
+                    <td name="group-description">
                       {{ group.description }}
                     </td>
                     <td>
@@ -149,7 +136,7 @@
                           <form role="form" method="post">{% csrf_token %}
                               <input name="cmd" value="delete_group" hidden>
                               <input name="group_name" value="{{ group.name }}" hidden>
-                            <button type="submit" class="btn btn-sm btn-danger">제거</button>
+                            <button id="remove-group-{{ group.name }}" type="submit" class="btn btn-sm btn-danger">제거</button>
                           </form>
                       </div>
                     </td>
@@ -313,7 +300,7 @@
 
               </div>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
               <!-- Projects table -->
               <table class="table align-items-center table-flush">
                 <thead class="thead-light">
@@ -326,7 +313,7 @@
                     <th scope="col"></th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style="max-height: 400px; overflow-y: auto;">
                 {% for user in users.items %}
                   <tr>
                     <th scope="row">
@@ -350,6 +337,86 @@
                               <input name="user_id" value="{{ user.id }}" hidden>
                             <button type="submit" class="btn btn-sm btn-danger">제거</button>
                           </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    <div class="row mt-4">
+          <div class="col-xl-12">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">
+                      <span class="badge badge-default">서비스</span>
+                      접속 중인 세션
+                  </h3>
+                </div>
+
+                  <div class="col text-right">
+                  <div class="dropdown">
+                                <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item">선택 삭제</a>
+                                    <div class="dropdown-divider"></div>
+
+                                    <a class="dropdown-item left" aria-disabled="true">
+                                         <div class="custom-control custom-checkbox mt--1">
+                                            <input class="custom-control-input" type="checkbox" name="checkbox-field" id="field-check-all">
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive" style="height: 400px; overflow-y: auto;">
+              <!-- Projects table -->
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">createDate</th>
+                    <th scope="col">userId</th>
+                    <th scope="col">sessionType</th>
+                    <th scope="col">
+                        <div class="custom-control custom-checkbox mt--4">
+                            <input class="custom-control-input" type="checkbox" name="checkbox-session" id="check-all">
+                            <label class="custom-control-label" for="check-all"></label>
+                        </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for session in sessions.items %}
+                  <tr>
+                    <th scope="row">
+                      {{ session.id }}
+                    </th>
+                    <td>
+                      {{ session.creationDate|to_date }}
+                    </td>
+                    <td>
+                      {{ session.userId }}
+                    </td>
+                    <td>
+                      {{ session.sessionType }}
+                    </td>
+                    <td>
+                        <div class="custom-control custom-checkbox mt--4">
+                            <input class="custom-control-input" type="checkbox" name="checkbox-session" id="checkbox-{{ session.id }}">
+                            <label class="custom-control-label" for="checkbox-{{ session.id }}"></label>
+                        </div>
                     </td>
                   </tr>
                 {% endfor %}
@@ -410,6 +477,10 @@
     });
     $("#guest_enabled").change(function () {
         set_guest_login()
+    });
+
+    $("#check-all").click(function () {
+        $("input[name='checkbox-session']").prop('checked', this.checked);
     });
   }
   </script>

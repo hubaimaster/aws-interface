@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 import base64
 
@@ -19,7 +19,7 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
     params = data['params']
     app_id = data['app_id']
@@ -37,20 +37,14 @@ def do(data, boto3):
         return user_group in read_groups
 
     file_path = params.get('file_path')
-    index = params.get('index')
-
-    table_name = 'storage-{}'.format(app_id)
     bucket_name = 'storage-{}'.format(app_id)
 
-    s3 = S3(boto3)
-    dynamo = DynamoDB(boto3)
-    item = dynamo.get_item(table_name, file_path).get('Item')
+    item = resource.db_get_item(file_path)
     if item:
         if has_permission(item):
             if item['type'] == 'split_file':
                 file_key = item['file_key']
-                file_bin = s3.download_file_bin(bucket_name, file_key)
-                file_b64 = base64.b64encode(file_bin).decode('utf-8')
+                file_b64 = resource.file_download_base64(file_key)
                 body['success'] = True
                 body['base64'] = file_b64
                 body['index'] = item['index']

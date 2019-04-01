@@ -1,26 +1,12 @@
 from .base import ServiceController
 from .utils import lambda_method, make_data
-from cloud.aws import *
 
 
 class AuthServiceController(ServiceController):
     RECIPE = 'auth'
 
-    def __init__(self, bundle, app_id):
-        super(AuthServiceController, self).__init__(bundle, app_id)
-        self._init_table()
-
-    def _init_table(self):
-        dynamodb = DynamoDB(self.boto3_session)
-        table_name = 'auth-' + self.app_id
-        dynamodb.init_table(table_name)
-        dynamodb.update_table(table_name, indexes=[{
-            'hash_key': 'partition',
-            'hash_key_type': 'S',
-            'sort_key': 'email',
-            'sort_key_type': 'S',
-        }])
-        return
+    def __init__(self, resource, app_id):
+        super(AuthServiceController, self).__init__(resource, app_id)
 
     @lambda_method
     def create_user(self, recipe, email, password, extra):
@@ -31,8 +17,7 @@ class AuthServiceController(ServiceController):
             'extra': extra,
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def set_user(self, recipe, user_id, email, password, extra):
@@ -44,8 +29,7 @@ class AuthServiceController(ServiceController):
             'extra': extra,
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def delete_user(self, recipe, user_id):
@@ -54,8 +38,7 @@ class AuthServiceController(ServiceController):
             'user_id': user_id,
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def get_user(self, recipe, user_id):
@@ -64,8 +47,7 @@ class AuthServiceController(ServiceController):
             'user_id': user_id,
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def get_user_count(self, recipe):
@@ -74,8 +56,7 @@ class AuthServiceController(ServiceController):
 
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def get_users(self, recipe, start_key, limit):
@@ -83,8 +64,7 @@ class AuthServiceController(ServiceController):
         params = {'start_key': start_key,
                   'limit': limit}
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def create_session(self, recipe, email, password):
@@ -94,8 +74,7 @@ class AuthServiceController(ServiceController):
             'password': password
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def delete_session(self, recipe, session_id):
@@ -104,8 +83,7 @@ class AuthServiceController(ServiceController):
             'session_id': session_id
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def get_session(self, recipe, session_id):
@@ -114,8 +92,7 @@ class AuthServiceController(ServiceController):
             'session_id': session_id
         }
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def get_sessions(self, recipe, start_key, limit):
@@ -123,16 +100,14 @@ class AuthServiceController(ServiceController):
         params = {'start_key': start_key,
                   'limit': limit}
         data = make_data(self.app_id, params, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def get_session_count(self, recipe):
         import cloud.auth.get_session_count as method
         parmas = {}
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)
 
     @lambda_method
     def create_admin(self, recipe, email, password, extra):
@@ -143,5 +118,4 @@ class AuthServiceController(ServiceController):
             'extra': extra,
         }
         data = make_data(self.app_id, parmas, recipe)
-        boto3 = self.boto3_session
-        return method.do(data, boto3)
+        return method.do(data, self.resource)

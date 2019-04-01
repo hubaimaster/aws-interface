@@ -1,24 +1,35 @@
 import json
 import time
 import tempfile
-import traceback
-
 import botocore
+
 from boto3.dynamodb.conditions import Key
-from time import sleep
 from sys import maxsize
 import cloud.shortuuid as shortuuid
 
 
-class Config:
-    stage_name = 'prod_aws_interface'
+def get_boto3_session(credentials):
+    import boto3
+    bundle = credentials['aws']
+    access_key = bundle['access_key']
+    secret_key = bundle['secret_key']
+    region_name = bundle.get('region_name', 'ap-northeast-2')  # TODO
+    session = boto3.Session(
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        region_name=region_name,
+    )
+    return session
 
 
 class APIGateway:
+    stage_name = 'prod_aws_interface'
+
     def __init__(self, boto3_session):
-        self.apigateway_client = boto3_session.client('apigateway')
+        self.region = boto3_session.region_name
+        self.client = boto3_session.client('apigateway')
         self.lambda_client = boto3_session.client('lambda')
-        self.iam = IAM(boto3_session)
+        self.iam_client = IAM(boto3_session)
 
     def get_rest_api_id(self, rest_api_name):
         rest_api_id = None
@@ -31,6 +42,17 @@ class APIGateway:
             response = self.create_rest_api(rest_api_name)
             rest_api_id = response['id']
         return rest_api_id
+
+    def delete_rest_api_by_name(self, rest_api_name):
+        try:
+            rest_api_id = self.get_rest_api_id(rest_api_name)
+            response = self.client.delete_rest_api(
+                restApiId=rest_api_id
+            )
+            return response
+        except BaseException as ex:
+            print(ex)
+            return None
 
     def get_root_resource_id(self, rest_api_id):
         resources = self.get_resources(rest_api_id).get('items', [])
@@ -48,16 +70,17 @@ class APIGateway:
                 resource_id = res['id']
         return resource_id
 
-    def get_rest_api_url(self, cloud_api_name, lambda_func_name, aws_region='ap-northeast-2'):
+    def get_rest_api_url(self, cloud_api_name):
         base_url = 'https://{}.execute-api.{}.amazonaws.com/{}/{}'
         api_id = self.get_rest_api_id(cloud_api_name)
-        region = aws_region
-        stage = Config.stage_name
+        region = self.region
+        stage = self.stage_name
         url = base_url.format(api_id, region, stage, cloud_api_name)
         return url
 
-    def connect_with_lambda(self, cloud_api_name, lambda_func_name, aws_region='ap-northeast-2'):
-        api_client = self.apigateway_client
+    def connect_with_lambda(self, cloud_api_name, lambda_func_name):
+        aws_region = self.region
+        api_client = self.client
         aws_lambda = self.lambda_client
 
         # Find existing rest api
@@ -65,7 +88,7 @@ class APIGateway:
         root_resource_id = self.get_root_resource_id(rest_api_id)
         resource_id = self.get_lambda_function_resource_id(rest_api_id, lambda_func_name)
 
-        stage_name = Config.stage_name
+        stage_name = self.stage_name
 
         if not resource_id:
             resource_id = api_client.create_resource(
@@ -78,7 +101,7 @@ class APIGateway:
 
         lambda_version = aws_lambda.meta.service_model.api_version
 
-        aws_account_id = self.iam.get_account_id()
+        aws_account_id = self.iam_client.get_account_id()
 
         uri_data = {
             "aws-region": aws_region,
@@ -125,7 +148,7 @@ class APIGateway:
 
     def put_method(self, rest_api_id, resource_id, method_type, auth_type='NONE'):
         try:
-            response = self.apigateway_client.put_method(
+            response = self.client.put_method(
                 restApiId=rest_api_id,
                 resourceId=resource_id,
                 httpMethod=method_type,
@@ -139,7 +162,7 @@ class APIGateway:
 
     def put_method_response(self, rest_api_id, resource_id, method_type, response_parameters=dict()):
         try:
-            response = self.apigateway_client.put_method_response(
+            response = self.client.put_method_response(
                 restApiId=rest_api_id,
                 resourceId=resource_id,
                 httpMethod=method_type,
@@ -157,7 +180,7 @@ class APIGateway:
         return uri
 
     def put_integration(self, rest_api_id, resource_id, method_type, uri):
-        integration_resp = self.apigateway_client.put_integration(
+        integration_resp = self.client.put_integration(
             restApiId=rest_api_id,
             resourceId=resource_id,
             httpMethod=method_type,
@@ -168,7 +191,7 @@ class APIGateway:
         return integration_resp
 
     def put_integration_response(self, rest_api_id, resource_id, method_type, response_parameters=dict()):
-        response = self.apigateway_client.put_integration_response(
+        response = self.client.put_integration_response(
             restApiId=rest_api_id,
             resourceId=resource_id,
             httpMethod=method_type,
@@ -208,7 +231,7 @@ class APIGateway:
             raise Exception('Failed to put permissions for {}'.format(lambda_func_name))
 
     def get_method(self, rest_api_id, resource_id, method_type='POST'):
-        response = self.apigateway_client.get_method(
+        response = self.client.get_method(
             restApiId=rest_api_id,
             resourceId=resource_id,
             httpMethod=method_type
@@ -216,13 +239,13 @@ class APIGateway:
         return response
 
     def get_rest_apis(self):
-        response = self.apigateway_client.get_rest_apis(
+        response = self.client.get_rest_apis(
             limit=100
         )
         return response
 
     def create_rest_api(self, api_name):
-        response = self.apigateway_client.create_rest_api(
+        response = self.client.create_rest_api(
             name=api_name,
             endpointConfiguration={
                 'types': [
@@ -233,7 +256,7 @@ class APIGateway:
         return response
 
     def create_resource(self, rest_api_id, parent_id, path_part):
-        response = self.apigateway_client.create_resource(
+        response = self.client.create_resource(
             restApiId=rest_api_id,
             parentId=parent_id,
             pathPart=path_part
@@ -241,19 +264,19 @@ class APIGateway:
         return response
 
     def get_resources(self, rest_api_id):
-        response = self.apigateway_client.get_resources(
+        response = self.client.get_resources(
             restApiId=rest_api_id,
             limit=100,
         )
         return response
 
     def delete_rest_api(self, rest_api_id):
-        return self.apigateway_client.delete_rest_api(
+        return self.client.delete_rest_api(
             restApiId=rest_api_id
         )
 
     def get_method_response(self, rest_api_id, resource_id, method_type, status_code):
-        response = self.apigateway_client.get_method_response(
+        response = self.client.get_method_response(
             restApiId=rest_api_id,
             resourceId=resource_id,
             httpMethod=method_type,
@@ -271,6 +294,11 @@ class DynamoDB:
         self.create_table(table_name)
         self.update_table(table_name, indexes=[{
             'hash_key': 'partition',
+            'hash_key_type': 'S',
+            'sort_key': 'creationDate',
+            'sort_key_type': 'N'
+        }, {
+            'hash_key': 'invertedQuery',
             'hash_key_type': 'S',
             'sort_key': 'creationDate',
             'sort_key_type': 'N'
@@ -293,8 +321,8 @@ class DynamoDB:
                     },
                 ],
                 ProvisionedThroughput={
-                    'ReadCapacityUnits': 1,
-                    'WriteCapacityUnits': 1
+                    'ReadCapacityUnits': 3,
+                    'WriteCapacityUnits': 3
                 },
                 StreamSpecification={
                     'StreamEnabled': True,
@@ -336,8 +364,8 @@ class DynamoDB:
                             'ProjectionType': 'ALL'
                         },
                         'ProvisionedThroughput': {
-                            'ReadCapacityUnits': 1,
-                            'WriteCapacityUnits': 1
+                            'ReadCapacityUnits': 3,
+                            'WriteCapacityUnits': 3
                         }
                     }
                 }
@@ -364,6 +392,29 @@ class DynamoDB:
                 continue
         return responses
 
+    def delete_table(self, name):
+        try:
+            response = self.client.delete_table(
+                TableName=name
+            )
+            return response
+        except BaseException as ex:
+            print(ex)
+            return None
+
+    def create_partition(self, table_name, partition):
+        item = {
+            'name': partition
+        }
+        response = self.put_item(table_name, 'partition-list', item, partition, indexing=False)
+        return response
+
+    def delete_partition(self, table_name, partition):
+        return self.delete_item(table_name, partition)
+
+    def get_partitions(self, table_name):
+        return self.get_items(table_name, 'partition-list', limit=maxsize)
+
     def delete_item(self, table_name, item_id):
         item = self.get_item(table_name, item_id)
         partition = item.get('Item', {}).get('partition', None)
@@ -379,6 +430,7 @@ class DynamoDB:
             }
         )
         self._add_item_count(table_name, '{}-count'.format(partition), value_to_add=-1)
+        self._delete_inverted_query(table_name, item_id)
         return response
 
     def get_item(self, table_name, item_id):
@@ -388,52 +440,7 @@ class DynamoDB:
         })
         return item
 
-    def get_items(self, table_name, partition, exclusive_start_key=None, limit=None, reverse=False):
-        scan_index_forward = not reverse
-        index_name = 'partition-creationDate'
-        table = self.resource.Table(table_name)
-        if not limit:
-            limit = maxsize
-        if exclusive_start_key:
-            response = table.query(
-                IndexName=index_name,
-                Limit=limit,
-                ConsistentRead=False,
-                ExclusiveStartKey=exclusive_start_key,
-                KeyConditionExpression=Key('partition').eq(partition),
-                ScanIndexForward=scan_index_forward,
-            )
-        else:
-            response = table.query(
-                IndexName=index_name,
-                Limit=limit,
-                ConsistentRead=False,
-                KeyConditionExpression=Key('partition').eq(partition),
-                ScanIndexForward=scan_index_forward,
-            )
-        return response
-
-    def get_items_with_index(self, table_name, index_name, hash_key_name, hash_key_value, sort_key_name, sort_key_value,
-                             exclusive_start_key=None, limit=100):
-        table = self.resource.Table(table_name)
-        if exclusive_start_key:
-            response = table.query(
-                IndexName=index_name,
-                Limit=limit,
-                ConsistentRead=False,
-                ExclusiveStartKey=exclusive_start_key,
-                KeyConditionExpression=Key(hash_key_name).eq(hash_key_value) & Key(sort_key_name).eq(sort_key_value)
-            )
-        else:
-            response = table.query(
-                IndexName=index_name,
-                Limit=limit,
-                ConsistentRead=False,
-                KeyConditionExpression=Key(hash_key_name).eq(hash_key_value) & Key(sort_key_name).eq(sort_key_value),
-            )
-        return response
-
-    def put_item(self, table_name, partition, item, item_id=None, creation_date=None):
+    def put_item(self, table_name, partition, item, item_id=None, creation_date=None, indexing=True):
         if not item_id:
             item_id = str(shortuuid.uuid())
         if not creation_date:
@@ -442,23 +449,93 @@ class DynamoDB:
         item['id'] = item_id
         item['creationDate'] = creation_date
         item['partition'] = partition
-
         response = table.put_item(
-            TableName=table_name,
             Item=item,
         )
         self._add_item_count(table_name, '{}-count'.format(partition))
+        if indexing:
+            self._delete_inverted_query(table_name, item_id)
+            self._put_inverted_query(table_name, partition, item)
+        return response
+
+    def get_items(self, table_name, partition, start_key=None, limit=None, reverse=False):
+        scan_index_forward = not reverse
+        index_name = 'partition-creationDate'
+        table = self.resource.Table(table_name)
+        self.get_items_eq_hash_key(table_name, index_name, 'partition', partition, start_key, limit)
+        if not limit:
+            limit = maxsize
+        if start_key:
+            response = table.query(
+                IndexName=index_name,
+                Limit=limit,
+                ConsistentRead=False,
+                ExclusiveStartKey=start_key,
+                KeyConditionExpression=Key('partition').eq(partition),
+                ScanIndexForward=scan_index_forward,
+            )
+        else:
+            response = table.query(
+                IndexName=index_name,
+                Limit=limit,
+                ConsistentRead=False,
+                KeyConditionExpression=Key('partition').eq(partition),
+                ScanIndexForward=scan_index_forward,
+            )
+        return response
+
+    def get_inverted_queries(self, table_name, partition, field, operand, operation, start_key=None, limit=100, reverse=False):
+        if operation == 'in' or operation == 'eq':
+            hash_key_name = 'invertedQuery'
+            sort_key_name = 'creationDate'
+            hash_key = '{}-{}-{}-{}'.format(partition, field, operand, operation)
+            index_name = '{}-{}'.format(hash_key_name, sort_key_name)
+            response = self.get_items_eq_hash_key(table_name, index_name, hash_key_name, hash_key, start_key, limit, reverse)
+            return response
+        else:
+            raise BaseException('an operation is must be <in> or <eq>')
+
+    def get_items_eq_hash_key(self, table_name, index_name, hash_key_name, hash_key_value,
+                              start_key=None, limit=100, reverse=False):
+        key_expression = Key(hash_key_name).eq(hash_key_value)
+        response = self.get_items_with_key_expression(table_name, index_name, key_expression, start_key, limit, reverse)
+        return response
+
+    def get_items_with_key_expression(self, table_name, index_name, key_expression,
+                                      start_key=None, limit=100, reverse=False):
+        scan_index_forward = not reverse
+        table = self.resource.Table(table_name)
+        if start_key:
+            response = table.query(
+                IndexName=index_name,
+                Limit=limit,
+                ConsistentRead=False,
+                ExclusiveStartKey=start_key,
+                KeyConditionExpression=key_expression,
+                ScanIndexForward=scan_index_forward,
+            )
+        else:
+            response = table.query(
+                IndexName=index_name,
+                Limit=limit,
+                ConsistentRead=False,
+                KeyConditionExpression=key_expression,
+                ScanIndexForward=scan_index_forward,
+            )
         return response
 
     def update_item(self, table_name, item_id, item):
         table = self.resource.Table(table_name)
         update_date = int(time.time())
         item['id'] = item_id
-        item['update_date'] = update_date
+        item['_update_date'] = update_date
         response = table.put_item(
             TableName=table_name,
             Item=item,
         )
+        partition = item.get('partition')
+        self._delete_inverted_query(table_name, item_id)
+        self._put_inverted_query(table_name, partition, item)
         return response
 
     def _put_item_count(self, table_name, count_id, value):
@@ -489,6 +566,51 @@ class DynamoDB:
     def get_item_count(self, table_name, count_id):
         response = self.get_item(table_name, count_id)
         return response
+
+    def _eq_operands(self, value):
+        value = str(value)
+        return [value]
+
+    def _in_operands(self, value):  # TODO 형태소 분석
+        value = str(value)
+        return value.split()
+
+    def _put_inverted_query(self, table_name, partition, item):
+        table = self.resource.Table(table_name)
+        item_id = item.get('id')
+        creation_date = item.get('creationDate', int(time.time()))
+        with table.batch_writer() as batch:
+            for field, value in item.items():
+                for operand in self._eq_operands(value):
+                    self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date)
+                for operand in self._in_operands(value):
+                    self._put_inverted_query_field(batch, partition, field, operand, 'in', item_id, creation_date)
+
+    def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date):
+        _invertedQuery = '{}-{}-{}-{}'.format(partition, field, operand, operation)
+        query = {
+            'id': 'query-{}'.format(shortuuid.uuid()),
+            'partition': 'index-{}'.format(item_id),
+            'invertedQuery': _invertedQuery,
+            'creationDate': creation_date,
+            'item_id': item_id,
+        }
+        response = table.put_item(
+            Item=query,
+        )
+        return response
+
+    def _delete_inverted_query(self, table_name, item_id):
+        table = self.resource.Table(table_name)
+        items = self.get_items(table_name, 'index-{}'.format(item_id), limit=maxsize).get('Items', [])
+        with table.batch_writer() as batch:
+            for item in items:
+                inverted_query_id = item.get('id', None)
+                batch.delete_item(
+                    Key={
+                        'id': inverted_query_id
+                    }
+                )
 
 
 class Lambda:
@@ -522,6 +644,16 @@ class Lambda:
         )
         return response
 
+    def delete_function(self, name):
+        try:
+            response = self.client.delete_function(
+                FunctionName=name,
+            )
+            return response
+        except BaseException as ex:
+            print(ex)
+            return None
+
 
 class S3:
     def __init__(self, boto3_session):
@@ -552,7 +684,7 @@ class S3:
             ACL='private',
             Bucket=bucket_name,
             CreateBucketConfiguration={
-                'LocationConstraint': 'ap-northeast-2'
+                'LocationConstraint': self.region
             },
         )
         return response
@@ -580,27 +712,49 @@ class S3:
             else:
                 raise
 
+    def delete_bucket(self, bucket_name):
+        try:
+            response = self.client.delete_bucket(
+                Bucket=bucket_name
+            )
+            return response
+        except BaseException as ex:
+            print(ex)
+            return None
+
+
 class IAM:
+    policy_arns = [
+        'arn:aws:iam::aws:policy/AWSLambdaRole',
+        'arn:aws:iam::aws:policy/AWSLambdaExecute',
+        'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+        'arn:aws:iam::aws:policy/AmazonS3FullAccess',
+        'arn:aws:iam::aws:policy/AWSXrayFullAccess',
+    ]
+
     def __init__(self, boto3_session):
         self.client = boto3_session.client('iam')
         self.resource = boto3_session.resource('iam')
 
     def create_role_and_attach_policies(self, role_name):
-        policy_arns = [
-            'arn:aws:iam::aws:policy/AWSLambdaRole',
-            'arn:aws:iam::aws:policy/AWSLambdaExecute',
-            'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
-            'arn:aws:iam::aws:policy/AmazonS3FullAccess',
-            'arn:aws:iam::aws:policy/AWSXrayFullAccess',
-        ]
         self.create_role(role_name)
-        self.attach_policies(role_name, policy_arns)
+        self.attach_policies(role_name, self.policy_arns)
         return self.get_role_arn(role_name)
 
     def get_role_arn(self, role_name):
         role = self.resource.Role(role_name)
         role_arn = role.arn
         return role_arn
+
+    def delete_role(self, role_name):
+        try:
+            response = self.client.delete_role(
+                RoleName=role_name
+            )
+            return response
+        except BaseException as ex:
+            print(ex)
+            return None
 
     def create_role(self, role_name):
         assume_role_policy_document = {
@@ -641,6 +795,21 @@ class IAM:
             print('Failed to attach policy: {}'.format(role_name))
             return None
         return response
+
+    def detach_all_policies(self, role_name):
+        for policy_arn in self.policy_arns:
+            self.detach_policy(role_name, policy_arn)
+
+    def detach_policy(self, role_name, policy_arn):
+        try:
+            response = self.client.detach_role_policy(
+                RoleName=role_name,
+                PolicyArn=policy_arn
+            )
+            return response
+        except BaseException as ex:
+            print(ex)
+            return None
 
     def get_account_id(self):
         account_id = self.resource.CurrentUser().arn.split(':')[4]

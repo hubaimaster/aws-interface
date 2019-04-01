@@ -7,16 +7,6 @@ class DatabaseAPI(API):
     RC_CLASS = DatabaseRecipeController
     SC_CLASS = DatabaseServiceController
 
-    # Recipe
-    def get_partitions(self):
-        return self.recipe_controller.get_partitions()
-
-    def put_partition(self, partition_name):
-        return self.recipe_controller.put_partition(partition_name)
-
-    def delete_partition(self, partition_name):
-        return self.recipe_controller.delete_partition(partition_name)
-
     # Service
     def create_item(self, partition, item, read_groups=['admin'], write_groups=['admin']):
         return self.service_controller.create_item(self.recipe_controller.to_json(),
@@ -42,5 +32,14 @@ class DatabaseAPI(API):
     def get_item_count(self, partition):
         return self.service_controller.get_item_count(self.recipe_controller.to_json(), partition)
 
-    def search_items(self, query):
+    def create_partition(self, partition):
+        return self.service_controller.create_partition(self.recipe_controller.to_json(), partition)
+
+    def delete_partition(self, partition):
+        return self.service_controller.delete_partition(self.recipe_controller.to_json(), partition)
+
+    def get_partitions(self):
+        return self.service_controller.get_partitions(self.recipe_controller.to_json())
+
+    def query_items(self, query):
         raise NotImplementedError()
