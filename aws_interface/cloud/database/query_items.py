@@ -9,9 +9,9 @@ info = {
     'input_format': {
         'session_id': 'str',
         'partition': 'str',
+        'query': 'list',
         'start_key': 'dict',
         'limit': 'int=100',
-        'reverse': 'bool=False',
     },
     'output_format': {
         'items': 'list',
@@ -26,14 +26,14 @@ def do(data, resource):
     user = data['user']
 
     partition = params.get('partition', None)
+    query_instructions = params.get('query', None)
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
-    reverse = params.get('reverse', False)
 
     if type(start_key) is str:
         start_key = json.loads(start_key)
-
-    items, end_key = resource.db_get_items(partition, start_key, limit, reverse)
+    print('query_instructions:', query_instructions)
+    items, end_key = resource.db_query(partition, query_instructions, start_key, limit)
 
     filtered = []
     for item in items:

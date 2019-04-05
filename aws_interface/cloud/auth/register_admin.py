@@ -33,7 +33,7 @@ def do(data, resource):
     default_group_name = 'admin'
 
     instructions = [
-        (None, ('eq', 'email', email))
+        (None, ('email', 'eq', email))
     ]
     items, end_key = resource.db_query('user', instructions)
     users = items

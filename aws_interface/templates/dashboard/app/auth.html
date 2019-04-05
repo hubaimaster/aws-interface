@@ -365,7 +365,7 @@
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item" onclick="delete_checked_sessions();">선택 삭제</a>
+                                    <a class="dropdown-item" onclick="delete_checked_sessions();"><i class="fas fa-trash"></i>선택 삭제</a>
                                 </div>
                             </div>
                 </div>
@@ -456,7 +456,7 @@
 
       });
   }
-  function delete_sessions(session_ids) {
+  function delete_sessions(session_ids){
       $.LoadingOverlay('show', {
           text:'Deleting sessions...'
       });

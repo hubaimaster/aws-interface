@@ -3,7 +3,8 @@ import os
 import shutil
 import tempfile
 import json
-from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer
+import base64
+from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3
 from resource.base import ResourceAllocator, Resource
 
 VENDOR = 'aws'
@@ -51,11 +52,13 @@ class AWSResourceAllocator(ResourceAllocator):
         self._create_dynamo_db_table()
         self._create_lambda_function()
         self._create_rest_api_connection()
+        self._create_bucket()
 
     def terminate(self):
         self._remove_dynamo_db_table()
         self._remove_lambda_function()
         self._remove_rest_api_connection()
+        self._remove_bucket()
 
     def get_rest_api_url(self):
         api_gateway = APIGateway(self.boto3_session)
@@ -119,6 +122,10 @@ class AWSResourceAllocator(ResourceAllocator):
         api_gateway = APIGateway(self.boto3_session)
         api_gateway.connect_with_lambda(api_name, func_name)
 
+    def _create_bucket(self):
+        s3 = S3(self.app_id)
+        s3.create_bucket(self.app_id)
+
     def _get_rest_api_url(self):
         api_name = '{}'.format(self.app_id)
         api_client = APIGateway(self.boto3_session)
@@ -141,6 +148,10 @@ class AWSResourceAllocator(ResourceAllocator):
         api_client.delete_rest_api_by_name(resource_name)
         iam.detach_all_policies(resource_name)
         iam.delete_role(resource_name)
+
+    def _remove_bucket(self):
+        s3 = S3(self.app_id)
+        s3.delete_bucket(self.app_id)
 
 
 class AWSResource(Resource):
@@ -201,40 +212,6 @@ class AWSResource(Resource):
         items = result.get('Items', [])
         return items, end_key
 
-    def db_query(self, partition, instructions, start_keys=None, limit=100, reverse=False):
-        # TODO 상위레이어에서 쿼리를 순차적으로 실행가능한 instructions 으로 만들어 전달 -> ORM 클래스 만들기
-        all_item_ids = set()
-
-        if start_keys is None:
-            start_keys = [None] * len(instructions)
-
-        def q(temp_start_keys):
-            item_ids = set()
-            end_keys = []
-            for idx, (operation, statement) in enumerate(instructions):
-                start_key = temp_start_keys[idx]
-                ids, end_key = self._invoke_statement(partition, statement, start_key, limit)
-                end_keys.append(end_key)
-                if operation == 'and':
-                    item_ids &= ids
-                elif operation == 'or':
-                    item_ids |= ids
-                else:
-                    item_ids |= ids
-            return item_ids, end_keys
-
-        _end_keys = [None] * len(instructions)
-        while limit > len(all_item_ids):
-            _item_ids, _end_keys = q(start_keys)
-            all_item_ids |= _item_ids
-            if all(end_key is None for end_key in _end_keys):
-                _end_keys = None
-                break
-        all_item_ids = list(all_item_ids)
-        items = [self.db_get_item(item_id) for item_id in all_item_ids]
-
-        return items, _end_keys
-
     def db_put_item(self, partition, item, item_id=None, creation_date=None):
         dynamo = DynamoDB(self.boto3_session)
         result = dynamo.put_item(self.app_id, partition, item, item_id, creation_date)
@@ -251,26 +228,7 @@ class AWSResource(Resource):
         count = item.get('count')
         return count
 
-    # File ops
-    def file_download_base64(self, file_id):
-        raise NotImplementedError
-
-    def file_upload_base64(self, file_id, file_base64):
-        raise NotImplementedError
-
-    def file_delete_base64(self, file_id):
-        raise NotImplementedError
-
-    def _invoke_statement(self, partition, statement, start_key, limit):
-        operation, field, value = statement
-        if operation == 'eq':
-            return self._query_eq(partition, field, value, start_key, limit)
-        elif operation == 'in':
-            return self._query_in(partition, field, value, start_key, limit)
-        else:
-            raise BaseException('an operation must be <eq> or <in>')
-
-    def _query_eq(self, partition, field, value, start_key, limit):
+    def db_get_item_ids_equal(self, partition, field, value, start_key, limit):
         dynamo = DynamoDB(self.boto3_session)
         response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', start_key, limit)
         items = response.get('Items', [])
@@ -278,10 +236,28 @@ class AWSResource(Resource):
         ids = {item.get('item_id') for item in items}
         return ids, end_key
 
-    def _query_in(self, partition, field, value, start_key, limit):
+    def db_get_item_ids_include(self, partition, field, value, start_key, limit):
         dynamo = DynamoDB(self.boto3_session)
         response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'in', start_key, limit)
         items = response.get('Items', [])
         end_key = response.get('LastEvaluatedKey', None)
         ids = {item.get('item_id') for item in items}
         return ids, end_key
+
+    # File ops
+    def file_download_base64(self, file_id):
+        s3 = S3(self.boto3_session)
+        binary = s3.download_file_bin(self.app_id, file_id)
+        b64 = base64.b64encode(binary)
+        return b64
+
+    def file_upload_base64(self, file_id, file_base64):
+        s3 = S3(self.boto3_session)
+        binary = base64.b64decode(file_base64)
+        result = s3.upload_file_bin(self.app_id, file_id, binary)
+        return bool(result)
+
+    def file_delete_base64(self, file_id):
+        s3 = S3(self.boto3_session)
+        result = s3.delete_file_bin(self.app_id, file_id)
+        return bool(result)

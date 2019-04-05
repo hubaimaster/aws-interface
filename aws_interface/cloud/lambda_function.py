@@ -26,9 +26,6 @@ def get_params(event):
 
 
 def handler(event, context):
-    import timeit
-    start = timeit.default_timer()
-
     params = event
     recipe_key = params.get('recipe_key', None)
     cloud_api_name = params.get('cloud_api_name', None)
@@ -83,7 +80,4 @@ def handler(event, context):
         'headers': module_response.get('header', {}),
         'body': module_response.get('body', {}),
     }
-
-    stop = timeit.default_timer()
-    print('Run time:', stop - start)
     return response

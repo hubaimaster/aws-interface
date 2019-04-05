@@ -199,6 +199,26 @@
             clickToHide: true
         });
     }
+    function deploy_resource() {
+        $.LoadingOverlay('show', {
+          text: '리소스를 배포중입니다'
+        });
+        $.post("{% url 'overview' app_id %}", {
+            'cmd': 'deploy_resource'
+        }, function (data) {
+            $.LoadingOverlay('hide');
+        });
+    }
+    function deploy_if_needed(){
+        $.post("{% url 'overview' app_id %}", {
+            'cmd': 'need_deploy'
+        }, function (data) {
+            var need_deploy = data['result'];
+            if (need_deploy){
+                deploy_resource();
+            }
+        });
+    }
   </script>
 
   <script>
@@ -231,6 +251,7 @@
             }
           }
         });
+        deploy_if_needed();
       });
   </script>
   
@@ -271,6 +292,7 @@
         return this;
     };
   </script>
+
 
 </body>
 </html>

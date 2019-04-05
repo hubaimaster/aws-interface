@@ -126,6 +126,7 @@ class Recipe(models.Model):
     name = models.CharField(max_length=255, editable=False)
     json_string = models.TextField(default='')
     app = models.ForeignKey(App, null=True, on_delete=models.CASCADE)  # should not be NULL from now on
+    need_deploy = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name.title()
@@ -136,7 +137,10 @@ class Recipe(models.Model):
 
     def save_recipe(self, api: core.api.API):
         self.json_string = api.get_recipe_controller().to_json()
-        self.apply_status = 'NO'
+        self.save()
+
+    def set_need_deploy(self, need_deploy):
+        self.need_deploy = need_deploy
         self.save()
 
     @contextmanager
@@ -154,5 +158,8 @@ class Recipe(models.Model):
         :return:
         """
         api = self.get_api(self.app.vendor, credential)
+        prev_json_string = self.json_string
         yield api
+        if api.get_recipe_controller().to_json() != prev_json_string:
+            self.set_need_deploy(True)
         self.save_recipe(api)

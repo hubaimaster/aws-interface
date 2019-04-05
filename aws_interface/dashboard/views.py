@@ -132,8 +132,18 @@ class Util:
                 recipes.append(recipe)
             else:
                 print('item.json_string is empty')
+            item.set_need_deploy(False)
         allocator = get_resource_allocator(app.vendor, credentials, app.id, recipes)
         allocator.create()
+        return True
+
+    @classmethod
+    def need_deploy(cls, app):
+        items = Recipe.objects.filter(app=app)
+        for item in items:
+            if item.need_deploy:
+                return True
+        return False
 
     @classmethod
     def terminate_resource(cls, credentials, app):
@@ -352,10 +362,9 @@ class Overview(LoginRequiredMixin, View):
         cmd = request.GET.get('cmd', None)
         app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
-        Util.deploy_resource(credentials, app)
+
         if cmd == 'download_sdk':
             sdk_bin = Util.generate_sdk(credentials, app, 'python3')
-
             if sdk_bin is None:
                 Util.add_alert(request, 'API 를 초기화 하고 있습니다. 상황에 따라 최대 3분 정도 소요될 수 있습니다.')
                 return redirect(request.path_info)
@@ -379,7 +388,15 @@ class Overview(LoginRequiredMixin, View):
         credentials = Util.get_credentials(request)
         cmd = request.POST['cmd']
         if cmd == 'deploy_resource':
-            Util.deploy_resource(credentials, app)
+            response = {
+                'result': Util.deploy_resource(credentials, app)
+            }
+            return JsonResponse(response)
+        if cmd == 'need_deploy':
+            response = {
+                'result': Util.need_deploy(app)
+            }
+            return JsonResponse(response)
 
 
 class Guide(LoginRequiredMixin, View):
@@ -440,7 +457,7 @@ class Auth(LoginRequiredMixin, View):
         app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
 
-        auth = app.recipe_set.get(name='auth')
+        auth = Util.get_recipe(app, 'auth')
         with auth.api(credentials) as api:
             cmd = request.POST['cmd']
             # Recipe
@@ -520,7 +537,7 @@ class Database(LoginRequiredMixin, View):
         app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
 
-        database = app.recipe_set.get(name='database')
+        database = Util.get_recipe(app, 'database')
 
         cmd = request.GET.get('cmd', None)
         with database.api(credentials) as database_api:
@@ -548,6 +565,9 @@ class Database(LoginRequiredMixin, View):
             elif cmd == 'delete_partition':
                 partition_name = request.POST['partition_name']
                 _ = database_api.delete_partition(partition_name)
+            elif cmd == 'delete_partitions':
+                partitions = request.POST.getlist('partitions[]')
+                _ = database_api.delete_partitions(partitions)
             elif cmd == 'get_items':
                 partition = request.POST['partition']
                 start_key = request.POST.get('start_key', None)
@@ -563,15 +583,34 @@ class Database(LoginRequiredMixin, View):
                 item_id = request.POST['item_id']
                 result = database_api.delete_item(item_id)
                 return JsonResponse(result)
+            elif cmd == 'delete_items':
+                item_ids = request.POST.getlist('item_ids[]')
+                result = database_api.delete_items(item_ids)
+                return JsonResponse(result)
             elif cmd == 'delete_field':
                 item_id = request.POST['item_id']
                 field_name = request.POST['field_name']
                 result = database_api.put_item_field(item_id, field_name, None)
                 return JsonResponse(result)
+            elif cmd == 'delete_fields':
+                field_names = request.POST.getlist('field_names[]')
+                item_id = request.POST['item_id']
+                for field_name in field_names:
+                    result = database_api.put_item_field(item_id, field_name, None)
+                return JsonResponse(result)
             elif cmd == 'get_item_count':
                 partition = request.POST['partition']
                 result = database_api.get_item_count(partition)
                 result = Util.encode_dict(result)
+                return JsonResponse(result)
+            elif cmd == 'query_items':
+                partition = request.POST['partition']
+                query = request.POST['query']
+                start_key = request.POST.get('start_key', None)
+
+                query = json.loads(query)
+                instructions = query['instructions']
+                result = database_api.query_items(partition, instructions, start_key)
                 return JsonResponse(result)
 
         return redirect(request.path_info)  # Redirect back
@@ -593,7 +632,7 @@ class Storage(LoginRequiredMixin, View):
             if cmd == 'download_file':
                 file_path = request.GET['file_path']
                 file_name = file_path.split('/').pop()
-                file_bin_b64 = storage_api.download_file(file_path)
+                file_bin_b64 = storage_api.download_b64(file_path)
                 file_bin = base64.b64decode(file_bin_b64)
                 response = HttpResponse(file_bin, content_type='application/x-binary')
                 file_name = file_name.encode('utf8').decode('ISO-8859-1')
@@ -601,12 +640,9 @@ class Storage(LoginRequiredMixin, View):
                 return response
             else:
                 folder_path = request.GET.get('folder_path', '/')
-                start_key = request.GET.get('start_key', None)
                 context['app_id'] = app_id
                 context['folder_path'] = folder_path
                 context['user_groups'] = auth_api.get_user_groups()
-                context['rest_api_url'] = storage_api._get_rest_api_url()
-                context['folder_list'] = storage_api.get_folder_list(folder_path, start_key)
 
         return render(request, 'dashboard/app/storage.html', context=context)
 
@@ -617,7 +653,7 @@ class Storage(LoginRequiredMixin, View):
         app = App.objects.get(id=app_id, user=request.user)
         credentials = Util.get_credentials(request)
 
-        storage = app.recipe_set.get(name='storage')
+        storage = Util.get_recipe(app, 'storage')
 
         with storage.api(credentials) as storage_api:
             cmd = request.POST['cmd']
@@ -634,7 +670,7 @@ class Storage(LoginRequiredMixin, View):
                 file_name = request.POST['file_name']
                 read_groups = json.loads(request.POST.get('read_groups'))
                 write_groups = json.loads(request.POST.get('write_groups'))
-                result = storage_api.upload_file(parent_path, file_name, file_bin, read_groups, write_groups)
+                result = storage_api.upload_b64(parent_path, file_name, file_bin, read_groups, write_groups)
                 return JsonResponse(result)
             elif cmd == 'get_folder_list':
                 folder_path = request.POST['folder_path']
@@ -643,12 +679,12 @@ class Storage(LoginRequiredMixin, View):
                 return JsonResponse(result)
             elif cmd == 'download_file':
                 file_path = request.POST['file_path']
-                file_bin = storage_api.download_file(file_path)
+                file_bin = storage_api.download_b64(file_path)
                 response = HttpResponse(file_bin, content_type='application/x-binary')
                 return response
             elif cmd == 'delete_path':
                 path = request.POST['path']
-                result = storage_api.delete_path(path)
+                result = storage_api.delete_b64(path)
                 return JsonResponse(result)
 
 

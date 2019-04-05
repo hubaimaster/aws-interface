@@ -44,7 +44,7 @@ def do(data, resource):
         return Response(body)
 
     instructions = [
-        (None, ('eq', 'email', email))
+        (None, ('email', 'eq', email))
     ]
     items, end_key = resource.db_query('user', instructions)
     users = items

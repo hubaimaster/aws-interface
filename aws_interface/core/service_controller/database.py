@@ -62,6 +62,15 @@ class DatabaseServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
+    def delete_items(self, recipe, item_ids):
+        import cloud.database.delete_items as method
+        params = {
+            'item_ids': item_ids,
+        }
+        data = make_data(self.app_id, params, recipe)
+        return method.do(data, self.resource)
+
+    @lambda_method
     def get_items(self, recipe, partition, reverse, start_key):
         import cloud.database.get_items as method
         params = {
@@ -100,9 +109,30 @@ class DatabaseServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
+    def delete_partitions(self, recipe, partitions):
+        import cloud.database.delete_partitions as method
+        params = {
+            'partitions': partitions,
+        }
+        data = make_data(self.app_id, params, recipe)
+        return method.do(data, self.resource)
+
+    @lambda_method
     def get_partitions(self, recipe):
         import cloud.database.get_partitions as method
         params = {
+        }
+        data = make_data(self.app_id, params, recipe)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def query_items(self, recipe, partition, query, start_key):
+        """:query:list"""
+        import cloud.database.query_items as method
+        params = {
+            'partition': partition,
+            'query': query,
+            'start_key': start_key,
         }
         data = make_data(self.app_id, params, recipe)
         return method.do(data, self.resource)

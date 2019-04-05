@@ -297,7 +297,8 @@ class DynamoDB:
             'hash_key_type': 'S',
             'sort_key': 'creationDate',
             'sort_key_type': 'N'
-        }, {
+        }])
+        self.update_table(table_name, indexes=[{
             'hash_key': 'invertedQuery',
             'hash_key_type': 'S',
             'sort_key': 'creationDate',
@@ -561,6 +562,7 @@ class DynamoDB:
             TableName=table_name,
             UpdateExpression='ADD #A :v',
         )
+        print('_add_item_count:', response)
         return response
 
     def get_item_count(self, table_name, count_id):

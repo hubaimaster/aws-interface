@@ -7,7 +7,7 @@ from cloud.util import has_write_permission
 info = {
     'input_format': {
         'session_id': 'str',
-        'item_id': 'str',
+        'item_ids': 'list',
     },
     'output_format': {
         'success': 'bool',
@@ -20,14 +20,17 @@ def do(data, resource):
     body = {}
     params = data['params']
     user = data['user']
+    success = True
 
-    item_id = params.get('item_id', None)
-
-    item = resource.db_get_item(item_id)
-    if has_write_permission(user, item):
-        resource.db_delete_item(item_id)
-        body['success'] = True
-    else:
-        body['success'] = False
+    item_ids = params.get('item_ids', [])
+    for item_id in item_ids:
+        item = resource.db_get_item(item_id)
+        if item and has_write_permission(user, item):
+            resource.db_delete_item(item_id)
+            success &= True
+        else:
+            success &= False
+    if not success:
         body['message'] = 'permission denied'
+    body['success'] = success
     return Response(body)

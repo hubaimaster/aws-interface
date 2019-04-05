@@ -1,6 +1,6 @@
 
 from cloud.response import Response
-from cloud.database.util import has_read_permission
+from cloud.util import has_read_permission
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
