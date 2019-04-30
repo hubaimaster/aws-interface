@@ -15,7 +15,7 @@ info = {
             'email': 'str',
             'passwordHash': 'str',
             'salt': 'str',
-            'group': 'str',
+            'groups': 'list',
             'extra': 'map',
         }
     }

@@ -1,5 +1,6 @@
 {% extends 'dashboard/app/base.html' %}
 {% load staticfiles %}
+{% load timetags %}
 {% block content %}
 
 <div class="main-content">
@@ -18,17 +19,6 @@
                 <strong>Auth </strong> 에 의존합니다.
             </div>
 
-            <div class="alert alert-neutral" role="alert">
-                <div class="row">
-                    <div class="col">
-                        <strong>{{ rest_api_url }}</strong> 의 POST Method 를 호출 할 수 있습니다.
-                    </div>
-                    <div class="col-auto">
-
-                    </div>
-                </div>
-            </div>
-
         </div>
       </div>
     </div>
@@ -41,15 +31,12 @@
               <div class="row align-items-center">
                 <div class="col">
                   <h3 id="path-name" class="mb-0">
-                      <span class="badge badge-default">서비스</span>
-                       {{ folder_path }}
+                       파일 목록
                   </h3>
                 </div>
 
                   <div class="col text-right">
-                  <a data-toggle="modal" data-target="#modal-put-folder" class="btn btn-sm btn-success">
-                      <span class="btn-inner--text" style="color: white;">폴더 생성</span>
-                  </a>
+
                   <a data-toggle="modal" data-target="#modal-upload-file" class="btn btn-sm btn-primary">
                       <span class="btn-inner--text" style="color: white;">파일 업로드</span>
                   </a>
@@ -92,7 +79,7 @@
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                 {% for group in user_groups %}
-                                                <a class="dropdown-item" onclick="put_folder_read_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                <a class="dropdown-item" onclick="put_folder_read_group('{{ group.name }}');">{{ group.name }} </a>
                                                 {% endfor %}
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -112,7 +99,7 @@
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                 {% for group in user_groups %}
-                                                <a class="dropdown-item" onclick="put_folder_write_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                <a class="dropdown-item" onclick="put_folder_write_group('{{ group.name }}');">{{ group.name }}</a>
                                                 {% endfor %}
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -152,8 +139,8 @@
                                     <div class="col-lg-12">
 
                                       <div class="form-group">
-                                        <label class="form-control-label" for="file-parent-path">업로드 위치</label>
-                                        <input name="file-parent-path" type="text" id="file-parent-path" class="form-control form-control-alternative" placeholder="/" disabled>
+                                        <label class="form-control-label" for="file-parent-path">파일 ID</label>
+                                        <input name="file-parent-path" type="text" id="file-parent-path" class="form-control form-control-alternative" placeholder="자동생성" disabled>
                                       </div>
                                       <div class="form-group">
                                         <label class="form-control-label" for="file-bin">파일</label>
@@ -172,7 +159,7 @@
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                 {% for group in user_groups %}
-                                                <a class="dropdown-item" onclick="put_file_read_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                <a class="dropdown-item" onclick="put_file_read_group('{{ group.name }}');">{{ group.name }}</a>
                                                 {% endfor %}
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -192,7 +179,7 @@
                                               </button>
                                               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                 {% for group in user_groups %}
-                                                <a class="dropdown-item" onclick="put_file_write_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                <a class="dropdown-item" onclick="put_file_write_group('{{ group.name }}');">{{ group.name }}</a>
                                                 {% endfor %}
                                                 <div class="dropdown-divider"></div>
                                                 <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -224,28 +211,24 @@
               <table id="dir-table" class="table align-items-center table-flush">
                 <thead class="thead-light">
                   <tr>
+                    <th scope="col">id</th>
                     <th scope="col">name</th>
-                    <th scope="col">type</th>
+                    <th scope="col">owner</th>
                     <th scope="col">create date</th>
-                    <th scope="col">read groups</th>
-                    <th scope="col">write groups</th>
+                    <th scope="col">size</th>
                     <th scope="col"></th>
                   </tr>
                 </thead>
                 <tbody>
-                {% for item in folder_list.items %}
+                {% for item in b64_info.items %}
                     <tr>
-                    {% if item.type == 'file' %}
-                        <th scope="row"><a href="{% url 'storage' app_id %}?cmd=download_file&file_path={{ item.path }}">{{ item.name }}</a></th>
-                    {% elif item.type == 'folder' %}
-                        <th scope="row"><a href="{% url 'storage' app_id %}?folder_path={{ item.path }}">{{ item.name }}</a></th>
-                    {% endif %}
-                        <td>{{ item.type }}</td>
-                        <td>{{ item.creationDate }}</td>
-                        <td>{{ item.read_groups }}</td>
-                        <td>{{ item.write_groups }}</td>
+                        <th scope="row"><a href="{% url 'storage' app_id %}?cmd=download_b64&file_id={{ item.id }}">{{ item.id }}</a></th>
+                        <td>{{ item.file_name }}</td>
+                        <td>{{ item.owner }}</td>
+                        <td>{{ item.creationDate|to_date }}</td>
+                        <td>{{ item.file_size }}</td>
                         <td>
-                            <button onclick="delete_path('{{ item.path }}')" class="btn btn-sm btn-danger">제거</button>
+                            <button onclick="delete_b64('{{ item.id }}')" class="btn btn-sm btn-danger">제거</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -296,9 +279,8 @@
     }
     function upload_file(parent_path, file_name, file_bin, read_groups, write_groups) {
         var formData = new FormData();
-        formData.append('cmd', 'upload_file');
+        formData.append('cmd', 'upload_b64');
         formData.append('file_bin', file_bin);
-        formData.append('parent_path', parent_path);
         formData.append('file_name', file_name);
         formData.append('read_groups', JSON.stringify(read_groups));
         formData.append('write_groups', JSON.stringify(write_groups));
@@ -397,10 +379,10 @@
         render_folder_write_groups();
     }
 
-    function delete_path(path){
+    function delete_b64(file_id){
         $.post("", {
-            cmd: 'delete_path',
-            path: path,
+            cmd: 'delete_b64',
+            file_id: file_id,
         }, function (data) {
             window.location.reload();
         });

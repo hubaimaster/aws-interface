@@ -32,7 +32,7 @@ def do(data, resource):
 
     if type(start_key) is str:
         start_key = json.loads(start_key)
-    print('query_instructions:', query_instructions)
+
     items, end_key = resource.db_query(partition, query_instructions, start_key, limit)
 
     filtered = []

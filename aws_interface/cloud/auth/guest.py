@@ -55,7 +55,7 @@ def do(data, resource):
         email = '{}@guest.com'.format(shortuuid.uuid())
         item = {
             'email': email,
-            'group': default_group_name,
+            'groups': [default_group_name],
             'extra': {},
             'loginMethod': 'guest_login',
         }

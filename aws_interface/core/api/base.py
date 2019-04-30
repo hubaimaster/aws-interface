@@ -38,4 +38,4 @@ class API(metaclass=ABCMeta):
         return self.recipe_controller
 
     def get_recipe_json_string(self):
-        return self.get_recipe_controller().to_json()
+        return self.get_recipe_controller().to_json_string()

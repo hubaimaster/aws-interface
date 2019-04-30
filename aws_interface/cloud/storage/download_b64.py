@@ -8,11 +8,12 @@ import base64
 info = {
     'input_format': {
         'session_id': 'str',
-        'file_key': 'str',
+        'file_id': 'str',
     },
     'output_format': {
+        'success': 'bool',
         'file_b64': 'str',
-        'success': 'bool'
+        'parent_file_id': 'str?',
     }
 }
 
@@ -22,14 +23,20 @@ def do(data, resource):
     params = data['params']
     user = data['user']
 
-    file_key = params.get('file_key')
+    file_id = params.get('file_id')
 
-    item = resource.db_get_item(file_key)
+    item = resource.db_get_item(file_id)
     if item:
         if has_read_permission(user, item):
-            file_key = item['file_key']
-            file_b64 = resource.file_download_base64(file_key)
+            file_id = item['file_id']
+            parent_file_id = item.get('parent_file_id', None)
+            file_b64 = resource.file_download_bin(file_id)
+            file_b64 = base64.b64encode(file_b64)
+            file_b64 = file_b64.decode('utf-8')
+
             body['file_b64'] = file_b64
+            body['parent_file_id'] = parent_file_id
+            body['file_name'] = item.get('file_name', None)
             body['success'] = True
             return Response(body)
         else:
@@ -38,6 +45,6 @@ def do(data, resource):
             return Response(body)
     else:
         body['success'] = False
-        body['message'] = 'file_key: {} does not exist'.format(file_key)
+        body['message'] = 'file_key: {} does not exist'.format(file_id)
         return Response(body)
 

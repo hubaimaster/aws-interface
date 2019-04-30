@@ -18,11 +18,19 @@ class RecipeController(metaclass=ABCMeta):
         assert (type(self).RECIPE is not None)
         self.data['recipe_type'] = type(self).RECIPE
 
-    def to_json(self):
+    def _init_cloud_api(self):
+        raise NotImplementedError
+
+    def to_json_string(self):
         return json.dumps(self.data)
 
     def load_json_string(self, json_string):
-        self.data = json.loads(json_string)
+        if json_string:
+            self.data = json.loads(json_string)
+        self._init_cloud_api()
+
+    def get_json_map(self):
+        return self.data
 
     def get_recipe(self):
         return type(self).RECIPE
@@ -58,5 +66,6 @@ class RecipeController(metaclass=ABCMeta):
         return True
 
     def get_cloud_apis(self):
+        self._init_cloud_api()
         cloud_apis = self.data.get('cloud_apis', {})
         return cloud_apis.values()

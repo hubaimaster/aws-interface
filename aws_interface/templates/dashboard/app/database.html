@@ -232,7 +232,11 @@
                                                         <div class="col-4">
                                                             <select id="query-operation" class="form-control">
                                                                 <option value="eq">==</option>
-                                                                <option value="in">in</option>
+                                                                <option value="in">contains</option>
+                                                                <option value="gt"> > </option>
+                                                                <option value="ls"> < </option>
+                                                                <option value="ge"> >= </option>
+                                                                <option value="le"> <= </option>
                                                             </select>
                                                         </div>
                                                         <div class="col-4">
@@ -523,14 +527,14 @@
           var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\"><th name=\"field\" id=\"" +
               key + "\" scope=\"row\">" +
               "<div class=\"row\">" +
-              "<div class=\"col-md-10\">" +
+              "<div class=\"col-10\">" +
               "<a style='color:cornflowerblue; cursor:pointer;' onclick=\"set_field('" + key + "', '" + value + "','" + value_type + "');\">" +
               "<label>" + key + "</label>&nbsp" +
               "<button class=\"btn btn-sm\">수정</button>" +
               "</a>" +
               "<textarea readonly class=\"form-control form-control-alternative\" style='width:100%;'>" + value + "</textarea>" +
               "</div>" +
-              "<div class=\"col-md-2\">" +
+              "<div class=\"col-2\">" +
               "<div style=\"text-align: right; float: right;\">" +
               "<div class=\"custom-control custom-checkbox mt--3\">\n" +
               "<input class=\"custom-control-input\" type=\"checkbox\" name=\"checkbox-field\" id=\"field-" + key + "\" value=\"" + key + "\">\n" +

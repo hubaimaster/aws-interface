@@ -129,37 +129,4 @@ class Recipe(models.Model):
     need_deploy = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name.title()
-
-    def get_api(self, vendor, credential):
-        api_cls = core.api.api_dict[self.name]
-        return api_cls(vendor, credential, self.app.id, self.json_string)
-
-    def save_recipe(self, api: core.api.API):
-        self.json_string = api.get_recipe_controller().to_json()
-        self.save()
-
-    def set_need_deploy(self, need_deploy):
-        self.need_deploy = need_deploy
-        self.save()
-
-    @contextmanager
-    def api(self, credential):
-        """
-        You can do this:
-            with recipe.api() as api:
-                use(api)
-        Instead of this:
-            api = recipe.api()
-            use(api)
-            recipe.save_recipe(api)
-        :param vendor:
-        :param credential:
-        :return:
-        """
-        api = self.get_api(self.app.vendor, credential)
-        prev_json_string = self.json_string
-        yield api
-        if api.get_recipe_controller().to_json() != prev_json_string:
-            self.set_need_deploy(True)
-        self.save_recipe(api)
+        return self.name

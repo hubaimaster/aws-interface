@@ -31,40 +31,40 @@ class AuthAPI(API):
 
     # Service
     def create_user(self, email, password, extra):
-        return self.service_controller.create_user(self.recipe_controller.to_json(), email, password, extra)
+        return self.service_controller.create_user(self.recipe_controller.to_json_string(), email, password, extra)
 
     def set_user(self, user_id, email, password, extra):
-        return self.service_controller.set_user(self.recipe_controller.to_json(), user_id, email, password, extra)
+        return self.service_controller.set_user(self.recipe_controller.to_json_string(), user_id, email, password, extra)
 
     def delete_user(self, user_id):
-        return self.service_controller.delete_user(self.recipe_controller.to_json(), user_id)
+        return self.service_controller.delete_user(self.recipe_controller.to_json_string(), user_id)
 
     def get_user(self, user_id):
-        return self.service_controller.get_user(self.recipe_controller.to_json(), user_id)
+        return self.service_controller.get_user(self.recipe_controller.to_json_string(), user_id)
 
     def get_users(self, start_key=None, limit=100):
-        return self.service_controller.get_users(self.recipe_controller.to_json(), start_key, limit)
+        return self.service_controller.get_users(self.recipe_controller.to_json_string(), start_key, limit)
 
     def get_user_count(self):
-        return self.service_controller.get_user_count(self.recipe_controller.to_json())
+        return self.service_controller.get_user_count(self.recipe_controller.to_json_string())
 
     def create_session(self, email, password):  # use as login
-        return self.service_controller.create_session(self.recipe_controller.to_json(), email, password)
+        return self.service_controller.create_session(self.recipe_controller.to_json_string(), email, password)
 
     def delete_session(self, session_id):  # use as logout
-        return self.service_controller.delete_session(self.recipe_controller.to_json(), session_id)
+        return self.service_controller.delete_session(self.recipe_controller.to_json_string(), session_id)
 
     def delete_sessions(self, session_ids):  # use as logout
-        return self.service_controller.delete_sessions(self.recipe_controller.to_json(), session_ids)
+        return self.service_controller.delete_sessions(self.recipe_controller.to_json_string(), session_ids)
 
     def get_session(self, session_id):  # use as login check
-        return self.service_controller.get_session(self.recipe_controller.to_json(), session_id)
+        return self.service_controller.get_session(self.recipe_controller.to_json_string(), session_id)
 
     def get_sessions(self, start_key=None, limit=100):  # it will connect for dashboard (use as list logged in users)
-        return self.service_controller.get_sessions(self.recipe_controller.to_json(), start_key, limit)
+        return self.service_controller.get_sessions(self.recipe_controller.to_json_string(), start_key, limit)
 
     def get_session_count(self):  # it will connect for dashboard
-        return self.service_controller.get_session_count(self.recipe_controller.to_json())
+        return self.service_controller.get_session_count(self.recipe_controller.to_json_string())
 
     def create_admin(self, email, password, extra):
-        return self.service_controller.create_admin(self.recipe_controller.to_json(), email, password, extra)
+        return self.service_controller.create_admin(self.recipe_controller.to_json_string(), email, password, extra)

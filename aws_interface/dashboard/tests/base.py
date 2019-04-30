@@ -98,6 +98,11 @@ class DashboardTestCase(StaticLiveServerTestCase):
         time.sleep(DELAY)
         self.browser.find_element_by_id('app-{}'.format(APP_NAME)).click()
         self.assertEqual(self.browser.current_url.endswith('overview'), True)
+        while True:
+            time.sleep(DELAY)
+            overlay_count = len(self.browser.find_elements_by_class_name('loadingoverlay'))
+            if overlay_count == 0:
+                break
 
     def _is_alert_presented(self):
         try:
@@ -134,3 +139,14 @@ class DashboardTestCase(StaticLiveServerTestCase):
         self.browser.find_element_by_id('login').click()
         time.sleep(DELAY)
         self.assertEqual(APPS_URL in self.browser.current_url, True)
+
+    def do_test_process(self):
+        from dashboard.tests.process_auth import AuthTestProcess
+        from dashboard.tests.process_bill import BillTestProcess
+        from dashboard.tests.process_sdk import SDKTestProcess
+        AuthTestProcess(self).do_test()
+        BillTestProcess(self).do_test()
+        SDKTestProcess(self).do_test()
+
+    def test(self):
+        self.do_test_process()

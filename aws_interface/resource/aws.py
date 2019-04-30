@@ -2,8 +2,8 @@ import importlib
 import os
 import shutil
 import tempfile
+import time
 import json
-import base64
 from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3
 from resource.base import ResourceAllocator, Resource
 
@@ -102,19 +102,11 @@ class AWSResourceAllocator(ResourceAllocator):
 
         zip_file = create_lambda_zipfile_bin(self.app_id, self.recipes, cloud_module_path, resource_module_path)
 
-        success = True
         try:
             lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
         except BaseException as ex:
             print(ex)
-            try:
-                print('[{}] apply_cloud_api: {}'.format(self.app_id, 'RETRY'))
-                lambda_client.update_function_code(name, zip_file)
-            except BaseException as ex:
-                success = False
-                print(ex)
-
-        print('[{}] apply_cloud_api: {}'.format(self.app_id, 'COMPLETE' if success else 'FAIL'))
+            lambda_client.update_function_code(name, zip_file)
 
     def _create_rest_api_connection(self):
         api_name = '{}'.format(self.app_id)
@@ -123,7 +115,7 @@ class AWSResourceAllocator(ResourceAllocator):
         api_gateway.connect_with_lambda(api_name, func_name)
 
     def _create_bucket(self):
-        s3 = S3(self.app_id)
+        s3 = S3(self.boto3_session)
         s3.create_bucket(self.app_id)
 
     def _get_rest_api_url(self):
@@ -205,7 +197,7 @@ class AWSResource(Resource):
         item = dynamo.get_item(self.app_id, item_id)
         return item.get('Item', None)
 
-    def db_get_items(self, partition, exclusive_start_key=None, limit=None, reverse=False):
+    def db_get_items(self, partition, exclusive_start_key=None, limit=100, reverse=False):
         dynamo = DynamoDB(self.boto3_session)
         result = dynamo.get_items(self.app_id, partition, exclusive_start_key, limit, reverse)
         end_key = result.get('LastEvaluatedKey', None)
@@ -236,28 +228,49 @@ class AWSResource(Resource):
         ids = {item.get('item_id') for item in items}
         return ids, end_key
 
-    def db_get_item_ids_include(self, partition, field, value, start_key, limit):
-        dynamo = DynamoDB(self.boto3_session)
-        response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'in', start_key, limit)
-        items = response.get('Items', [])
-        end_key = response.get('LastEvaluatedKey', None)
-        ids = {item.get('item_id') for item in items}
-        return ids, end_key
-
     # File ops
-    def file_download_base64(self, file_id):
+    def file_download_bin(self, file_id):
         s3 = S3(self.boto3_session)
-        binary = s3.download_file_bin(self.app_id, file_id)
-        b64 = base64.b64encode(binary)
-        return b64
+        binary = s3.download_bin(self.app_id, file_id)
+        return binary
 
-    def file_upload_base64(self, file_id, file_base64):
+    def file_upload_bin(self, file_id, binary):
         s3 = S3(self.boto3_session)
-        binary = base64.b64decode(file_base64)
-        result = s3.upload_file_bin(self.app_id, file_id, binary)
+        result = s3.upload_bin(self.app_id, file_id, binary)
         return bool(result)
 
-    def file_delete_base64(self, file_id):
+    def file_delete_bin(self, file_id):
         s3 = S3(self.boto3_session)
-        result = s3.delete_file_bin(self.app_id, file_id)
+        result = s3.delete_bin(self.app_id, file_id)
         return bool(result)
+
+    # Server-less ops
+    def sl_create_function(self, function_name, runtime, handler, zip_file_bin):
+        lambda_client = Lambda(self.boto3_session)
+        iam = IAM(self.boto3_session)
+        role_name = '{}'.format(self.app_id)
+        role_arn = iam.create_role_and_attach_policies(role_name)
+        name = '{}-{}'.format(self.app_id, function_name)
+        desc = 'aws-interface-logic'
+        result = lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file_bin)
+        return bool(result)
+
+    def sl_delete_function(self, function_name):
+        lambda_client = Lambda(self.boto3_session)
+        name = '{}-{}'.format(self.app_id, function_name)
+        result = lambda_client.delete_function(name)
+        return bool(result)
+
+    def sl_update_function(self, function_name, zip_file_bin):
+        lambda_client = Lambda(self.boto3_session)
+        name = '{}-{}'.format(self.app_id, function_name)
+        result = lambda_client.update_function_code(name, zip_file_bin)
+        return bool(result)
+
+    def sl_invoke_function(self, function_name, payload):
+        lambda_client = Lambda(self.boto3_session)
+        name = '{}-{}'.format(self.app_id, function_name)
+        result = lambda_client.invoke_function(name, payload)
+        error = result.get('FunctionError', None)
+        response_payload = result.get('Payload', None)
+        return response_payload, error

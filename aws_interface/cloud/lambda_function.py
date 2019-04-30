@@ -32,7 +32,7 @@ def handler(event, context):
 
     with open('./cloud/recipes.json', 'r') as f:
         recipes = json.load(f)
-      
+
     with open('./cloud/app_id.txt', 'r') as file:
         app_id = file.read()
 

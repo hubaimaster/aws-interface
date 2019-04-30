@@ -1,4 +1,4 @@
-import json
+import simplejson as json
 
 
 def make_data(app_id, params, recipe_json, admin=True):
@@ -10,7 +10,7 @@ def make_data(app_id, params, recipe_json, admin=True):
         'admin': admin,
         'user': {
             'id': 'admin-{}'.format(app_id),
-            'group': 'admin',
+            'groups': ['admin'],
             'creationDate': 0,
             'extra': {}
         }
@@ -21,6 +21,8 @@ def make_data(app_id, params, recipe_json, admin=True):
 def lambda_method(func):
     def wrap(*args, **kwargs):
         result = func(*args, **kwargs)
-        return result.get('body', {})
+        body = result.get('body', {})
+        json_body = json.dumps(body)
+        return json.loads(json_body)
     return wrap
 

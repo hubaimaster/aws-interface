@@ -13,8 +13,8 @@
             <div class="alert alert-primary" role="alert">
                 <strong>AWS Lambda</strong>  를 사용합니다.
             </div>
-            <div class="alert alert-danger" role="alert">
-                <strong>곧 지원될 예정입나다</strong>
+            <div class="alert alert-default" role="alert">
+                <strong>Auth </strong> 에 의존합니다.
             </div>
           <!-- Card stats -->
 
@@ -24,7 +24,131 @@
     <!-- Page content -->
     <div class="container-fluid mt--7">
       <div class="row">
+        <div class="col-xl-12">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col">
+                  <h3 class="mb-0">함수 목록</h3>
+                </div>
 
+                <div class="col text-right">
+                  <a data-toggle="modal" data-target="#modal-create-function" class="btn btn-sm btn-primary">
+                      <span class="btn-inner--text" style="color: white;">함수 생성</span>
+                  </a>
+                </div>
+
+                <div class="modal fade" id="modal-create-function" tabindex="-1" role="dialog" aria-labelledby="modal-create-function" aria-hidden="true">
+                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title" id="modal-title-default">함수 생성</h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                        </div>
+
+                            <div class="modal-body">
+                                <div class="pl-lg-12">
+                                  <div class="row">
+                                    <div class="col-lg-12">
+
+                                      <div class="form-group">
+                                        <label class="form-control-label" for="folder-name">*이름</label>
+                                        <input name="folder-name" type="text" id="function-name" class="form-control form-control-alternative" placeholder="함수 이름">
+                                      </div>
+
+                                      <div class="form-group">
+                                        <label class="form-control-label" for="folder-name">*런타임</label>
+                                        <select name="folder-name" id="function-runtime" class="form-control form-control-alternative">
+                                            <option value="python36">Python 3.6</option>
+                                            <option value="python27">Python 2.7</option>
+                                            <option value="java8">java 8</option>
+                                        </select>
+                                      </div>
+
+                                      <div class="form-group">
+                                        <label id="function-description" class="form-control-label" for="folder-name">설명</label>
+                                        <input name="folder-name" type="text" id="folder-name" class="form-control form-control-alternative" placeholder="함수 설명">
+                                      </div>
+
+                                      <div class="form-group">
+                                        <label class="form-control-label" for="file-bin">소스 코드 .zip 파일</label>
+                                        <input name="file-bin" type="file" id="function-zipfile" class="form-control form-control-alternative btn">
+                                      </div>
+
+                                      <div class="form-group">
+                                        <label class="form-control-label" for="folder-name">실행될 함수경로.메소드이름</label>
+                                        <input name="folder-name" type="text" id="function-handler" class="form-control form-control-alternative" placeholder="Ex) path.to.function.method_name">
+                                      </div>
+
+                                      <div class="form-group">
+                                        <label class="form-control-label" for="input-username">함수를 실행할 수 있는 그룹</label>
+                                        <div id="function-run-groups" class="mb-2">
+
+                                        </div>
+
+                                          <div class="dropdown">
+                                              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                그룹 추가
+                                              </button>
+                                              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                {% for group in user_groups %}
+                                                <a class="dropdown-item" onclick="put_folder_read_group('{{ group.name }}');">{{ group.name }} </a>
+                                                {% endfor %}
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
+                                              </div>
+                                          </div>
+
+                                      </div>
+
+
+
+                                    </div>
+                                  </div>
+                                </div>
+                              <p>
+                                  확인 버튼을 클릭하여 함수를 생성합니다.
+                              </p>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                              <button id="create-folder" class="btn btn-primary">확인</button>
+                            </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+
+              </div>
+            </div>
+            <div class="table-responsive">
+              <!-- Projects table -->
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">이름</th>
+                    <th scope="col">생성일자</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for usage in usages %}
+                  <tr>
+                    <th scope="row">
+                      {{ usage.Service }}
+                    </th>
+                    <td>
+                      {{ usage.Cost.Amount|floatformat }} {{ usage.Cost.Unit }}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
       </div>
       <div class="row mt-7">
@@ -42,5 +166,109 @@
       </footer>
     </div>
   </div>
+
+    <script>
+
+    var function_run_groups = [];
+
+    {% for user_group in user_groups %}
+      function_run_groups.push('{{ user_group.name }}');
+    {% endfor %}
+
+    function upload_file(parent_path, file_name, file_bin, read_groups, write_groups) {
+        var formData = new FormData();
+        formData.append('cmd', 'upload_b64');
+        formData.append('file_bin', file_bin);
+        formData.append('file_name', file_name);
+        formData.append('read_groups', JSON.stringify(read_groups));
+        formData.append('write_groups', JSON.stringify(write_groups));
+        $.ajax({
+               url : '',
+               type : 'POST',
+               data : formData,
+               processData: false,  // tell jQuery not to process the data
+               contentType: false,  // tell jQuery not to set contentType
+               success : function(data) {
+                   window.location.reload();
+               }
+        });
+    }
+
+    function put_function_run_group(group_name) {
+        if (file_read_groups.includes(group_name)){
+            alert("이미 해당 그룹이 존재합니다");
+        }else{
+            file_read_groups.push(group_name);
+            render_function_run_groups();
+        }
+    }
+    function remove_function_run_group(group_name) {
+        file_read_groups.remove(group_name);
+        render_function_run_groups();
+    }
+
+    function render_function_run_groups() {
+        $("#function-run-groups").empty();
+        for (var i = 0; i < function_run_groups.length; i++){
+            var group = function_run_groups[i];
+            var tag = "<a onclick=\"remove_function_run_groups('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+            $("#function-run-groups").append(tag);
+        }
+    }
+
+    function put_folder_read_group(group_name) {
+        if (function_run_groups.includes(group_name)){
+            alert("이미 해당 그룹이 존재합니다");
+        }else{
+            function_run_groups.push(group_name);
+            render_function_run_groups();
+        }
+    }
+    function remove_function_run_groups(group_name) {
+        function_run_groups.remove(group_name);
+        render_function_run_groups();
+    }
+
+    function delete_b64(file_id){
+        $.post("", {
+            cmd: 'delete_b64',
+            file_id: file_id,
+        }, function (data) {
+            window.location.reload();
+        });
+    }
+
+    window.onload = function () {
+        render_function_run_groups();
+        render_folder_write_groups();
+        render_function_run_groups();
+        render_file_write_groups();
+        $("#create-folder").click(function () {
+            var folder_name = $("#folder-name").val();
+            if (folder_name == null || folder_name.length == 0){
+                alert("폴더 이름을 채워주세요");
+                return;
+            }
+            create_folder('{{ folder_path }}', folder_name, function_run_groups, folder_write_groups);
+            $("#modal-put-folder").modal('hide');
+            $("#folder-name").val(null);
+        });
+        $("#upload-file").click(function () {
+            var parent_path = $("#folder-parent-path").val();
+            var file_bin = $('#file-bin')[0].files[0];
+            var filename = $("#file-bin").val().replace(/.*(\/|\\)/, '');
+            if (file_bin == null || file_bin.length == 0){
+                alert("파일을 지정해주세요");
+                return;
+            }
+            if (file_read_groups.length == 0 || file_write_groups.length == 0){
+                alert("권한 그룹은 1개 이상 지정해야 합니다");
+                return;
+            }
+            upload_file('{{ folder_path }}', filename, file_bin, file_read_groups, file_write_groups);
+            $("#modal-upload-file").modal('hide');
+        });
+    };
+  </script>
 
 {% endblock %}

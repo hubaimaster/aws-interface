@@ -1,5 +1,7 @@
 import requests
 import json
+import base64
+import os
 
 
 class Client:
@@ -115,9 +117,11 @@ class Client:
         })
         return response
 
-    def database_get_items(self, partition):
+    def database_get_items(self, partition, start_key=None, limit=None):
         response = self._database('get_items', {
-            'partition': partition
+            'partition': partition,
+            'start_key': start_key,
+            'limit': limit,
         })
         return response
 
@@ -138,43 +142,82 @@ class Client:
         })
         return response
 
-    def storage_create_folder(self, parent_path, folder_name, read_groups, write_groups):
-        response = self._storage('create_folder', {
-            'parent_path': parent_path,
-            'folder_name': folder_name,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
-        })
-        return response
-
-    def storage_delete_path(self, path):
-        response = self._storage('delete_path', {
-            'path': path
-        })
-        return response
-
-    def storage_download_file(self, file_path):
-        response = self._storage('download_file', {
-            'file_path': file_path
-        })
-        return response
-
-    def storage_get_folder_list(self, path, start_key=None):
-        response = self._storage('get_folder_list', {
-            'path': path,
+    def database_query_items(self, partition, query, start_key=None, limit=None):
+        response = self._database('query_items', {
+            'partition': partition,
+            'query': query,
             'start_key': start_key,
+            'limit': limit,
         })
         return response
 
-    def storage_upload_file(self, parent_path, file_bin, file_name, read_groups, write_groups):
-        response = self._storage('upload_file', {
-            'parent_path': parent_path,
-            'file_bin': file_bin,
+    def _storage_delete_b64(self, file_id):
+        response = self._storage('delete_b64', {
+            'file_id': file_id
+        })
+        return response
+
+    def _storage_download_b64_chunk(self, file_id):
+        response = self._storage('download_b64', {
+            'file_id': file_id
+        })
+        return response
+
+    def _storage_upload_b64_chunk(self, parent_file_id, file_name, file_b64, read_groups, write_groups):
+        response = self._storage('upload_b64', {
+            'parent_file_id': parent_file_id,
             'file_name': file_name,
+            'file_b64': file_b64,
             'read_groups': read_groups,
             'write_groups': write_groups,
         })
         return response
+
+    def storage_delete_file(self, file_id):
+        self._storage_delete_b64(file_id)
+
+    def storage_download_file(self, file_id, download_path):
+        """
+        :param file_id: file_id that is uploaded on aws via storage_upload_file
+        :param download_path: str
+        :return:
+        """
+        string_file_b64 = None
+        file_name = 'file'
+        while file_id:
+            result = self._storage_download_b64_chunk(file_id)
+            file_id = result.get('parent_file_id', None)
+            file_name = result.get('file_name', file_name)
+            if string_file_b64:
+                string_file_b64 = result.get('file_b64') + string_file_b64
+            else:
+                string_file_b64 = result.get('file_b64')
+
+        string_b64 = string_file_b64.encode('utf-8')
+        file_bin = base64.b64decode(string_b64)
+
+        with open(download_path, 'wb+') as file_obj:
+            file_obj.seek(0)
+            file_obj.write(file_bin)
+
+    def storage_upload_file(self, file_path, read_groups=['owner', 'user'], write_groups=['owner']):
+        def divide_chunks(text, n):
+            for i in range(0, len(text), n):
+                yield text[i:i + n]
+
+        file_name = os.path.basename(file_path)
+        with open(file_path, 'rb') as file_obj:
+            raw_base64 = file_obj.read()
+
+        raw_base64 = base64.b64encode(raw_base64)
+        raw_base64 = raw_base64.decode('utf-8')
+
+        base64_chunks = divide_chunks(raw_base64, 1024 * 1024 * 6)  # 4mb
+        parent_file_id = None
+        for base64_chunk in base64_chunks:
+            result = self._storage_upload_b64_chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups)
+            parent_file_id = result.get('file_id')
+        return result
 
 
 def _post(url, data):
@@ -197,6 +240,11 @@ def example():
         'type': 'test',
     }, 'test', ['owner'], ['owner'])
     print('database_create_item response: {}'.format(response))
+
+    response = client.storage_upload_file('manifest.json')
+    print(response)
+
+    client.storage_download_file(response['file_id'], 'download')
 
 
 if __name__ == '__main__':  # SHOW EXAMPLE

@@ -292,18 +292,18 @@ class DynamoDB:
 
     def init_table(self, table_name):
         self.create_table(table_name)
-        self.update_table(table_name, indexes=[{
+        self.update_table(table_name, index={
             'hash_key': 'partition',
             'hash_key_type': 'S',
             'sort_key': 'creationDate',
             'sort_key_type': 'N'
-        }])
-        self.update_table(table_name, indexes=[{
+        })
+        self.update_table(table_name, index={
             'hash_key': 'invertedQuery',
             'hash_key_type': 'S',
             'sort_key': 'creationDate',
             'sort_key_type': 'N'
-        }])
+        })
 
     def create_table(self, table_name):
         try:
@@ -321,10 +321,7 @@ class DynamoDB:
                         'KeyType': 'HASH'
                     },
                 ],
-                ProvisionedThroughput={
-                    'ReadCapacityUnits': 3,
-                    'WriteCapacityUnits': 3
-                },
+                BillingMode='PAY_PER_REQUEST',
                 StreamSpecification={
                     'StreamEnabled': True,
                     'StreamViewType': 'KEYS_ONLY'
@@ -334,64 +331,60 @@ class DynamoDB:
         except:
             return None
 
-    def update_table(self, table_name, indexes):
-        responses = []
-        for index in indexes:
-            attr_updates = []
-            index_updates = []
-            hash_key = index['hash_key']
-            hash_key_type = index['hash_key_type']
-            sort_key = index.get('sort_key', None)
-            sort_key_type = index.get('sort_key_type', None)
-            key_schema = [
-                {
-                    'AttributeName': hash_key,
-                    'KeyType': 'HASH'
-                }
-            ]
-            if sort_key:
-                index_name = hash_key + '-' + sort_key
-                key_schema.append({
-                    'AttributeName': sort_key,
-                    'KeyType': 'RANGE'
-                })
-            else:
-                index_name = hash_key
-            index_create = {
-                    'Create': {
-                        'IndexName': index_name,
-                        'KeySchema': key_schema,
-                        'Projection': {
-                            'ProjectionType': 'ALL'
-                        },
-                        'ProvisionedThroughput': {
-                            'ReadCapacityUnits': 3,
-                            'WriteCapacityUnits': 3
-                        }
-                    }
-                }
-            hash_key_update = {
+    def update_table(self, table_name, index):
+        attr_updates = []
+        index_updates = []
+        hash_key = index['hash_key']
+        hash_key_type = index['hash_key_type']
+        sort_key = index.get('sort_key', None)
+        sort_key_type = index.get('sort_key_type', None)
+        key_schema = [
+            {
                 'AttributeName': hash_key,
-                'AttributeType': hash_key_type
+                'KeyType': 'HASH'
             }
-            index_updates.append(index_create)
-            attr_updates.append(hash_key_update)
-            if sort_key:
-                sort_key_update = {
-                    'AttributeName': sort_key,
-                    'AttributeType': sort_key_type
+        ]
+        if sort_key:
+            index_name = hash_key + '-' + sort_key
+            key_schema.append({
+                'AttributeName': sort_key,
+                'KeyType': 'RANGE'
+            })
+        else:
+            index_name = hash_key
+        index_create = {
+            'Create': {
+                'IndexName': index_name,
+                'KeySchema': key_schema,
+                'Projection': {
+                    'ProjectionType': 'ALL'
                 }
-                attr_updates.append(sort_key_update)
+            }
+        }
+        hash_key_update = {
+            'AttributeName': hash_key,
+            'AttributeType': hash_key_type
+        }
+        index_updates.append(index_create)
+        attr_updates.append(hash_key_update)
+        if sort_key:
+            sort_key_update = {
+                'AttributeName': sort_key,
+                'AttributeType': sort_key_type
+            }
+            attr_updates.append(sort_key_update)
+
+        while True:
             try:
                 response = self.client.update_table(
                     AttributeDefinitions=attr_updates,
                     TableName=table_name,
                     GlobalSecondaryIndexUpdates=index_updates
                 )
-                responses.append(response)
-            except:
-                continue
-        return responses
+                return response
+            except Exception as e:
+                print(e)
+                return e
 
     def delete_table(self, name):
         try:
@@ -562,7 +555,6 @@ class DynamoDB:
             TableName=table_name,
             UpdateExpression='ADD #A :v',
         )
-        print('_add_item_count:', response)
         return response
 
     def get_item_count(self, table_name, count_id):
@@ -573,10 +565,6 @@ class DynamoDB:
         value = str(value)
         return [value]
 
-    def _in_operands(self, value):  # TODO 형태소 분석
-        value = str(value)
-        return value.split()
-
     def _put_inverted_query(self, table_name, partition, item):
         table = self.resource.Table(table_name)
         item_id = item.get('id')
@@ -585,8 +573,6 @@ class DynamoDB:
             for field, value in item.items():
                 for operand in self._eq_operands(value):
                     self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date)
-                for operand in self._in_operands(value):
-                    self._put_inverted_query_field(batch, partition, field, operand, 'in', item_id, creation_date)
 
     def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date):
         _invertedQuery = '{}-{}-{}-{}'.format(partition, field, operand, operation)
@@ -656,11 +642,20 @@ class Lambda:
             print(ex)
             return None
 
+    def invoke_function(self, name, payload_bytes):
+        response = self.client.invoke(
+            FunctionName=name,
+            InvocationType='RequestResponse',
+            Payload=payload_bytes,
+        )
+        return response
+
 
 class S3:
     def __init__(self, boto3_session):
         self.client = boto3_session.client('s3')
         self.resource = boto3_session.resource('s3')
+        self.region = boto3_session.region_name
 
     @classmethod
     def to_dns_name(cls, bucket_name):
@@ -691,16 +686,19 @@ class S3:
         )
         return response
 
-    def upload_file_bin(self, bucket_name, file_name, file_bin):
+    def upload_bin(self, bucket_name, file_name, binary):
         bucket_name = self.to_dns_name(bucket_name)
-        response = self.client.upload_fileobj(file_bin, bucket_name, file_name)
-        return response
+        with tempfile.TemporaryFile() as tmp:
+            tmp.write(binary)
+            tmp.seek(0)
+            response = self.client.upload_fileobj(tmp, bucket_name, file_name)
+            return response
 
-    def delete_file_bin(self, bucket_name, file_name):
+    def delete_bin(self, bucket_name, file_name):
         bucket_name = self.to_dns_name(bucket_name)
         return self.resource.Object(bucket_name, file_name).delete()
 
-    def download_file_bin(self, bucket_name, file_name):
+    def download_bin(self, bucket_name, file_name):
         bucket_name = self.to_dns_name(bucket_name)
         try:
             with tempfile.NamedTemporaryFile() as data:
@@ -727,7 +725,6 @@ class S3:
 
 class IAM:
     policy_arns = [
-        'arn:aws:iam::aws:policy/AWSLambdaRole',
         'arn:aws:iam::aws:policy/AWSLambdaExecute',
         'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
         'arn:aws:iam::aws:policy/AmazonS3FullAccess',
@@ -794,7 +791,7 @@ class IAM:
                 PolicyArn=policy_arn
             )
         except Exception as e:
-            print('Failed to attach policy: {}'.format(role_name))
+            print('Failed to attach policy: {} by: {}'.format(role_name, e))
             return None
         return response
 

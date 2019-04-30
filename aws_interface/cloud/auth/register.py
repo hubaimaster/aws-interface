@@ -57,7 +57,7 @@ def do(data, resource):
             'email': email,
             'passwordHash': password_hash,
             'salt': salt,
-            'group': default_group_name,
+            'groups': [default_group_name],
             'extra': extra,
             'loginMethod': 'email_login',
         }

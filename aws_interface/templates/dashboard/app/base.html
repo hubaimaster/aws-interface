@@ -34,7 +34,9 @@
 
 </head>
 
+
 <body>
+
   <!-- Sidenav -->
   <nav class="navbar navbar-vertical fixed-left navbar-expand-md navbar-light bg-white" id="sidenav-main">
     <div class="container-fluid">
@@ -57,9 +59,7 @@
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
-            <div class=" dropdown-header noti-title">
-              <h6 class="text-overflow m-0">환영합니다</h6>
-            </div>
+
             <a href="{% url 'apps'%}" class="dropdown-item">
               <i class="ni ni-app"></i>
               <span>Apps</span>
@@ -141,6 +141,11 @@
             </a>
           </li>
 
+          <li class="nav-item">
+            <a id="link-log" class="nav-link" href="{%  url 'log' app_id %}">
+              <i class="ni ni-books text-default"></i> Log
+            </a>
+          </li>
 
         </ul>
         <!-- Divider -->
@@ -187,38 +192,9 @@
   <!-- Loading Overlay JS -->
   <script src="{% static 'assets/js/loadingoverlay.js' %}"></script>
 
+
   <script>
-      function notifyInfo(text, status) {
-        $.notify({
-            text: text,
-            status: status,
-        }, {
-            style: 'metro',
-            className: 'info',
-            autoHide: false,
-            clickToHide: true
-        });
-    }
-    function deploy_resource() {
-        $.LoadingOverlay('show', {
-          text: '리소스를 배포중입니다'
-        });
-        $.post("{% url 'overview' app_id %}", {
-            'cmd': 'deploy_resource'
-        }, function (data) {
-            $.LoadingOverlay('hide');
-        });
-    }
-    function deploy_if_needed(){
-        $.post("{% url 'overview' app_id %}", {
-            'cmd': 'need_deploy'
-        }, function (data) {
-            var need_deploy = data['result'];
-            if (need_deploy){
-                deploy_resource();
-            }
-        });
-    }
+
   </script>
 
   <script>
@@ -251,7 +227,8 @@
             }
           }
         });
-        deploy_if_needed();
+        //deploy_if_needed();
+          deploy_resource();
       });
   </script>
   

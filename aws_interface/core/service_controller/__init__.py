@@ -3,9 +3,16 @@ from .bill import BillServiceController
 from .auth import AuthServiceController
 from .database import DatabaseServiceController
 from .storage import StorageServiceController
+from .logic import LogicServiceController
+from .log import LogServiceController
 
 
 sc_list = [
-    BillServiceController, AuthServiceController, DatabaseServiceController, StorageServiceController
+    BillServiceController,
+    AuthServiceController,
+    DatabaseServiceController,
+    StorageServiceController,
+    LogicServiceController,
+    LogServiceController,
 ]
 sc_dict = dict([(sc.RECIPE, sc) for sc in sc_list])

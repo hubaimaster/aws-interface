@@ -63,13 +63,14 @@ def _generate_manifest(resource):
     manifest['recipe_keys'] = list()
 
     # Populate manifest
-    rc: dict
-    for rc in recipes:
-        recipe_type = rc.get('recipe_type')
+    recipe: str
+    for recipe in recipes:
+        recipe = json.loads(recipe)
+        recipe_type = recipe.get('recipe_type')
 
         recipe_manifest = {
             'rest_api_url': rest_api_url,
-            'cloud_apis': list(rc.get('cloud_apis', {})),
+            'cloud_apis': list(recipe.get('cloud_apis', {})),
         }
         manifest['recipe_keys'].append(recipe_type)
         manifest[recipe_type] = recipe_manifest
