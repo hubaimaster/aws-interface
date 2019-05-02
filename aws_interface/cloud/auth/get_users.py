@@ -30,7 +30,7 @@ def do(data, resource):
     limit = params.get('limit', 100)
     partition = 'user'
 
-    items, end_key = resource.db_get_items(partition, exclusive_start_key=start_key, limit=limit)
+    items, end_key = resource.db_get_items_in_partition(partition, exclusive_start_key=start_key, limit=limit)
     body['items'] = items
     body['end_key'] = end_key
     return Response(body)

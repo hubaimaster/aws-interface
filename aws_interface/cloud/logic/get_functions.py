@@ -26,7 +26,7 @@ def do(data, resource):
     start_key = params.get('start_key', None)
     limit = params.get('limit', None)
 
-    items, end_key = resource.db_get_items(partition, start_key, limit)
+    items, end_key = resource.db_get_items_in_partition(partition, start_key, limit)
 
     body['items'] = items
     body['end_key'] = end_key

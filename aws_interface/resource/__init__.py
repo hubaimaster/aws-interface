@@ -7,7 +7,7 @@ def get_resource(vendor, credential, app_id, vendor_session=None):
     raise BaseException('No vendor name which is {}'.format(vendor))
 
 
-def get_resource_allocator(vendor, credential, app_id, recipes):
+def get_resource_allocator(vendor, credential, app_id):
     if vendor == 'aws':
-        return AWSResourceAllocator(credential, app_id, recipes)
+        return AWSResourceAllocator(credential, app_id)
     raise BaseException('No vendor name which is {}'.format(vendor))

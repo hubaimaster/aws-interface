@@ -3,9 +3,11 @@ from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.utils import IntegrityError
 
 from dashboard.models import *
 from dashboard.views.utils import Util, page_manage
+from core.adapter.django import DjangoAdapter
 
 
 class Apps(LoginRequiredMixin, View):
@@ -28,13 +30,14 @@ class Apps(LoginRequiredMixin, View):
             return redirect('apps')
         elif cmd == 'remove_app':
             app_id = request.POST['app_id']
-            apps = App.objects.filter(id=app_id, user=request.user)
-            if apps:
-                app = apps[0]
-                credentials = Util.get_credentials(request)
-                Util.terminate_resource(credentials, app)
+
+            try:
+                app = App.objects.get(id=app_id, user=request.user)
+                adapter = DjangoAdapter(app_id, request)
+                adapter.terminate_resource()
+                app.delete()
                 Util.add_alert(request, 'Application removed')
-            else:
+            except IntegrityError as ex:
+                print(ex)
                 Util.add_alert(request, 'Failed to remove application')
             return redirect('apps')
-

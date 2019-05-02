@@ -1,7 +1,7 @@
 
 from cloud.crypto import *
 from cloud.response import Response
-
+import cloud.auth.get_email_login as get_email_login
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -19,7 +19,6 @@ info = {
 
 def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
 
     email = params['email']
@@ -30,7 +29,7 @@ def do(data, resource):
     password_hash = hash_password(password, salt)
 
     partition = 'user'
-    login_conf = recipe['login_method']['email_login']
+    login_conf = get_email_login.do(data, resource)['body']['item']
     default_group_name = login_conf['default_group_name']
     enabled = login_conf['enabled']
     if enabled == 'true':
@@ -46,8 +45,8 @@ def do(data, resource):
     instructions = [
         (None, ('email', 'eq', email))
     ]
-    items, end_key = resource.db_query('user', instructions)
-    users = items
+    items, end_key = resource.db_query(partition, instructions)
+    users = list(items)
     if len(users) > 0:
         body['message'] = '이미 가입된 회원이 존재합니다.'
         body['error'] = '1'

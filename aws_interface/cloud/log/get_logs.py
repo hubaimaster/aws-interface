@@ -38,7 +38,7 @@ def do(data, resource):
     if len(instructions) > 0:
         items, end_key = resource.db_query(partition, instructions, start_key)
     else:
-        items, end_key = resource.db_get_items(partition, start_key)
+        items, end_key = resource.db_get_items_in_partition(partition, start_key)
     body['end_key'] = end_key
     body['items'] = items
     return Response(body)

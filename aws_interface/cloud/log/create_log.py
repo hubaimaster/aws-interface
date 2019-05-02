@@ -13,6 +13,7 @@ info = {
     },
     'output_format': {
         'success': 'bool',
+        'message': 'str?',
     }
 }
 
@@ -21,19 +22,24 @@ def do(data, resource):
     partition = 'log'
     body = {}
     params = data['params']
-    user = data['user']
+    user = data.get('user', None)
 
     event_source = params.get('event_source')
     event_name = params.get('event_name')
     event_param = params.get('event_param')
 
-    item = dict()
-    item['event_name'] = event_name
-    item['event_param'] = event_param
-    item['event_source'] = event_source
-    item['owner'] = user.get('id', None)
+    if user:
+        item = dict()
+        item['event_name'] = event_name
+        item['event_param'] = event_param
+        item['event_source'] = event_source
+        item['owner'] = user.get('id')
 
-    success = resource.db_put_item(partition, item)
+        success = resource.db_put_item(partition, item)
 
-    body['success'] = success
-    return Response(body)
+        body['success'] = success
+        return Response(body)
+    else:
+        body['success'] = False
+        body['message'] = 'No user session'
+        return Response(body)

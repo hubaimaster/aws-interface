@@ -6,13 +6,31 @@ from core.adapter.django import DjangoAdapter
 from dashboard.views.utils import Util, page_manage
 from dashboard.models import App
 import os
+import threading
+import time
 
 
 class Overview(LoginRequiredMixin, View):
+    @classmethod
+    def allocate_resource_in_background(cls, adapter, request):
+        def do_allocation(retry_count=0):
+            try:
+                adapter.allocate_resource()
+            except Exception as ex:
+                print(ex)
+                delay = 15
+                print('System will reallocate resources after {} seconds'.format(delay))
+                time.sleep(delay)
+                if retry_count < 4:
+                    do_allocation(retry_count + 1)
+        background_thread = threading.Thread(target=do_allocation)
+        background_thread.start()
+
     @page_manage
     def get(self, request, app_id):
         cmd = request.GET.get('cmd', None)
         adapter = DjangoAdapter(app_id, request)
+        self.allocate_resource_in_background(adapter, request)
         if cmd == 'download_sdk':
             sdk_bin = adapter.generate_sdk('python3')
             if sdk_bin is None:

@@ -1,7 +1,5 @@
 from .base import Adapter
-from dashboard.models import App, Recipe
-from core.recipe_controller import rc_dict
-import simplejson as json
+from dashboard.models import App
 
 
 class DjangoAdapter(Adapter):
@@ -17,13 +15,4 @@ class DjangoAdapter(Adapter):
 
     def _get_vendor(self):
         return self.app.vendor
-
-    def _load_recipe_json_string(self, recipe_type):
-        recipe, created = Recipe.objects.get_or_create(app=self.app, name=recipe_type)
-        return recipe.json_string
-
-    def _save_recipe_json_string(self, recipe_type, json_string):
-        recipe, created = Recipe.objects.get_or_create(app=self.app, name=recipe_type)
-        recipe.json_string = json_string
-        recipe.save()
 

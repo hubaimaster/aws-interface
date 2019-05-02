@@ -2,7 +2,7 @@ from .base import ServiceController
 
 
 class BillServiceController(ServiceController):
-    RECIPE = 'bill'
+    SERVICE_TYPE = 'bill'
 
     def __init__(self, resource, app_id):
         super(BillServiceController, self).__init__(resource, app_id)

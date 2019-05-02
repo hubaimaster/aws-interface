@@ -15,7 +15,9 @@ info = {
     },
     'output_format': {
         'items': 'list',
-        'end_key': 'str'
+        'end_key': 'str',
+        'success': 'bool',
+        'message': 'str?',
     }
 }
 
@@ -33,16 +35,21 @@ def do(data, resource):
     if type(start_key) is str:
         start_key = json.loads(start_key)
 
-    items, end_key = resource.db_query(partition, query_instructions, start_key, limit)
+    if resource.db_get_item(partition):
+        items, end_key = resource.db_query(partition, query_instructions, start_key, limit)
 
-    filtered = []
-    for item in items:
-        if has_read_permission(user, item):
-            item.pop('read_groups')
-            item.pop('write_groups')
-            item.pop('partition')
-            filtered.append(item)
+        filtered = []
+        for item in items:
+            if has_read_permission(user, item):
+                filtered.append(item)
 
-    body['items'] = filtered
-    body['end_key'] = end_key
-    return Response(body)
+        body['items'] = filtered
+        body['end_key'] = end_key
+        body['success'] = True
+        return Response(body)
+    else:
+        body['items'] = []
+        body['end_key'] = None
+        body['success'] = False
+        body['message'] = 'No such partition'
+        return Response(body)

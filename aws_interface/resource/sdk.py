@@ -1,8 +1,9 @@
 
-import json
 import os
 import shutil
 import tempfile
+from os import listdir
+from os.path import isfile, join
 
 
 PLATFORMS = (
@@ -13,12 +14,12 @@ PLATFORMS = (
 )
 
 
-def generate(resource, platform):
+def generate(rest_api_url, platform):
     """
     Generate the sdk for the given recipe types.
 
-    :param resource
-    Instance of Resource class
+    :param rest_api_url
+    URL of REST API
 
     :param platform
 
@@ -30,15 +31,13 @@ def generate(resource, platform):
     template_dir = os.path.dirname(os.path.abspath(__file__))
     template_dir = os.path.join(template_dir, 'templates')
     template_dir = os.path.join(template_dir, platform)
-    print(template_dir)
+
     working_dir = tempfile.mkdtemp()
     sdk_dir = os.path.join(working_dir, 'sdk')
 
     shutil.copytree(template_dir, sdk_dir)
-    manifest = _generate_manifest(resource)
-    with open(os.path.join(sdk_dir, 'manifest.json'), 'w') as f:
-        json.dump(manifest, f)
 
+    _replace_template_key(sdk_dir, 'REST_API_URL', rest_api_url)
     # Archive all files and extract binary
     output_filename = tempfile.mktemp()
     shutil.make_archive(output_filename, 'zip', sdk_dir)
@@ -53,25 +52,20 @@ def generate(resource, platform):
     return zip_file_bin
 
 
-def _generate_manifest(resource):
-    manifest = dict()
-
-    rest_api_url = resource.get_rest_api_url()
-    recipes = resource.get_recipes()
-
-    # Initialize list of recipe types
-    manifest['recipe_keys'] = list()
-
-    # Populate manifest
-    recipe: str
-    for recipe in recipes:
-        recipe = json.loads(recipe)
-        recipe_type = recipe.get('recipe_type')
-
-        recipe_manifest = {
-            'rest_api_url': rest_api_url,
-            'cloud_apis': list(recipe.get('cloud_apis', {})),
-        }
-        manifest['recipe_keys'].append(recipe_type)
-        manifest[recipe_type] = recipe_manifest
-    return manifest
+def _replace_template_key(sdk_dir, key, value):
+    """
+    Replace {{key}} to value in file
+    :param sdk_dir: dir included file included {{key}}
+    :param key: tag to replace
+    :param value: replacement for {{key}}
+    :return:
+    """
+    target_key = '{{' + key + '}}'
+    files = [f for f in listdir(sdk_dir) if isfile(join(sdk_dir, f))]
+    for file in files:
+        file = os.path.join(sdk_dir, file)
+        with open(file, 'r') as rf:
+            template_file = rf.read()
+            template_file = template_file.replace(target_key, value)
+        with open(file, 'w+') as wf:
+            wf.write(template_file)

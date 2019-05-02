@@ -5,7 +5,7 @@ class ServiceController(metaclass=ABCMeta):
     """
     Make sure to set RECIPE when you inherit this class.
     """
-    RECIPE = None
+    SERVICE_TYPE = None
 
     def __init__(self, resource, app_id):
         """
@@ -18,6 +18,6 @@ class ServiceController(metaclass=ABCMeta):
 
         :param app_id:
         """
-        assert(type(self).RECIPE is not None)
+        assert(type(self).SERVICE_TYPE is not None)
         self.app_id = app_id
         self.resource = resource

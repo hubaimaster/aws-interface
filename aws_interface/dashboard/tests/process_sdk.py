@@ -1,4 +1,4 @@
-from dashboard.tests.base import *
+from dashboard.tests.test import *
 
 
 class SDKTestProcess:

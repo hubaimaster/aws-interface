@@ -2,6 +2,7 @@
 from cloud.crypto import *
 from cloud.response import Response
 import cloud.shortuuid as shortuuid
+import cloud.auth.get_email_login as get_email_login
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -20,13 +21,12 @@ info = {
 
 def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
 
     email = params.get('email', None)
     password = params.get('password', None)
 
-    login_conf = recipe['login_method']['email_login']
+    login_conf = get_email_login.do(data, resource)['body']['item']
     enabled = login_conf['enabled']
     if enabled == 'true':
         enabled = True
@@ -51,7 +51,7 @@ def do(data, resource):
             session_id = shortuuid.uuid()
             session_item = {
                 'userId': user_id,
-                'sessionType': 'member',
+                'sessionType': 'email_login',
             }
             success = resource.db_put_item('session', session_item, session_id)
             body['session_id'] = session_id

@@ -3,11 +3,6 @@ var awsi = (function () {
 
   function create () {
     document.write("<script src='jquery.min.js'></script>");
-    var manifest = null;
-    $.getJSON('manifest.json', function(data) {
-        alert(data);
-        manifest = data;
-    });
 
     function _request(method, url, data, success){
       if (getSessionId() != null){
@@ -19,7 +14,7 @@ var awsi = (function () {
         data: data,
         success : success,
         error : function(e) {
-            //alert("error: " + JSON.stringify(e));
+            alert("error: " + JSON.stringify(e));
         }
       });
     }
@@ -33,7 +28,7 @@ var awsi = (function () {
     }
 
     function _get_rest_api_url(recipe_key){
-      var url = manifest[recipe_key]['rest_api_url'];
+      var url = '{{REST_API_URL}}';
       return url;
     }
     

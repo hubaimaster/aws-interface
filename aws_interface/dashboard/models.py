@@ -1,11 +1,9 @@
 
-from contextlib import contextmanager
 import uuid
 from django.db import models
 from dashboard.security.crypto import AESCipher
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import cloud.shortuuid as shortuuid
-import core.api
 import json
 
 
@@ -115,18 +113,6 @@ class App(models.Model):
 
     class Meta:
         unique_together = ('name', 'user')
-
-    def __str__(self):
-        return self.name
-
-
-class Recipe(models.Model):
-    id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
-    creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
-    name = models.CharField(max_length=255, editable=False)
-    json_string = models.TextField(default='')
-    app = models.ForeignKey(App, null=True, on_delete=models.CASCADE)  # should not be NULL from now on
-    need_deploy = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

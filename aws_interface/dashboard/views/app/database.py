@@ -6,7 +6,6 @@ from django.http import JsonResponse
 
 from core.adapter.django import DjangoAdapter
 from dashboard.views.utils import Util, page_manage
-
 from decimal import Decimal
 import json
 
@@ -30,7 +29,7 @@ class Database(LoginRequiredMixin, View):
                 }
             partitions = partition_dict.values()
 
-            context['user_groups'] = auth_api.get_user_groups()
+            context['user_groups'] = auth_api.get_user_groups()['groups']
             context['partitions'] = partitions
 
         return render(request, 'dashboard/app/database.html', context=context)

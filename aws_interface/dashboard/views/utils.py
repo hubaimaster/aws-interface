@@ -1,16 +1,13 @@
 
 from django.shortcuts import render, redirect
-from django.core.exceptions import ObjectDoesNotExist
 from dashboard.models import *
 from botocore.errorfactory import ClientError
 from numbers import Number
-from resource import get_resource_allocator
-from core.recipe_controller import rc_dict
 
 
 class Util:
     @classmethod
-    def __pop_alert(cls, request, context):
+    def _pop_alert(cls, request, context):
         alert = request.session.get('alert', None)
         request.session['alert'] = None
         context['alert'] = alert
@@ -30,7 +27,7 @@ class Util:
     @classmethod
     def get_context(cls, request):
         context = dict()
-        cls.__pop_alert(request, context)
+        cls._pop_alert(request, context)
         return context
 
     @classmethod
@@ -83,28 +80,13 @@ class Util:
         app.save()
         Util.add_alert(request, '새로운 어플리케이션이 생성되었습니다')
 
-    @classmethod
-    def init_recipes(cls, app):
-        from core.recipe_controller import rc_dict
-        for name, recipe_cls in rc_dict.items():
-            default_json_string = recipe_cls().to_json_string()
-            try:
-                recipe = Recipe.objects.get(app=app, name=name)
-                if not recipe.json_string:
-                    recipe.json_string = default_json_string
-                    recipe.save()
-            except ObjectDoesNotExist as _:
-                recipe = Recipe(app=app, name=name)
-                recipe.json_string = default_json_string
-                recipe.save()
-                continue
-
 
 def page_manage(func):
     def wrap(*args, **kwargs):
         try:
             result = func(*args, **kwargs)
         except ClientError as ex:
+            print('!!! Error:', ex)
             title = 'Unknown Error'
             desc = '원인을 알 수 없는 에러입니다'
             link = None

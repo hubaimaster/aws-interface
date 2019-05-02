@@ -27,7 +27,7 @@ def do(data, resource):  # This is for admins
     limit = params.get('limit', 100)
     reverse = params.get('reverse', False)
 
-    items, end_key = resource.db_get_items(partition, start_key, limit, reverse)
+    items, end_key = resource.db_get_items_in_partition(partition, start_key, limit, reverse)
 
     body['items'] = list(filter(lambda x: x.get('next_file_id', None) is None, items))
     body['end_key'] = end_key

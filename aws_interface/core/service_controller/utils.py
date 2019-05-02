@@ -1,11 +1,9 @@
 import simplejson as json
 
 
-def make_data(app_id, params, recipe_json, admin=True):
-    recipe = json.loads(recipe_json)
+def make_data(app_id, params, admin=True):
     data = {
         'params': params,
-        'recipe': recipe,
         'app_id': app_id,
         'admin': admin,
         'user': {

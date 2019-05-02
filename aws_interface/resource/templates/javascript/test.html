@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TEST</title>
+</head>
+<body>
+    <script src="aws_interface.js"></script>
+
+    <script>
+        alert('ok');
+        awsi.getInstance().auth.login('kchdully@naver.com', 'kch1234', function (data) {
+            alert(data);
+        });
+    </script>
+</body>
+</html>

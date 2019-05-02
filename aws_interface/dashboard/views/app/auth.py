@@ -16,16 +16,17 @@ class Auth(LoginRequiredMixin, View):
 
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_auth() as api:
-            context['user_groups'] = api.get_user_groups()
+            context['user_groups'] = api.get_user_groups()['groups']
             context['user_count'] = api.get_user_count()
             context['session_count'] = api.get_session_count()
             context['users'] = api.get_users()
             context['sessions'] = api.get_sessions()
-            context['email_login'] = api.get_email_login()
-            context['guest_login'] = api.get_guest_login()
+            context['email_login'] = api.get_email_login()['item']
+            context['guest_login'] = api.get_guest_login()['item']
+
         return render(request, 'dashboard/app/auth.html', context=context)
 
-    @page_manage
+    # @page_manage
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
@@ -44,16 +45,16 @@ class Auth(LoginRequiredMixin, View):
                 description = request.POST['group_description']
                 api.put_user_group(name, description)
             elif cmd == 'set_email_login':
-                default_group = request.POST['email_default_group']
-                enabled = request.POST['email_enabled']
+                default_group = request.POST['default_group_name']
+                enabled = request.POST['enabled']
                 if enabled == 'true':
                     enabled = True
                 else:
                     enabled = False
                 api.set_email_login(enabled, default_group)
             elif cmd == 'set_guest_login':
-                default_group = request.POST['guest_default_group']
-                enabled = request.POST['guest_enabled']
+                default_group = request.POST['default_group_name']
+                enabled = request.POST['enabled']
                 if enabled == 'true':
                     enabled = True
                 else:

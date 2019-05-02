@@ -3,13 +3,9 @@ from resource.sdk import generate
 
 
 class ResourceAllocator(metaclass=ABCMeta):
-    def __init__(self, credential, app_id, recipes):
+    def __init__(self, credential, app_id):
         self.credential = credential
         self.app_id = app_id
-        self.recipes = recipes
-
-    def get_recipes(self):
-        return self.recipes
 
     def get_credential(self):
         return self.credential
@@ -18,7 +14,7 @@ class ResourceAllocator(metaclass=ABCMeta):
         return self.app_id
 
     def generate_sdk(self, platform):
-        return generate(self, platform)
+        return generate(self.get_rest_api_url(), platform)
 
     # API, create and terminate.
     def create(self):
@@ -33,9 +29,6 @@ class ResourceAllocator(metaclass=ABCMeta):
         raise NotImplementedError
 
     def get_rest_api_url(self):
-        raise NotImplementedError
-
-    def get_logs(self):
         raise NotImplementedError
 
 
@@ -72,7 +65,10 @@ class Resource(metaclass=ABCMeta):
     def db_get_item(self, item_id):
         raise NotImplementedError
 
-    def db_get_items(self, partition, start_key=None, limit=None, reverse=False):
+    def db_get_items(self, item_ids):
+        raise NotImplementedError
+
+    def db_get_items_in_partition(self, partition, start_key=None, limit=None, reverse=False):
         raise NotImplementedError
 
     def db_put_item(self, partition, item, item_id=None, creation_date=None):
@@ -139,17 +135,17 @@ class Resource(metaclass=ABCMeta):
                 if instruction_type == 'index':
                     if option == 'and':
                         item_set &= set(self._db_index_items(statement, partition))
-                    elif option == 'or':
+                    elif option == 'or' or option is None:
                         item_set |= set(self._db_index_items(statement, partition))
                 elif instruction_type == 'filter':
                     if option == 'and':
                         item_set = set(self._db_filter_items(statement, item_set))
-                    elif option == 'or':
+                    elif option == 'or' or option is None:
                         raise BaseException('You cannot use option [or] on filtering')
                 elif instruction_type == 'scan':
                     if option == 'and':
                         item_set &= set(self._db_scan_items(statement, partition))
-                    elif option == 'or':
+                    elif option == 'or' or option is None:
                         item_set |= set(self._db_scan_items(statement, partition))
             return list(item_set)
         if not limit:
@@ -158,9 +154,10 @@ class Resource(metaclass=ABCMeta):
             start_index = 0
         items = get_items()
         items = items[start_index: start_index + limit]
-        items = [self._db_fake_item_to_real(item) for item in items]
+        items = self._db_batch_fake_items_to_real(items)
+
         end_index = start_index + limit
-        return items, end_index
+        return list(items), end_index
 
     def _db_instruction_type(self, statement, option):
         field, condition, value = statement
@@ -188,22 +185,21 @@ class Resource(metaclass=ABCMeta):
             '_is_fake': True
         }
 
-    def _db_is_fake_item(self, item):
-        return item.get('_is_fake', False)
-
-    def _db_fake_item_to_real(self, item):
-        if self._db_is_fake_item(item):
-            real_item = self.db_get_item(item['id'])
-        else:
-            real_item = item
-        return real_item
+    def _db_batch_fake_items_to_real(self, items):
+        item_ids = [item['id'] for item in items]
+        bulk_size = 100
+        items = []
+        for i in range(0, len(item_ids), bulk_size):
+            items.extend(self.db_get_items(item_ids[i:i+bulk_size]))
+        for item in items:
+            yield IDDict(item)
 
     def _db_index_items(self, statement, partition):
         field, condition, value = statement
         start_key = None
         while True:
             if condition == 'eq':
-                item_ids, start_key = self.db_get_item_ids_equal(partition, field, value, start_key)
+                item_ids, start_key = self.db_get_item_ids_equal(partition, field, value, start_key, 10000)
                 for item_id in item_ids:
                     yield IDDict(self._db_get_fake_item(item_id))
             else:
@@ -213,8 +209,8 @@ class Resource(metaclass=ABCMeta):
 
     def _db_filter_items(self, statement, items):
         field, condition, value = statement
+        items = self._db_batch_fake_items_to_real(items)
         for item in items:
-            item = IDDict(self._db_fake_item_to_real(item))
             item_value = item.get(field, None)
             if not item_value:
                 continue
@@ -259,7 +255,7 @@ class Resource(metaclass=ABCMeta):
     def _db_scan_items(self, statement, partition):
         start_key = None
         while True:
-            items, start_key = self.db_get_items(partition, start_key)
+            items, start_key = self.db_get_items_in_partition(partition, start_key)
             for item in self._db_filter_items(statement, items):
                 yield IDDict(item)
             if start_key is None:

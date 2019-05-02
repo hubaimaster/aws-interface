@@ -15,4 +15,4 @@ sc_list = [
     LogicServiceController,
     LogServiceController,
 ]
-sc_dict = dict([(sc.RECIPE, sc) for sc in sc_list])
+sc_dict = dict([(sc.SERVICE_TYPE, sc) for sc in sc_list])

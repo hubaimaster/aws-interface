@@ -6,50 +6,34 @@ import os
 
 class Client:
     def __init__(self):
+        self.url = '{{REST_API_URL}}'
         self.session_id = None
         self.guest_id = None
-        with open('manifest.json', 'r') as fp:
-            self.manifest = json.load(fp)
 
-    @property
-    def _recipe_keys(self):
-        return self.manifest['recipe_keys']
-
-    def _get_recipe_manifest(self, recipe_key):
-        if recipe_key not in self._recipe_keys:
-            raise Exception('recipe_key must be in {}'.format(self._recipe_keys))
-        else:
-            return self.manifest[recipe_key]
-
-    def _get_api_list(self, recipe_key):
-        manifest = self._get_recipe_manifest(recipe_key)
-        return manifest['cloud_apis']
-
-    def _get_api_url(self, recipe_key):
-        manifest = self._get_recipe_manifest(recipe_key)
-        return manifest['rest_api_url']
-
-    def _call_api(self, recipe_key, api_name, data=None):
-        manifest = self._get_recipe_manifest(recipe_key)
+    def _call_api(self, service_type, function_name, data=None):
         if not data:
             data = {}
-        url = self._get_api_url(recipe_key)
-        data['cloud_api_name'] = api_name
-        data['recipe_key'] = recipe_key
+        data['module_name'] = 'cloud.{}.{}'.format(service_type, function_name)
         if self.session_id:
             data['session_id'] = self.session_id
         data = json.dumps(data)
-        resp = _post(url, data)
+        resp = _post(self.url, data)
         return resp.json().get('body', {'error': '404', 'message': 'NO RESPONSE'})
 
     def _auth(self, api_name, data):
+        self.log_create_log('auth', api_name, None)
         return self._call_api('auth', api_name, data)
 
     def _database(self, api_name, data):
+        self.log_create_log('database', api_name, None)
         return self._call_api('database', api_name, data)
 
     def _storage(self, api_name, data):
+        self.log_create_log('storage', api_name, None)
         return self._call_api('storage', api_name, data)
+
+    def _log(self, api_name, data):
+        return self._call_api('log', api_name, data)
 
     def auth_register(self, email, password, extra={}):
         response = self._auth('register', {
@@ -200,8 +184,8 @@ class Client:
             file_obj.seek(0)
             file_obj.write(file_bin)
 
-    def storage_upload_file(self, file_path, read_groups=['owner', 'user'], write_groups=['owner']):
-        def divide_chunks(text, n):
+    def storage_upload_file(self, file_path, read_groups, write_groups):
+        def div_chunks(text, n):
             for i in range(0, len(text), n):
                 yield text[i:i + n]
 
@@ -212,12 +196,20 @@ class Client:
         raw_base64 = base64.b64encode(raw_base64)
         raw_base64 = raw_base64.decode('utf-8')
 
-        base64_chunks = divide_chunks(raw_base64, 1024 * 1024 * 6)  # 4mb
+        base64_chunks = div_chunks(raw_base64, 1024 * 1024 * 6)  # 4mb
         parent_file_id = None
         for base64_chunk in base64_chunks:
             result = self._storage_upload_b64_chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups)
             parent_file_id = result.get('file_id')
         return result
+
+    def log_create_log(self, event_source, event_name, event_param):
+        response = self._log('create_log', {
+            'event_source': event_source,
+            'event_name': event_name,
+            'event_param': event_param,
+        })
+        return response
 
 
 def _post(url, data):
@@ -238,10 +230,10 @@ def example():
 
     response = client.database_create_item({
         'type': 'test',
-    }, 'test', ['owner'], ['owner'])
+    }, 'test', read_groups=['owner'], write_groups=['owner'])
     print('database_create_item response: {}'.format(response))
 
-    response = client.storage_upload_file('manifest.json')
+    response = client.storage_upload_file('aws_interface.py', read_groups=['owner'], write_groups=['owner'])
     print(response)
 
     client.storage_download_file(response['file_id'], 'download')

@@ -1,4 +1,6 @@
 def has_read_permission(user, item):
+    if user is None or item is None:
+        return False
     user_groups = user.get('groups', [])
     user_id = user.get('id', None)
     groups = item.get('read_groups', [])
@@ -12,6 +14,8 @@ def has_read_permission(user, item):
 
 
 def has_write_permission(user, item):
+    if user is None or item is None:
+        return False
     user_groups = user.get('groups', [])
     user_id = user.get('id', None)
     groups = item.get('write_groups', [])
@@ -25,6 +29,8 @@ def has_write_permission(user, item):
 
 
 def has_run_permission(user, item):
+    if user is None or item is None:
+        return False
     user_groups = user.get('groups', [])
     user_id = user.get('id', None)
     groups = item.get('run_groups', [])

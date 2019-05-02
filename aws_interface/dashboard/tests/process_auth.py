@@ -1,4 +1,4 @@
-from dashboard.tests.base import *
+from dashboard.tests.test import *
 
 
 class AuthTestProcess:
@@ -43,6 +43,7 @@ class AuthTestProcess:
         self._create_group(group_name, group_desc)
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user_group(group_name))
+        time.sleep(DELAY)
         self.parent.browser.find_element_by_id('remove-group-{}'.format(group_name)).click()
         time.sleep(DELAY)
         self.parent.assertFalse(self._has_user_group(group_name))

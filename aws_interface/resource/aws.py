@@ -2,15 +2,11 @@ import importlib
 import os
 import shutil
 import tempfile
-import time
-import json
 from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3
 from resource.base import ResourceAllocator, Resource
 
-VENDOR = 'aws'
 
-
-def create_lambda_zipfile_bin(app_id, recipes, cloud_path, resource_path):
+def create_lambda_zipfile_bin(app_id, cloud_path, resource_path):
     output_filename = tempfile.mktemp()
     cloud_name = 'cloud'
     resource_name = 'resource'
@@ -19,17 +15,9 @@ def create_lambda_zipfile_bin(app_id, recipes, cloud_path, resource_path):
         shutil.copytree(cloud_path, '{}/{}'.format(tmp_dir, cloud_name))
         shutil.copytree(resource_path, '{}/{}'.format(tmp_dir, resource_name))
 
-        # Copy recipes json
-        with open(os.path.join(tmp_dir, cloud_name, 'recipes.json'), 'w+') as file:
-            recipes_dict = {recipe['recipe_type']: recipe for recipe in recipes}
-            json.dump(recipes_dict, file)
-
         # Write txt file included app_id
         with open(os.path.join(tmp_dir, cloud_name, 'app_id.txt'), 'w+') as file:
             file.write(app_id)
-
-        with open(os.path.join(tmp_dir, cloud_name, 'vendor.txt'), 'w+') as file:
-            file.write(VENDOR)
 
         # Archive all files
         shutil.make_archive(output_filename, 'zip', tmp_dir)
@@ -44,8 +32,8 @@ def create_lambda_zipfile_bin(app_id, recipes, cloud_path, resource_path):
 
 
 class AWSResourceAllocator(ResourceAllocator):
-    def __init__(self, credential, app_id, recipes):
-        super(AWSResourceAllocator, self).__init__(credential, app_id, recipes)
+    def __init__(self, credential, app_id):
+        super(AWSResourceAllocator, self).__init__(credential, app_id)
         self.boto3_session = get_boto3_session(credential)
 
     def create(self):
@@ -64,20 +52,13 @@ class AWSResourceAllocator(ResourceAllocator):
         api_gateway = APIGateway(self.boto3_session)
         return api_gateway.get_rest_api_url(self.app_id)
 
-    def get_logs(self):
-        return ['dummy', 'log']
-
     def _create_dynamo_db_table(self):
         dynamo = DynamoDB(self.boto3_session)
         dynamo.init_table(self.app_id)
 
     def _create_lambda_function(self):
         """
-        Update AWS Lambda functions
-
-        Upload python scripts for the APIs specified in the recipe to AWS Lambda in compressed format.
-        The original python scripts are located in cloud/<recipe_type>
-
+        Create or Update An AWS Lambda function
         :return:
         """
         print('[{}] apply_cloud_api: START'.format(self.app_id))
@@ -90,7 +71,7 @@ class AWSResourceAllocator(ResourceAllocator):
         name = '{}'.format(self.app_id)
         desc = 'aws-interface cloud API'
         runtime = 'python3.6'
-        handler = 'cloud.lambda_function.handler'
+        handler = 'cloud.lambda_function.aws_handler'
 
         cloud_module_name = 'cloud'
         cloud_module = importlib.import_module(cloud_module_name)
@@ -100,7 +81,7 @@ class AWSResourceAllocator(ResourceAllocator):
         resource_module = importlib.import_module(resource_module_name)
         resource_module_path = os.path.dirname(resource_module.__file__)
 
-        zip_file = create_lambda_zipfile_bin(self.app_id, self.recipes, cloud_module_path, resource_module_path)
+        zip_file = create_lambda_zipfile_bin(self.app_id, cloud_module_path, resource_module_path)
 
         try:
             lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
@@ -142,7 +123,7 @@ class AWSResourceAllocator(ResourceAllocator):
         iam.delete_role(resource_name)
 
     def _remove_bucket(self):
-        s3 = S3(self.app_id)
+        s3 = S3(self.boto3_session)
         s3.delete_bucket(self.app_id)
 
 
@@ -197,9 +178,14 @@ class AWSResource(Resource):
         item = dynamo.get_item(self.app_id, item_id)
         return item.get('Item', None)
 
-    def db_get_items(self, partition, exclusive_start_key=None, limit=100, reverse=False):
+    def db_get_items(self, item_ids):
         dynamo = DynamoDB(self.boto3_session)
-        result = dynamo.get_items(self.app_id, partition, exclusive_start_key, limit, reverse)
+        result = dynamo.get_items(self.app_id, item_ids)
+        return result.get('Items', [])
+
+    def db_get_items_in_partition(self, partition, exclusive_start_key=None, limit=100, reverse=False):
+        dynamo = DynamoDB(self.boto3_session)
+        result = dynamo.get_items_in_partition(self.app_id, partition, exclusive_start_key, limit, reverse)
         end_key = result.get('LastEvaluatedKey', None)
         items = result.get('Items', [])
         return items, end_key

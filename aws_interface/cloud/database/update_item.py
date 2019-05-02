@@ -14,6 +14,7 @@ info = {
     },
     'output_format': {
         'success': 'bool',
+        'message': 'str?',
     }
 }
 

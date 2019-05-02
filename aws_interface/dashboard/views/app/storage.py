@@ -3,9 +3,8 @@ from django.shortcuts import render, HttpResponse
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-
-from dashboard.models import *
 from dashboard.views.utils import Util, page_manage
+from core.adapter.django import DjangoAdapter
 
 import json
 import base64
@@ -17,13 +16,9 @@ class Storage(LoginRequiredMixin, View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        app = App.objects.get(id=app_id, user=request.user)
-        credentials = Util.get_credentials(request)
+        adapter = DjangoAdapter(app_id, request)
 
-        auth = Util.get_recipe(app, 'auth')
-        storage = Util.get_recipe(app, 'storage')
-
-        with auth.api(credentials) as auth_api, storage.api(credentials) as storage_api:
+        with adapter.open_api_auth() as auth_api, adapter.open_api_storage() as storage_api:
             cmd = request.GET.get('cmd', None)
             if cmd == 'download_file':
                 file_path = request.GET['file_path']
@@ -60,7 +55,7 @@ class Storage(LoginRequiredMixin, View):
                 result = storage_api.get_b64_info_items(None)
                 context['app_id'] = app_id
                 context['b64_info'] = result
-                context['user_groups'] = auth_api.get_user_groups()
+                context['user_groups'] = auth_api.get_user_groups()['groups']
 
         return render(request, 'dashboard/app/storage.html', context=context)
 
@@ -68,12 +63,9 @@ class Storage(LoginRequiredMixin, View):
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-        app = App.objects.get(id=app_id, user=request.user)
-        credentials = Util.get_credentials(request)
 
-        storage = Util.get_recipe(app, 'storage')
-
-        with storage.api(credentials) as storage_api:
+        adapter = DjangoAdapter(app_id, request)
+        with adapter.open_api_storage() as storage_api:
             cmd = request.POST['cmd']
             if cmd == 'upload_b64':  # 분할 업로드
                 file_bin = request.FILES['file_bin']
@@ -89,14 +81,11 @@ class Storage(LoginRequiredMixin, View):
                 raw_base64 = file_bin.read()
                 raw_base64 = base64.b64encode(raw_base64)
                 raw_base64 = raw_base64.decode('utf-8')
-
                 base64_chunks = divide_chunks(raw_base64, 1024 * 1024 * 4)  # 4mb
-
                 for base64_chunk in base64_chunks:
                     result = storage_api.upload_b64(parent_file_id, file_name, base64_chunk, read_groups, write_groups)
                     parent_file_id = result.get('file_id')
                 return JsonResponse(result)
-
             elif cmd == 'get_b64_info_items':  # For admins
                 start_key = request.POST.get('start_key', None)
                 result = storage_api.get_b64_info_items(start_key)

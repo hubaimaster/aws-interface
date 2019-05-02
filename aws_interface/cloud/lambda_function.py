@@ -1,79 +1,77 @@
-import urllib
-import cgi
-import json
 import importlib
-import boto3
 import cloud.auth.get_me as get_me
+import cloud.log.create_log as create_log
 from resource import get_resource
-
 import sys
 
 
-def get_params(event):
-    params = event.get('queryStringParameters', None)
-    body = event.get('body', None)
-    if params is None:
-        params = {}
-    if body is not None and len(body) > 0:
-        pairs = body.split('&')
-        for pair in pairs:
-            pair = pair.split('=')
-            param = pair[1]
-            param = urllib.parse.unquote(param)
-            param = cgi.escape(param)
-            params[pair[0]] = param
-    return params
+CALLABLE_MODULE_WHITE_LIST = {
+    # auth
+    'cloud.auth.delete_user',
+    'cloud.auth.delete_user_group',
+    'cloud.auth.get_email_login',
+    'cloud.auth.get_guest_login',
+    'cloud.auth.get_me',
+    'cloud.auth.get_session',
+    'cloud.auth.get_user',
+    'cloud.auth.get_users',
+    'cloud.auth.guest',
+    'cloud.auth.login',
+    'cloud.auth.logout',
+    'cloud.auth.register',
+    'cloud.auth.set_user',
+    # database
+    'cloud.database.create_item',
+    'cloud.database.delete_item',
+    'cloud.database.delete_items',
+    'cloud.database.get_item',
+    'cloud.database.get_items',
+    'cloud.database.put_item_field',
+    'cloud.database.query_items',
+    'cloud.database.update_item',
+    # log
+    'cloud.log.create_log',
+    # logic
+    'cloud.logic.run_function',
+    # storage
+    'cloud.storage.delete_b64',
+    'cloud.storage.download_b64',
+    'cloud.storage.upload_b64',
+}
 
 
-def handler(event, context):
+# AWS Lambda handler
+def aws_handler(event, context):
+    import boto3
+    vendor = 'aws'
     params = event
-    recipe_key = params.get('recipe_key', None)
-    cloud_api_name = params.get('cloud_api_name', None)
-
-    with open('./cloud/recipes.json', 'r') as f:
-        recipes = json.load(f)
-
     with open('./cloud/app_id.txt', 'r') as file:
         app_id = file.read()
+    resource = get_resource(vendor, None, app_id, boto3.Session())
+    return abstracted_handler(params, resource)
 
-    with open('./cloud/vendor.txt', 'r') as file:
-        vendor = file.read().strip()
 
-    recipe = recipes[recipe_key]
-    cloud_apis = recipe.get('cloud_apis', {})
-    cloud_api = cloud_apis.get(cloud_api_name, {})
-    module_name = cloud_api.get('module')
-    permissions = cloud_api.get('permissions', [])
-
+def abstracted_handler(params, resource):
+    module_name = params.get('module_name', None)
+    if module_name not in CALLABLE_MODULE_WHITE_LIST:
+        print('module_name: {} not in CALLABLE_MODULE_WHITE_LIST'.format(module_name))
+        response = {
+            'statusCode': 403,
+            'body': {
+                'message': 'permission denied'
+            }
+        }
+        return response
     data = {
         'params': params,
-        'recipe': recipe,
-        'app_id': app_id,
         'admin': False,
     }
-
-    """ <<< This code should be changed on the other machine of vendor """
-    boto_session = boto3.Session()
-    resource = get_resource(vendor, None, app_id, boto_session)
-    """ >>> """
-
     user = get_me.do(data, resource).get('body', {}).get('item', None)
     data['user'] = user
 
     module = importlib.import_module(module_name)
     sys.modules[module_name] = module
-
-    if 'all' in permissions:
-        module_response = module.do(data, resource)
-    elif user.get('group', None) in permissions:
-        module_response = module.do(data, resource)
-    else:
-        module_response = {
-            'statusCode': 201,
-            'body': {
-                'message': 'permission denied'
-            }
-        }
+    module_response = module.do(data, resource)
 
     response = {
         'statusCode': module_response.get('statusCode', 200),

@@ -25,10 +25,6 @@ def do(data, resource):
     item = resource.db_get_item(item_id)
 
     if has_read_permission(user, item):
-        # Remove system key
-        item.pop('read_groups')
-        item.pop('write_groups')
-        item.pop('partition')
         body['item'] = item
         body['success'] = True
     else:
