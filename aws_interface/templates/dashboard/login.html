@@ -101,7 +101,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input name="email" class="form-control" placeholder="Email" type="email">
+                    <input id="email" name="email" class="form-control" placeholder="Email" type="email">
                   </div>
                 </div>
                 <div class="form-group">
@@ -109,18 +109,18 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input name="password" class="form-control" placeholder="Password" type="password">
+                    <input id="password" name="password" class="form-control" placeholder="Password" type="password">
                   </div>
                 </div>
                 <div class="text-center">
-                  <button type="submitm" class="btn btn-primary my-4">로그인</button>
+                  <button id="login" type="submitm" class="btn btn-primary my-4">로그인</button>
                 </div>
               </form>
             </div>
           </div>
           <div class="row mt-3">
             <div class="col-12 text-right">
-              <a href="{% url 'register' %}" class="text-light"><small>새로 가입하기</small></a>
+              <a id="register" href="{% url 'register' %}" class="text-light"><small>새로 가입하기</small></a>
             </div>
           </div>
         </div>

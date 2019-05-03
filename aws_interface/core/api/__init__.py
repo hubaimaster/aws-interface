@@ -3,11 +3,14 @@ from .bill import BillAPI
 from .auth import AuthAPI
 from .database import DatabaseAPI
 from .storage import StorageAPI
-from .sdk import generate_sdk
+from .logic import LogicAPI
+from .log import LogAPI
 
-
-from core.recipe_controller import recipe_list
 api_list = [
-    BillAPI, AuthAPI, DatabaseAPI, StorageAPI
+    BillAPI,
+    AuthAPI,
+    DatabaseAPI,
+    StorageAPI,
+    LogicAPI,
+    LogAPI,
 ]
-api_dict = dict([(api.get_recipe(), api) for api in api_list])

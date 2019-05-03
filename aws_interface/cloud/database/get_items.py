@@ -1,6 +1,6 @@
-from cloud.aws import *
+
 from cloud.response import Response
-from cloud.database.util import has_read_permission
+from cloud.util import has_read_permission
 import json
 
 # Define the input output format of the function.
@@ -15,16 +15,16 @@ info = {
     },
     'output_format': {
         'items': 'list',
-        'end_key': 'str'
+        'end_key': 'str',
+        'success': 'bool',
+        'message': 'str?',
     }
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
-    app_id = data['app_id']
     user = data['user']
 
     partition = params.get('partition', None)
@@ -35,18 +35,21 @@ def do(data, boto3):
     if type(start_key) is str:
         start_key = json.loads(start_key)
 
-    table_name = 'database-{}'.format(app_id)
+    if resource.db_get_item(partition):
+        items, end_key = resource.db_get_items_in_partition(partition, start_key, limit, reverse)
 
-    dynamo = DynamoDB(boto3)
-    result = dynamo.get_items(table_name, partition, start_key, limit, reverse)
-    end_key = result.get('LastEvaluatedKey', None)
-    items = result.get('Items', [])
+        filtered = []
+        for item in items:
+            if has_read_permission(user, item):
+                filtered.append(item)
 
-    filtered = []
-    for item in items:
-        if has_read_permission(user, item):
-            filtered.append(item)
-
-    body['items'] = filtered
-    body['end_key'] = end_key
-    return Response(body)
+        body['items'] = filtered
+        body['end_key'] = end_key
+        body['success'] = True
+        return Response(body)
+    else:
+        body['items'] = []
+        body['end_key'] = None
+        body['success'] = False
+        body['message'] = 'No such partition: {}'.format(partition)
+        return Response(body)

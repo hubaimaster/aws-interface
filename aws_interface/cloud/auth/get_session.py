@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 
 
@@ -20,18 +20,10 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
-    app_id = data['app_id']
-
     session_id = params.get('session_id', None)
-
-    table_name = 'auth-{}'.format(app_id)
-
-    dynamo = DynamoDB(boto3)
-    result = dynamo.get_item(table_name, session_id)
-    item = result.get('Item', None)
+    item = resource.db_get_item(session_id)
     body['item'] = item
     return Response(body)

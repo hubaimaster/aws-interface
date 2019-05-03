@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 
 # Define the input output format of the function.
@@ -15,16 +15,11 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
-    recipe = data['recipe']
-    app_id = data['app_id']
-
-    table_name = 'auth-{}'.format(app_id)
     partition = 'user'
-
-    dynamo = DynamoDB(boto3)
-    count = dynamo.get_item_count(table_name, '{}-count'.format(partition))
-    item = count.get('Item', {'count': 0})
-    body['item'] = item
+    count = resource.db_get_count(partition)
+    body['item'] = {
+        'count': count
+    }
     return Response(body)

@@ -6,6 +6,7 @@
     <!-- Top navbar -->
     {% include 'dashboard/app/top-navbar.html' %}
     <!-- Header -->
+    <input id="view-tag" value="database" hidden>
     <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
       <div class="container-fluid">
         <div class="header-body">
@@ -17,37 +18,44 @@
                 <strong>Auth </strong> 에 의존합니다.
             </div>
 
-            <div class="alert alert-neutral" role="alert">
-                <div class="row">
-                    <div class="col">
-                        <strong>{{ rest_api_url }}</strong> 의 POST Method 를 호출 할 수 있습니다.
-                    </div>
-                    <div class="col-auto">
-
-                    </div>
-                </div>
-            </div>
-
         </div>
       </div>
     </div>
     <!-- Page content -->
     <div class="container-fluid mt--8">
+
       <div class="row mt-4">
         <div class="col-xl-12 mb-5 mb-xl-0">
           <div class="card shadow">
-
+          <div class="card-body" style="padding-top: 0px; padding-left: 15px; padding-right: 15px; padding-bottom: 0px;">
             <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xl-3" style="padding-right: 0;">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding: 0;">
               <!-- Projects table -->
               <table class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">
                         <button scope="row" data-toggle="modal" data-target="#modal-add-partition" class="btn btn-sm">
-                            <span class="badge badge-primary">레시피</span>
-                            파티션 추가 +
+                            파티션 +
                         </button>
+                        <div style="text-align: right; float: right;">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" onclick="delete_checked_partitions();"><i class="fas fa-trash"></i>선택 삭제</a>
+                                    <div class="dropdown-divider"></div>
+
+                                    <a class="dropdown-item" aria-disabled="true">
+                                         <div class="custom-control custom-checkbox mt--1">
+                                            <input class="custom-control-input" type="checkbox" name="checkbox-partition" id="partition-check-all">
+                                            <label class="custom-control-label" for="partition-check-all" style="width:100%;">전체 선택</label>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="modal-add-partition" tabindex="-1" role="dialog" aria-labelledby="modal-add-partition" aria-hidden="true">
                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                               <div class="modal-content">
@@ -88,7 +96,12 @@
                   <tr>
                     <th id="{{ partition.name }}" name="partition" scope="row" onclick="set_partition('{{ partition.name }}');">
                       {{ partition.name }}
-                        <button onclick="delete_partition('{{ partition.name }}');" style='font-size:7pt; margin-left:16px;'>삭제</button>
+                        <div style="text-align: right; float: right;">
+                            <div class="custom-control custom-checkbox mt--3">
+                                <input class="custom-control-input" type="checkbox" name="checkbox-partition" id="partition-{{ partition.name }}" value="{{ partition.name }}">
+                                <label class="custom-control-label" for="partition-{{ partition.name }}"></label>
+                            </div>
+                        </div>
                     </th>
                   </tr>
                   {% endfor %}
@@ -96,18 +109,35 @@
               </table>
             </div>
 
-              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xl-3" style="padding: 0;">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding: 0;">
               <!-- Projects table -->
               <table style="display:table; width:100%; table-layout:fixed;" id="item-table" class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">
                         <button id="open-add-item-modal" scope="row" class="btn btn-sm">
-                            <span class="badge badge-default">서비스</span>
-                            아이템 추가 +
+                            아이템 +
                         </button>
                         <text id="item_count"></text>
+                        <div style="text-align: right; float: right;">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" id="query-item-modal"><i class="fas fa-search"></i>아이템 검색</a>
+                                    <a class="dropdown-item" onclick="delete_checked_items();"><i class="fas fa-trash"></i>선택 삭제</a>
+                                    <div class="dropdown-divider"></div>
 
+                                    <a class="dropdown-item" aria-disabled="true">
+                                         <div class="custom-control custom-checkbox mt--1">
+                                            <input class="custom-control-input" type="checkbox" name="checkbox-item" id="item-check-all">
+                                            <label class="custom-control-label" for="item-check-all" style="width:100%;">전체 선택</label>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                               <div class="modal-content">
@@ -137,7 +167,7 @@
                                                       </button>
                                                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                         {% for group in user_groups %}
-                                                        <a class="dropdown-item" onclick="put_read_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                        <a class="dropdown-item" onclick="put_read_group('{{ group.name }}');">{{ group.name }}</a>
                                                         {% endfor %}
                                                         <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -157,7 +187,7 @@
                                                       </button>
                                                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                         {% for group in user_groups %}
-                                                        <a class="dropdown-item" onclick="put_write_group('{{ group.name }}');">{{ group.name }} : {{ group.description }}</a>
+                                                        <a class="dropdown-item" onclick="put_write_group('{{ group.name }}');">{{ group.name }}</a>
                                                         {% endfor %}
                                                         <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -179,27 +209,137 @@
                               </div>
                             </div>
                         </div>
+                        <div class="modal fade" id="modal-query-item" tabindex="-1" role="dialog" aria-labelledby="modal-query-item" aria-hidden="true">
+                                <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h4 class="modal-title" id="modal-title-default">아이템 검색</h4>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                      </button>
+                                    </div>
+                                        <div class="modal-body">
+                                            <div class="pl-lg-12">
+                                              <div class="row">
+                                                <div class="col-lg-12">
+                                                  <div class="form-group">
+                                                    <label class="form-control-label">쿼리 추가</label>
+
+                                                    <div class="row">
+                                                        <div class="col-4">
+                                                            <input id="query-field-name" class="form-control form-control-alternative" type="text" placeholder="필드 이름"/>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <select id="query-operation" class="form-control">
+                                                                <option value="eq">==</option>
+                                                                <option value="in">contains</option>
+                                                                <option value="gt"> > </option>
+                                                                <option value="ls"> < </option>
+                                                                <option value="ge"> >= </option>
+                                                                <option value="le"> <= </option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <input id="query-field-value" class="form-control form-control-alternative" type="text" placeholder="필드 값"/>
+                                                        </div>
+                                                    </div>
+                                                      <div class="row mt-3">
+                                                          <div class="col-6">
+                                                            <select id="logic-operation" class="form-control" disabled>
+                                                                <option value="or">OR</option>
+                                                                <option value="and">AND</option>
+                                                            </select>
+                                                        </div>
+                                                          <div class="col-6">
+                                                            <input onclick="put_query();" type="button" class="form-control btn btn-success" value="+">
+                                                        </div>
+
+                                                      </div>
+
+                                                  </div>
+
+                                                  <div class="form-group">
+                                                    <label class="form-control-label">쿼리 목록</label>
+                                                    <div class="table-responsive">
+                                                    <table id="query-list" class="table table-sm table-hover scroll-content">
+                                                        <thead class="thead-light">
+                                                            <tr>
+                                                                <th>
+                                                                    옵션
+                                                                </th>
+                                                                <th>
+                                                                    필드
+                                                                </th>
+                                                                <th>
+                                                                    조건
+                                                                </th>
+                                                                <th>
+                                                                    값
+                                                                </th>
+                                                                <th>
+
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody style="background: white;">
+
+                                                        </tbody>
+                                                    </table>
+                                                    </div>
+                                                  </div>
+                                                  <div class="form-group">
+                                                      <label class="form-control-label">생성된 쿼리</label>
+                                                      <textarea id="query-text" class="form-control form-control-alternative" disabled></textarea>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                          <button id="query-item-btn" class="btn btn-primary">검색</button>
+                                        </div>
+                                  </div>
+                                </div>
+                            </div>
                     </th>
                   </tr>
                 </thead>
 
-                <tbody style="display: block; height: 400px; overflow-y: auto;">
+                <tbody style="display: block; max-height: 400px; overflow-y: auto;">
 
                 </tbody>
 
               </table>
             </div>
 
-             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 col-xl-6" style="padding-left: 0;">
+             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding: 0;">
               <!-- Projects table -->
               <table id="field-table" class="table table-sm table-hover table-borderless">
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">
                         <button id="open-add-field-modal" scope="row" class="btn btn-sm">
-                            <span class="badge badge-default">서비스</span>
-                            필드 추가 +
+                            필드 +
                         </button>
+                        <div style="text-align: right; float: right;">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" onclick="delete_checked_fields();"><i class="fas fa-trash"></i>선택 삭제</a>
+                                    <div class="dropdown-divider"></div>
+
+                                    <a class="dropdown-item left" aria-disabled="true">
+                                         <div class="custom-control custom-checkbox mt--1">
+                                            <input class="custom-control-input" type="checkbox" name="checkbox-field" id="field-check-all">
+                                            <label class="custom-control-label" for="field-check-all" style="width:100%;">전체 선택</label>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="modal-add-field" tabindex="-1" role="dialog" aria-labelledby="modal-add-field" aria-hidden="true">
                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                               <div class="modal-content">
@@ -227,7 +367,8 @@
                                               </div>
                                               <div class="form-group">
                                                 <label class="form-control-label" for="field-value">값</label>
-                                                <input id="field-value" type="text" class="form-control form-control-alternative" placeholder="필드 값">
+                                                <textarea rows="5" id="field-value" type="text" class="form-control form-control-alternative" placeholder="필드 값">
+                                                </textarea>
                                               </div>
                                             </div>
                                           </div>
@@ -247,13 +388,13 @@
                     </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style="display: block; max-height: 400px; overflow-y: auto;">
 
                 </tbody>
               </table>
             </div>
           </div>
-
+          </div>
           </div>
         </div>
       </div>
@@ -278,6 +419,8 @@
 
   var read_groups = [];
   var write_groups = [];
+
+  var query_instructions = [];
   {% for user_group in user_groups %}
       read_groups.push('{{ user_group.name }}');
       write_groups.push('{{ user_group.name }}');
@@ -301,8 +444,9 @@
           start_key = end_key;
           $("#item-table>tbody").empty();
           append_items(items);
+          append_more_button();
           get_item_count(p, function (data) {
-              var ment = "총 " + data['item']["count"] + "개 항목 중 " + items.length + "개";
+              var ment = items.length + " / " + data['item']["count"];
               $("#item_count").html(ment);
           });
       });
@@ -313,13 +457,21 @@
               item_ids.push(items[i]["id"]);
               var iid = items[i]["id"];
               var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\">" +
-                  "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" + iid +
-                  "<button onclick='delete_item(\"" + iid + "\");' class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+                  "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" +
+                  "<text>"  + iid + "</text>" +
+                  "<div style=\"text-align: right; float: right;\">" +
+                  "<div class=\"custom-control custom-checkbox mt--3\">" +
+                  "<input class=\"custom-control-input\" type=\"checkbox\" name=\"checkbox-item\" id=\"item-" + iid + "\" value=\"" + iid + "\">" +
+                  "<label class=\"custom-control-label\" for=\"item-" + iid + "\"></label>\n" +
+                  "</div>" +
+                  "</div>" +
                   "</th></tr>";
               $("#item-table").append(row);
           }
       }
       $("[name='more-item']").remove();
+  }
+  function append_more_button() {
       var more = "<tr name='more-item' style=\"display:table; width:100%; table-layout:fixed;\">" +
               "<th style='vertical-align:middle;' onclick=\"append_more_items();\" scope=\"row\">항목 더 보기 +" +
               "</th></tr>";
@@ -337,9 +489,9 @@
           var end_key = data['end_key'];
           start_key = end_key;
           append_items(_items);
-
+          append_more_button();
           get_item_count(partition, function (data) {
-              var ment = "총 " + data['item']["count"] + "개 항목 중 " + item_ids.length + "개";
+              var ment = item_ids.length + " / " + data['item']["count"];
               $("#item_count").html(ment);
           });
       });
@@ -372,9 +524,25 @@
               value_type = 'L';
               value = JSON.stringify(value);
           }
-          var row = "<tr><th name=\"field\" id=\"" +
-              key + "\" scope=\"row\"><a onclick=\"set_field('" + key + "', '" + value + "','" + value_type + "');\">" + key + " : " + value + "</a>" +
-              "<button onclick='delete_field(\"" + key + "\");' class='' style='font-size:7pt; margin-left:16px;'>삭제</button>" +
+          var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\"><th name=\"field\" id=\"" +
+              key + "\" scope=\"row\">" +
+              "<div class=\"row\">" +
+              "<div class=\"col-10\">" +
+              "<a style='color:cornflowerblue; cursor:pointer;' onclick=\"set_field('" + key + "', '" + value + "','" + value_type + "');\">" +
+              "<label>" + key + "</label>&nbsp" +
+              "<button class=\"btn btn-sm\">수정</button>" +
+              "</a>" +
+              "<textarea readonly class=\"form-control form-control-alternative\" style='width:100%;'>" + value + "</textarea>" +
+              "</div>" +
+              "<div class=\"col-2\">" +
+              "<div style=\"text-align: right; float: right;\">" +
+              "<div class=\"custom-control custom-checkbox mt--3\">\n" +
+              "<input class=\"custom-control-input\" type=\"checkbox\" name=\"checkbox-field\" id=\"field-" + key + "\" value=\"" + key + "\">\n" +
+              "<label class=\"custom-control-label\" for=\"field-" + key + "\"></label>\n" +
+              "</div>" +
+              "</div>" +
+              "</div>" +
+              "</div>" +
               "</th></tr>";
           $("#field-table").append(row);
       });
@@ -493,13 +661,68 @@
             $("#write-groups").append(tag);
         }
     }
+    function render_query_list() {
+        $("#query-list>tbody").empty();
+        if (query_instructions.length > 0){
+            $("#logic-operation").prop("disabled", false);
+        }else{
+            $("#logic-operation").prop("disabled", true);
+            $("#logic-operation").val('or');
+        }
+        $("#query-text").val(query_instructions);
+        for (var i = 0; i < query_instructions.length; i++){
+            var query = query_instructions[i];
+            query = JSON.parse(query);
+            if (i == 0){
+                query['option'] = '';
+            }
+            var tag = "" +
+                "<tr>\n" +
+                "<td>\n" +
+                query['option'] +
+                "</td>\n" +
+                "<td>\n" +
+                query['field'] +
+                "</td>\n" +
+                "<td>\n" +
+                query['condition'] +
+                "</td>\n" +
+                "<td>\n" +
+                query['value'] +
+                "</td>\n" +
+                "<td>\n" +
+                "<a class=\"btn btn-danger btn-sm text text-white\" style=\"padding-top:0; padding-bottom:0;\" onclick=\"remove_query(" + i + ");\"><i class=\"fas fa-trash\"></i></a>" +
+                "</td>\n" +
+                "</tr>";
+            $("#query-list").append(tag);
+        }
+    }
     function put_read_group(group_name) {
         if (read_groups.includes(group_name)){
-            alert("이미 해당 그룹이 존재합니다");
+            //alert("이미 해당 그룹이 존재합니다");
         }else{
             read_groups.push(group_name);
             render_read_groups();
         }
+    }
+    function make_query(logic_operation, field_name, query_operation, field_value) {
+        _query = {
+            'option': logic_operation,
+            'field': field_name,
+            'condition': query_operation,
+            'value': field_value,
+        };
+        _query = String(JSON.stringify(_query));
+        return _query;
+    }
+    function put_query() {
+        var logic_operation = $("#logic-operation").val();
+        var field_name = $("#query-field-name").val();
+        var query_operation = $("#query-operation").val();
+        var field_value = $("#query-field-value").val();
+        query = make_query(logic_operation, field_name, query_operation, field_value);
+        query_instructions.push(query);
+        render_query_list();
     }
     function remove_read_group(group_name) {
         read_groups.remove(group_name);
@@ -517,6 +740,96 @@
         write_groups.remove(group_name);
         render_write_groups();
     }
+    function remove_query(_query_idx) {
+        query_instructions.splice(_query_idx, 1);
+        render_query_list();
+    }
+    function delete_partitions(partitions) {
+      $.LoadingOverlay('show', {
+          text:'Deleting partitions...'
+      });
+      $.post("", {
+          cmd: "delete_partitions",
+          'partitions[]': partitions,
+      }, function (data) {
+          $.LoadingOverlay('hide');
+          window.location.reload();
+      });
+  }
+  function delete_items(item_ids) {
+      $.LoadingOverlay('show', {
+          text:'Deleting items...'
+      });
+      $.post("", {
+          cmd: "delete_items",
+          'item_ids[]': item_ids,
+      }, function (data) {
+          set_partition(partition);
+          $.LoadingOverlay('hide');
+      });
+  }
+  function delete_fields(item_id, field_names) {
+      $.LoadingOverlay('show', {
+          text:'Deleting items...'
+      });
+      $.post("", {
+          cmd: "delete_fields",
+          item_id: item_id,
+          'field_names[]': field_names,
+      }, function (data) {
+          set_item(item_id);
+          $.LoadingOverlay('hide');
+      });
+  }
+  function query_items(partition, instructions) {
+        query = {
+            'instructions': instructions
+        };
+        query = JSON.stringify(query);
+      $.post("", {
+          cmd: "query_items",
+          partition: partition,
+          'query': query,
+      }, function (data) {
+          var items = data['items'];
+          item_ids = [];
+          $("#item-table>tbody").empty();
+          append_items(items);
+          //append_more_query_button(); TODO
+          $("#modal-query-item").modal('hide');
+      });
+  }
+    function delete_checked_partitions() {
+        var partitions = [];
+        var checkboxs = $("input[name='checkbox-partition']");
+        for (var i = 0; i < checkboxs.length; i++){
+          if (checkboxs[i].checked){
+              partitions.push(checkboxs[i].value);
+          }
+        }
+        delete_partitions(partitions);
+    }
+    function delete_checked_items() {
+        var item_ids = [];
+        var checkboxs = $("input[name='checkbox-item']");
+        for (var i = 0; i < checkboxs.length; i++){
+          if (checkboxs[i].checked){
+              item_ids.push(checkboxs[i].value);
+          }
+        }
+        delete_items(item_ids);
+    }
+    function delete_checked_fields() {
+        var item_ids = [];
+        var checkboxs = $("input[name='checkbox-field']");
+        for (var i = 0; i < checkboxs.length; i++){
+          if (checkboxs[i].checked){
+              item_ids.push(checkboxs[i].value);
+          }
+        }
+        delete_fields(item_id, item_ids);
+    }
+
   </script>
   <script>
     window.onload = function(){
@@ -536,6 +849,14 @@
            }
            $("#modal-add-item").modal('show');
         });
+        $("#query-item-modal").click(function () {
+           if (partition == null){
+              alert("파티션을 지정해주세요");
+              return;
+           }
+           $("#modal-query-item").modal('show');
+        });
+
         $("#open-add-field-modal").click(function () {
             if (partition == null || item_id == null){
               alert("아이템을 지정해주세요");
@@ -545,6 +866,22 @@
             $("#field-value").val(null);
             $("#field-type").val('S');
             $("#modal-add-field").modal('show');
+        });
+        $("#partition-check-all").click(function () {
+            $("input[name='checkbox-partition']").prop('checked', this.checked);
+        });
+        $("#item-check-all").click(function () {
+            $("input[name='checkbox-item']").prop('checked', this.checked);
+        });
+        $("#field-check-all").click(function () {
+            $("input[name='checkbox-field']").prop('checked', this.checked);
+        });
+        $("#query-item-btn").click(function () {
+            var query_json_instructions = [];
+            for (var i = 0; i < query_instructions.length; i++){
+                query_json_instructions.push(JSON.parse(query_instructions[i]));
+            }
+            query_items(partition, query_json_instructions);
         });
         render_read_groups();
         render_write_groups();

@@ -109,3 +109,8 @@ venv.bak/
 .mypy_cache/
 aws_interface/.idea/workspace.xml
 aws_interface/.idea/workspace.xml
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

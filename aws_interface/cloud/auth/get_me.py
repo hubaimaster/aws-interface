@@ -1,4 +1,4 @@
-from cloud.aws import *
+
 from cloud.response import Response
 
 # Define the input output format of the function.
@@ -21,28 +21,20 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
-    app_id = data['app_id']
-
     session_id = params.get('session_id', None)
-
-    table_name = 'auth-{}'.format(app_id)
-
-    dynamo = DynamoDB(boto3)
     try:
-        result = dynamo.get_item(table_name, session_id)
+        item = resource.db_get_item(session_id)
     except BaseException as ex:
         print(ex)
         body['message'] = 'permission denied'
         return Response(body)
 
-    item = result.get('Item', {})
     user_id = item.get('userId', None)
     if user_id:
-        user = dynamo.get_item(table_name, user_id).get('Item', None)
+        user = resource.db_get_item(user_id)
         body['item'] = user
     else:
         body['item'] = None

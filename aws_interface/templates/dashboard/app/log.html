@@ -1,0 +1,46 @@
+{% extends 'dashboard/app/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+<div class="main-content">
+    <!-- Top navbar -->
+    {% include 'dashboard/app/top-navbar.html' %}
+    <!-- Header -->
+    <input id="view-tag" value="logic" hidden>
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+      <div class="container-fluid">
+        <div class="header-body">
+            <div class="alert alert-primary" role="alert">
+                <strong>AWS Lambda</strong>  를 사용합니다.
+            </div>
+            <div class="alert alert-danger" role="alert">
+                <strong>곧 지원될 예정입나다</strong>
+            </div>
+          <!-- Card stats -->
+
+        </div>
+      </div>
+    </div>
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+      <div class="row">
+
+
+      </div>
+      <div class="row mt-7">
+
+      </div>
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="row align-items-center justify-content-xl-between">
+          <div class="col-xl-6">
+            <div class="copyright text-center text-xl-left text-muted">
+              &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+{% endblock %}

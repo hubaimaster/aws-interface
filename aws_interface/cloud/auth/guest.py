@@ -1,7 +1,7 @@
-from cloud.aws import *
+
 from cloud.response import Response
 import cloud.shortuuid as shortuuid
-
+import cloud.auth.get_guest_login as get_guest_login
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -16,16 +16,13 @@ info = {
 }
 
 
-def do(data, boto3):
+def do(data, resource):
     body = {}
-    recipe = data['recipe']
     params = data['params']
-    app_id = data['app_id']
 
     guest_id = params.get('guest_id', None)
-    table_name = 'auth-{}'.format(app_id)
 
-    login_conf = recipe['login_method']['guest_login']
+    login_conf = get_guest_login.do(data, resource)['body']['item']
     default_group_name = login_conf['default_group_name']
     enabled = login_conf['enabled']
     if enabled == 'true':
@@ -38,15 +35,14 @@ def do(data, boto3):
         body['message'] = '게스트 로그인이 비활성화 상태입니다.'
         return Response(body)
 
-    dynamo = DynamoDB(boto3)
-
     if guest_id:
-        result = dynamo.get_item(table_name, guest_id)
-        if result.get('Item', None):
+        item = resource.db_get_item(guest_id)
+        if item:
             session_item = {
-                'userId': guest_id
+                'userId': guest_id,
+                'sessionType': 'guest',
             }
-            dynamo.put_item(table_name, 'session', session_item)
+            resource.db_put_item('session', session_item)
             body['message'] = '게스트 로그인 성공'
             return Response(body)
         else:
@@ -58,16 +54,17 @@ def do(data, boto3):
         email = '{}@guest.com'.format(shortuuid.uuid())
         item = {
             'email': email,
-            'group': default_group_name,
+            'groups': [default_group_name],
             'extra': {},
             'loginMethod': 'guest_login',
         }
-        dynamo.put_item(table_name, 'user', item, item_id=guest_id)
+        resource.db_put_item('user', item, item_id=guest_id)
         session_id = shortuuid.uuid()
         session_item = {
-            'userId': guest_id
+            'userId': guest_id,
+            'sessionType': 'guest_login',
         }
-        dynamo.put_item(table_name, 'session', session_item, item_id=session_id)
+        resource.db_put_item('session', session_item, item_id=session_id)
         body['session_id'] = session_id
         body['guest_id'] = guest_id
         body['message'] = '게스트 로그인 성공'

@@ -1,17 +1,14 @@
 from .base import ServiceController
-from .utils import lambda_method, make_data
-from cloud.aws import *
 
 
 class BillServiceController(ServiceController):
-    RECIPE = 'bill'
+    SERVICE_TYPE = 'bill'
 
-    def __init__(self, bundle, app_id):
-        super(BillServiceController, self).__init__(bundle, app_id)
-        self.cost_explorer = CostExplorer(self.boto3_session)
+    def __init__(self, resource, app_id):
+        super(BillServiceController, self).__init__(resource, app_id)
 
     def get_cost(self, start, end):
-        response = self.cost_explorer.get_cost(start, end)
+        response = self.resource.cost_for(start, end)
         response = response.get('ResultsByTime', {})
         response = response[-1]
 
@@ -23,7 +20,7 @@ class BillServiceController(ServiceController):
         return result
 
     def get_usage_costs(self, start, end):
-        response = self.cost_explorer.get_cost_and_usage(start, end)
+        response = self.resource.cost_and_usage_for(start, end)
         response = response.get('ResultsByTime', {})
         response = response[-1]
 
