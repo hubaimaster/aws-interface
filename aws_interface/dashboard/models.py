@@ -111,8 +111,5 @@ class App(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     vendor = models.CharField(max_length=255, default='aws')
 
-    class Meta:
-        unique_together = ('name', 'user')
-
     def __str__(self):
         return self.name
