@@ -111,6 +111,6 @@ aws_interface/.idea/workspace.xml
 aws_interface/.idea/workspace.xml
 
 # Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
+.aws_interface/elasticbeanstalk/*
+!.aws_interface/elasticbeanstalk/*.cfg.yml
+!.aws_interface/elasticbeanstalk/*.global.yml
