@@ -1,8 +1,8 @@
 
 from django.shortcuts import render, redirect
-from dashboard.models import *
 from botocore.errorfactory import ClientError
 from numbers import Number
+from dashboard.models import App
 
 
 class Util:
