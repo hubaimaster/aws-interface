@@ -12,24 +12,25 @@
 # AWS Interface
 AWS-Interface lets you jump start your next big idea with a powerful and flexible backend. Amazon's web services were meant to be easy and simple—but they're simply not ☹️. There are often too many services for us mere mortals to track. With AWS Interface, we take away the nitty-gritty and let you focus on your ideas and your business.
 
-Here's how it works: register your AWS IAM credentials for us to work with. Then, select the Recipes that you need for your backend service and tweak them through our website. That's it! We've built an infinitely scalable backend for your service via AWS services, and an auto-generated SDK for the frontend platform of your choice.\
+Here's how it works: register your AWS IAM credentials for us to work with. Then, select the Service that you need for your backend service and tweak them through our website. That's it! We've built an infinitely scalable backend for your service via AWS services, and an auto-generated SDK for the frontend platform of your choice.
 
 
 ## For Users
 
-### Recipe
+### Service
 
-This is an abstraction of backend/DB components for you to use in your service. We will support these five recipes when we first kick off AWS Interface.
+This is an abstraction of backend/DB components for you to use in your service. We will support these five Services when we first kick off AWS Interface.
 
 - **Bill**: Billing for your internal AWS account 
 - **Auth**: Login/authentication of users
 - **Database**: General-purpose *database stuff*
 - **Storage**: File storage and distribution
 - **Logic** : Deployment of server-less (state-less) logic
+- **Log** :  User Logging and Viewing
 
 ### Dashboard
 
-This is where you can configure and manage your Recipes/internal database. You can access your dashboard via [aws-interface.com](http://aws-interface.com) or host your own dashboard on your local server. Make sure to register your AWS IAM credentials to start using AWS Interface. The Dashboard is currently build on the Django framework.
+This is where you can configure and manage your Service/internal database. You can access your dashboard via [aws-interface.com](http://aws-interface.com) or host your own dashboard on your local server. Make sure to register your AWS IAM credentials to start using AWS Interface. The Dashboard is currently build on the Django framework.
 
 ### Backend
 
@@ -41,21 +42,47 @@ You can use the auto-generated client SDK's within your client apps to communica
 
 
 ## For Contributors
+<div align="center">
+<img src="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/awsist.png"><br><br>
+</div>
 
-### RecipeController Abstract Class
+### Django
+The Django Web interface imports the core classes above and calls the necessary functions through the adapter.
 
-You can think of Recipes as abstract features for your backend. Each abstract feature is implemented via a concrete child of RecipeController, such as the AuthRecipeController and DatabaseRecipeController. The main role of the RecipeController is to manage the dictionary that stores configuration info for each abstract feature. For example, the AuthRecipeController provides an interface to control user groups and password rules.
+### Adapter Abstract Class
+It takes the user's credentials and app_id as constructor parameters, and bundles the API and ResourceAllocator together to make it easier to use functions in the upper layer. For example, if the top layer is Django,
+Create and use DjangoAdapter.
 
-### ServiceController Abstract Class
+### ServiceController Abstract Class 
+It is a wrapping layer that allows you to call functions implemented in the Cloud layer directly without going through AWS or Azure.
 
-The main role of the ServiceController is to configure the Backend (your AWS services) according to the provided Recipes. For example, when you apply your AuthRecipe, the AuthServiceController will create a table in AWS DynamoDB, and create the required interfaces via AWS Lambda and API Gateway.
+### Cloud Module
+Auth, and Database are implemented by calling Resource. This module is called by the ServiceController and, at the same time, is uploaded by the ResourceAllocator to a server-less architecture like AWS Lambda.
 
-The ServiceController also serves as an admin interface for your backend and also serves as the SDK generator. For example, the AuthServiceController allows you to manage your users, check who is online, etc.
+### Resource Abstract Class
+This layer allows you to use Cloud Services, including Azure, GCP, and NCP, including AWS.
+For example, if you implement an AWSResource that inherits Resource, you can use AWS as a backend.
 
-### Dashboard
+### ResourceAllocator Abstract Class
+Initializes the state of the Cloud service to be used in the Resource layer. Create a DB instance and upload the Cloud module to the Server-less service to prepare the resource for use. AWSResourceAllocator, for example, uses the boto3 module in AWS to create DynamoDB,
+Lambda, and API Gateway to prepare resources for use.
 
-The dashboard provides a web interface based on Django. The dashboard communicates with the above core classes by via imports.
+### SDK
+It is an SDK automatically generated by superclass of ResourceAllocator. You can access the Service on various platforms by importing the SDK into the client.
 
+### AWS 상세 구현
+
+When you create an application in the dashboard, AWS DynamoDB tables, Lambda functions, and API Gateway are automatically connected to Lambda. And automatically generated SDK communicates with API Gateway through http method.
+
+For example, below is the actual operation of the Auth Service.
+
+1. (User) Register the AWS IAM authentication information in the AWS interface.
+2. (User) From the Dashboard, create an application and change the service configuration.
+3. (AWS interface) Create a single table in DynamoDB and create a user model in it.
+4. (AWS interface) Write a Lambda function that can read and write models.
+5. (AWS interface) Connect the created Lambda function to the API Gateway for external use.
+6. (AWS Interface) Automatically creates an SDK that can be accessed from outside the API Gateway with Java, Python, Swift, etc.
+7. (User) Invoke the auto-generated SDK from the client app to communicate with AWS resources.
 
 ## Environment
 
