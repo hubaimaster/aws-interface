@@ -13,6 +13,7 @@ import json
 import os
 from django.core.exceptions import ImproperlyConfigured
 
+# THIS FILE FOR DEV BRANCH
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SECRETS_DIR = os.path.join(BASE_DIR, 'secret')
 SECRETS_BASE = os.path.join(SECRETS_DIR, 'base.json')
