@@ -2,30 +2,33 @@
   <img src="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/assets/img/brand/blue.png"><br><br>
 </div>
 
+
+
 ![Language](https://img.shields.io/badge/Language-Python3.6-blue.svg)
 ![Language](https://img.shields.io/badge/NaverFest-Finalist-brightgreen.svg)
 [![Build Status](https://travis-ci.org/hubaimaster/aws-interface.svg?branch=master)](https://travis-ci.org/hubaimaster/aws-interface)
 
-**[Naver D2 Fest 결승 진출!! 끼요오오옷ㅅㅅ](https://github.com/D2CampusFest/6th)**
+**[Naver D2 Fest 결승 우수상 수상!!](https://github.com/D2CampusFest/6th)**
 
 # AWS-Interface
 
-**AWS 인터페이스** 는 Amazon Web Services (AWS)에서 제공하는 IAM, DynamoDB, Lambda, API Gateway 등의 서비스를 추상화하여 손쉽게 사용할 수 있게 해주는 인터페이스입니다.
+**AWS 인터페이스** (이하 AWSI) 는 Amazon Web Services (AWS)에서 제공하는 IAM, DynamoDB, Lambda, API Gateway 등의 서비스를 추상화하여 손쉽게 사용할 수 있게 해주는 인터페이스입니다.
 
 새로운 서비스를 제작할 때, 주로 확장성과 초기 투자 비용 사이의 trade-off를 고민하게 됩니다. 처음에는 EC2 인스턴스를 하나 파서 웹 프레임워크와 함께 서버 안에서 돌려도 되지만, 서비스가 커지면 AWS DynamoDB와 같은 서비스를 고려해야 합니다. 사실 DynamoDB도 확장성 좋고 쓰기 쉬운 서비스라고 만들었겠지만, 정작 능숙하게 다룰줄 아는 개발자가 몇명이나 될까요?
 
-AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe)라는 추상적인 개념으로 DB를 구성할 수 있도록 합니다. 레시피를 작성하면 실제 백엔드를 담당하는 AWS 등의 IaaS 서비스가 자동으로 구성되고 이와 손쉽게 통신할 수 있는 플랫폼별 SDK가 만들어집니다. DB를 관리할 수 있는 대시보드 또한 AWS 인터페이스에서 제공됩니다.
+AWS 인터페이스는 이런 문제를 해결하기 위해서 추상적인 개념만으로 서비스를 구성할 수 있도록 합니다. AWSI 에서 어플리케이션을 생성하면 실제 백엔드를 담당하는 AWS 등의 IaaS 서비스가 자동으로 구성되고 이와 손쉽게 통신할 수 있는 플랫폼별 SDK가 만들어집니다. 서비스를 관리할 수 있는 대시보드 또한 AWS 인터페이스에서 제공됩니다.
 
 ## 서비스 구성 (사용자 입장)
 
-### Recipe (레시피)
-서비스하고자 하는 앱의 백엔드 및 DB 단에 들어갈 요소를 설정하는 단위입니다. 서비스에 추가할 추상화된 기능이라고 생각할 수 있습니다. 초기에는 5가지 레시피를 지원할 예정입니다.
+### Service (서비스)
+서비스하고자 하는 앱의 백엔드 및 DB 단에 들어갈 요소를 설정하는 단위입니다. 서비스에 추가할 추상화된 기능이라고 생각할 수 있습니다. 초기에는 6가지 Service 를 지원할 예정입니다.
 
 - Bill: 백엔드 요금 사용 내역 확인
 - Auth: 로그인 및 사용자 인증
 - Database: 각종 데이터
 - Storage: 파일 저장 및 배포
 - Logic : 서버리스 API 코드 생성 및 배포
+- Log : 사용자 로그 기록 및 확인
 
 ### Dashboard (대시보드)
 레시피를 구성하고, DB를 관리할 수 있는 웹 인터페이스를 대시보드라고 부릅니다. [aws-interface.com](http://aws-interface.com) 에서  IAM 정보를 입력해서 계정을 만들거나 로컬에서 호스팅된 대시보드에 IAM 정보를 등록한 후에 이용 가능합니다. 웹 인터페이스는 Django 프레임워크를 기반으로 합니다.
@@ -37,27 +40,48 @@ AWS 인터페이스는 이런 문제를 해결하기 위해서 레시피 (Recipe
 레시피를 기반으로 자동으로 구성된 백엔드를 클라이언트 앱에서 접근하기 위한 SDK를 말합니다. SDK는 Python, Swift, Java 등 다양한 플랫폼에서 지원하는 언어로 자동 생성됩니다.
 
 ## 서비스 설계 (개발자 입장)
-
-### RecipeController Abstract Class
-상술한 바와 같이 Recipe는 서비스에서 제공할 추상화된 기능을 말합니다. 기능에 따라 소스 추상 클래스를 상속한 AuthRecipeController, DatabaseRecipeController 등이 구현됩니다. RecipeController 클래스는 이러한 기능들을 구성하는 설정을 담은 dictionary 를 조작하는 역할을 하는 것으로 생각할 수 있습니다. 예컨대 로그인 및 사용자 관리를 담당하는 AuthRecipeController 에서는 사용자 그룹, 비밀번호 규칙 등을 설정할 수 있습니다.
-
-### ServiceController Abstract Class
-레시피에 명시된 바에 따라 Backend (뒷단의 IaaS 서비스)를 조작하는 컨트롤러입니다. 예컨대, AuthSauce가 담긴 Recipe를 ServiceController (이하 SC)에서 apply시키면, AWS DynamoDB 상에서 관련 테이블이 만들어지고 그것을 조작할 수 있는 Lambda 함수와 API Gateway 설정이 만들어집니다. Client SDK 생성 및 관리자 기능 또한 SC에서 제공됩니다. 예컨대 AuthSC에서는 현재 접속한 사용자를 확인하는 등의 기능이 제공됩니다. SC도 Recipe와 마찬가지로 AuthSC, DatabaseSC 등으로 상속되어 구현됩니다.
+<div align="center">
+  <img src="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/awsist.png"><br><br>
+</div>
 
 ### Django
-장고 웹 인터페이스 단에서는 위의 core 클래스들을 import해서 필요한 함수를 호출하는 방식으로 구현됩니다.
+장고 웹 인터페이스 단에서는 위의 core 클래스들을 import 해서 필요한 함수를 Adapter 를 통해 호출하는 방식으로 구현됩니다.
+
+### Adapter Abstract Class
+사용자의 Credential 과 app_id 를 생성자 파라메터로 받아와 API 와 ResourceAllocator 를 함께 묶어서 상위 레이어에서 기능을 손쉽게 사용할 수 있도록 해줍니다. 예를들어 상위 레이어가 Django 라면 Adapter 를 상속한 
+DjangoAdapter 만들어서 사용합니다. 
+
+### ServiceController Abstract Class 
+Cloud 레이어에서 구현된 기능을 AWS 나 Azure 를 거치지 않고 직접 호출할 수 있게 해주는 Wrapping 레이어입니다.
+
+### Cloud Module
+Auth, Database 등의 기능을 Resource 를 호출하여 구현합니다. 이 모듈은 ServiceController 에 의해 호출되며, 동시에 ResourceAllocator 에 의해
+AWS Lambda 같은 Server-less 아키텍쳐에 업로드됩니다. 
+
+### Resource Abstract Class
+이 레이어 덕분에 AWS 를 포함해 Azure, GCP, NCP 등의 Cloud Service 를 사용할 수 있습니다.
+예를 들어 Resource 를 상속한 AWSResource 를 구현하면 사용자는 Backend 로 AWS 를 사용할 수 있습니다.
+
+### ResourceAllocator Abstract Class
+Resource 레이어에서 사용할 Cloud service 의 상태를 초기화 합니다. DB 인스턴스를 생성하거나 Server-less function 서비스에 
+Cloud 모듈을 업로드하는 등의 작업을 통해 Resource 를 사용할 수 있게 준비하는 역할을 합니다. 예를 들어 AWSResourceAllocator 는 AWS 에서 boto3 모듈을 통해 DynamoDB, 
+Lambda, API Gateway 등을 생성하여 Resource 를 사용할 수 있게 준비합니다.
+
+### SDK
+ResourceAllocator 의 Superclass 에 의해 자동으로 생성되는 SDK 입니다. 해당 SDK 를 클라이언트에 Import 하여 다양한 플랫폼에서 
+Service 에 접근할 수 있습니다.
 
 ### AWS 상세 구현
-대시보드에서 레시피를 설정하고 deploy하면 AWS 내의 DynamoDB와 API Gateway가 자동으로 설정되고, DB 내에 적절한 테이블이 생성됩니다. 이어 자동으로 생성된 SDK 는 API Gateway와 http 방식으로 통신을 하게 됩니다.
+대시보드에서 어플리케이션을 생성하면 AWS 내의 DynamoDB 테이블과 Lambda 함수 그리고 API Gateway 가 자동으로 Lambda 에 연결됩니다. 이어 자동으로 생성된 SDK 는 API Gateway와 http 방식으로 통신을 하게 됩니다.
 
-예를 들어, 아래는 Auth 레시피가 실제 구현되는 과정입니다.
+예를 들어, 아래는 Auth Service 가 실제 작동하는 과정입니다.
 
-1. (사용자) AWS IAM 인증 정보를 AWS 인터페이스에 등록합니다.
-2. (사용자) Auth 레시피를 구성하고 deploy합니다.
-3. (AWS 인터페이스) DynamoDB에서 단일 테이블을 만들고 그 안에 사용자 모델을 빌드합니다. 
+1. (사용자) AWS IAM 인증 정보를 AWS 인터페이스에 등록하여 가입합니다.
+2. (사용자) 대시보드에서 어플리케이션을 생성하고 서비스 구성을 변경합니다.
+3. (AWS 인터페이스) DynamoDB에서 단일 테이블을 만들고 그 안에 사용자 모델을 생성합니다. 
 4. (AWS 인터페이스) 모델들을 읽고 쓸 수 있는 Lambda 함수를 작성합니다.
-5. (AWS 인터페이스) 작성된 Lambda 함수를 외부에서 이용할 수 있게 API Gateway로 배포합니다.
-6. (AWS 인터페이스) API Gateway에 배포한 API에 접근할 수 있는 SDK를 Java, Python, Swift 등으로 자동 생성합니다.
+5. (AWS 인터페이스) 작성된 Lambda 함수를 외부에서 이용할 수 있게 API Gateway 와 연결합니다.
+6. (AWS 인터페이스) API Gateway 에 외부에서 접근할 수 있는 SDK를 Java, Python, Swift 등으로 자동 생성합니다.
 7. (사용자) 자동 생성된 SDK를 클라이언트 앱에서 불러와서 AWS 리소스와 통신합니다.
 
 ## 환경 설정
