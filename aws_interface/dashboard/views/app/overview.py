@@ -29,10 +29,11 @@ class Overview(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         cmd = request.GET.get('cmd', None)
+        platform = request.GET.get('platform', 'python3')
         adapter = DjangoAdapter(app_id, request)
         self.allocate_resource_in_background(adapter, request)
         if cmd == 'download_sdk':
-            sdk_bin = adapter.generate_sdk('python3')
+            sdk_bin = adapter.generate_sdk(platform)
             if sdk_bin is None:
                 Util.add_alert(request, 'API 를 초기화 하고 있습니다. 상황에 따라 최대 3분 정도 소요될 수 있습니다.')
                 return redirect(request.path_info)

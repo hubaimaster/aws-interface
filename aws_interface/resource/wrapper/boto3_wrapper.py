@@ -447,6 +447,10 @@ class DynamoDB:
         response = self.put_item(table_name, 'partition-list', item, partition, indexing=False)
         return response
 
+    def get_partition(self, table_name, partition):
+        response = self.get_item(table_name, partition)
+        return response.get('Item', None)
+
     def delete_partition(self, table_name, partition):
         return self.delete_item(table_name, partition)
 
@@ -515,7 +519,7 @@ class DynamoDB:
 
         return {'Items': items}
 
-    def get_items_in_partition(self, table_name, partition, start_key=None, limit=None, reverse=False):
+    def get_items_in_partition(self, table_name, partition, start_key=None, limit=100, reverse=False):
         scan_index_forward = not reverse
         index_name = 'partition-creationDate'
         table = self.resource.Table(table_name)

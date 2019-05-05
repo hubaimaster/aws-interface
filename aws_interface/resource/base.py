@@ -53,6 +53,9 @@ class Resource(metaclass=ABCMeta):
     def db_create_partition(self, partition):
         raise NotImplementedError
 
+    def db_has_partition(self, partition):
+        raise NotImplementedError
+
     def db_delete_partition(self, partition):
         raise NotImplementedError
 

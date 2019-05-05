@@ -57,12 +57,6 @@ class Client:
         })
         return response
 
-    def auth_get_users(self, start_key=None):
-        response = self._auth('get_users', {
-            'start_key': start_key,
-        })
-        return response
-
     def auth_logout(self):
         response = self._auth('logout', {
             'session_id': self.session_id

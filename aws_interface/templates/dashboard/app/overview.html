@@ -25,9 +25,16 @@
                       SDK 내려받기
                   </button>
                   <div class="dropdown-menu dropdown-menu" aria-labelledby="dropdownMenuButton">
-                      <a class="dropdown-item text-body" href="{% url 'overview' app_id %}?cmd=download_sdk&platform=python36">
-                          <img src="{% static 'assets/img/icons/common/python.png' %}" style="max-height: 24px;">
-                           Python3.6</a>
+                      <a class="dropdown-item text-body" href="{% url 'overview' app_id %}?cmd=download_sdk&platform=python3">
+                          <img src="{% static 'assets/img/icons/common/python.png' %}" style="max-height: 24px; max-width: 24px;">
+                           Python3.6
+                      </a>
+
+                      <a class="dropdown-item text-body" href="{% url 'overview' app_id %}?cmd=download_sdk&platform=swift">
+                          <img src="{% static 'assets/img/icons/common/swift.svg' %}" style="max-height: 24px; max-width: 24px;">
+                           Swift (iOS)
+                      </a>
+
                   </div>
               </div>
 
