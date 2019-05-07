@@ -251,7 +251,7 @@
                 </div>
 
                   <div class="col text-right">
-                  <a data-toggle="modal" data-target="#modal-put-user" class="btn btn-sm btn-primary">
+                  <a id="create-user-button" data-toggle="modal" data-target="#modal-put-user" class="btn btn-sm btn-primary">
                       <span class="btn-inner--text" style="color: white;">회원 생성</span>
                   </a>
                 </div>
@@ -276,8 +276,8 @@
                                         <input name="user_email" type="email" id="input-username" class="form-control form-control-alternative" placeholder="example@email.com">
                                       </div>
                                         <div class="form-group">
-                                        <label class="form-control-label" for="input-username">비밀번호</label>
-                                        <input name="user_password" type="password" id="input-username" class="form-control form-control-alternative" placeholder="******">
+                                        <label class="form-control-label" for="input-password">비밀번호</label>
+                                        <input name="user_password" type="password" id="input-password" class="form-control form-control-alternative" placeholder="******">
                                       </div>
 
                                     </div>
@@ -289,7 +289,7 @@
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                              <button type="submit" class="btn btn-primary">확인</button>
+                              <button id="create-user-commit" type="submit" class="btn btn-primary">확인</button>
                             </div>
                         </form>
                       </div>
@@ -321,7 +321,7 @@
                     <td>
                       {{ user.creationDate|to_date }}
                     </td>
-                    <td>
+                    <td name="col-user-email">
                       {{ user.email }}
                     </td>
                     <td>

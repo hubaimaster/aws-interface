@@ -62,12 +62,16 @@
 
             <a href="{% url 'apps'%}" class="dropdown-item">
               <i class="ni ni-app"></i>
-              <span>Apps</span>
+              <span>어플리케이션 목록</span>
+            </a>
+            <a href="{%  url 'accesskey' %}" class="dropdown-item">
+              <i class="ni ni-settings"></i>
+              <span class="nav-link-inner--text">회원 정보 변경</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="#!" class="dropdown-item">
               <i class="ni ni-user-run"></i>
-              <span>Logout</span>
+              <span>로그아웃</span>
             </a>
           </div>
         </li>
@@ -191,8 +195,6 @@
   <script src="{% static 'assets/js/notify-metro.js' %}"></script>
   <!-- Loading Overlay JS -->
   <script src="{% static 'assets/js/loadingoverlay.js' %}"></script>
-
-
   <script>
 
   </script>
@@ -227,8 +229,6 @@
             }
           }
         });
-        //deploy_if_needed();
-          deploy_resource();
       });
   </script>
   

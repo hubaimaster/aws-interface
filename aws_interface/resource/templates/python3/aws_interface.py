@@ -217,7 +217,7 @@ def _post(url, data):
     return response
 
 
-def example():
+def test():
     email = 'email@example.com'
     password = 'password'
     client = Client()
@@ -239,5 +239,3 @@ def example():
     client.storage_download_file(response['file_id'], 'download')
 
 
-if __name__ == '__main__':  # SHOW EXAMPLE
-    example()

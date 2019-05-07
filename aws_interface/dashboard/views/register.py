@@ -16,8 +16,11 @@ class Register(View):
     def post(self, request):
         email = request.POST['email']
         password = request.POST['password']
-        aws_access_key = request.POST['access_key']
-        aws_secret_key = request.POST['secret_key']
+        vendor = request.POST['vendor']
+
+        aws_access_key = request.POST['aws_access_key']
+        aws_secret_key = request.POST['aws_secret_key']
+        aws_region = request.POST['aws_region']
 
         normalized_email = get_user_model().objects.normalize_email(email)
         users = get_user_model().objects.all().filter(email=normalized_email)
@@ -34,12 +37,13 @@ class Register(View):
             Util.add_alert(request, '유효한 AccessKey 를 입력해주세요.')
             return redirect('register')
         else:
-            credentials = {
-                'aws': {
+            credentials = {}
+            if vendor == 'aws':
+                credentials['aws'] = {
                     'access_key': aws_access_key,
-                    'secret_key': aws_secret_key
-                },
-            }
+                    'secret_key': aws_secret_key,
+                    'region': aws_region,
+                }
             get_user_model().objects.create_user(
                 email, password,
                 credentials=credentials,

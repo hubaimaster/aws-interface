@@ -155,6 +155,11 @@ class AWSResource(Resource):
         response = dynamo.delete_partition(self.app_id, partition)
         return bool(response)
 
+    def db_has_partition(self, partition):
+        dynamo = DynamoDB(self.boto3_session)
+        response = dynamo.get_partition(self.app_id, partition)
+        return bool(response)
+
     def db_get_partitions(self):
         dynamo = DynamoDB(self.boto3_session)
         response = dynamo.get_partitions(self.app_id)

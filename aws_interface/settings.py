@@ -13,7 +13,6 @@ import json
 import os
 from django.core.exceptions import ImproperlyConfigured
 
-# THIS FILE FOR DEV BRANCH
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SECRETS_DIR = os.path.join(BASE_DIR, 'secret')
 SECRETS_BASE = os.path.join(SECRETS_DIR, 'base.json')
@@ -29,7 +28,7 @@ SECRET_KEY = secrets_base['SECRET_KEY']
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 

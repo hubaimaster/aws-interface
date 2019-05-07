@@ -1,6 +1,5 @@
 {% extends 'dashboard/app/base.html' %}
 {% load staticfiles %}
-{% load i18n %}
 {% block content %}
 
 <div class="main-content">
@@ -19,8 +18,30 @@
             <h1 class="display-2 text-white">{{ app_name }}</h1>
             <h2 class="text-white">AWS-Interface 에 오신걸 환영합니다</h2>
 	          <p class="text-white mt-0 mb-5">간단한 설정을 통해 강력한 백엔드 서비스를 순식간에 생성할 수 있습니다.</p>
+
+              <div class="dropdown">
+                  <button id="show-sdk-button" class="btn btn-info mt-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="ni ni-mobile-button"></i>
+                      SDK 내려받기
+                  </button>
+                  <div class="dropdown-menu dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a id="download-sdk-python3" class="dropdown-item text-body" href="{% url 'overview' app_id %}?cmd=download_sdk&platform=python3">
+                          <img src="{% static 'assets/img/icons/common/python.png' %}" style="max-height: 24px; max-width: 24px;">
+                           Python3.6
+                      </a>
+
+                      <a id="download-sdk-swift" class="dropdown-item text-body" href="{% url 'overview' app_id %}?cmd=download_sdk&platform=swift">
+                          <img src="{% static 'assets/img/icons/common/swift.svg' %}" style="max-height: 24px; max-width: 24px;">
+                           Swift (iOS)
+                      </a>
+
+                  </div>
+              </div>
+
+
 	          <a href="{% url 'guide' app_id %}" class="btn btn-success mt-2">가이드 문서 확인</a>
-	          <a id="download-sdk" href="{% url 'overview' app_id %}?cmd=download_sdk" class="btn btn-info mt-2">SDK 내려받기</a>
+
+
 	          <a href="https://github.com/hubaimaster/aws-interface" target="_blank" class="btn btn-dark btn-icon mt-2">
 		          <i class="fab fa-github mr-2"></i> <span class="nav-link-inner--text">Github에서 보기</span>
 	          </a>
@@ -114,8 +135,7 @@
       </div>
 
         <div class="row mt-3">
-
-                <div class="col-xl-6 mb-5 mb-xl-0">
+            <div class="col-xl-6 mb-5 mb-xl-0">
           <div class="card card-stats shadow">
             <div class="card-body">
               <div class="row">
@@ -125,6 +145,25 @@
                 </div>
                    <div class="col-auto">
                     <i class="ni ni-cloud-upload-96 text-green"></i>
+                </div>
+              </div>
+            </div>
+              <div class="card-footer">
+                <a href="{% url 'logic' app_id %}" class="btn btn-sm btn-primary text-white">바로가기</a>
+            </div>
+          </div>
+        </div>
+
+            <div class="col-xl-6 mb-5 mb-xl-0">
+          <div class="card card-stats shadow">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h4>로그 기록 및 관리</h4>
+                  <h1 class="mb-0">Log</h1>
+                </div>
+                   <div class="col-auto">
+                    <i class="ni ni-books text-dark"></i>
                 </div>
               </div>
             </div>

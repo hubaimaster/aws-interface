@@ -78,8 +78,8 @@
           <div class="row justify-content-center">
             <div class="col-lg-5 col-md-6">
               <h1 class="text-white">환영합니다</h1>
-              <p class="text-lead text-white"><a target="_blank" href="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/start_awsi.pdf" class="text-info"><b>AWS IAM Access key</b> 를 등록하여</a> </br>AWS Interface 를 시작하세요</p>
-                <h4 class="text-light">Access key 는 암호화 되어 저장됩니다</h4>
+              <p class="text-lead text-white"><a target="_blank" href="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/start_awsi.pdf" class="text-info"><b>백엔드 인증 정보</b></a> 를 등록하여 시작하기</p>
+                <h4 class="text-light">백엔드 인증 정보는 암호화 되어 저장됩니다</h4>
             </div>
           </div>
         </div>
@@ -98,7 +98,7 @@
           <div class="card bg-secondary shadow border-0">
             <div class="card-body px-lg-5 py-lg-5">
               <div class="text-center text-muted mb-4">
-                <small>AWS IAM Access key 를 입력하여 가입하기</small>
+                <h3>기본 회원 정보</h3>
               </div>
 
               <form role="form" method="post">{% csrf_token %}
@@ -118,12 +118,24 @@
                     <input id="password" name="password" class="form-control" placeholder="Password" type="password">
                   </div>
                 </div>
+
+                <div class="dropdown-divider"></div>
+                <div class="text-left text-muted mb-3 mt-3">
+                    <h4>백엔드 인증 정보</h4>
+                    <div class="text-left text-muted">
+                        <select id="vendor" name="vendor">
+                            <option value="aws">Amazon Web Service (AWS)</option>
+                        </select>
+
+                    </div>
+                  </div>
+
                 <div class="form-group">
                   <div class="input-group input-group-alternative mb-3">
                       <div class="input-group-prepend">
                           <span class="input-group-text"><i class="ni ni-active-40"></i></span>
                       </div>
-                      <input id="access_key" name="access_key" class="form-control" placeholder="Access key" type="text">
+                      <input id="access_key" name="aws_access_key" class="form-control" placeholder="Access key" type="text">
                   </div>
                 </div>
                 <div class="form-group">
@@ -131,12 +143,24 @@
                       <div class="input-group-prepend">
                           <span class="input-group-text"><i class="ni ni-key-25"></i></span>
                       </div>
-                      <input id="secret_key" name="secret_key" class="form-control" placeholder="Secret key" type="password" autocomplete="off">
+                      <input id="secret_key" name="aws_secret_key" class="form-control" placeholder="Secret key" type="password" autocomplete="off">
                   </div>
                 </div>
+                <div class="form-group">
+                  <div class="input-group input-group-alternative mb-3">
+                      <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="ni ni-world"></i></span>
+                      </div>
+                      <select id="region" name="aws_region" class="form-control">
+                          <option value="ap-northeast-2">ap-northeast-2 (대한민국)</option>
+                      </select>
+                  </div>
+                </div>
+
                 <div class="text-center">
                     <button id="register" type="submit" class="btn btn-primary mt-4">가입하기</button>
                 </div>
+
               </form>
             </div>
           </div>

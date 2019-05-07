@@ -65,8 +65,8 @@
 
             <li class="nav-item">
               <a class="nav-link nav-link-icon" href="{%  url 'accesskey' %}">
-                <i class="ni ni-key-25"></i>
-                <span class="nav-link-inner--text">AccessKey 설정</span>
+                <i class="ni ni-settings"></i>
+                <span class="nav-link-inner--text">회원 정보 변경</span>
               </a>
             </li>
 
@@ -146,15 +146,18 @@
                       <div class="card bg-secondary shadow border-0">
                           <div class="card-body px-lg-4 py-lg-4">
                               <div class="mb--2 mt--2 mr--2" style="text-align: right;">
-                                <a class="nav-link nav-link-icon" href="#" id="navbar-default_dropdown_1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a class="nav-link nav-link-icon" href="#" id="setting-{{ app.name }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                   <i class="ni ni-settings-gear-65"></i>
                                   <span class="nav-link-inner--text d-lg-none">Settings</span>
                                 </a>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbar-default_dropdown_1">
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="setting-{{ app.name }}">
                                   <form method="post" action="">{% csrf_token %}
                                     <input hidden name="cmd" value="remove_app">
                                     <input hidden name="app_id" value="{{ app.id }}">
-                                    <button type="submit" class="dropdown-item">Delete Application</button>
+                                    <button id="delete-{{ app.name }}" type="submit" class="dropdown-item">
+                                        <i class="fas fa-trash align-baseline"></i>
+                                        어플리케이션 삭제
+                                    </button>
                                   </form>
                                 </div>
                               </div>

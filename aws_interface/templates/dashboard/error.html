@@ -39,7 +39,11 @@
         <div class="header-body text-center mb-7">
           <div class="row justify-content-center">
             <div class="col-lg-12 col-md-12">
-              <h1 class="text-white">ERROR</h1>
+            {% if error_type == 'allocating' %}
+                <h1 class="text-white">자원 할당중</h1>
+            {% else %}
+              <h1 class="text-white">오류</h1>
+            {% endif %}
               <h2 class="text-lead text-light">{{ title }}</h2>
               <h3 class="text-lead text-light">{{ desc }}</h3>
               <h5>{{ error }}</h5>
@@ -77,13 +81,13 @@
   <!-- Argon JS -->
   <script src="{% static "assets/js/argon.js" %}"></script>
 
-
   <script type="text/javascript">
      $(function(){
        {% if alert %}
           alert('{{ alert }}');
        {% endif %}
      });
+
   </script>
 
 

@@ -3,31 +3,29 @@ import platform
 import tempfile
 import shutil
 import os
-import uuid
 from urllib.request import urlopen
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 
-rand_str = 'thisisrandom' # str(uuid.uuid4()).replace('-', '')
-
-APP_NAME = 'TEST-{}'.format(rand_str)
+TEST_STRING = 'testapp'
+APP_NAME = '{}'.format(TEST_STRING)
 
 DELAY = 2
 LONG_DELAY = 4
-WEB_DRIVE_LINUX = 'https://chromedriver.storage.googleapis.com/73.0.3683.20/chromedriver_linux64.zip'
-WEB_DRIVE_MAC = 'https://chromedriver.storage.googleapis.com/73.0.3683.20/chromedriver_mac64.zip'
-WEB_DRIVE_WINDOWS = 'https://chromedriver.storage.googleapis.com/73.0.3683.20/chromedriver_win32.zip'
+WEB_DRIVE_LINUX = 'https://chromedriver.storage.googleapis.com/2.46/chromedriver_linux64.zip'
+WEB_DRIVE_MAC = 'https://chromedriver.storage.googleapis.com/2.46/chromedriver_mac64.zip'
+WEB_DRIVE_WINDOWS = 'https://chromedriver.storage.googleapis.com/2.46/chromedriver_win32.zip'
 
 LOGIN_URL = '/login'
 APPS_URL = '/apps'
 
-EMAIL = 'test@{}.com'.format(rand_str)
+EMAIL = 'test@{}.com'.format(TEST_STRING)
 PASSWORD = 'TEST_PASSWORD'
 
-ACCESS_KEY = 'AKIAISQS66PCYCBRCMAA' # input('\nACCESS_KEY:')
-SECRET_KEY = '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' # input('\nSECRET_KEY:')
+ACCESS_KEY = 'AKIA3VX52XAX2KBZ3CR7' # input('\nACCESS_KEY:')
+SECRET_KEY = '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' # input('\nSECRET_KEY:')
 
 
 class DashboardTestCase(StaticLiveServerTestCase):
@@ -125,6 +123,12 @@ class DashboardTestCase(StaticLiveServerTestCase):
 
     def tearDown(self):
         time.sleep(DELAY)
+        self.browser.get(self.live_server_url + APPS_URL)
+        time.sleep(DELAY)
+        self.browser.find_element_by_id('setting-{}'.format(APP_NAME)).click()
+        time.sleep(DELAY)
+        self.browser.find_element_by_id('delete-{}'.format(APP_NAME)).click()
+        time.sleep(20)
         self.browser.quit()
         shutil.rmtree(self.temp_dir)
 
@@ -141,11 +145,13 @@ class DashboardTestCase(StaticLiveServerTestCase):
         self.assertEqual(APPS_URL in self.browser.current_url, True)
 
     def do_test_process(self):
-        from dashboard.tests.process_auth import AuthTestProcess
-        from dashboard.tests.process_bill import BillTestProcess
-        from dashboard.tests.process_sdk import SDKTestProcess
+        from dashboard.tests.auth import AuthTestProcess
+        from dashboard.tests.bill import BillTestProcess
+        from dashboard.tests.sdk import SDKTestProcess
+        from dashboard.tests.database import DatabaseTestProcess
         AuthTestProcess(self).do_test()
         BillTestProcess(self).do_test()
+        DatabaseTestProcess(self).do_test()
         SDKTestProcess(self).do_test()
 
     def test(self):

@@ -15,5 +15,5 @@ class Logic(LoginRequiredMixin, View):
 
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_auth() as auth_api:
-            context['user_groups'] = auth_api.get_user_groups()
+            context['user_groups'] = auth_api.get_user_groups()['groups']
         return render(request, 'dashboard/app/logic.html', context=context)
