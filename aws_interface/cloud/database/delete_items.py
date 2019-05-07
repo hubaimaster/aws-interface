@@ -23,8 +23,8 @@ def do(data, resource):
     success = True
 
     item_ids = params.get('item_ids', [])
-    if len(item_ids) > 100:
-        body['message'] = 'number of item_ids must be less than 100'
+    if len(item_ids) > 128:
+        body['message'] = 'number of item_ids must be less than 128'
         body['success'] = False
         return Response(body)
 

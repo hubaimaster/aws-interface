@@ -86,11 +86,14 @@ class User(AbstractUser):
         else:
             credentials = dict()
         credentials[vendor] = credential
+        credentials = json.dumps(credentials)
         self.c_credentials = self.encrypt(raw_password, credentials)
 
     def get_credential(self, raw_password, vendor):
         assert (self.check_password(raw_password))
-        return self.decrypt(raw_password, self.c_credentials).get(vendor, None)
+        credentials = self.decrypt(raw_password, self.c_credentials)
+        credentials = json.loads(credentials)
+        return credentials.get(vendor, None)
 
     def set_credentials(self, raw_password, credentials):
         assert (self.check_password(raw_password))

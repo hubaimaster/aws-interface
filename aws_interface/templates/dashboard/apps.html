@@ -65,8 +65,8 @@
 
             <li class="nav-item">
               <a class="nav-link nav-link-icon" href="{%  url 'accesskey' %}">
-                <i class="ni ni-key-25"></i>
-                <span class="nav-link-inner--text">AccessKey 설정</span>
+                <i class="ni ni-settings"></i>
+                <span class="nav-link-inner--text">회원 정보 변경</span>
               </a>
             </li>
 
@@ -154,7 +154,10 @@
                                   <form method="post" action="">{% csrf_token %}
                                     <input hidden name="cmd" value="remove_app">
                                     <input hidden name="app_id" value="{{ app.id }}">
-                                    <button id="delete-{{ app.name }}" type="submit" class="dropdown-item">Delete Application</button>
+                                    <button id="delete-{{ app.name }}" type="submit" class="dropdown-item">
+                                        <i class="fas fa-trash align-baseline"></i>
+                                        어플리케이션 삭제
+                                    </button>
                                   </form>
                                 </div>
                               </div>
