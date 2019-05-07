@@ -57,6 +57,12 @@ class Client:
         })
         return response
 
+    def auth_get_users(self, start_key=None):
+        response = self._auth('get_users', {
+            'start_key': start_key,
+        })
+        return response
+
     def auth_logout(self):
         response = self._auth('logout', {
             'session_id': self.session_id
@@ -211,7 +217,7 @@ def _post(url, data):
     return response
 
 
-def example():
+def test():
     email = 'email@example.com'
     password = 'password'
     client = Client()
@@ -233,5 +239,3 @@ def example():
     client.storage_download_file(response['file_id'], 'download')
 
 
-if __name__ == '__main__':  # SHOW EXAMPLE
-    example()

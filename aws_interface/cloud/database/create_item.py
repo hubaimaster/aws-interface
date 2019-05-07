@@ -33,6 +33,7 @@ def do(data, resource):
 
     read_groups.append('admin')
     write_groups.append('admin')
+
     read_groups = list(set(read_groups))
     write_groups = list(set(write_groups))
 

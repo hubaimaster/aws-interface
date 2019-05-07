@@ -15,4 +15,3 @@ class DjangoAdapter(Adapter):
 
     def _get_vendor(self):
         return self.app.vendor
-

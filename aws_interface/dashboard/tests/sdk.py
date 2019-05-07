@@ -20,5 +20,7 @@ class SDKTestProcess:
         self.parent.assert_view_tag('overview')
         time.sleep(LONG_DELAY)
         # USER GROUP
-        self.parent.browser.find_element_by_id('download-sdk').click()
+        self.parent.browser.find_element_by_id('show-sdk-button').click()
+        self.parent.browser.find_element_by_id('download-sdk-python3').click()
+
         print('download_dir:{}'.format(self.parent.download_dir))

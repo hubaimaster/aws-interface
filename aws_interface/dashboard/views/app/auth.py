@@ -2,9 +2,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-
 from dashboard.views.utils import Util, page_manage
-
 from core.adapter.django import DjangoAdapter
 
 
@@ -34,7 +32,7 @@ class Auth(LoginRequiredMixin, View):
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_auth() as api:
             cmd = request.POST['cmd']
-            # Recipe
+
             if cmd == 'delete_group':
                 name = request.POST['group_name']
                 succeed = api.delete_user_group(name)
@@ -61,7 +59,6 @@ class Auth(LoginRequiredMixin, View):
                     enabled = False
                 api.set_guest_login(enabled, default_group)
 
-            # Service
             elif cmd == 'put_user':
                 email = request.POST['user_email']
                 password = request.POST['user_password']

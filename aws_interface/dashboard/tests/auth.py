@@ -20,12 +20,28 @@ class AuthTestProcess:
                 has_group_name = True
         return has_group_name
 
-    def _create_user(self, name):
-        pass
+    def _create_user(self, email, password):
+        self.parent.browser.find_element_by_id('create-user-button').click()
+        time.sleep(DELAY)
+        self.parent.browser.find_element_by_id('input-username').send_keys(email)
+        self.parent.browser.find_element_by_id('input-password').send_keys(password)
+        self.parent.browser.find_element_by_id('create-user-commit').click()
+
+    def _has_user(self, target_email):
+        emails = self.parent.browser.find_elements_by_name('col-user-email')
+        for email in emails:
+            email = email.text
+            print('email:', email)
+            if target_email == email:
+                return True
+        return False
 
     def do_test(self):
         group_name = 'TEST-GROUP'
         group_desc = 'Group for testing'
+        email = 'test@email.com'
+        password = 'testpassword1234'
+
         time.sleep(DELAY)
         start_time = time.time()
         self.parent.browser.find_element_by_id('link-auth').click()
@@ -48,6 +64,8 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self.parent.assertFalse(self._has_user_group(group_name))
         time.sleep(LONG_DELAY)
+        self._create_user(email, password)
+        time.sleep(LONG_DELAY)
+        self.parent.assertTrue(self._has_user(email))
         # LOGIN METHOD
-
 

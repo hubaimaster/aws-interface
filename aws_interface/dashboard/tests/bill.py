@@ -1,5 +1,4 @@
 import time
-from dashboard.tests.test import DashboardTestCase
 
 DELAY = 2
 LONG_DELAY = 4

@@ -13,6 +13,10 @@ if __name__ == '__main__':
     data['SECRET_KEY'] = ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
                                   for _ in range(50)])
 
+    data['ADMIN_EMAIL'] = 'admin@awsi.com'
+    data['ADMIN_PASSWORD'] = ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*=+')
+                                      for _ in range(7)])
+
     base_json = os.path.join(secret_dir, 'base.json')
     with open(base_json, 'w') as f:
         json.dump(data, f)
