@@ -110,7 +110,7 @@ class User(AbstractUser):
 class App(models.Model):
     id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
-    name = models.CharField(max_length=255, blank=False, unique=True)
+    name = models.CharField(max_length=255, blank=False, unique=False)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     vendor = models.CharField(max_length=255, default='aws')
 
