@@ -8,10 +8,6 @@ certifi==2018.11.29
 chardet==3.0.4
 colorama==0.3.9
 Django==2.1.8
-docker==3.7.2
-docker-compose==1.23.2
-docker-pycreds==0.4.0
-dockerpty==0.4.1
 docopt==0.6.2
 docutils==0.14
 future==0.16.0
@@ -36,3 +32,4 @@ texttable==0.9.1
 urllib3==1.24.2
 wcwidth==0.1.7
 websocket-client==0.56.0
+pymysql

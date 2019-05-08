@@ -24,7 +24,7 @@ class Auth(LoginRequiredMixin, View):
 
         return render(request, 'dashboard/app/auth.html', context=context)
 
-    # @page_manage
+    @page_manage
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id

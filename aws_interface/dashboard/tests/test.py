@@ -3,11 +3,26 @@ import platform
 import tempfile
 import shutil
 import os
+import json
+import settings
 from urllib.request import urlopen
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
+
+
+base_dir = os.path.dirname(os.path.abspath(settings.__file__))
+secret_dir = os.path.join(base_dir, 'secret')
+secret_base_dir = os.path.join(secret_dir, 'base.json')
+
+try:
+    secrets_base = json.load(open(secret_base_dir, 'rt'))
+    ACCESS_KEY = secrets_base['AWS_ACCESS_KEY']
+    SECRET_KEY = secrets_base['AWS_SECRET_KEY']
+except Exception:
+    raise BaseException('Could not find secret file {}'.format(secret_base_dir))
+
 
 TEST_STRING = 'testapp'
 APP_NAME = '{}'.format(TEST_STRING)
@@ -23,9 +38,6 @@ APPS_URL = '/apps'
 
 EMAIL = 'test@{}.com'.format(TEST_STRING)
 PASSWORD = 'TEST_PASSWORD'
-
-ACCESS_KEY = 'AKIA3VX52XAX2KBZ3CR7' # input('\nACCESS_KEY:')
-SECRET_KEY = '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' # input('\nSECRET_KEY:')
 
 
 class DashboardTestCase(StaticLiveServerTestCase):

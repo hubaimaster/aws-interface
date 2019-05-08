@@ -24,6 +24,13 @@ except FileNotFoundError:
 
 SECRET_KEY = secrets_base['SECRET_KEY']
 
+DB_ENGINE = secrets_base['DB_ENGINE']
+DB_NAME = secrets_base['DB_NAME']
+DB_USER = secrets_base['DB_USER']
+DB_PASSWORD = secrets_base['DB_PASSWORD']
+DB_HOST = secrets_base['DB_HOST']
+DB_PORT = secrets_base['DB_PORT']
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -82,10 +89,21 @@ LOGIN_REDIRECT_URL = '/apps/'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': DB_ENGINE,
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
