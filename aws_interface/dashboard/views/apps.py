@@ -15,7 +15,7 @@ class Apps(LoginRequiredMixin, View):
     def get(self, request):
         context = Util.get_context(request)
         try:
-            apps = App.objects.filter(user_id=request.user.id)
+            apps = App.objects.filter(user=request.user)
             apps = [{'id': app.id, 'creation_date': app.creation_date, 'name': app.name} for app in apps]
             context['apps'] = apps
         except ObjectDoesNotExist:

@@ -2,7 +2,9 @@
 from django.shortcuts import render, redirect
 from botocore.errorfactory import ClientError
 from numbers import Number
-from dashboard.models import App
+from dashboard.models import App, Log
+import simplejson as json
+import traceback
 
 
 class Util:
@@ -69,16 +71,22 @@ class Util:
         if not name or len(name) < 3:
             Util.add_alert(request, '이름은 3글자 이상입니다')
             return redirect('apps')
-        user_id = request.user.id
-        app = App.objects.filter(user=request.user.id, name=name)
+        user = request.user
+        app = App.objects.filter(user=request.user, name=name)
         if app:
             Util.add_alert(request, '같은 이름의 어플리케이션이 존재합니다')
             return redirect('apps')
         app = App()
         app.name = name
-        app.user_id = user_id
+        app.user = user
         app.save()
         Util.add_alert(request, '새로운 어플리케이션이 생성되었습니다')
+
+    @classmethod
+    def log(cls, level, user, event):
+        level = level.lower()
+        log = Log(level=level, user=user, event=event)
+        log.save()
 
 
 def page_manage(func):
@@ -90,10 +98,17 @@ def page_manage(func):
             desc = '원인을 알 수 없는 에러입니다'
             link = None
             link_desc = None
-            error_type = None
 
             request = args[1]
+
             context = Util.get_context(request)
+            url = str(request.build_absolute_uri())
+
+            event = 'URL "{}"'.format(url)
+            event = '{}\n{}'.format(event, traceback.format_exc())
+
+            Util.log('error', request.user, event)
+
             code = ex.response.get('Error', {}).get('Code', None)
             if code == 'UnrecognizedClientException':
                 title = '등록된 IAM AccessKey 를 확인해주세요'

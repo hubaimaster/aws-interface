@@ -116,3 +116,11 @@ class App(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Log(models.Model):
+    id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
+    creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    level = models.CharField(max_length=255)
+    event = models.TextField()
