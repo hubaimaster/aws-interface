@@ -104,7 +104,7 @@ def page_manage(func):
                 title = '등록된 IAM AccessKey 의 권한이 부족합니다'
                 desc = '아래 가이드 링크를 참고하여 AdminUser 권한을 추가합니다'
                 link = 'guide'
-                link_desc = 'AWS IAM AccessKey 권한 추가히기'
+                link_desc = 'AWS IAM AccessKey 권한 추가기'
                 error_type = 'invalid_access_key'
             elif code == 'ResourceNotFoundException':
                 title = '잠시만 기다려주세요 AWS Interface 가 백엔드 서비스를 생성중 입니다'
