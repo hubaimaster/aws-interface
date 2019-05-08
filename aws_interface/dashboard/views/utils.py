@@ -86,7 +86,6 @@ def page_manage(func):
         try:
             result = func(*args, **kwargs)
         except ClientError as ex:
-            print('!!! Error:', ex)
             title = 'Unknown Error'
             desc = '원인을 알 수 없는 에러입니다'
             link = None
@@ -104,7 +103,7 @@ def page_manage(func):
                 title = '등록된 IAM AccessKey 의 권한이 부족합니다'
                 desc = '아래 가이드 링크를 참고하여 AdminUser 권한을 추가합니다'
                 link = 'guide'
-                link_desc = 'AWS IAM AccessKey 권한 추가히기'
+                link_desc = 'AWS IAM AccessKey 권한 추가하기'
                 error_type = 'invalid_access_key'
             elif code == 'ResourceNotFoundException':
                 title = '잠시만 기다려주세요 AWS Interface 가 백엔드 서비스를 생성중 입니다'
@@ -122,7 +121,6 @@ def page_manage(func):
             context['link'] = link
             context['link_desc'] = link_desc
             context['code'] = code
-            # TODO 에러났을때 엉키는거 방지.. 어플 디폴로이 초기화 등
 
             return render(request, 'dashboard/error.html', context=context)
         return result

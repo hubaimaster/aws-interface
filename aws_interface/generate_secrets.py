@@ -13,9 +13,8 @@ if __name__ == '__main__':
     data['SECRET_KEY'] = ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
                                   for _ in range(50)])
 
-    data['ADMIN_EMAIL'] = 'admin@awsi.com'
-    data['ADMIN_PASSWORD'] = ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*=+')
-                                      for _ in range(7)])
+    data['ADMIN_EMAIL'] = input('ADMIN_EMAIL: ')
+    data['ADMIN_PASSWORD'] = input('ADMIN_PASSWORD: ')
 
     data["DB_ENGINE"] = "django.db.backends.mysql"
     print('Using DB_ENGINE as {}'.format(data["DB_ENGINE"]))
