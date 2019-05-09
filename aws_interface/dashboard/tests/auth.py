@@ -1,4 +1,4 @@
-from dashboard.tests.test import *
+from dashboard.tests.test_dashboard import *
 
 
 class AuthTestProcess:

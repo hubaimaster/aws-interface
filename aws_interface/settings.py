@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 import json
 import os
+import pymysql
 from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -89,14 +90,9 @@ LOGIN_REDIRECT_URL = '/apps/'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-import pymysql
 pymysql.install_as_MySQLdb()
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
     'default': {
         'ENGINE': DB_ENGINE,
         'NAME': DB_NAME,
@@ -106,6 +102,12 @@ DATABASES = {
         'PORT': DB_PORT,
     }
 }
+
+if DEBUG:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 
 
 # Password validation
