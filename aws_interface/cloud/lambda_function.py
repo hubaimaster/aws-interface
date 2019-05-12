@@ -1,6 +1,5 @@
 import importlib
 import cloud.auth.get_me as get_me
-import cloud.log.create_log as create_log
 from resource import get_resource
 import sys
 

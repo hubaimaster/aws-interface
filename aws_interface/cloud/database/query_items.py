@@ -12,6 +12,7 @@ info = {
         'query': 'list',
         'start_key': 'dict',
         'limit': 'int=100',
+        'reverse': 'bool=False',
     },
     'output_format': {
         'items': 'list',
@@ -31,12 +32,13 @@ def do(data, resource):
     query_instructions = params.get('query', None)
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
+    reverse = params.get('reverse', False)
 
     if type(start_key) is str:
         start_key = json.loads(start_key)
 
     if resource.db_get_item(partition):
-        items, end_key = resource.db_query(partition, query_instructions, start_key, limit)
+        items, end_key = resource.db_query(partition, query_instructions, start_key, limit, reverse)
 
         filtered = []
         for item in items:

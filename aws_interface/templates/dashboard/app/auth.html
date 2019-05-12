@@ -376,10 +376,10 @@
               <table class="table align-items-center table-flush">
                 <thead class="thead-light">
                   <tr>
-                    <th scope="col">id</th>
-                    <th scope="col">createDate</th>
                     <th scope="col">userId</th>
+                    <th scope="col">createDate</th>
                     <th scope="col">sessionType</th>
+                    <th scope="col">session_id (HASH)</th>
                     <th scope="col">
                         <div class="custom-control custom-checkbox mt--4">
                             <input class="custom-control-input" type="checkbox" name="checkbox-session" id="check-all">
@@ -392,16 +392,18 @@
                 {% for session in sessions.items %}
                   <tr>
                     <th scope="row">
-                      {{ session.id }}
+                     {{ session.userId }}
                     </th>
                     <td>
                       {{ session.creationDate|to_date }}
                     </td>
                     <td>
-                      {{ session.userId }}
+                        {{ session.sessionType }}
+
                     </td>
                     <td>
-                      {{ session.sessionType }}
+                         {{ session.id }}
+
                     </td>
                     <td>
                         <div class="custom-control custom-checkbox mt--4">

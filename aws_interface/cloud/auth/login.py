@@ -1,8 +1,8 @@
 
 from cloud.crypto import *
 from cloud.response import Response
-import cloud.shortuuid as shortuuid
 import cloud.auth.get_email_login as get_email_login
+from secrets import token_urlsafe
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -48,12 +48,12 @@ def do(data, resource):
         salt = user['salt']
         if password_hash == hash_password(password, salt):
             user_id = user['id']
-            session_id = shortuuid.uuid()
+            session_id = token_urlsafe(32)
             session_item = {
                 'userId': user_id,
                 'sessionType': 'email_login',
             }
-            success = resource.db_put_item('session', session_item, session_id)
+            success = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
             body['session_id'] = session_id
             body['message'] = '로그인 성공'
         else:

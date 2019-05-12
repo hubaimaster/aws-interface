@@ -1,6 +1,7 @@
 {% extends 'dashboard/app/base.html' %}
 {% load staticfiles %}
 {% block content %}
+{% load timetags %}
 
 <div class="main-content">
     <!-- Top navbar -->
@@ -13,9 +14,7 @@
             <div class="alert alert-primary" role="alert">
                 <strong>AWS Lambda</strong>  를 사용합니다.
             </div>
-            <div class="alert alert-danger" role="alert">
-                <strong>곧 지원될 예정입나다</strong>
-            </div>
+
           <!-- Card stats -->
 
         </div>
@@ -24,8 +23,78 @@
     <!-- Page content -->
     <div class="container-fluid mt--7">
       <div class="row">
+          <div class="col-xl-12">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <div class="row align-items-center">
+                <div class="col-3">
+                  <h3 class="mb-0">
+                      이벤트 목록
+                  </h3>
+                </div>
 
+                  <div class="col-9">
+                      <form method="get" action="">
+                          <div class="row">
+                              <div class="col-3">
+                                  <input name="event_source" type="text" class="form-control form-control-sm" placeholder="SOURCE" value="{{ event_source }}">
+                              </div>
+                              <div class="col-3">
+                                  <input name="event_name" type="text" class="form-control form-control-sm" placeholder="NAME" value="{{ event_name }}">
+                              </div>
+                              <div class="col-4">
+                                  <input name="event_param" type="text" class="form-control form-control-sm" placeholder="PARAM" value="{{ event_param }}">
+                              </div>
+                              <div class="col-2">
+                                  <button type="submit" id="search-event-btn" class="btn btn-sm btn-primary">
+                                      <span class="btn-inner--text" style="color: white;">검색</span>
+                                  </button>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
 
+              </div>
+            </div>
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+              <!-- Projects table -->
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">owner</th>
+                    <th scope="col">createDate</th>
+                    <th scope="col">event_source</th>
+                    <th scope="col">event_name</th>
+                    <th scope="col">event_param</th>
+                  </tr>
+                </thead>
+                <tbody style="max-height: 400px; overflow-y: auto;">
+                {% for log in logs %}
+                  <tr>
+                    <th scope="row">
+                      {{ log.owner }}
+                    </th>
+                    <td>
+                      {{ log.creationDate|to_date }}
+                    </td>
+                    <td>
+                      {{ log.event_source }}
+                    </td>
+                    <td>
+                      {{ log.event_name }}
+                    </td>
+                      <td>
+                      {{ log.event_param }}
+                    </td>
+
+                  </tr>
+                {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="row mt-7">
 

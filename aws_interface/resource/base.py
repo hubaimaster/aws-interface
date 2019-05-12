@@ -1,5 +1,7 @@
 from abc import ABCMeta
 from resource.sdk import generate
+from concurrent.futures import ThreadPoolExecutor
+import time
 
 
 class ResourceAllocator(metaclass=ABCMeta):
@@ -84,7 +86,18 @@ class Resource(metaclass=ABCMeta):
     def db_get_count(self, partition):
         raise NotImplementedError
 
-    def db_get_item_ids_equal(self, partition, field, value, start_key, limit):
+    def db_get_item_id_and_orders(self, partition, field, value, order_field, start_key, limit, reverse):
+        """
+        item_id 와 order 필드 값들을 빠르게 가져와야함
+        :param partition: 대상을 가져올 파티션
+        :param field: 필드
+        :param value: 값
+        :param order_field: 이 필드를 기준으로 reverse 에 따라 오름/내림차순 정렬
+        :param start_key: 탐색 시작점
+        :param limit: 반환되는 아이템 리스트 길이
+        :param reverse: False 면 오름차순, True 면 내림차순
+        :return: [{'item_id' : str, order_field: str}, ...]
+        """
         raise NotImplementedError
 
     # File ops
@@ -116,11 +129,14 @@ class Resource(metaclass=ABCMeta):
         raise NotImplementedError
 
     # SHOULD NOT RE-IMPLEMENT
-    def db_query(self, partition, instructions, start_index=0, limit=100):
+    def db_query(self, partition, instructions, start_key_set=None, limit=100, reverse=False, order_by='creationDate'):
         """:return:items:list,end_key:str"""
         # TODO 상위레이어에서 쿼리를 순차적으로 실행가능한 instructions 으로 만들어 전달 -> ORM 클래스 만들기
 
-        def get_items():
+        def get_items(_start_key_list, _sub_limit):
+            if not _start_key_list:
+                _start_key_list = [None] * len(instructions)
+            _end_key_list = [None] * len(instructions)
             item_set = set()
             for idx, option_statement in enumerate(instructions):
                 if isinstance(option_statement, list):
@@ -137,9 +153,11 @@ class Resource(metaclass=ABCMeta):
                 instruction_type = self._db_instruction_type(statement, option)
                 if instruction_type == 'index':
                     if option == 'and':
-                        item_set &= set(self._db_index_items(statement, partition))
+                        raise BaseException('You cannot use option [and] on index')
                     elif option == 'or' or option is None:
-                        item_set |= set(self._db_index_items(statement, partition))
+                        pairs, _end_key_list[idx] = self._db_index_items(statement, partition, order_by,
+                                                                        _start_key_list[idx], _sub_limit, reverse)
+                        item_set |= set(pairs)
                 elif instruction_type == 'filter':
                     if option == 'and':
                         item_set = set(self._db_filter_items(statement, item_set))
@@ -147,26 +165,55 @@ class Resource(metaclass=ABCMeta):
                         raise BaseException('You cannot use option [or] on filtering')
                 elif instruction_type == 'scan':
                     if option == 'and':
-                        item_set &= set(self._db_scan_items(statement, partition))
+                        pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, _start_key_list[idx], _sub_limit,
+                                                                       reverse)
+                        item_set &= set(pairs)
                     elif option == 'or' or option is None:
-                        item_set |= set(self._db_scan_items(statement, partition))
-            return list(item_set)
+                        pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, _start_key_list[idx], _sub_limit,
+                                                                       reverse)
+                        item_set |= set(pairs)
+            return list(item_set), _end_key_list
+
+        if start_key_set:
+            start_index = start_key_set.get('index', 0)
+            start_key_list = start_key_set.get('key_list', None)
+        else:
+            start_index = 0
+            start_key_list = None
+
+        sub_limit = limit * 10
         if not limit:
             limit = 100
-        if not start_index:
-            start_index = 0
-        items = get_items()
-        items = items[start_index: start_index + limit]
-        items = self._db_batch_fake_items_to_real(items)
 
-        end_index = start_index + limit
-        return list(items), end_index
+        ct = time.time()
+
+        all_items = []
+        while True:
+            items, end_key_list = get_items(start_key_list, sub_limit)
+            all_items.extend(items)
+            if len(all_items) >= start_index + limit:
+                end_index = len(items) - (len(all_items) - (start_index + limit))
+                if end_index == 0:
+                    start_key_list = end_key_list
+                break
+            if all(end_key is None for end_key in end_key_list):
+                end_index = 0
+                break
+            start_key_list = end_key_list
+
+        all_items = sorted(all_items, key=lambda item: (item[order_by], item['id']), reverse=reverse)
+        all_items = all_items[start_index: start_index + limit]
+        all_items = self._db_batch_fake_items_to_real(all_items)
+        all_items = sorted(all_items, key=lambda item: (item[order_by], item['id']), reverse=reverse)
+        end_key_set = {'index': end_index, 'key_list': start_key_list}
+        print('end_time:', time.time() - ct)
+        return list(all_items), end_key_set
 
     def _db_instruction_type(self, statement, option):
         field, condition, value = statement
         if option == 'and':
             if condition == 'eq':
-                return 'index'
+                return 'filter'
             else:
                 return 'filter'
         elif option == 'or':
@@ -182,33 +229,31 @@ class Resource(metaclass=ABCMeta):
         else:
             raise BaseException('No such option : [{}]'.format(option))
 
-    def _db_get_fake_item(self, item_id):
-        return {
-            'id': item_id,
+    def _db_get_fake_item(self, item, order_by):
+        return IDDict({
+            'id': item['item_id'],
+            order_by: item[order_by],
             '_is_fake': True
-        }
+        })
 
     def _db_batch_fake_items_to_real(self, items):
-        item_ids = [item['id'] for item in items]
         bulk_size = 100
-        items = []
-        for i in range(0, len(item_ids), bulk_size):
-            items.extend(self.db_get_items(item_ids[i:i+bulk_size]))
-        for item in items:
-            yield IDDict(item)
+        item_ids = [item['id'] for item in items if '_is_fake' in item]
+        items = [item for item in items if '_is_fake' not in item]
+        with ThreadPoolExecutor(max_workers=32) as exc:
+            for i in range(0, len(item_ids), bulk_size):
+                def get_bulk(start, end):
+                    items.extend(self.db_get_items(item_ids[start:end]))
+                exc.submit(get_bulk, i, i + bulk_size)
+        return [IDDict(item) for item in items]
 
-    def _db_index_items(self, statement, partition):
+    def _db_index_items(self, statement, partition, order_by, start_key, limit, reverse):
         field, condition, value = statement
-        start_key = None
-        while True:
-            if condition == 'eq':
-                item_ids, start_key = self.db_get_item_ids_equal(partition, field, value, start_key, 10000)
-                for item_id in item_ids:
-                    yield IDDict(self._db_get_fake_item(item_id))
-            else:
-                raise BaseException('You cannot use condition : [{}] for indexing'.format(condition))
-            if start_key is None:
-                break
+        if condition != 'eq':
+            raise BaseException('You cannot use condition : [{}] for indexing'.format(condition))
+        pairs, end_key = self.db_get_item_id_and_orders(partition, field, value, order_by, start_key, limit, reverse)
+        pairs = [IDDict(self._db_get_fake_item(pair, order_by)) for pair in pairs]
+        return pairs, end_key
 
     def _db_filter_items(self, statement, items):
         field, condition, value = statement
@@ -255,11 +300,7 @@ class Resource(metaclass=ABCMeta):
                 else:
                     raise BaseException('No such condition : [{}]'.format(condition))
 
-    def _db_scan_items(self, statement, partition):
-        start_key = None
-        while True:
-            items, start_key = self.db_get_items_in_partition(partition, start_key)
-            for item in self._db_filter_items(statement, items):
-                yield IDDict(item)
-            if start_key is None:
-                break
+    def _db_scan_items(self, statement, partition, start_key, limit, reverse):
+        items, end_key = self.db_get_items_in_partition(partition, start_key, limit, reverse)
+        items = [IDDict(item) for item in self._db_filter_items(statement, items)]
+        return items, end_key

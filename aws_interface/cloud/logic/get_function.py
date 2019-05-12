@@ -24,7 +24,7 @@ def do(data, resource):
 
     function_name = params.get('function_name')
 
-    item_ids = resource.db_get_item_ids_equal(partition, 'function_name', function_name)
+    item_ids = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
     if len(item_ids) == 0:
         body['message'] = 'function_name: {} did not exist'.format(function_name)
         return Response(body)

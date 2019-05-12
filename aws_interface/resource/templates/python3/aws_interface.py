@@ -126,12 +126,13 @@ class Client:
         })
         return response
 
-    def database_query_items(self, partition, query, start_key=None, limit=None):
+    def database_query_items(self, partition, query, start_key=None, limit=None, reverse=False):
         response = self._database('query_items', {
             'partition': partition,
             'query': query,
             'start_key': start_key,
             'limit': limit,
+            'reverse': reverse,
         })
         return response
 

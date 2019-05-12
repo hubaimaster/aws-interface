@@ -1,5 +1,6 @@
 
 from cloud.response import Response
+from cloud.crypto import Hash
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -26,7 +27,7 @@ def do(data, resource):
     params = data['params']
     session_id = params.get('session_id', None)
     try:
-        item = resource.db_get_item(session_id)
+        item = resource.db_get_item(Hash.sha3_512(session_id))
     except BaseException as ex:
         print(ex)
         body['message'] = 'permission denied'

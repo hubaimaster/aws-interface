@@ -45,7 +45,7 @@ def do(data, resource):
     item['run_groups'] = run_groups
     item['runnable'] = runnable
 
-    item_ids = resource.db_get_item_ids_equal(partition, 'function_name', function_name)
+    item_ids = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
     if len(item_ids) == 0:
         resource.db_put_item('logic', item)
         resource.sl_create_function(function_name, runtime, handler, run_groups, zip_file)

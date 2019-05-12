@@ -10,4 +10,4 @@ class LogAPI(API):
         return self.service_controller.create_log(event_source, event_name, event_param)
 
     def get_logs(self, event_source=None, event_name=None, event_param=None, user_id=None):
-        return self.service_controller.delete_function(event_source, event_name, event_param, user_id)
+        return self.service_controller.get_logs(event_source, event_name, event_param, user_id)

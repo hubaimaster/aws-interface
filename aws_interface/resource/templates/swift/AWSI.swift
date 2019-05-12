@@ -208,11 +208,12 @@ class AWSI {
         ["and|or", "field", "condition (eq|gt|..)", "value"], ...
     ]
     */
-    func database_query_items(partition: String, query: [[String]], start_key: [String: Any]?, limit: Int=100, callback: @escaping (_ response: [String: Any]?)->Void){
+    func database_query_items(partition: String, query: [[String]], start_key: [String: Any]?, limit: Int=100, reverse: Bool=false, callback: @escaping (_ response: [String: Any]?)->Void){
         var data: [String: Any] = [
             "partition": partition,
             "query": query,
             "limit": limit,
+            "reverse": reverse,
         ]
         if let start_key = start_key{
             data["start_key"] = start_key

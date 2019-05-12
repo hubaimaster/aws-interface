@@ -4,6 +4,7 @@ import shutil
 import tempfile
 from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3
 from resource.base import ResourceAllocator, Resource
+import time
 
 
 def create_lambda_zipfile_bin(app_id, cloud_path, resource_path):
@@ -211,13 +212,15 @@ class AWSResource(Resource):
         count = item.get('count')
         return count
 
-    def db_get_item_ids_equal(self, partition, field, value, start_key, limit):
+    def db_get_item_id_and_orders(self, partition, field, value, order_by, start_key, limit, reverse):
+        # order_field 가 'creationDate' 이 아니면 아직 사용 불가능
         dynamo = DynamoDB(self.boto3_session)
         response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', start_key, limit)
         items = response.get('Items', [])
         end_key = response.get('LastEvaluatedKey', None)
-        ids = {item.get('item_id') for item in items}
-        return ids, end_key
+        item_id_and_creation_date_list = [{'item_id': item.get('item_id'), order_by: item.get(order_by)}
+                                          for item in items]
+        return item_id_and_creation_date_list, end_key
 
     # File ops
     def file_download_bin(self, file_id):

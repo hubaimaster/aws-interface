@@ -126,13 +126,15 @@ class DatabaseServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
-    def query_items(self, partition, query, start_key):
+    def query_items(self, partition, query, start_key, limit=100, reverse=False):
         """:query:list"""
         import cloud.database.query_items as method
         params = {
             'partition': partition,
             'query': query,
             'start_key': start_key,
+            'limit': limit,
+            'reverse': reverse,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

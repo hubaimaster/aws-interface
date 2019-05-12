@@ -6,6 +6,7 @@ import botocore
 from boto3.dynamodb.conditions import Key
 from boto3.dynamodb.types import TypeDeserializer
 from sys import maxsize
+from decimal import Decimal
 import cloud.shortuuid as shortuuid
 
 
@@ -293,18 +294,6 @@ class DynamoDB:
 
     def init_table(self, table_name):
         self.create_table(table_name)
-        # self.update_table(table_name, index={
-        #     'hash_key': 'partition',
-        #     'hash_key_type': 'S',
-        #     'sort_key': 'creationDate',
-        #     'sort_key_type': 'N'
-        # })
-        # self.update_table(table_name, index={
-        #     'hash_key': 'invertedQuery',
-        #     'hash_key_type': 'S',
-        #     'sort_key': 'creationDate',
-        #     'sort_key_type': 'N'
-        # })
 
     def create_table(self, table_name):
         try:
@@ -482,11 +471,14 @@ class DynamoDB:
         })
         return item
 
+    def time(self):
+        return Decimal("%.20f" % time.time())
+
     def put_item(self, table_name, partition, item, item_id=None, creation_date=None, indexing=True):
         if not item_id:
             item_id = str(shortuuid.uuid())
         if not creation_date:
-            creation_date = int(time.time())
+            creation_date = self.time()
         table = self.resource.Table(table_name)
         item['id'] = item_id
         item['creationDate'] = creation_date
@@ -564,6 +556,11 @@ class DynamoDB:
 
     def get_items_with_key_expression(self, table_name, index_name, key_expression,
                                       start_key=None, limit=100, reverse=False):
+        if start_key:
+            for key in start_key:
+                if isinstance(start_key[key], float):
+                    start_key[key] = Decimal(start_key[key])
+
         scan_index_forward = not reverse
         table = self.resource.Table(table_name)
         if start_key:
@@ -587,7 +584,7 @@ class DynamoDB:
 
     def update_item(self, table_name, item_id, item):
         table = self.resource.Table(table_name)
-        update_date = int(time.time())
+        update_date = self.time()
         item['id'] = item_id
         item['_update_date'] = update_date
         response = table.put_item(
@@ -635,7 +632,7 @@ class DynamoDB:
     def _put_inverted_query(self, table_name, partition, item):
         table = self.resource.Table(table_name)
         item_id = item.get('id')
-        creation_date = item.get('creationDate', int(time.time()))
+        creation_date = item.get('creationDate', self.time())
         with table.batch_writer() as batch:
             for field, value in item.items():
                 for operand in self._eq_operands(value):
