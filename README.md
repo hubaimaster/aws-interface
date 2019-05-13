@@ -8,8 +8,8 @@
 
 **[WE R Naver D2 Award of Excellence!](https://github.com/D2CampusFest/6th)**
 ## Globalization
-### ![English](https://github.com/hubaimaster/aws-interface/blob/master/README.md)
-### ![한국어](https://github.com/hubaimaster/aws-interface/blob/master/README_KR.md)
+#### [English](https://github.com/hubaimaster/aws-interface/blob/master/README.md)
+#### [Korean (한국어)](https://github.com/hubaimaster/aws-interface/blob/master/README_KR.md)
 
 
 # AWS Interface
