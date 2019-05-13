@@ -215,7 +215,7 @@ class AWSResource(Resource):
     def db_get_item_id_and_orders(self, partition, field, value, order_by, start_key, limit, reverse):
         # order_field 가 'creationDate' 이 아니면 아직 사용 불가능
         dynamo = DynamoDB(self.boto3_session)
-        response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', start_key, limit)
+        response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', start_key, limit, reverse)
         items = response.get('Items', [])
         end_key = response.get('LastEvaluatedKey', None)
         item_id_and_creation_date_list = [{'item_id': item.get('item_id'), order_by: item.get(order_by)}

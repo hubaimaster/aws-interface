@@ -36,15 +36,16 @@
                   <div class="col-9">
                       <form method="get" action="">
                           <div class="row">
+                              <div class="col-4">
+                                  <input name="user_id" type="text" class="form-control form-control-sm" placeholder="OWNER" value="{{ user_id }}">
+                              </div>
                               <div class="col-3">
                                   <input name="event_source" type="text" class="form-control form-control-sm" placeholder="SOURCE" value="{{ event_source }}">
                               </div>
                               <div class="col-3">
                                   <input name="event_name" type="text" class="form-control form-control-sm" placeholder="NAME" value="{{ event_name }}">
                               </div>
-                              <div class="col-4">
-                                  <input name="event_param" type="text" class="form-control form-control-sm" placeholder="PARAM" value="{{ event_param }}">
-                              </div>
+
                               <div class="col-2">
                                   <button type="submit" id="search-event-btn" class="btn btn-sm btn-primary">
                                       <span class="btn-inner--text" style="color: white;">검색</span>

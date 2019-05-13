@@ -512,29 +512,8 @@ class DynamoDB:
         return {'Items': items}
 
     def get_items_in_partition(self, table_name, partition, start_key=None, limit=100, reverse=False):
-        scan_index_forward = not reverse
         index_name = 'partition-creationDate'
-        table = self.resource.Table(table_name)
-        self.get_items_eq_hash_key(table_name, index_name, 'partition', partition, start_key, limit)
-        if not limit:
-            limit = maxsize
-        if start_key:
-            response = table.query(
-                IndexName=index_name,
-                Limit=limit,
-                ConsistentRead=False,
-                ExclusiveStartKey=start_key,
-                KeyConditionExpression=Key('partition').eq(partition),
-                ScanIndexForward=scan_index_forward,
-            )
-        else:
-            response = table.query(
-                IndexName=index_name,
-                Limit=limit,
-                ConsistentRead=False,
-                KeyConditionExpression=Key('partition').eq(partition),
-                ScanIndexForward=scan_index_forward,
-            )
+        response = self.get_items_eq_hash_key(table_name, index_name, 'partition', partition, start_key, limit, reverse)
         return response
 
     def get_inverted_queries(self, table_name, partition, field, operand, operation, start_key=None, limit=100, reverse=False):
