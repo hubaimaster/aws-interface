@@ -9,6 +9,9 @@
 [![Build Status](https://travis-ci.org/hubaimaster/aws-interface.svg?branch=master)](https://travis-ci.org/hubaimaster/aws-interface)
 
 **[Naver D2 Fest 결승 우수상 수상!!](https://github.com/D2CampusFest/6th)**
+## Globalization
+- **[English](https://github.com/hubaimaster/aws-interface/blob/master/README.md)**
+- **[Korean (한국어)](https://github.com/hubaimaster/aws-interface/blob/master/README_KR.md)**
 
 # AWS-Interface
 
