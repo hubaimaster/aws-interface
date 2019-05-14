@@ -5,6 +5,7 @@ from numbers import Number
 from dashboard.models import App, Log
 import simplejson as json
 import traceback
+import settings
 
 
 class Util:
@@ -94,6 +95,9 @@ def page_manage(func):
         try:
             result = func(*args, **kwargs)
         except ClientError as ex:
+            if settings.DEBUG:
+                pass
+                #raise ex
             title = 'Unknown Error'
             desc = '원인을 알 수 없는 에러입니다'
             link = None

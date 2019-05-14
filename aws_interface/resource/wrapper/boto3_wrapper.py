@@ -3,7 +3,7 @@ import time
 import tempfile
 import botocore
 
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, GreaterThanEquals, LessThanEquals
 from boto3.dynamodb.types import TypeDeserializer
 from sys import maxsize
 from decimal import Decimal
@@ -516,13 +516,35 @@ class DynamoDB:
         response = self.get_items_eq_hash_key(table_name, index_name, 'partition', partition, start_key, limit, reverse)
         return response
 
-    def get_inverted_queries(self, table_name, partition, field, operand, operation, start_key=None, limit=100, reverse=False):
+    def get_items_in_partition_by_order(self, table_name, partition, order_by, order_min, order_max, start_key=None, limit=100, reverse=False):
+        index_name = 'partition-{}'.format(order_by)
+        key_expression = Key('partition').eq(partition)
+        if order_min:
+            key_expression = key_expression & Key(order_by).gte(order_min)
+        elif order_max:
+            key_expression = key_expression & Key(order_by).lte(order_max)
+        response = self.get_items_with_key_expression(table_name, index_name, key_expression, start_key, limit,
+                                                      reverse)
+        return response
+
+
+    def get_inverted_queries(self, table_name, partition, field, operand, operation, order_by, order_min, order_max, start_key=None, limit=100, reverse=False):
         if operation == 'in' or operation == 'eq':
             hash_key_name = 'invertedQuery'
-            sort_key_name = 'creationDate'
+            sort_key_name = '{}'.format(order_by)
             hash_key = '{}-{}-{}-{}'.format(partition, field, operand, operation)
             index_name = '{}-{}'.format(hash_key_name, sort_key_name)
-            response = self.get_items_eq_hash_key(table_name, index_name, hash_key_name, hash_key, start_key, limit, reverse)
+            key_expression = Key(hash_key_name).eq(hash_key)
+            if order_min:
+                key_expression = key_expression & Key(sort_key_name).gte(order_min)
+            elif order_max:
+                key_expression = key_expression & Key(sort_key_name).lte(order_max)
+            try:
+                response = self.get_items_with_key_expression(table_name, index_name, key_expression, start_key, limit,
+                                                          reverse)
+            except Exception as ex:
+                print(ex)
+                response = {'Items': []}
             return response
         else:
             raise BaseException('an operation is must be <in> or <eq>')

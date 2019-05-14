@@ -189,9 +189,9 @@ class AWSResource(Resource):
         result = dynamo.get_items(self.app_id, item_ids)
         return result.get('Items', [])
 
-    def db_get_items_in_partition(self, partition, exclusive_start_key=None, limit=100, reverse=False):
+    def db_get_items_in_partition(self, partition, order_by='creationDate', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):
         dynamo = DynamoDB(self.boto3_session)
-        result = dynamo.get_items_in_partition(self.app_id, partition, exclusive_start_key, limit, reverse)
+        result = dynamo.get_items_in_partition_by_order(self.app_id, partition, order_by, order_min, order_max, start_key, limit, reverse)
         end_key = result.get('LastEvaluatedKey', None)
         items = result.get('Items', [])
         return items, end_key
@@ -212,10 +212,10 @@ class AWSResource(Resource):
         count = item.get('count')
         return count
 
-    def db_get_item_id_and_orders(self, partition, field, value, order_by, start_key, limit, reverse):
+    def db_get_item_id_and_orders(self, partition, field, value, order_by, order_min, order_max, start_key, limit, reverse):
         # order_field 가 'creationDate' 이 아니면 아직 사용 불가능
         dynamo = DynamoDB(self.boto3_session)
-        response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', start_key, limit, reverse)
+        response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by, order_min, order_max, start_key, limit, reverse)
         items = response.get('Items', [])
         end_key = response.get('LastEvaluatedKey', None)
         item_id_and_creation_date_list = [{'item_id': item.get('item_id'), order_by: item.get(order_by)}

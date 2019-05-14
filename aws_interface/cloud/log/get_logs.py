@@ -36,9 +36,9 @@ def do(data, resource):
             instructions.append((operation, (field_name, 'eq', value)))
             operation = 'and'
     if len(instructions) > 0:
-        items, end_key = resource.db_query(partition, instructions, start_key, reverse=True)
+        items, end_key = resource.db_query(partition, instructions, start_key=start_key, reverse=True)
     else:
-        items, end_key = resource.db_get_items_in_partition(partition, start_key, reverse=True)
+        items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, reverse=True)
     body['end_key'] = end_key
     body['items'] = items
     return Response(body)

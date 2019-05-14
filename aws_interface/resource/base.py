@@ -73,7 +73,7 @@ class Resource(metaclass=ABCMeta):
     def db_get_items(self, item_ids):
         raise NotImplementedError
 
-    def db_get_items_in_partition(self, partition, start_key=None, limit=None, reverse=False):
+    def db_get_items_in_partition(self, partition, order_by, order_min, order_max, start_key=None, limit=None, reverse=False):
         raise NotImplementedError
 
     def db_put_item(self, partition, item, item_id=None, creation_date=None):
@@ -86,13 +86,15 @@ class Resource(metaclass=ABCMeta):
     def db_get_count(self, partition):
         raise NotImplementedError
 
-    def db_get_item_id_and_orders(self, partition, field, value, order_field, start_key, limit, reverse):
+    def db_get_item_id_and_orders(self, partition, field, value, order_by, order_min, order_max, start_key, limit, reverse):
         """
         item_id 와 order 필드 값들을 빠르게 가져와야함
         :param partition: 대상을 가져올 파티션
         :param field: 필드
         :param value: 값
-        :param order_field: 이 필드를 기준으로 reverse 에 따라 오름/내림차순 정렬
+        :param order_by: 이 필드를 기준으로 reverse 에 따라 오름/내림차순 정렬
+        :param order_min: order_by 가 이 값 이상인 아이템만 반환하고 Endkey 도 그에따라 반환
+        :param order_max: order_by 가 이 값 이하인 아이템만 반환하고 Endkey 도 그에따라 반환
         :param start_key: 탐색 시작점
         :param limit: 반환되는 아이템 리스트 길이
         :param reverse: False 면 오름차순, True 면 내림차순
@@ -129,7 +131,7 @@ class Resource(metaclass=ABCMeta):
         raise NotImplementedError
 
     # SHOULD NOT RE-IMPLEMENT
-    def db_query(self, partition, instructions, start_key_set=None, limit=100, reverse=False, order_by='creationDate'):
+    def db_query(self, partition, instructions, start_key=None, limit=100, reverse=False, order_by='creationDate'):
         """:return:items:list,end_key:str"""
         # TODO 상위레이어에서 쿼리를 순차적으로 실행가능한 instructions 으로 만들어 전달 -> ORM 클래스 만들기
 
@@ -138,6 +140,8 @@ class Resource(metaclass=ABCMeta):
                 _start_key_list = [None] * len(instructions)
             _end_key_list = [None] * len(instructions)
             item_set = set()
+            order_min = None
+            order_max = None
             for idx, option_statement in enumerate(instructions):
                 if isinstance(option_statement, list):
                     option = option_statement[0]
@@ -153,10 +157,20 @@ class Resource(metaclass=ABCMeta):
                 instruction_type = self._db_instruction_type(statement, option)
                 if instruction_type == 'index':
                     if option == 'and':
-                        raise BaseException('You cannot use option [and] on index')
+                        pairs, _end_key_list[idx] = self._db_index_items(statement, partition, order_by, order_min,
+                                                                         order_max, _start_key_list[idx], _sub_limit, reverse)
+                        if reverse and pairs:
+                            order_min = pairs[-1][order_by]
+                        elif pairs:
+                            order_max = pairs[-1][order_by]
+                        item_set &= set(pairs)
                     elif option == 'or' or option is None:
-                        pairs, _end_key_list[idx] = self._db_index_items(statement, partition, order_by,
-                                                                        _start_key_list[idx], _sub_limit, reverse)
+                        pairs, _end_key_list[idx] = self._db_index_items(statement, partition, order_by, order_min,
+                                                                         order_max, _start_key_list[idx], _sub_limit, reverse)
+                        if reverse and pairs:
+                            order_min = pairs[-1][order_by]
+                        elif pairs:
+                            order_max = pairs[-1][order_by]
                         item_set |= set(pairs)
                 elif instruction_type == 'filter':
                     if option == 'and':
@@ -165,18 +179,26 @@ class Resource(metaclass=ABCMeta):
                         raise BaseException('You cannot use option [or] on filtering')
                 elif instruction_type == 'scan':
                     if option == 'and':
-                        pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, _start_key_list[idx], _sub_limit,
-                                                                       reverse)
+                        pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, order_by, order_min, order_max,
+                                                                        _start_key_list[idx], _sub_limit, reverse)
+                        if reverse and pairs:
+                            order_min = pairs[-1][order_by]
+                        elif pairs:
+                            order_max = pairs[-1][order_by]
                         item_set &= set(pairs)
                     elif option == 'or' or option is None:
-                        pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, _start_key_list[idx], _sub_limit,
-                                                                       reverse)
+                        pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, order_by, order_min, order_max,
+                                                                        _start_key_list[idx], _sub_limit, reverse)
+                        if reverse and pairs:
+                            order_min = pairs[-1][order_by]
+                        elif pairs:
+                            order_max = pairs[-1][order_by]
                         item_set |= set(pairs)
             return list(item_set), _end_key_list
 
-        if start_key_set:
-            start_index = start_key_set.get('index', 0)
-            start_key_list = start_key_set.get('key_list', None)
+        if start_key:
+            start_index = start_key.get('index', 0)
+            start_key_list = start_key.get('key_list', None)
         else:
             start_index = 0
             start_key_list = None
@@ -247,11 +269,11 @@ class Resource(metaclass=ABCMeta):
                 exc.submit(get_bulk, i, i + bulk_size)
         return [IDDict(item) for item in items]
 
-    def _db_index_items(self, statement, partition, order_by, start_key, limit, reverse):
+    def _db_index_items(self, statement, partition, order_by, order_min, order_max, start_key, limit, reverse):
         field, condition, value = statement
         if condition != 'eq':
             raise BaseException('You cannot use condition : [{}] for indexing'.format(condition))
-        pairs, end_key = self.db_get_item_id_and_orders(partition, field, value, order_by, start_key, limit, reverse)
+        pairs, end_key = self.db_get_item_id_and_orders(partition, field, value, order_by, order_min, order_max, start_key, limit, reverse)
         pairs = [IDDict(self._db_get_fake_item(pair, order_by)) for pair in pairs]
         return pairs, end_key
 
@@ -300,7 +322,8 @@ class Resource(metaclass=ABCMeta):
                 else:
                     raise BaseException('No such condition : [{}]'.format(condition))
 
-    def _db_scan_items(self, statement, partition, start_key, limit, reverse):
-        items, end_key = self.db_get_items_in_partition(partition, start_key, limit, reverse)
+    #TODO
+    def _db_scan_items(self, statement, partition, order_by, order_min, order_max, start_key, limit, reverse):
+        items, end_key = self.db_get_items_in_partition(partition, order_by, order_min, order_max, start_key, limit, reverse)
         items = [IDDict(item) for item in self._db_filter_items(statement, items)]
         return items, end_key

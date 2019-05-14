@@ -22,14 +22,14 @@ def do(data, resource):
             'name': 'user',
             'description': 'Normal user group',
         },
-        'owner': {
-            'name': 'owner',
-            'description': 'Owner of file or object',
-        },
-        'admin': {
-            'name': 'admin',
-            'description': 'Admin group',
-        },
+        # 'owner': {
+        #     'name': 'owner',
+        #     'description': 'Owner of file or object',
+        # },
+        # 'admin': {
+        #     'name': 'admin',
+        #     'description': 'Admin group',
+        # },
     }
 
     item = resource.db_get_item('user_groups')

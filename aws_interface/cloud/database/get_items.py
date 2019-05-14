@@ -38,7 +38,7 @@ def do(data, resource):
     if type(start_key) is str:
         start_key = json.loads(start_key)
     if resource.db_has_partition(partition):
-        items, end_key = resource.db_get_items_in_partition(partition, start_key, limit, reverse)
+        items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit, reverse=reverse)
 
         filtered = []
         for item in items:

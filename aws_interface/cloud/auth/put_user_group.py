@@ -19,6 +19,8 @@ def do(data, resource):
     params = data['params']
     name = params['name']
     description = params['description']
+    if not description:
+        description = None
 
     item = resource.db_get_item('user_groups')
     if not item:

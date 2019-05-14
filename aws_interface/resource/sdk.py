@@ -10,7 +10,8 @@ PLATFORMS = (
     'java',
     'javascript',
     'python3',
-    'swift'
+    'swift',
+    'nodejs',
 )
 
 

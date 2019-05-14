@@ -126,7 +126,7 @@ class Client:
         })
         return response
 
-    def database_query_items(self, partition, query, start_key=None, limit=None, reverse=False):
+    def database_query_items(self, partition, query, start_key=None, limit=100, reverse=False):
         response = self._database('query_items', {
             'partition': partition,
             'query': query,
@@ -187,7 +187,7 @@ class Client:
 
     def storage_upload_file(self, file_path, read_groups, write_groups):
         def div_chunks(text, n):
-            for i in range(0, len(text), n):
+            for i in range(0, len(text) - 1, n):
                 yield text[i:i + n]
 
         file_name = os.path.basename(file_path)
