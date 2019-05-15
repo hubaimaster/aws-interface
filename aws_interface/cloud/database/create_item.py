@@ -23,6 +23,10 @@ def do(data, resource):
     body = {}
     params = data['params']
     user = data['user']
+    if not user:
+        body['success'] = False
+        body['message'] = 'Only logged-in user can upload file.'
+        return Response(body)
 
     user_id = user.get('id', None)
 

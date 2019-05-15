@@ -16,7 +16,6 @@ info = {
             'passwordHash': 'str',
             'salt': 'str',
             'group': 'str',
-            'extra': 'map',
         }
     }
 }

@@ -1,27 +1,29 @@
-var request = require('request');
+const request = require('request');
 const base_url = '{{REST_API_URL}}';
 
-let client = function() {
-    var session_id = null;
+class Client{
 
-    function get(object, key, default_value=null) {
+    constructor() {
+        this.session_id = null;
+    }
+
+    static _get(object, key, default_value=null) {
         var result = object[key];
         return (typeof result !== "undefined") ? result : default_value;
     }
 
-    function call_api(service_type, function_name, data, callback) {
-        var data = data;
+    _call_api(service_type, function_name, data, callback) {
         if (data == null){
             data = {};
         }
         data['module_name'] = 'cloud.' + service_type + '.' + function_name;
-        if (session_id != null){
-            data['session_id'] = session_id;
+        if (this.session_id != null){
+            data['session_id'] = this.session_id;
         }
-        post(base_url, data, callback);
+        this._post(base_url, data, callback);
     }
 
-    function post(url, data, callback){
+    _post(url, data, callback){
         let options = {
             uri: base_url,
             method: 'POST',
@@ -29,7 +31,6 @@ let client = function() {
         };
         request(options, function (error, response, body) {
             if (error) {
-                console.log(error);
                 callback({
                     'error': error,
                     'message': error.message,
@@ -40,69 +41,91 @@ let client = function() {
         });
     }
 
-    function auth(api_name, data, callback) {
-        call_api('auth', api_name, data, callback);
+    _auth(api_name, data, callback) {
+        let self = this;
+        this._call_api('auth', api_name, data, function (data) {
+            self.log_create_log('auth', api_name, null, function (data) {
+                
+            });
+            callback(data);
+        });
     }
 
-    function database(api_name, data, callback) {
-        call_api('database', api_name, data, callback);
+    _database(api_name, data, callback) {
+        let self = this;
+        this._call_api('database', api_name, data, function (data) {
+            self.log_create_log('database', api_name, null, function (data) {
+
+            });
+            callback(data);
+        });
     }
 
-    function storage(api_name, data, callback) {
-        call_api('storage', api_name, data, callback);
+    _storage(api_name, data, callback) {
+        let self = this;
+        this._call_api('storage', api_name, data, function (data) {
+            self.log_create_log('storage', api_name, null, function (data) {
+
+            });
+            callback(data);
+        });
     }
 
-    function log(api_name, data, callback) {
-        call_api('log', api_name, data, callback);
+    _log(api_name, data, callback) {
+        this._call_api('log', api_name, data, callback);
     }
 
-    function auth_register(email, password, extra={}, callback) {
-        auth('register', {
+    auth_register(email, password, extra={}, callback) {
+        this._auth('register', {
             'email': email,
             'password': password,
             'extra': extra,
         }, callback);
     }
 
-    function auth_login(email, password, callback) {
-        auth('login', {
+    auth_login(email, password, callback) {
+        let self = this;
+        this._auth('login', {
             'email': email,
             'password': password,
         }, function (data) {
-            session_id = get(data,'session_id');
+            if ('session_id' in data){
+                self.session_id = Client._get(data,'session_id');
+            }
             callback(data);
         });
     }
 
-    function auth_get_user(user_id, callback) {
-        auth('get_user', {
+    auth_get_user(user_id, callback) {
+        this._auth('get_user', {
             'user_id': user_id,
         }, callback);
     }
 
-    function auth_get_users(start_key=null, callback) {
-        auth('get_users', {
+    auth_get_users(start_key=null, callback) {
+        this._auth('get_users', {
             'start_key': start_key,
         }, callback);
     }
 
-    function auth_logout(callback) {
-        auth('logout', {
-            'session_id': session_id,
+    auth_logout(callback) {
+        this._auth('logout', {
+            'session_id': this.session_id,
         }, callback);
     }
 
-    function auth_guest(guest_id=null, callback) {
-        auth('guest', {
+    auth_guest(guest_id=null, callback) {
+        let self = this;
+        this._auth('guest', {
             'guest_id': guest_id,
         }, function (data) {
-            session_id = get(data,'session_id');
+            self.session_id = Client._get(data,'session_id');
             callback(data);
         });
     }
 
-    function database_create_item(item, partition, read_groups, write_groups, callback) {
-        database('create_item', {
+    database_create_item(item, partition, read_groups, write_groups, callback) {
+        this._database('create_item', {
             'item': item,
             'partition': partition,
             'read_groups': read_groups,
@@ -110,36 +133,36 @@ let client = function() {
         }, callback);
     }
 
-    function database_delete_item(item_id, callback) {
-        database('delete_item', {
+    database_delete_item(item_id, callback) {
+        this._database('delete_item', {
             'item_id': item_id,
         }, callback);
     }
 
-    function database_get_item(item_id, callback) {
-        database('get_item', {
+    database_get_item(item_id, callback) {
+        this._database('get_item', {
             'item_id': item_id,
         }, callback);
     }
 
-    function database_get_items(partition, start_key=null, limit=100, callback) {
-        database('get_items', {
+    database_get_items(partition, start_key=null, limit=100, callback) {
+        this._database('get_items', {
             'partition': partition,
             'start_key': start_key,
             'limit': limit,
         }, callback);
     }
 
-    function database_put_item_field(item_id, field_name, field_value, callback) {
-        database('put_item_field', {
+    database_put_item_field(item_id, field_name, field_value, callback) {
+        this._database('put_item_field', {
             'item_id': item_id,
             'field_name': field_name,
             'field_value': field_value,
         }, callback);
     }
 
-    function database_update_item(item_id, item, read_groups, write_groups, callback) {
-        database('update_item', {
+    database_update_item(item_id, item, read_groups, write_groups, callback) {
+        this._database('update_item', {
             'item_id': item_id,
             'item': item,
             'read_groups': read_groups,
@@ -147,8 +170,8 @@ let client = function() {
         }, callback);
     }
 
-    function database_query_items(partition, query, start_key=null, limit=100, reverse=false, callback) {
-        database('query_items', {
+    database_query_items(partition, query, start_key=null, limit=100, reverse=false, callback) {
+        this._database('query_items', {
             'partition': partition,
             'query': query,
             'start_key': start_key,
@@ -157,20 +180,20 @@ let client = function() {
         }, callback);
     }
 
-    function storage_delete_b64(file_id, callback) {
-        database('delete_b64', {
+    storage_delete_b64(file_id, callback) {
+        this._storage('delete_b64', {
             'file_id': file_id,
         }, callback);
     }
 
-    function storage_download_b64_chunk(file_id, callback) {
-        database('download_b64', {
+    storage_download_b64_chunk(file_id, callback) {
+        this._storage('download_b64', {
             'file_id': file_id,
         }, callback);
     }
 
-    function storage_upload_b64_chunk(parent_file_id, file_name, file_b64, read_groups, write_groups, callback) {
-        database('upload_b64', {
+    storage_upload_b64_chunk(parent_file_id, file_name, file_b64, read_groups, write_groups, callback) {
+        this._storage('upload_b64', {
             'parent_file_id': parent_file_id,
             'file_name': file_name,
             'file_b64': file_b64,
@@ -178,39 +201,44 @@ let client = function() {
             'write_groups': write_groups,
         }, callback);
     }
-    
-    function storage_delete_file(file_id, callback) {
-        storage_delete_b64(file_id, callback);
+
+    storage_delete_file(file_id, callback) {
+        this.storage_delete_b64(file_id, callback);
     }
-    
-    function storage_download_file(file_id, callback_bin) {
-        var file_id = file_id;
+
+    storage_download_file(file_id, callback_file) {
+        let self = this;
         var string_file_b64 = null;
         var file_name = 'file';
         function download(file_id, callback){
-            storage_download_b64_chunk(file_id, function (result) {
-                file_id = get(result, 'parent_file_id', null);
-                file_name = get(result,'file_name', file_name);
+            self.storage_download_b64_chunk(file_id, function (result) {
+                file_id = Client._get(result, 'parent_file_id', null);
+                file_name = Client._get(result,'file_name', file_name);
                 if (string_file_b64 != null){
-                    string_file_b64 = result['file_b64'] + string_file_b64;
+                    string_file_b64 = Client._get(result, 'file_b64') + string_file_b64;
                 }else{
-                    string_file_b64 = result['file_b64'];
+                    string_file_b64 = Client._get(result, 'file_b64');
                 }
                 if (file_id == null){
-                    callback(string_file_b64);
+                    callback(string_file_b64, result);
                 }else{
                     download(file_id, callback);
                 }
             });
         }
-        download(file_id, function (string_file_b64) {
-            var string_b64 = Buffer.from(string_file_b64, 'utf8');
-            var file_bin = Buffer.from(string_b64, 'base64');
-            callback_bin(file_bin);
+        download(file_id, function (string_file_b64, result) {
+            if (string_file_b64 == null){
+                callback_file(null);
+                console.error(result);
+            }else{
+                let file_bin = Buffer.from(string_file_b64, 'base64');
+                callback_file(file_bin);
+            }
         });
     }
 
-    function storage_upload_file(bin, read_groups, write_groups, callback) {
+    storage_upload_file(bin, read_groups, write_groups, callback) {
+        let self = this;
         function *div_chunks(text, n){
             for (var i = 0; i < text.length; i+= n){
                 yield text.slice(i, i + n);
@@ -221,8 +249,10 @@ let client = function() {
         var raw_base64 = Buffer.from(base64_data, 'utf8');
         var base64_chunks = div_chunks(raw_base64, 1024 * 1024 * 6);
         var parent_file_id = null;
+        let file_name = "file";
         function upload(parent_file_id, base64_chunk, callback){
-            storage_upload_b64_chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups, function (data) {
+            base64_chunk = base64_chunk.toString();
+            self.storage_upload_b64_chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups, function (data) {
                 var parent_file_id = data['file_id'];
                 var next_base64_chunk = base64_chunks.next();
                 if (next_base64_chunk.done){
@@ -232,43 +262,17 @@ let client = function() {
                 }
             });
         }
-        upload(parent_file_id, base64_chunk.next().value, callback);
+        upload(parent_file_id, base64_chunks.next().value, callback);
     }
-    
-    function log_create_log(event_source, event_name, event_param, callback) {
-        log('create_log', {
+
+    log_create_log(event_source, event_name, event_param, callback) {
+        this._log('create_log', {
             'event_source': event_source,
             'event_name': event_name,
             'event_param': event_param,
         }, callback);
     }
 
-    return{
-        auth: {
-            register: auth_register,
-            login: auth_login,
-            get_user: auth_get_user,
-            get_users: auth_get_users,
-            logout: auth_logout,
-            guest: auth_guest,
-        },
-        database: {
-            create_item: database_create_item,
-            delete_item: database_delete_item,
-            get_item: database_get_item,
-            get_items: database_get_items,
-            put_item_field: database_put_item_field,
-            query_items: database_query_items,
-            update_item: database_update_item,
-        },
-        storage: {
-            delete_file: storage_delete_file,
-            download_file: storage_download_file,
-            upload_file: storage_upload_file,
-        },
-        log: {
-            create_log: log_create_log,
-        }
-    }
-}();
-module.exports = exports = client;
+}
+
+module.exports.Client = Client;

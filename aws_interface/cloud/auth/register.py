@@ -57,9 +57,12 @@ def do(data, resource):
             'passwordHash': password_hash,
             'salt': salt,
             'groups': [default_group_name],
-            'extra': extra,
             'loginMethod': 'email_login',
         }
+        # Put extra value in the item
+        for key in extra:
+            if key not in item:
+                item[key] = extra[key]
         resource.db_put_item(partition, item)
         body['message'] = '회원가입에 성공하였습니다.'
         return Response(body)
