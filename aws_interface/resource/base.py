@@ -203,23 +203,28 @@ class Resource(metaclass=ABCMeta):
             start_index = 0
             start_key_list = None
 
-        sub_limit = limit * 10
+        sub_limit = 1000
         if not limit:
             limit = 100
 
         ct = time.time()
 
         all_items = []
+
+        no_more_items = False
         while True:
             items, end_key_list = get_items(start_key_list, sub_limit)
             all_items.extend(items)
             if len(all_items) >= start_index + limit:
                 end_index = len(items) - (len(all_items) - (start_index + limit))
-                if end_index == 0:
+                print('end_index:', end_index)
+                if end_index % sub_limit == 0:
+                    end_index = 0
                     start_key_list = end_key_list
                 break
             if all(end_key is None for end_key in end_key_list):
                 end_index = 0
+                no_more_items = True
                 break
             start_key_list = end_key_list
 
@@ -227,7 +232,10 @@ class Resource(metaclass=ABCMeta):
         all_items = all_items[start_index: start_index + limit]
         all_items = self._db_batch_fake_items_to_real(all_items)
         all_items = sorted(all_items, key=lambda item: (item[order_by], item['id']), reverse=reverse)
-        end_key_set = {'index': end_index, 'key_list': start_key_list}
+        if no_more_items:
+            end_key_set = None
+        else:
+            end_key_set = {'index': end_index, 'key_list': start_key_list}
         print('end_time:', time.time() - ct)
         return list(all_items), end_key_set
 
