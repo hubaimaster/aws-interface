@@ -7,4 +7,4 @@ if __name__ == '__main__':
         raise BaseException("settings.DEBUG is not False -> Can't run deploy")
     if not os.path.exists('../secret.tar.enc'):
         subprocess.run('./archive_secret.sh')
-    subprocess.run('eb deploy aws-interface-prod')
+    subprocess.run('./deploy.sh')

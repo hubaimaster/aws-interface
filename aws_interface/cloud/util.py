@@ -41,3 +41,16 @@ def has_run_permission(user, item):
         elif 'owner' in groups and user_id == item.get('owner'):
             return True
         return False
+
+
+system_partitions = ['user', 'log']
+
+
+def database_can_not_access_to_item(item):
+    partition = item.get('partition', None)
+    if not partition:
+        return True
+    if partition in system_partitions:
+        return True
+    else:
+        return False

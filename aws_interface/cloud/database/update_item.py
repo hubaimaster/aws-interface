@@ -1,6 +1,6 @@
 
 from cloud.response import Response
-from cloud.util import has_write_permission
+from cloud.util import has_write_permission, database_can_not_access_to_item
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -33,6 +33,10 @@ def do(data, resource):
     new_item['write_groups'] = write_groups
 
     item = resource.db_get_item(item_id)
+    if database_can_not_access_to_item(item):
+        body['success'] = False
+        body['message'] = 'Database cannot access to system item'
+        return Response(body)
 
     if has_write_permission(user, item):
         resource.db_update_item(item_id, new_item)

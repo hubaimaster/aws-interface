@@ -20,6 +20,9 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.auth.register',
     'cloud.auth.set_user',
     # database
+    'cloud.database.create_partition',  # Only for admin
+    'cloud.database.delete_partition',  # Only for admin
+    'cloud.database.delete_partitions',  # Only for admin
     'cloud.database.create_item',
     'cloud.database.delete_item',
     'cloud.database.delete_items',

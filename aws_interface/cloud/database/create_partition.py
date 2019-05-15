@@ -18,6 +18,11 @@ info = {
 def do(data, resource):
     body = {}
     params = data['params']
+    user = data['user']
+    if 'admin' not in user['groups']:
+        body['success'] = False
+        body['message'] = 'Permission denied'
+        return Response(body)
     partition = params.get('partition', None)
     resource.db_create_partition(partition)
 

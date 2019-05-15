@@ -20,7 +20,7 @@ def do(data, resource):
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
     partition = 'session'
-    items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit)
+    items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit, reverse=True)
     body['items'] = items
     body['end_key'] = end_key
     return Response(body)
