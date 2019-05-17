@@ -19,6 +19,6 @@ def do(data, resource):
     params = data['params']
 
     session_id = params.get('session_id', None)
-    resource.db_delete_item(session_id)
+    resource.db_delete_item(Hash.sha3_512(session_id))
     body['message'] = '로그아웃 되었습니다.'
     return Response(body)
