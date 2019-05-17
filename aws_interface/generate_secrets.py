@@ -21,7 +21,7 @@ if __name__ == '__main__':
     print('Using DB_ENGINE as {}'.format(data["DB_ENGINE"]))
 
     if DB_ENGINE == 'sqlite3':
-        data["DB_NAME"] = input('DB_NAME: ')
+        data["DB_NAME"] = input('DB_NAME (ex: db.sqlite3):')
     else:
         data["DB_NAME"] = input('DB_NAME: ')
         data["DB_USER"] = input('DB_USER: ')

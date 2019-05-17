@@ -307,7 +307,7 @@
                     <th scope="col">id</th>
                     <th scope="col">createDate</th>
                     <th scope="col">email</th>
-                    <th scope="col">group</th>
+                    <th scope="col">groups</th>
                     <th scope="col">extra</th>
                     <th scope="col"></th>
                   </tr>
@@ -327,8 +327,11 @@
                     <td>
                       {{ user.groups }}
                     </td>
-                      <td>
-                      {{ user.extra }}
+                      <td> {
+                          {% for key, value in user.items %}
+                            {{ key }} : {{ value }}
+                          {% endfor %}
+                            }
                     </td>
                     <td>
                         <form role="form" method="post">{% csrf_token %}

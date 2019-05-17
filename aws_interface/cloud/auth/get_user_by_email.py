@@ -6,7 +6,7 @@ from cloud.response import Response
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'user_id': 'str'
+        'email': 'str'
     },
     'output_format': {
         'item': {
@@ -25,12 +25,12 @@ info = {
 def do(data, resource):
     body = {}
     params = data['params']
-    user_id = params.get('user_id', None)
+    email = params.get('email', None)
     user = data.get('user', {})
 
     if 'admin' in user.get('groups', []):
-        item = resource.db_get_item(user_id)
-        body['item'] = item
+        items, end_key = resource.db_query('user', [{'option': None, 'field': 'email', 'value': email, 'condition': 'eq'}])
+        body['item'] = items[0]
         return Response(body)
     elif user.get('id', None):
         body['item'] = user
