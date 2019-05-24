@@ -1,5 +1,7 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 
 
 # Define the input output format of the function.
@@ -10,21 +12,17 @@ info = {
         'partition': 'str',
     },
     'output_format': {
-        'success': 'bool'
+
     }
 }
 
 
+@NeedPermission(Permission.Run.Database.create_partition)
 def do(data, resource):
     body = {}
     params = data['params']
-    user = data['user']
-    if 'admin' not in user['groups']:
-        body['success'] = False
-        body['message'] = 'Permission denied'
-        return Response(body)
+
     partition = params.get('partition', None)
     resource.db_create_partition(partition)
 
-    body['success'] = True
     return Response(body)

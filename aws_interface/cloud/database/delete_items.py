@@ -1,7 +1,10 @@
 
 from cloud.response import Response
-from cloud.util import has_write_permission
+from cloud.permission import has_write_permission
 from concurrent.futures import ThreadPoolExecutor
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
+
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
@@ -10,22 +13,23 @@ info = {
         'item_ids': 'list',
     },
     'output_format': {
-        'success': 'bool',
-        'message': 'str',
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        }
     }
 }
 
 
+@NeedPermission(Permission.Run.Database.delete_items)
 def do(data, resource):
     body = {}
     params = data['params']
     user = data['user']
-    success = True
 
     item_ids = params.get('item_ids', [])
     if len(item_ids) > 128:
-        body['message'] = 'number of item_ids must be less than 128'
-        body['success'] = False
+        body['error'] = Error.number_of_batch_items_must_be_less_than_128
         return Response(body)
 
     with ThreadPoolExecutor(max_workers=32) as executor:
@@ -36,5 +40,4 @@ def do(data, resource):
                     resource.db_delete_item(item_id)
             executor.submit(delete_item, _item_id)
 
-    body['success'] = success
     return Response(body)

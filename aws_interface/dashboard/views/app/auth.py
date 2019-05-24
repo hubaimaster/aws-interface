@@ -4,6 +4,8 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from dashboard.views.utils import Util, page_manage
 from core.adapter.django import DjangoAdapter
+from decimal import Decimal
+from concurrent.futures import ThreadPoolExecutor
 
 
 class Auth(LoginRequiredMixin, View):
@@ -18,9 +20,13 @@ class Auth(LoginRequiredMixin, View):
             context['user_count'] = api.get_user_count()
             context['session_count'] = api.get_session_count()
             context['users'] = api.get_users()
+            context['visible_user_fields'] = ['id', 'creation_date', 'email', 'groups']
+            context['none_extra_fields'] = ['id', 'creation_date', 'email', 'groups',
+                                           'password_hash', 'salt', 'partition', 'login_method']
             context['sessions'] = api.get_sessions()
             context['email_login'] = api.get_email_login()['item']
             context['guest_login'] = api.get_guest_login()['item']
+            context['all_permissions'] = api.get_all_permissions()['permissions']
 
         return render(request, 'dashboard/app/auth.html', context=context)
 
@@ -35,9 +41,9 @@ class Auth(LoginRequiredMixin, View):
 
             if cmd == 'delete_group':
                 name = request.POST['group_name']
-                succeed = api.delete_user_group(name)
-                if not succeed:
-                    Util.add_alert(request, '시스템 그룹은 삭제할 수 없습니다.')
+                error = api.delete_user_group(name).get('error', None)
+                if error:
+                    Util.add_alert(request, '{}: {}'.format(error['code'], error['message']))
             elif cmd == 'put_group':
                 name = request.POST['group_name']
                 description = request.POST['group_description']
@@ -69,6 +75,37 @@ class Auth(LoginRequiredMixin, View):
             elif cmd == 'delete_sessions':
                 session_ids = request.POST.getlist('session_ids[]')
                 api.delete_sessions(session_ids)
+            elif cmd == 'delete_users':
+                user_ids = request.POST.getlist('user_ids[]')
+                api.delete_users(user_ids)
+            elif cmd == 'detach_group_permission':
+                group_name = request.POST.get('group_name')
+                permission = request.POST.get('permission')
+                api.detach_group_permission(group_name, permission)
+            elif cmd == 'attach_group_permission':
+                group_name = request.POST.get('group_name')
+                permission = request.POST.get('permission')
+                api.attach_group_permission(group_name, permission)
+            elif cmd == 'set_users':
+                user_ids = request.POST.getlist('user_ids[]')
+                field_name = request.POST.get('field_name')
+                field_type = request.POST.get('field_type')
+                field_value = request.POST.get('field_value', None)
+                if field_type == 'S':
+                    field_value = str(field_value)
+                elif field_type == 'N':
+                    field_value = Decimal(field_value)
+                with ThreadPoolExecutor(max_workers=32) as exc:
+                    for user_id in user_ids:
+                        exc.submit(api.set_user, user_id, field_name, field_value)
+            elif cmd == 'attach_user_group':
+                user_id = request.POST.get('user_id')
+                group_name = request.POST.get('group_name')
+                api.attach_user_group(user_id, group_name)
+            elif cmd == 'detach_user_group':
+                user_id = request.POST.get('user_id')
+                group_name = request.POST.get('group_name')
+                api.detach_user_group(user_id, group_name)
 
         return redirect(request.path_info)  # Redirect back
 

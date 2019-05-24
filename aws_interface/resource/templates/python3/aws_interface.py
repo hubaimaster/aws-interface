@@ -32,6 +32,9 @@ class Client:
         self.log_create_log('storage', api_name, None)
         return self._call_api('storage', api_name, data)
 
+    def _logic(self, api_name, data):
+        return self._call_api('logic', api_name, data)
+
     def _log(self, api_name, data):
         return self._call_api('log', api_name, data)
 
@@ -54,6 +57,11 @@ class Client:
     def auth_get_user(self, user_id):
         response = self._auth('get_user', {
             'user_id': user_id
+        })
+        return response
+
+    def auth_get_me(self):
+        response = self._auth('get_me', {
         })
         return response
 
@@ -204,6 +212,13 @@ class Client:
             parent_file_id = result.get('file_id')
         return result
 
+    def logic_run_function(self, function_name, payload):
+        response = self._logic('run_function', {
+            'function_name': function_name,
+            'payload': payload,
+        })
+        return response
+
     def log_create_log(self, event_source, event_name, event_param):
         response = self._log('create_log', {
             'event_source': event_source,
@@ -218,7 +233,7 @@ def _post(url, data):
     return response
 
 
-def test():
+def examples():
     email = 'email@example.com'
     password = 'password'
     client = Client()

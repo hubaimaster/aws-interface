@@ -1,6 +1,7 @@
 
 from cloud.response import Response
 from cloud.crypto import Hash
+from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -10,16 +11,14 @@ info = {
     },
     'output_format': {
         'item': {
-            'email': 'str',
-            'passwordHash': 'str',
-            'salt': 'str',
-            'group': 'str',
-            'extra': 'map',
-        }
+            'id': 'str',
+            'creationDate': 'int',
+        },
     }
 }
 
 
+@NeedPermission(Permission.Run.Auth.get_session)
 def do(data, resource):
     body = {}
     params = data['params']

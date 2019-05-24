@@ -27,7 +27,7 @@ from dashboard.views.app.auth import Auth
 from dashboard.views.app.overview import Overview
 from dashboard.views.app.storage import Storage
 from dashboard.views.app.database import Database
-from dashboard.views.app.logic import Logic
+from dashboard.views.app.logic import Logic, LogicEdit
 from dashboard.views.app.log import Log
 from dashboard.views.app.bill import Bill
 from dashboard.views.app.guide import Guide
@@ -51,5 +51,6 @@ urlpatterns = [
     path('<app_id>/database', Database.as_view(), name='database'),
     path('<app_id>/storage', Storage.as_view(), name='storage'),
     path('<app_id>/logic', Logic.as_view(), name='logic'),
+    path('<app_id>/logic/<function_name>', LogicEdit.as_view(), name='logic_edit'),
     path('<app_id>/log', Log.as_view(), name='log'),
 ]

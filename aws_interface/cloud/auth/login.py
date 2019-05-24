@@ -3,6 +3,8 @@ from cloud.crypto import *
 from cloud.response import Response
 import cloud.auth.get_email_login as get_email_login
 from secrets import token_urlsafe
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -12,13 +14,16 @@ info = {
         'password': 'str'
     },
     'output_format': {
-        'message': 'str',
-        'error': 'str',
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        },
         'session_id': 'str',
     }
 }
 
 
+@NeedPermission(Permission.Run.Auth.login)
 def do(data, resource):
     body = {}
     params = data['params']
@@ -34,8 +39,7 @@ def do(data, resource):
         enabled = False
 
     if not enabled:
-        body['error'] = '5'
-        body['message'] = '이메일 로그인이 비활성화 상태입니다.'
+        body['error'] = Error.email_login_invalid
         return Response(body)
 
     instructions = [
@@ -44,22 +48,19 @@ def do(data, resource):
     items, end_key = resource.db_query('user', instructions)
     if len(items) > 0:
         user = items[0]
-        password_hash = user['passwordHash']
+        password_hash = user['password_hash']
         salt = user['salt']
         if password_hash == hash_password(password, salt):
             user_id = user['id']
             session_id = token_urlsafe(32)
             session_item = {
-                'userId': user_id,
-                'sessionType': 'email_login',
+                'user_id': user_id,
+                'session_type': 'email_login',
             }
-            success = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
+            _ = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
             body['session_id'] = session_id
-            body['message'] = '로그인 성공'
         else:
-            body['message'] = '비밀번호가 틀립니다.'
-            body['error'] = '2'
+            body['error'] = Error.wrong_password
     else:
-        body['message'] = '해당 계정이 존재하지 않습니다.'
-        body['error'] = '1'
+        body['error'] = Error.no_such_account
     return Response(body)

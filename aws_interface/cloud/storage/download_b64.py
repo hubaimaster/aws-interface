@@ -1,6 +1,8 @@
 
 from cloud.response import Response
-from cloud.util import has_read_permission
+from cloud.permission import has_read_permission
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 import base64
 
 # Define the input output format of the function.
@@ -11,13 +13,18 @@ info = {
         'file_id': 'str',
     },
     'output_format': {
-        'success': 'bool',
         'file_b64': 'str',
-        'parent_file_id': 'str?',
+        'parent_file_id?': 'str',
+        'file_name?': 'str',
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        }
     }
 }
 
 
+@NeedPermission(Permission.Run.Storage.download_b64)
 def do(data, resource):
     body = {}
     params = data['params']
@@ -37,14 +44,11 @@ def do(data, resource):
             body['file_b64'] = file_b64
             body['parent_file_id'] = parent_file_id
             body['file_name'] = item.get('file_name', None)
-            body['success'] = True
             return Response(body)
         else:
-            body['success'] = False
-            body['message'] = 'permission denied'
+            body['error'] = Error.permission_denied
             return Response(body)
     else:
-        body['success'] = False
-        body['message'] = 'file_key: {} does not exist'.format(file_id)
+        body['error'] = Error.invalid_file_key
         return Response(body)
 

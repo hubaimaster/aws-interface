@@ -1,5 +1,6 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
 
 
 # Define the input output format of the function.
@@ -9,7 +10,10 @@ info = {
 
     },
     'output_format': {
-
+        'item': {
+            'enabled': 'bool',
+            'default_group_name': 'str'
+        },
     }
 }
 

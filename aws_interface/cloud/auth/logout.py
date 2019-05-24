@@ -1,6 +1,8 @@
 
 from cloud.response import Response
 from cloud.crypto import Hash
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -9,16 +11,22 @@ info = {
         'session_id': 'str',
     },
     'output_format': {
-        'message': 'str',
+        'error?': {
+            'code': 'int',
+            'message': 'str'
+        },
     }
 }
 
 
+@NeedPermission(Permission.Run.Auth.logout)
 def do(data, resource):
     body = {}
     params = data['params']
 
     session_id = params.get('session_id', None)
-    resource.db_delete_item(Hash.sha3_512(session_id))
-    body['message'] = '로그아웃 되었습니다.'
-    return Response(body)
+    if resource.db_delete_item(Hash.sha3_512(session_id)):
+        return Response(body)
+    else:
+        body['error'] = Error.logout_failed
+        return Response(body)

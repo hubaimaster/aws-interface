@@ -1,4 +1,5 @@
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -6,10 +7,10 @@ info = {
     'input_format': {
         'session_id': 'str',
 
-        'event_source': 'str?',
-        'event_name': 'str?',
-        'user_id': 'str?',
-        'start_key': 'str?',
+        'event_source?': 'str',
+        'event_name?': 'str',
+        'user_id?': 'str',
+        'start_key?': 'str',
     },
     'output_format': {
         'success': 'bool',
@@ -19,6 +20,7 @@ info = {
 }
 
 
+@NeedPermission(Permission.Run.Log.get_logs)
 def do(data, resource):
     partition = 'log'
     body = {}

@@ -2,6 +2,8 @@
 from cloud.crypto import *
 from cloud.response import Response
 import cloud.auth.get_email_login as get_email_login
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -9,14 +11,18 @@ info = {
     'input_format': {
         'email': 'str',
         'password': 'str',
-        'extra': 'map'
+        'extra?': 'map'
     },
     'output_format': {
-        'message': 'str',
+        'error?': {
+            'code': 'int',
+            'message': 'str'
+        },
     }
 }
 
 
+@NeedPermission(Permission.Run.Auth.register)
 def do(data, resource):
     body = {}
     params = data['params']
@@ -38,8 +44,7 @@ def do(data, resource):
         enabled = False
 
     if not enabled:
-        body['error'] = '4'
-        body['message'] = '이메일 로그인이 비활성화 상태입니다.'
+        body['error'] = Error.email_login_invalid
         return Response(body)
 
     instructions = [
@@ -48,21 +53,19 @@ def do(data, resource):
     items, end_key = resource.db_query(partition, instructions)
     users = list(items)
     if len(users) > 0:
-        body['message'] = '이미 가입된 회원이 존재합니다.'
-        body['error'] = '1'
+        body['error'] = Error.existing_account
         return Response(body)
     else:
         item = {
             'email': email,
-            'passwordHash': password_hash,
+            'password_hash': password_hash,
             'salt': salt,
             'groups': [default_group_name],
-            'loginMethod': 'email_login',
+            'login_method': 'email_login',
         }
         # Put extra value in the item
         for key in extra:
             if key not in item:
                 item[key] = extra[key]
         resource.db_put_item(partition, item)
-        body['message'] = '회원가입에 성공하였습니다.'
         return Response(body)

@@ -1,6 +1,8 @@
 
 from cloud.response import Response
-from cloud.util import has_write_permission, database_can_not_access_to_item
+from cloud.permission import has_write_permission, database_can_not_access_to_item
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -9,14 +11,18 @@ info = {
         'session_id': 'str',
         'item_id': 'str',
         'field_name': 'str',
-        'field_value': '?',
+        'field_value?': 'any',
     },
     'output_format': {
-        'success': 'bool',
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        }
     }
 }
 
 
+@NeedPermission(Permission.Run.Database.put_item_field)
 def do(data, resource):
     body = {}
     params = data['params']
@@ -28,8 +34,7 @@ def do(data, resource):
 
     item = resource.db_get_item(item_id)
     if database_can_not_access_to_item(item):
-        body['success'] = False
-        body['message'] = 'Database cannot access to system item'
+        body['error'] = Error.permission_denied
         return Response(body)
 
     if has_write_permission(user, item):
@@ -37,8 +42,6 @@ def do(data, resource):
         if field_value is None:
             item.pop(field_name)
         resource.db_update_item(item_id, item)
-        body['success'] = True
     else:
-        body['success'] = False
-        body['message'] = 'permission denied'
+        body['error'] = Error.permission_denied
     return Response(body)

@@ -1,7 +1,9 @@
 import sys
 from cloud.response import Response
-from cloud.util import has_write_permission
+from cloud.permission import has_write_permission
+from cloud.permission import Permission, NeedPermission
 from cloud.shortuuid import uuid
+from cloud.message import Error
 import base64
 
 # Define the input output format of the function.
@@ -10,22 +12,24 @@ info = {
     'input_format': {
         'session_id': 'str',
 
-        'parent_file_id': 'str?',
-        'file_name': 'str?',
+        'parent_file_id?': 'str',
+        'file_name?': 'str',
         'file_b64': 'str',
 
         'read_groups': 'list',
         'write_groups': 'list'
     },
     'output_format': {
-        'success': 'bool',
-        'message': 'str?',
-
         'file_id': 'str',
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        }
     }
 }
 
 
+@NeedPermission(Permission.Run.Storage.upload_b64)
 def do(data, resource):
     body = {}
     params = data['params']
@@ -53,8 +57,7 @@ def do(data, resource):
                 parent_file_info['next_file_id'] = file_id
                 file_size += parent_file_info['file_size']
             else:
-                body['success'] = False
-                body['message'] = 'Permission denied'
+                body['error'] = Error.permission_denied
                 return Response(body)
 
     file_info = {
@@ -75,6 +78,5 @@ def do(data, resource):
     file_b64 = base64.b64decode(file_b64)
     resource.file_upload_bin(file_id, file_b64)
 
-    body['success'] = True
     body['file_id'] = file_id
     return Response(body)

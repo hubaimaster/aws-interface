@@ -20,13 +20,12 @@ class AuthServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
-    def set_user(self, user_id, email, password, extra):
+    def set_user(self, user_id, field, value):
         import cloud.auth.set_user as method
         params = {
             'user_id': user_id,
-            'email': email,
-            'password': password,
-            'extra': extra,
+            'field': field,
+            'value': value,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
@@ -137,20 +136,20 @@ class AuthServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
-    def put_user_group(self, name, description):
+    def put_user_group(self, group_name, description):
         import cloud.auth.put_user_group as method
         params = {
-            'name': name,
+            'group_name': group_name,
             'description': description,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
 
     @lambda_method
-    def delete_user_group(self, name):
+    def delete_user_group(self, group_name):
         import cloud.auth.delete_user_group as method
         params = {
-            'name': name,
+            'group_name': group_name,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
@@ -186,5 +185,73 @@ class AuthServiceController(ServiceController):
     def get_guest_login(self):
         import cloud.auth.get_guest_login as method
         params = {}
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def attach_group_permission(self, group_name, permission):
+        import cloud.auth.attach_group_permission as method
+        params = {
+            'group_name': group_name,
+            'permission': permission,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def detach_group_permission(self, group_name, permission):
+        import cloud.auth.detach_group_permission as method
+        params = {
+            'group_name': group_name,
+            'permission': permission,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def attach_user_group(self, user_id, group_name):
+        import cloud.auth.attach_user_group as method
+        params = {
+            'group_name': group_name,
+            'user_id': user_id,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def detach_user_group(self, user_id, group_name):
+        import cloud.auth.detach_user_group as method
+        params = {
+            'group_name': group_name,
+            'user_id': user_id,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def set_me(self, field, value):
+        import cloud.auth.set_user as method
+        params = {
+            'field': field,
+            'value': value,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_all_permissions(self):
+        import cloud.auth.get_all_permissions as method
+        params = {
+
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def delete_users(self, user_ids):
+        import cloud.auth.delete_users as method
+        params = {
+            'user_ids': user_ids
+        }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

@@ -2,94 +2,94 @@
 {% load staticfiles %}
 {% block content %}
 
-<div class="main-content">
-    <!-- Top navbar -->
-    {% include 'dashboard/app/top-navbar.html' %}
-    <!-- Header -->
-    <input id="view-tag" value="bill" hidden>
-    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
-      <div class="container-fluid">
-        <div class="header-body">
-            <!-- Alert -->
+    <div class="main-content">
+        <!-- Top navbar -->
+        {% include 'dashboard/app/top-navbar.html' %}
+        <!-- Header -->
+        <input id="view-tag" value="bill" hidden>
+        <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+            <div class="container-fluid">
+                <div class="header-body">
+                    <!-- Alert -->
 
-            <div class="alert alert-primary" role="alert">
-                <strong>AWS Cost Explorer</strong>  를 사용합니다.
-            </div>
-
-            <div class="alert alert-default" role="alert">
-                <strong>AWS</strong> 에서 사용한 <strong>모든 리소스</strong> 항목에 대한 요금입니다.
-            </div>
-
-          <!-- Card stats -->
-          <div class="row">
-            <div class="col-xl-12 col-lg-12">
-              <div class="card card-stats mb-4 mb-xl-0">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col">
-                      <h5 class="card-title text-uppercase text-muted mb-0">이번달 사용 요금</h5>
-                      <span class="h2 font-weight-bold mb-0">{{ cost.Amount|floatformat }} {{ cost.Unit }}</span>
+                    <div class="alert alert-primary" role="alert">
+                        <strong>AWS Cost Explorer</strong>  를 사용합니다.
                     </div>
-                    <div class="col-auto">
-                        <a target="_blank" href="https://console.aws.amazon.com/billing" class="btn btn-sm btn-primary">AWS 에서 확인</a>
+
+                    <div class="alert alert-default" role="alert">
+                        <strong>AWS</strong> 에서 사용한 <strong>모든 리소스</strong> 항목에 대한 요금입니다.
                     </div>
-                  </div>
+
+                    <!-- Card stats -->
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12">
+                            <div class="card card-stats mb-4 mb-xl-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="card-title text-uppercase text-muted mb-0">이번달 사용 요금</h5>
+                                            <span class="h2 font-weight-bold mb-0">{{ cost.Amount|floatformat }} {{ cost.Unit }}</span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <a target="_blank" href="https://console.aws.amazon.com/billing" class="btn btn-sm btn-primary">AWS 에서 확인</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-    <!-- Page content -->
-    <div class="container-fluid mt--7">
-      <div class="row mt-1">
-        <div class="col-xl-12">
-          <div class="card shadow">
-            <div class="card-header border-0">
-              <div class="row align-items-center">
-                <div class="col">
-                  <h3 class="mb-0">이번달 요금 내역</h3>
+        <!-- Page content -->
+        <div class="container-fluid mt--7">
+            <div class="row mt-1">
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">이번달 요금 내역</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">항목</th>
+                                    <th scope="col">금액</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for usage in usages %}
+                                    <tr>
+                                        <th scope="row">
+                                            {{ usage.Service }}
+                                        </th>
+                                        <td>
+                                            {{ usage.Cost.Amount|floatformat }} {{ usage.Cost.Unit }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div class="table-responsive">
-              <!-- Projects table -->
-              <table class="table align-items-center table-flush">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">항목</th>
-                    <th scope="col">금액</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for usage in usages %}
-                  <tr>
-                    <th scope="row">
-                      {{ usage.Service }}
-                    </th>
-                    <td>
-                      {{ usage.Cost.Amount|floatformat }} {{ usage.Cost.Unit }}
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="row align-items-center justify-content-xl-between">
+                    <div class="col-xl-6">
+                        <div class="copyright text-center text-xl-left text-muted">
+                            &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
-      </div>
-      <!-- Footer -->
-      <footer class="footer">
-        <div class="row align-items-center justify-content-xl-between">
-          <div class="col-xl-6">
-            <div class="copyright text-center text-xl-left text-muted">
-              &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
-  </div>
 
 {% endblock %}

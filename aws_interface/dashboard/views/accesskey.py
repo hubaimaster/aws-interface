@@ -10,6 +10,7 @@ class AccessKey(LoginRequiredMixin, View):
     @page_manage
     def get(self, request):
         context = Util.get_context(request)
+        context['email'] = request.user.email
         return render(request, 'dashboard/accesskey.html', context=context)
 
     @page_manage

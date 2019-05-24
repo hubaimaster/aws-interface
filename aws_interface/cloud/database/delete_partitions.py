@@ -1,5 +1,6 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
 
 
 # Define the input output format of the function.
@@ -10,23 +11,18 @@ info = {
         'partitions': 'list',
     },
     'output_format': {
-        'success': 'bool'
+
     }
 }
 
 
+@NeedPermission(Permission.Run.Database.delete_partitions)
 def do(data, resource):
     body = {}
     params = data['params']
-    user = data['user']
-    if 'admin' not in user['groups']:
-        body['success'] = False
-        body['message'] = 'Permission denied'
-        return Response(body)
 
     partitions = params.get('partitions', [])
     for partition in partitions:
         resource.db_delete_partition(partition)
 
-    body['success'] = True
     return Response(body)

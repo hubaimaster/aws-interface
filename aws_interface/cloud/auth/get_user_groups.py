@@ -1,5 +1,6 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
 
 
 # Define the input output format of the function.
@@ -9,7 +10,7 @@ info = {
 
     },
     'output_format': {
-        'groups': 'map',
+        'groups': [{'str': 'any'}],
     }
 }
 
@@ -20,28 +21,19 @@ def do(data, resource):
     default_groups = {
         'user': {
             'name': 'user',
-            'description': 'Normal user group',
+            'description': 'Default user group',
+            'permissions': Permission.default_user_permissions,
         },
-        # 'owner': {
-        #     'name': 'owner',
-        #     'description': 'Owner of file or object',
-        # },
-        # 'admin': {
-        #     'name': 'admin',
-        #     'description': 'Admin group',
-        # },
     }
 
-    item = resource.db_get_item('user_groups')
-    if not item:
-        item = {
-            'groups': default_groups
-        }
-        resource.db_put_item('meta-info', item, 'user_groups')
+    group_items, _ = resource.db_get_items_in_partition('user_group', limit=10000)
+    has_default_groups = True
+    for group_name in default_groups:
+        if group_name not in [group_item['name'] for group_item in group_items]:
+            has_default_groups = False
+            resource.db_put_item('user_group', default_groups[group_name], 'user-group-{}'.format(group_name))
+    if not has_default_groups:
+        group_items, _ = resource.db_get_items_in_partition('user_group', limit=10000)
 
-    groups = item.get('groups')
-    for group in default_groups:
-        groups[group] = default_groups[group]
-
-    body['groups'] = [groups[group] for group in groups]
+    body['groups'] = group_items
     return Response(body)

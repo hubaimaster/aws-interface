@@ -1,5 +1,6 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -8,12 +9,13 @@ info = {
         'start_key': 'str'
     },
     'output_format': {
-        'items': 'list',
+        'items': [{'str': 'any'}],
         'end_key': 'str'
     }
 }
 
 
+@NeedPermission(Permission.Run.Auth.get_sessions)
 def do(data, resource):
     body = {}
     params = data['params']

@@ -1,5 +1,6 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
 
 
 # Define the input output format of the function.
@@ -9,16 +10,15 @@ info = {
         'session_id': 'str',
     },
     'output_format': {
-        'success': 'bool',
-        'items': 'list',
+        'items': ['str'],
     }
 }
 
 
+@NeedPermission(Permission.Run.Database.get_partitions)
 def do(data, resource):
     body = {}
     params = data['params']
     partitions = resource.db_get_partitions()
     body['items'] = partitions
-    body['success'] = True
     return Response(body)

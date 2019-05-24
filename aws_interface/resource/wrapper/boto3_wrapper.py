@@ -306,10 +306,10 @@ class DynamoDB:
                         'AttributeName': 'partition',
                         'AttributeType': 'S'
                     }, {
-                        'AttributeName': 'invertedQuery',
+                        'AttributeName': 'inverted_query',
                         'AttributeType': 'S'
                     }, {
-                        'AttributeName': 'creationDate',
+                        'AttributeName': 'creation_date',
                         'AttributeType': 'N'
                     }
                 ],
@@ -327,13 +327,13 @@ class DynamoDB:
                 },
                 GlobalSecondaryIndexes=[
                     {
-                        'IndexName': 'partition-creationDate',
+                        'IndexName': 'partition-creation_date',
                         'KeySchema': [
                             {
                                 'AttributeName': 'partition',
                                 'KeyType': 'HASH'
                             }, {
-                                'AttributeName': 'creationDate',
+                                'AttributeName': 'creation_date',
                                 'KeyType': 'RANGE'
                             },
                         ],
@@ -341,13 +341,13 @@ class DynamoDB:
                             'ProjectionType': 'ALL'
                         }
                     }, {
-                        'IndexName': 'invertedQuery-creationDate',
+                        'IndexName': 'inverted_query-creation_date',
                         'KeySchema': [
                             {
-                                'AttributeName': 'invertedQuery',
+                                'AttributeName': 'inverted_query',
                                 'KeyType': 'HASH'
                             }, {
-                                'AttributeName': 'creationDate',
+                                'AttributeName': 'creation_date',
                                 'KeyType': 'RANGE'
                             },
                         ],
@@ -362,6 +362,10 @@ class DynamoDB:
             return response
         except Exception as ex:
             print(ex)
+            self.update_table(table_name, {'hash_key': 'partition', 'hash_key_type': 'S',
+                                           'sort_key': 'creation_date', 'sort_key_type': 'N'})
+            self.update_table(table_name, {'hash_key': 'inverted_query', 'hash_key_type': 'S',
+                                           'sort_key': 'creation_date', 'sort_key_type': 'N'})
             return None
 
     def update_table(self, table_name, index):
@@ -449,9 +453,7 @@ class DynamoDB:
     def delete_item(self, table_name, item_id):
         item = self.get_item(table_name, item_id)
         partition = item.get('Item', {}).get('partition', None)
-        if not partition:
-            print('It cannot be removed. table_name: {}, item_id: {}'.format(table_name, item_id))
-            return False
+
         response = self.client.delete_item(
             TableName=table_name,
             Key={
@@ -460,7 +462,9 @@ class DynamoDB:
                 }
             }
         )
-        self._add_item_count(table_name, '{}-count'.format(partition), value_to_add=-1)
+
+        if partition:
+            self._add_item_count(table_name, '{}-count'.format(partition), value_to_add=-1)
         self._delete_inverted_query(table_name, item_id)
         return response
 
@@ -481,7 +485,7 @@ class DynamoDB:
             creation_date = self.time()
         table = self.resource.Table(table_name)
         item['id'] = item_id
-        item['creationDate'] = creation_date
+        item['creation_date'] = creation_date
         item['partition'] = partition
         response = table.put_item(
             Item=item,
@@ -512,7 +516,7 @@ class DynamoDB:
         return {'Items': items}
 
     def get_items_in_partition(self, table_name, partition, start_key=None, limit=100, reverse=False):
-        index_name = 'partition-creationDate'
+        index_name = 'partition-creation_date'
         response = self.get_items_eq_hash_key(table_name, index_name, 'partition', partition, start_key, limit, reverse)
         return response
 
@@ -530,7 +534,7 @@ class DynamoDB:
 
     def get_inverted_queries(self, table_name, partition, field, operand, operation, order_by, order_min, order_max, start_key=None, limit=100, reverse=False):
         if operation == 'in' or operation == 'eq':
-            hash_key_name = 'invertedQuery'
+            hash_key_name = 'inverted_query'
             sort_key_name = '{}'.format(order_by)
             hash_key = '{}-{}-{}-{}'.format(partition, field, operand, operation)
             index_name = '{}-{}'.format(hash_key_name, sort_key_name)
@@ -585,9 +589,7 @@ class DynamoDB:
 
     def update_item(self, table_name, item_id, item):
         table = self.resource.Table(table_name)
-        update_date = self.time()
         item['id'] = item_id
-        item['_update_date'] = update_date
         response = table.put_item(
             TableName=table_name,
             Item=item,
@@ -633,19 +635,19 @@ class DynamoDB:
     def _put_inverted_query(self, table_name, partition, item):
         table = self.resource.Table(table_name)
         item_id = item.get('id')
-        creation_date = item.get('creationDate', self.time())
+        creation_date = item.get('creation_date', self.time())
         with table.batch_writer() as batch:
             for field, value in item.items():
                 for operand in self._eq_operands(value):
                     self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date)
 
     def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date):
-        _invertedQuery = '{}-{}-{}-{}'.format(partition, field, operand, operation)
+        _inverted_query = '{}-{}-{}-{}'.format(partition, field, operand, operation)
         query = {
             'id': 'query-{}'.format(shortuuid.uuid()),
             'partition': 'index-{}'.format(item_id),
-            'invertedQuery': _invertedQuery,
-            'creationDate': creation_date,
+            'inverted_query': _inverted_query,
+            'creation_date': creation_date,
             'item_id': item_id,
         }
         response = table.put_item(

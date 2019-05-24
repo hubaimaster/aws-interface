@@ -1,31 +1,29 @@
 
 from cloud.response import Response
-
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'name': 'str'
+        'group_name': 'str'
     },
     'output_format': {
-        'items': 'list',
+
     }
 }
 
 
+@NeedPermission(Permission.Run.Auth.delete_user_group)
 def do(data, resource):
     body = {}
     params = data['params']
-    name = params['name']
+    group_name = params['group_name']
 
-    item = resource.db_get_item('user_groups')
-    if not item:
-        item = {}
+    if group_name == 'user':
+        body['error'] = Error.default_user_group_cannot_be_modified
+        return Response(body)
 
-    groups = item.get('groups', {})
-    if name in groups:
-        groups.pop(name)
-    body['groups'] = groups
-    resource.db_put_item('meta-info', item, 'user_groups')
+    _ = resource.db_delete_item('user-group-{}'.format(group_name))
     return Response(body)

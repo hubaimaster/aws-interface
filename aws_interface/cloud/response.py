@@ -16,3 +16,5 @@ class Response(dict):
         self['statusCode'] = status_code
         self['header'] = header
         self['body'] = body
+        if 'error' in body:
+            self['error'] = body['error']

@@ -29,11 +29,14 @@ class AuthAPI(API):
     def create_user(self, email, password, extra):
         return self.service_controller.create_user(email, password, extra)
 
-    def set_user(self, user_id, email, password, extra):
-        return self.service_controller.set_user(user_id, email, password, extra)
+    def set_user(self, user_id, field, value):
+        return self.service_controller.set_user(user_id, field, value)
 
     def delete_user(self, user_id):
         return self.service_controller.delete_user(user_id)
+
+    def delete_users(self, user_ids):
+        return self.service_controller.delete_users(user_ids)
 
     def get_user(self, user_id):
         return self.service_controller.get_user(user_id)
@@ -64,3 +67,21 @@ class AuthAPI(API):
 
     def create_admin(self, email, password, extra):
         return self.service_controller.create_admin(email, password, extra)
+
+    def attach_group_permission(self, group_name, permission):
+        return self.service_controller.attach_group_permission(group_name, permission)
+
+    def detach_group_permission(self, group_name, permission):
+        return self.service_controller.detach_group_permission(group_name, permission)
+
+    def attach_user_group(self, user_id, group_name):
+        return self.service_controller.attach_user_group(user_id, group_name)
+
+    def detach_user_group(self, user_id, group_name):
+        return self.service_controller.detach_user_group(user_id, group_name)
+
+    def set_me(self, field, value):
+        return self.service_controller.set_me(field, value)
+
+    def get_all_permissions(self):
+        return self.service_controller.get_all_permissions()

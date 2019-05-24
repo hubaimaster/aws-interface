@@ -24,7 +24,9 @@ class AuthTestProcess:
         self.parent.browser.find_element_by_id('create-user-button').click()
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('input-username').send_keys(email)
+        time.sleep(DELAY)
         self.parent.browser.find_element_by_id('input-password').send_keys(password)
+        time.sleep(DELAY)
         self.parent.browser.find_element_by_id('create-user-commit').click()
 
     def _has_user(self, target_email):

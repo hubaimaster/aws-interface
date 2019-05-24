@@ -1,5 +1,6 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
 
 
 # Define the input output format of the function.
@@ -22,6 +23,7 @@ info = {
 }
 
 
+@NeedPermission(Permission.Run.Auth.get_user_by_email)
 def do(data, resource):
     body = {}
     params = data['params']

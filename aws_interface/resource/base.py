@@ -21,7 +21,7 @@ class ResourceAllocator(metaclass=ABCMeta):
     # API, create and terminate.
     def create(self):
         """
-        Apply/deploy the recipe to AWS backend services. This includes
+        Apply/deploy the recipe to backend services like aws, azure, gcp, ... This includes
         setting up interfaces through AWS Lambda and API Gateway.
         :return:
         """
@@ -73,7 +73,17 @@ class Resource(metaclass=ABCMeta):
     def db_get_items(self, item_ids):
         raise NotImplementedError
 
-    def db_get_items_in_partition(self, partition, order_by, order_min, order_max, start_key=None, limit=None, reverse=False):
+    def db_get_items_in_partition(self, partition, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=None, reverse=False):
+        """
+        :param partition:
+        :param order_by:
+        :param order_min:
+        :param order_max:
+        :param start_key:
+        :param limit:
+        :param reverse:
+        :return: items, end_key
+        """
         raise NotImplementedError
 
     def db_put_item(self, partition, item, item_id=None, creation_date=None):
@@ -86,7 +96,7 @@ class Resource(metaclass=ABCMeta):
     def db_get_count(self, partition):
         raise NotImplementedError
 
-    def db_get_item_id_and_orders(self, partition, field, value, order_by, order_min, order_max, start_key, limit, reverse):
+    def db_get_item_id_and_orders(self, partition, field, value, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):
         """
         item_id 와 order 필드 값들을 빠르게 가져와야함
         :param partition: 대상을 가져올 파티션
@@ -106,32 +116,14 @@ class Resource(metaclass=ABCMeta):
     def file_download_bin(self, file_id):
         raise NotImplementedError
 
-    def file_upload_bin(self, file_id, file_base64):
+    def file_upload_bin(self, file_id, binary):
         raise NotImplementedError
 
     def file_delete_bin(self, file_id):
         raise NotImplementedError
 
-    # Server-less ops
-    def sl_create_function(self, function_name, runtime, handler, zip_file_bin):
-        raise NotImplementedError
-
-    def sl_delete_function(self, function_name):
-        raise NotImplementedError
-
-    def sl_update_function(self, function_name, zip_file_bin):
-        raise NotImplementedError
-
-    def sl_invoke_function(self, function_name, payload):
-        """
-        :param function_name:
-        :param payload: Parameters that function required
-        :return: error:str|None, response_payload:dict|None
-        """
-        raise NotImplementedError
-
     # SHOULD NOT RE-IMPLEMENT
-    def db_query(self, partition, instructions, start_key=None, limit=100, reverse=False, order_by='creationDate'):
+    def db_query(self, partition, instructions, start_key=None, limit=100, reverse=False, order_by='creation_date'):
         """:return:items:list,end_key:str"""
         # TODO 상위레이어에서 쿼리를 순차적으로 실행가능한 instructions 으로 만들어 전달 -> ORM 클래스 만들기
 

@@ -1,23 +1,24 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
         'session_id': 'str',
-        'start_key': 'str',
-        'limit': 'int',
-        'reverse': 'bool',
+        'start_key?': 'str',
+        'limit?': 'int',
+        'reverse?': 'bool',
     },
     'output_format': {
-        'items': 'list',
-        'end_key': 'str',
-        'success': 'bool'
+        'items': [{'str': 'any'}],
+        'end_key?': 'str',
     }
 }
 
 
+@NeedPermission(Permission.Run.Storage.get_b64_info_items)
 def do(data, resource):  # This is for admins
     body = {}
     params = data['params']
@@ -31,6 +32,5 @@ def do(data, resource):  # This is for admins
 
     body['items'] = list(filter(lambda x: x.get('next_file_id', None) is None, items))
     body['end_key'] = end_key
-    body['success'] = True
     return Response(body)
 

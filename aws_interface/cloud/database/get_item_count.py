@@ -1,5 +1,6 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
 
 
 # Define the input output format of the function.
@@ -11,11 +12,16 @@ info = {
     'output_format': {
         'item': {
             'count': 'int'
+        },
+        'error': {
+            'code': 'int',
+            'message': 'str',
         }
     }
 }
 
 
+@NeedPermission(Permission.Run.Database.get_item_count)
 def do(data, resource):
     body = {}
     params = data['params']

@@ -1,5 +1,7 @@
 
 from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -12,12 +14,15 @@ info = {
         'event_param': 'str',
     },
     'output_format': {
-        'success': 'bool',
-        'message': 'str?',
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        }
     }
 }
 
 
+@NeedPermission(Permission.Run.Log.create_log)
 def do(data, resource):
     partition = 'log'
     body = {}
@@ -36,10 +41,11 @@ def do(data, resource):
         item['owner'] = user.get('id')
 
         success = resource.db_put_item(partition, item)
-
-        body['success'] = success
-        return Response(body)
+        if success:
+            return Response(body)
+        else:
+            body['error'] = Error.log_creation_failed
+            return Response(body)
     else:
-        body['success'] = False
-        body['message'] = 'No user session'
+        body['error'] = Error.invalid_session
         return Response(body)

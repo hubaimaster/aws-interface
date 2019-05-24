@@ -1,6 +1,8 @@
 
 from cloud.response import Response
-from cloud.util import has_read_permission
+from cloud.permission import has_read_permission
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -10,12 +12,16 @@ info = {
         'item_id': 'str',
     },
     'output_format': {
-        'success': 'bool',
         'item': 'map',
+        'error': {
+            'code': 'int',
+            'message': 'str',
+        }
     }
 }
 
 
+@NeedPermission(Permission.Run.Database.get_item)
 def do(data, resource):
     body = {}
     params = data['params']
@@ -26,8 +32,7 @@ def do(data, resource):
 
     if has_read_permission(user, item):
         body['item'] = item
-        body['success'] = True
     else:
-        body['success'] = False
-        body['message'] = 'permission denied'
+        body['error'] = Error.permission_denied
+
     return Response(body)

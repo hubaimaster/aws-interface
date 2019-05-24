@@ -1,6 +1,8 @@
 
 from cloud.response import Response
-from cloud.util import has_read_permission
+from cloud.permission import has_read_permission
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 import json
 
 # Define the input output format of the function.
@@ -14,14 +16,17 @@ info = {
         'reverse': 'bool=False',
     },
     'output_format': {
-        'items': 'list',
-        'end_key': 'str',
-        'success': 'bool',
-        'message': 'str?',
+        'items?': [{'str': 'any'}],
+        'end_key?': 'str',
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        }
     }
 }
 
 
+@NeedPermission(Permission.Run.Database.get_items)
 def do(data, resource):
     body = {}
     params = data['params']
@@ -44,14 +49,11 @@ def do(data, resource):
         for item in items:
             if has_read_permission(user, item):
                 filtered.append(item)
-
         body['items'] = filtered
         body['end_key'] = end_key
-        body['success'] = True
         return Response(body)
     else:
-        body['items'] = []
+        body['items'] = None
         body['end_key'] = None
-        body['success'] = False
-        body['message'] = 'No such partition: {}'.format(partition)
+        body['error'] = Error.permission_denied
         return Response(body)

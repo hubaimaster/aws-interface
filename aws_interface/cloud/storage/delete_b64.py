@@ -1,6 +1,9 @@
 
 from cloud.response import Response
-from cloud.util import has_write_permission
+from cloud.permission import has_write_permission
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
+
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
@@ -9,12 +12,15 @@ info = {
         'file_id': 'str',
     },
     'output_format': {
-        'success': 'bool',
-        'message': 'str',
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        }
     }
 }
 
 
+@NeedPermission(Permission.Run.Storage.delete_b64)
 def do(data, resource):
     body = {}
     params = data['params']
@@ -30,9 +36,7 @@ def do(data, resource):
 
             file_id_to_delete = file_item.get('parent_file_id', None)
         else:
-            body['success'] = False
-            body['message'] = 'permission denied'
+            body['error'] = Error.permission_denied
             return Response(body)
 
-    body['success'] = True
     return Response(body)
