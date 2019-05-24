@@ -1,6 +1,8 @@
 
 from cloud.response import Response
-from cloud.util import has_write_permission
+from cloud.permission import has_write_permission
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -11,12 +13,23 @@ info = {
         'function_name': 'str',
     },
     'output_format': {
-        'item': 'dict',
-        'message:': 'str?',
+        'item': {
+            'function_name': 'str',
+            'runtime': 'str',
+            'handler': 'str',
+            'description': 'str',
+            'zip_file_id': 'str',
+            'runnable': 'bool',
+        },
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        },
     }
 }
 
 
+@NeedPermission(Permission.Run.Logic.get_function)
 def do(data, resource):
     partition = 'logic-function'
     body = {}
@@ -24,11 +37,13 @@ def do(data, resource):
 
     function_name = params.get('function_name')
 
-    item_ids = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
-    if len(item_ids) == 0:
-        body['message'] = 'function_name: {} did not exist'.format(function_name)
+    items, _ = resource.db_query(partition,
+                                 [{'option': None, 'field': 'function_name', 'value': function_name,
+                                   'condition': 'eq'}])
+
+    if len(items) == 0:
+        body['error'] = Error.no_such_function
         return Response(body)
     else:
-        item = resource.db_get_item(item_ids[0])
-        body['item'] = item
+        body['item'] = items[0]
         return Response(body)

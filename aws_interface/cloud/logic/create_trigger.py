@@ -1,0 +1,1 @@
+from cloud.permission import Permission, NeedPermission

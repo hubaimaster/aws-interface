@@ -15,13 +15,15 @@ info = {
 }
 
 
-@NeedPermission(Permission.Run.Logic.get_functions)
+@NeedPermission(Permission.Run.Logic.get_function_tests)
 def do(data, resource):
-    partition = 'logic-function'
+    partition = 'logic-function-test'
     body = {}
     params = data['params']
+
     start_key = None
     limit = 1000
+
     items = []
     while True:
         _items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit)

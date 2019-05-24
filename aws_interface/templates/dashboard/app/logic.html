@@ -2,273 +2,398 @@
 {% load staticfiles %}
 {% block content %}
 
-<div class="main-content">
-    <!-- Top navbar -->
-    {% include 'dashboard/app/top-navbar.html' %}
-    <!-- Header -->
-    <input id="view-tag" value="logic" hidden>
-    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
-      <div class="container-fluid">
-        <div class="header-body">
-            <div class="alert alert-primary" role="alert">
-                <strong>AWS Lambda</strong>  를 사용합니다.
-            </div>
-            <div class="alert alert-default" role="alert">
-                <strong>Auth </strong> 에 의존합니다.
-            </div>
-          <!-- Card stats -->
+    {% load timetags %}
 
+    <div class="main-content">
+        <!-- Top navbar -->
+        {% include 'dashboard/app/top-navbar.html' %}
+        <!-- Header -->
+        <input id="view-tag" value="logic" hidden>
+        <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+            <div class="container-fluid">
+                <div class="header-body">
+                    <div class="alert alert-primary" role="alert">
+                        <strong>AWS Lambda</strong>  를 사용합니다.
+                    </div>
+                    <div class="alert alert-default" role="alert">
+                        <strong>Auth </strong> 에 의존합니다.
+                    </div>
+                    <!-- Card stats -->
+
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <!-- Page content -->
-    <div class="container-fluid mt--7">
-      <div class="row">
-        <div class="col-xl-12">
-          <div class="card shadow">
-            <div class="card-header border-0">
-              <div class="row align-items-center">
-                <div class="col">
-                  <h3 class="mb-0">함수 목록</h3>
-                </div>
+        <!-- Page content -->
+        <div class="container-fluid mt--7">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">함수 테스트 목록</h3>
+                                </div>
 
-                <div class="col text-right">
-                  <a data-toggle="modal" data-target="#modal-create-function" class="btn btn-sm btn-primary">
-                      <span class="btn-inner--text" style="color: white;">함수 생성</span>
-                  </a>
-                </div>
+                                <div class="col text-right">
+                                    <a data-toggle="modal" data-target="#modal-create-function-test" class="btn btn-sm btn-primary">
+                                        <span class="btn-inner--text" style="color: white;">테스트 생성</span>
+                                    </a>
+                                </div>
 
-                <div class="modal fade" id="modal-create-function" tabindex="-1" role="dialog" aria-labelledby="modal-create-function" aria-hidden="true">
-                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h4 class="modal-title" id="modal-title-default">함수 생성</h4>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                          </button>
-                        </div>
+                                <div class="modal fade" id="modal-test-result" tabindex="-1" role="dialog" aria-labelledby="modal-test-result" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">테스트 결과</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
 
-                            <div class="modal-body">
-                                <div class="pl-lg-12">
-                                  <div class="row">
-                                    <div class="col-lg-12">
+                                            <div class="modal-body">
+                                                <div class="pl-lg-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
 
-                                      <div class="form-group">
-                                        <label class="form-control-label" for="folder-name">*이름</label>
-                                        <input name="folder-name" type="text" id="function-name" class="form-control form-control-alternative" placeholder="함수 이름">
-                                      </div>
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="file-bin">실행 결과</label>
+                                                                <textarea id="result-test-input" name="test_input" rows="10" name="handler" type="text" class="form-control form-control-alternative" disabled></textarea>
+                                                            </div>
 
-                                      <div class="form-group">
-                                        <label class="form-control-label" for="folder-name">*런타임</label>
-                                        <select name="folder-name" id="function-runtime" class="form-control form-control-alternative">
-                                            <option value="python36">Python 3.6</option>
-                                            <option value="python27">Python 2.7</option>
-                                            <option value="java8">java 8</option>
-                                        </select>
-                                      </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                      <div class="form-group">
-                                        <label id="function-description" class="form-control-label" for="folder-name">설명</label>
-                                        <input name="folder-name" type="text" id="folder-name" class="form-control form-control-alternative" placeholder="함수 설명">
-                                      </div>
-
-                                      <div class="form-group">
-                                        <label class="form-control-label" for="file-bin">소스 코드 .zip 파일</label>
-                                        <input name="file-bin" type="file" id="function-zipfile" class="form-control form-control-alternative btn">
-                                      </div>
-
-                                      <div class="form-group">
-                                        <label class="form-control-label" for="folder-name">실행될 함수경로.메소드이름</label>
-                                        <input name="folder-name" type="text" id="function-handler" class="form-control form-control-alternative" placeholder="Ex) path.to.function.method_name">
-                                      </div>
-
-                                      <div class="form-group">
-                                        <label class="form-control-label" for="input-username">함수를 실행할 수 있는 그룹</label>
-                                        <div id="function-run-groups" class="mb-2">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-primary" data-dismiss="modal">확인</button>
+                                            </div>
 
                                         </div>
-
-                                          <div class="dropdown">
-                                              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                그룹 추가
-                                              </button>
-                                              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                {% for group in user_groups %}
-                                                <a class="dropdown-item" onclick="put_folder_read_group('{{ group.name }}');">{{ group.name }} </a>
-                                                {% endfor %}
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
-                                              </div>
-                                          </div>
-
-                                      </div>
-
-
-
                                     </div>
-                                  </div>
                                 </div>
-                              <p>
-                                  확인 버튼을 클릭하여 함수를 생성합니다.
-                              </p>
+
+                                <div class="modal fade" id="modal-create-function-test" tabindex="-1" role="dialog" aria-labelledby="modal-create-function-test" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <form method="POST">{% csrf_token %}
+                                                <input name="cmd" value="create_function_test" hidden>
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title" id="modal-title-default">함수 테스트 생성</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+
+                                                <div class="modal-body modal-lg">
+                                                    <div class="pl-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="folder-name">테스트 이름</label>
+                                                                    <input name="test_name" type="text" class="form-control form-control-alternative" placeholder="테스트 케이스 이름">
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="function-description">테스트할 함수 이름</label>
+                                                                    <select name="function_name" class="form-control">
+                                                                        {% for function in functions %}
+                                                                            <option value="{{ function.function_name }}">{{ function.function_name }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="file-bin">테스트 페이로드 (JSON)</label>
+                                                                    <textarea id="test_input" name="test_input" rows="5" name="handler" type="text" id="test-input" class="form-control form-control-alternative" placeholder='{"field": "value"}'></textarea>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p>
+                                                        확인 버튼을 클릭하여 테스트를 생성합니다.
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                                    <button type="submit" id="create-function-test" class="btn btn-primary" disabled>확인</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+
                             </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                              <button id="create-folder" class="btn btn-primary">확인</button>
+                        </div>
+                        <div>
+
+                            <div class="table-responsive">
+                                <!-- Projects table -->
+                                <table class="table align-items-center table-flush">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">test_name</th>
+                                        <th scope="col">function_name</th>
+                                        <th scope="col">test_input</th>
+                                        <th scope="col"></th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for function_test in function_tests %}
+                                        <tr>
+                                            <th scope="row">
+                                                {{ function_test.test_name }}
+                                            </th>
+                                            <td>
+                                                {{ function_test.function_name }}
+                                            </td>
+                                            <td>
+                                                {{ function_test.test_input }}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-success" onclick="run_function('{{ function_test.function_name }}', '{{ function_test.test_input }}')">테스트</button>
+                                            </td>
+                                            <td>
+                                                <form method="post">{% csrf_token %}
+                                                    <input name="cmd" value="delete_function_test" hidden>
+                                                    <input name="test_name" value="{{ function_test.test_name }}" hidden>
+                                                    <button class="btn btn-sm btn-danger" type="submit">제거</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
 
-                      </div>
+                        </div>
                     </div>
-                  </div>
+                </div>
+
+            </div>
 
 
-              </div>
+            <div class="row mt-5">
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">함수 목록</h3>
+                                </div>
+
+                                <div class="col text-right">
+                                    <a data-toggle="modal" data-target="#modal-create-function" class="btn btn-sm btn-primary">
+                                        <span class="btn-inner--text" style="color: white;">함수 생성</span>
+                                    </a>
+                                </div>
+
+                                <div class="modal fade" id="modal-create-function" tabindex="-1" role="dialog" aria-labelledby="modal-create-function" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">함수 생성</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <div class="pl-lg-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="folder-name">*이름</label>
+                                                                <input name="function_name" type="text" id="function-name" class="form-control form-control-alternative" placeholder="함수 이름">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="folder-name">*런타임</label>
+                                                                <select name="runtime" id="function-runtime" class="form-control form-control-alternative">
+                                                                    <option value="python3.6">Python 3.6</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="function-description">설명</label>
+                                                                <input name="function-description" type="text" id="function-description" class="form-control form-control-alternative" placeholder="함수 설명">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="file-bin">소스 코드 .zip 파일</label>
+                                                                <input name="zip_file" type="file" id="function-zipfile" class="form-control form-control-alternative btn">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="folder-name">실행될 함수경로.메소드이름 <i class="ni ni-support-16" data-toggle="tooltip" data-placement="top" title="def handler(payload, user) 메소드가 호출됩니다"></i></label>
+                                                                <input name="handler" type="text" id="function-handler" class="form-control form-control-alternative" placeholder="path.to.function.handler">
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p>
+                                                    함수를 생성하면 SDK 에서 logic_run_function("function_name") 을 호출하여 실행 결과를 반환 받을 수 있습니다.
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                                <button id="create-function" class="btn btn-primary">확인</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">function_name</th>
+                                    <th scope="col">description</th>
+                                    <th scope="col">runtime</th>
+                                    <th scope="col">handler</th>
+                                    <th scope="col">creation_date</th>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for function in functions %}
+                                    <tr>
+                                        <th scope="row">
+                                            {{ function.function_name }}
+                                        </th>
+                                        <td>
+                                            {{ function.description }}
+                                        </td>
+                                        <td>
+                                            {{ function.runtime }}
+                                        </td>
+                                        <td>
+                                            {{ function.handler }}
+                                        </td>
+                                        <td>
+                                            {{ function.creation_date|to_date }}
+                                        </td>
+
+                                        <td>
+                                            <form method="post">{% csrf_token %}
+                                                <input name="cmd" value="delete_function" hidden>
+                                                <input name="function_name" value="{{ function.function_name }}" hidden>
+                                                <button type="submit" class="btn btn-danger btn-sm">제거</button>
+                                            </form>
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <div class="table-responsive">
-              <!-- Projects table -->
-              <table class="table align-items-center table-flush">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">이름</th>
-                    <th scope="col">생성일자</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for usage in usages %}
-                  <tr>
-                    <th scope="row">
-                      {{ usage.Service }}
-                    </th>
-                    <td>
-                      {{ usage.Cost.Amount|floatformat }} {{ usage.Cost.Unit }}
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+
+
+            <div class="row mt-7">
+
             </div>
-          </div>
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="row align-items-center justify-content-xl-between">
+                    <div class="col-xl-6">
+                        <div class="copyright text-center text-xl-left text-muted">
+                            &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
-
-      </div>
-      <div class="row mt-7">
-
-      </div>
-      <!-- Footer -->
-      <footer class="footer">
-        <div class="row align-items-center justify-content-xl-between">
-          <div class="col-xl-6">
-            <div class="copyright text-center text-xl-left text-muted">
-              &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
-  </div>
 
     <script>
 
-    var function_run_groups = [];
 
-    {% for user_group in user_groups %}
-      function_run_groups.push('{{ user_group.name }}');
-    {% endfor %}
+        function create_function(function_name, description, handler, runtime, zip_file) {
+            var formData = new FormData();
+            formData.append('cmd', 'create_function');
+            formData.append('function_name', function_name);
+            formData.append('description', description);
+            formData.append('handler', handler);
+            formData.append('runtime', runtime);
+            formData.append('zip_file', zip_file);
 
-    function upload_file(parent_path, file_name, file_bin, read_groups, write_groups) {
-        var formData = new FormData();
-        formData.append('cmd', 'upload_b64');
-        formData.append('file_bin', file_bin);
-        formData.append('file_name', file_name);
-        formData.append('read_groups', JSON.stringify(read_groups));
-        formData.append('write_groups', JSON.stringify(write_groups));
-        $.ajax({
-               url : '',
-               type : 'POST',
-               data : formData,
-               processData: false,  // tell jQuery not to process the data
-               contentType: false,  // tell jQuery not to set contentType
-               success : function(data) {
-                   window.location.reload();
-               }
-        });
-    }
-
-    function put_function_run_group(group_name) {
-        if (file_read_groups.includes(group_name)){
-            alert("이미 해당 그룹이 존재합니다");
-        }else{
-            file_read_groups.push(group_name);
-            render_function_run_groups();
+            $.ajax({
+                url : '',
+                type : 'POST',
+                data : formData,
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,  // tell jQuery not to set contentType
+                success : function(data) {
+                    window.location.reload();
+                }
+            });
         }
-    }
-    function remove_function_run_group(group_name) {
-        file_read_groups.remove(group_name);
-        render_function_run_groups();
-    }
 
-    function render_function_run_groups() {
-        $("#function-run-groups").empty();
-        for (var i = 0; i < function_run_groups.length; i++){
-            var group = function_run_groups[i];
-            var tag = "<a onclick=\"remove_function_run_groups('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
-            $("#function-run-groups").append(tag);
+        function run_function(function_name, payload){
+            $.post("", {
+                cmd: "run_function",
+                function_name: function_name,
+                payload: payload,
+            }, function (data) {
+                $("#result-test-input").val(JSON.stringify(data, null, 4));
+                $("#modal-test-result").modal('show');
+            });
         }
-    }
 
-    function put_folder_read_group(group_name) {
-        if (function_run_groups.includes(group_name)){
-            alert("이미 해당 그룹이 존재합니다");
-        }else{
-            function_run_groups.push(group_name);
-            render_function_run_groups();
-        }
-    }
-    function remove_function_run_groups(group_name) {
-        function_run_groups.remove(group_name);
-        render_function_run_groups();
-    }
+        window.onload = function () {
 
-    function delete_b64(file_id){
-        $.post("", {
-            cmd: 'delete_b64',
-            file_id: file_id,
-        }, function (data) {
-            window.location.reload();
-        });
-    }
+            $("#create-function").click(function () {
+                const function_name = $("#function-name").val();
+                const description = $("#function-description").val();
+                const handler = $("#function-handler").val();
+                const runtime = $("#function-runtime").val();
+                const zip_file = $('#function-zipfile')[0].files[0];
 
-    window.onload = function () {
-        render_function_run_groups();
-        render_folder_write_groups();
-        render_function_run_groups();
-        render_file_write_groups();
-        $("#create-folder").click(function () {
-            var folder_name = $("#folder-name").val();
-            if (folder_name == null || folder_name.length == 0){
-                alert("폴더 이름을 채워주세요");
-                return;
-            }
-            create_folder('{{ folder_path }}', folder_name, function_run_groups, folder_write_groups);
-            $("#modal-put-folder").modal('hide');
-            $("#folder-name").val(null);
-        });
-        $("#upload-file").click(function () {
-            var parent_path = $("#folder-parent-path").val();
-            var file_bin = $('#file-bin')[0].files[0];
-            var filename = $("#file-bin").val().replace(/.*(\/|\\)/, '');
-            if (file_bin == null || file_bin.length == 0){
-                alert("파일을 지정해주세요");
-                return;
-            }
-            if (file_read_groups.length == 0 || file_write_groups.length == 0){
-                alert("권한 그룹은 1개 이상 지정해야 합니다");
-                return;
-            }
-            upload_file('{{ folder_path }}', filename, file_bin, file_read_groups, file_write_groups);
-            $("#modal-upload-file").modal('hide');
-        });
-    };
-  </script>
+                if (function_name == null || function_name.length == 0){
+                    alert("이름을 지정해주세요");
+                    return;
+                }
+                if (zip_file == null || zip_file.length == 0){
+                    alert("파일을 지정해주세요");
+                    return;
+                }
+                create_function(function_name, description, handler, runtime, zip_file);
+                $("#modal-create-function").modal('hide');
+            });
+
+            $("#test_input").change(function () {
+                function is_json(str) {
+                    try {
+                        JSON.parse(str);
+                    } catch (e) {
+                        return false;
+                    }
+                    return true;
+                }
+                const test_input = $("#test_input").val();
+                if (is_json(test_input)){
+                    $("#create-function-test").prop("disabled", false);
+                }else{
+                    $("#create-function-test").prop("disabled", true);
+                }
+            });
+
+        };
+    </script>
 
 {% endblock %}

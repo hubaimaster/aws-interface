@@ -1,41 +1,78 @@
 
 from cloud.response import Response
-from cloud.util import has_run_permission
+from cloud.permission import Permission, NeedPermission
+from cloud.message import Error
+import sys
+import io
+import os
+import tempfile
+
+from zipimport import zipimporter
+from zipfile import ZipFile
+from contextlib import redirect_stdout
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'session_id': 'str',
-
         'function_name': 'str',
         'payload': 'dict',
     },
     'output_format': {
         'response': 'dict',
-        'message:': 'str?',
-        'error': 'str?',
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        },
     }
 }
 
 
+# TODO now it can only invoke python3.6 runtime. any other runtimes (java, node, ..) will be able to invoke.
+@NeedPermission(Permission.Run.Logic.run_function)
 def do(data, resource):
     partition = 'logic-function'
     body = {}
     params = data['params']
-    user = data['user']
+    user = data.get('user', None)
 
     function_name = params.get('function_name')
     payload = params.get('payload')
 
-    item_ids = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
-    if len(item_ids) == 0:
-        body['message'] = 'function_name: {} did not exist'.format(function_name)
+    items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}])
+
+    if len(items) == 0:
+        body['error'] = Error.no_such_function
         return Response(body)
     else:
-        item = resource.db_get_item(item_ids[0])
-        if has_run_permission(user, item):
-            response_payload, error = resource.sl_invoke_function(function_name, payload)
-        body['response'] = response_payload
-        body['error'] = error
+        item = items[0]
+
+        zip_file_id = item['zip_file_id']
+        function_handler = item['handler']
+        function_package = '.'.join(function_handler.split('.')[:-1])
+        function_method = function_handler.split('.')[-1]
+
+        zip_file_bin = resource.file_download_bin(zip_file_id)
+        zip_temp_dir = tempfile.mktemp(prefix='/tmp/')
+        extracted_dir = tempfile.mkdtemp(prefix='/tmp/')
+
+        with open(zip_temp_dir, 'wb') as zip_temp:
+            zip_temp.write(zip_file_bin)
+        with ZipFile(zip_temp_dir) as zip_file:
+            zip_file.extractall(extracted_dir)
+
+        importer = zipimporter(zip_temp_dir)
+        module = importer.load_module(function_package)
+        sys.modules[function_package] = module
+        try:
+            std_str = io.StringIO()
+            with redirect_stdout(std_str):
+                handler = getattr(module, function_method)
+                body['response'] = handler(payload, user)
+            body['stdout'] = std_str.getvalue()
+        except Exception as ex:
+            body['error'] = Error.function_error
+            body['error']['message'] = body['error']['message'].format(ex)
+        os.remove(zip_temp_dir)
+
         return Response(body)
