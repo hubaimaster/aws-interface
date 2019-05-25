@@ -61,12 +61,21 @@ def _replace_template_key(sdk_dir, key, value):
     :param value: replacement for {{key}}
     :return:
     """
+    exts_to_replace = [
+        '.py',
+        '.swift',
+        '.js',
+        '.txt',
+        '.java',
+    ]
     target_key = '{{' + key + '}}'
     files = [f for f in listdir(sdk_dir) if isfile(join(sdk_dir, f))]
     for file in files:
-        file = os.path.join(sdk_dir, file)
-        with open(file, 'r') as rf:
-            template_file = rf.read()
-            template_file = template_file.replace(target_key, value)
-        with open(file, 'w+') as wf:
-            wf.write(template_file)
+        file_name, extension = os.path.splitext(file)
+        if extension in exts_to_replace:
+            file = os.path.join(sdk_dir, file)
+            with open(file, 'r') as rf:
+                template_file = rf.read()
+                template_file = template_file.replace(target_key, value)
+            with open(file, 'w+') as wf:
+                wf.write(template_file)

@@ -2,8 +2,27 @@ import importlib
 import os
 import shutil
 import tempfile
+import json
+from numbers import Number
 from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3
 from resource.base import ResourceAllocator, Resource
+
+
+def encode_dict(dict_obj):
+    def cast_number(v):
+        if isinstance(v, dict):
+            return encode_dict(v)
+        if not isinstance(v, Number):
+            return v
+        if v % 1 == 0:
+            return int(v)
+        else:
+            return float(v)
+
+    if isinstance(dict_obj, dict):
+        return {k: cast_number(v) for k, v in dict_obj.items()}
+    else:
+        return dict_obj
 
 
 def create_lambda_zipfile_bin(app_id, cloud_path, resource_path):
@@ -189,10 +208,14 @@ class AWSResource(Resource):
         return result.get('Items', [])
 
     def db_get_items_in_partition(self, partition, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):
+        if isinstance(start_key, str):
+            start_key = json.loads(start_key)
         dynamo = DynamoDB(self.boto3_session)
         result = dynamo.get_items_in_partition_by_order(self.app_id, partition, order_by, order_min, order_max, start_key, limit, reverse)
         end_key = result.get('LastEvaluatedKey', None)
         items = result.get('Items', [])
+        if end_key is not None:
+            end_key = json.dumps(encode_dict(end_key))
         return items, end_key
 
     def db_put_item(self, partition, item, item_id=None, creation_date=None):
@@ -213,12 +236,16 @@ class AWSResource(Resource):
 
     def db_get_item_id_and_orders(self, partition, field, value, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):
         # order_field 가 'creation_date' 이 아니면 아직 사용 불가능
+        if isinstance(start_key, str):
+            start_key = json.loads(start_key)
         dynamo = DynamoDB(self.boto3_session)
         response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by, order_min, order_max, start_key, limit, reverse)
         items = response.get('Items', [])
         end_key = response.get('LastEvaluatedKey', None)
         item_id_and_creation_date_list = [{'item_id': item.get('item_id'), order_by: item.get(order_by)}
                                           for item in items]
+        if end_key is not None:
+            end_key = json.dumps(encode_dict(end_key))
         return item_id_and_creation_date_list, end_key
 
     # File ops
@@ -236,34 +263,3 @@ class AWSResource(Resource):
         s3 = S3(self.boto3_session)
         result = s3.delete_bin(self.app_id, file_id)
         return bool(result)
-
-    # Server-less ops
-    def sl_create_function(self, function_name, runtime, handler, zip_file_bin):
-        lambda_client = Lambda(self.boto3_session)
-        iam = IAM(self.boto3_session)
-        role_name = '{}'.format(self.app_id)
-        role_arn = iam.create_role_and_attach_policies(role_name)
-        name = '{}-{}'.format(self.app_id, function_name)
-        desc = 'aws-interface-logic'
-        result = lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file_bin)
-        return bool(result)
-
-    def sl_delete_function(self, function_name):
-        lambda_client = Lambda(self.boto3_session)
-        name = '{}-{}'.format(self.app_id, function_name)
-        result = lambda_client.delete_function(name)
-        return bool(result)
-
-    def sl_update_function(self, function_name, zip_file_bin):
-        lambda_client = Lambda(self.boto3_session)
-        name = '{}-{}'.format(self.app_id, function_name)
-        result = lambda_client.update_function_code(name, zip_file_bin)
-        return bool(result)
-
-    def sl_invoke_function(self, function_name, payload):
-        lambda_client = Lambda(self.boto3_session)
-        name = '{}-{}'.format(self.app_id, function_name)
-        result = lambda_client.invoke_function(name, payload)
-        error = result.get('FunctionError', None)
-        response_payload = result.get('Payload', None)
-        return response_payload, error

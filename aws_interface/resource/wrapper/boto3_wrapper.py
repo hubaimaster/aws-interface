@@ -884,7 +884,7 @@ class IAM:
 
 class CostExplorer:
     def __init__(self, boto3_session):
-        self.client = boto3_session.client('ce', 'us-east-1')
+        self.client = boto3_session.client('ce')
 
     def get_cost_and_usage(self, start, end):
         response = self.client.get_cost_and_usage(

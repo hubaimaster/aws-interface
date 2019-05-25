@@ -3,7 +3,6 @@ from django.shortcuts import render, redirect
 from botocore.errorfactory import ClientError
 from numbers import Number
 from dashboard.models import App, Log
-import simplejson as json
 import traceback
 import settings
 
@@ -92,12 +91,17 @@ class Util:
 
 def page_manage(func):
     def wrap(*args, **kwargs):
+        try:  # Logging
+            request = args[1]
+            event = 'func:{}, args:{}, kwargs:{}'.format(func, args, kwargs)
+            Util.log('info', request.user, event)
+        except Exception as ex:
+            print(ex)
         try:
             result = func(*args, **kwargs)
         except ClientError as ex:
             if settings.DEBUG:
-                pass
-                #raise ex
+                raise ex
             title = 'Unknown Error'
             desc = '원인을 알 수 없는 에러입니다'
             link = None
@@ -114,6 +118,7 @@ def page_manage(func):
             Util.log('error', request.user, event)
 
             code = ex.response.get('Error', {}).get('Code', None)
+            error_type = None
             if code == 'UnrecognizedClientException':
                 title = '등록된 IAM AccessKey 를 확인해주세요'
                 desc = '유효하지 않은 AccessKey 가 입력되어 있습니다'

@@ -71,6 +71,10 @@ class Client{
         });
     }
 
+    _logic(api_name, data, callback) {
+        this._call_api('logic', api_name, data, callback);
+    }
+
     _log(api_name, data, callback) {
         this._call_api('log', api_name, data, callback);
     }
@@ -247,7 +251,7 @@ class Client{
         var buff = Buffer.from(bin, 'utf8');
         let base64_data = buff.toString('base64');
         var raw_base64 = Buffer.from(base64_data, 'utf8');
-        var base64_chunks = div_chunks(raw_base64, 1024 * 1024 * 6);
+        var base64_chunks = div_chunks(raw_base64, 1024 * 1024 * 4);
         var parent_file_id = null;
         let file_name = "file";
         function upload(parent_file_id, base64_chunk, callback){
@@ -270,6 +274,13 @@ class Client{
             'event_source': event_source,
             'event_name': event_name,
             'event_param': event_param,
+        }, callback);
+    }
+
+    logic_run_function(function_name, payload, callback){
+        this._logic('logic', {
+            'function_name': function_name,
+            'payload': payload,
         }, callback);
     }
 

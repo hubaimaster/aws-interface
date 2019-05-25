@@ -1,3 +1,4 @@
+
 import Foundation
 
 private class AWSINetworkRequest {
@@ -141,7 +142,7 @@ class AWSI {
         }
         auth(function_name: "guest", data: data) { (response) in
             if let json = response, json.keys.contains("session_id"), let session_id = json["session_id"] as? String{
-               self.session_id = session_id
+                self.session_id = session_id
             }
             callback(response)
         }
@@ -171,7 +172,7 @@ class AWSI {
         database(function_name: "get_item", data: data, callback: callback)
     }
 
-    func database_get_items(partition: String, start_key: [String: Any]?=nil, limit: Int=100, callback: @escaping (_ response: [String: Any]?)->Void){
+    func database_get_items(partition: String, start_key: String?=nil, limit: Int=100, callback: @escaping (_ response: [String: Any]?)->Void){
         var data: [String: Any] = [
             "partition": partition,
             "limit": limit,
@@ -205,10 +206,10 @@ class AWSI {
 
     /*
      query = [
-        ["and|or", "field", "condition (eq|gt|..)", "value"], ...
-    ]
-    */
-    func database_query_items(partition: String, query: [[String]], start_key: [String: Any]?, limit: Int=100, reverse: Bool=false, callback: @escaping (_ response: [String: Any]?)->Void){
+     ["and|or", "field", "condition (eq|gt|..)", "value"], ...
+     ]
+     */
+    func database_query_items(partition: String, query: [[String]], start_key: String?, limit: Int=100, reverse: Bool=false, callback: @escaping (_ response: [String: Any]?)->Void){
         var data: [String: Any] = [
             "partition": partition,
             "query": query,
