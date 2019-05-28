@@ -130,9 +130,16 @@ class Auth(LoginRequiredMixin, View):
             result = api.get_users(start_key)
             users = result['items']
             end_key = result.get('end_key')
+            user_groups = api.get_user_groups()['groups']
+            visible_user_fields = ['id', 'creation_date', 'email', 'groups']
+            none_extra_fields = ['id', 'creation_date', 'email', 'groups',
+                                 'password_hash', 'salt', 'partition', 'login_method']
             template = loader.get_template('dashboard/app/component/auth_user_table_row.html')
             context = {
                 'users': users,
+                'user_groups': user_groups,
+                'visible_user_fields': visible_user_fields,
+                'none_extra_fields': none_extra_fields,
             }
             return {
                 'user_rows': template.render(context, request),
