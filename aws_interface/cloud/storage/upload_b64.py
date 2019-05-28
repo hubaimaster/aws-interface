@@ -3,7 +3,7 @@ from cloud.response import Response
 from cloud.permission import has_write_permission
 from cloud.permission import Permission, NeedPermission
 from cloud.shortuuid import uuid
-from cloud.message import Error
+from cloud.message import error
 import base64
 
 # Define the input output format of the function.
@@ -57,7 +57,7 @@ def do(data, resource):
                 parent_file_info['next_file_id'] = file_id
                 file_size += parent_file_info['file_size']
             else:
-                body['error'] = Error.permission_denied
+                body['error'] = error.PERMISSION_DENIED
                 return Response(body)
 
     file_info = {

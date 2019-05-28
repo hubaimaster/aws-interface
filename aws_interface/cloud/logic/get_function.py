@@ -2,7 +2,7 @@
 from cloud.response import Response
 from cloud.permission import has_write_permission
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -42,7 +42,7 @@ def do(data, resource):
                                    'condition': 'eq'}])
 
     if len(items) == 0:
-        body['error'] = Error.no_such_function
+        body['error'] = error.NO_SUCH_FUNCTION
         return Response(body)
     else:
         body['item'] = items[0]

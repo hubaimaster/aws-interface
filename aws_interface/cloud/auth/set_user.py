@@ -1,6 +1,6 @@
 from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -33,7 +33,7 @@ def do(data, resource):
 
     # For security
     if field in ['id', 'email', 'password_hash', 'salt', 'groups', 'login_method']:
-        body['error'] = Error.forbidden_modification
+        body['error'] = error.FORBIDDEN_MODIFICATION
         return Response(body)
     else:
         user[field] = value

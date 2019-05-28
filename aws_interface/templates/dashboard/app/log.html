@@ -57,7 +57,7 @@
 
                             </div>
                         </div>
-                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <div id="log-table" class="table-responsive">
                             <!-- Projects table -->
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
@@ -69,31 +69,34 @@
                                     <th scope="col">event_param</th>
                                 </tr>
                                 </thead>
-                                <tbody style="max-height: 400px; overflow-y: auto;">
-                                {% for log in logs %}
-                                    <tr>
-                                        <th scope="row">
-                                            {{ log.owner }}
-                                        </th>
-                                        <td>
-                                            {{ log.creationDate|to_date }}
-                                        </td>
-                                        <td>
-                                            {{ log.event_source }}
-                                        </td>
-                                        <td>
-                                            {{ log.event_name }}
-                                        </td>
-                                        <td>
-                                            {{ log.event_param }}
-                                        </td>
-
-                                    </tr>
-                                {% endfor %}
+                                <tbody>
+{#                                {% for log in logs %}#}
+{#                                    <tr>#}
+{#                                        <th scope="row">#}
+{#                                            {{ log.owner }}#}
+{#                                        </th>#}
+{#                                        <td>#}
+{#                                            {{ log.creationDate|to_date }}#}
+{#                                        </td>#}
+{#                                        <td>#}
+{#                                            {{ log.event_source }}#}
+{#                                        </td>#}
+{#                                        <td>#}
+{#                                            {{ log.event_name }}#}
+{#                                        </td>#}
+{#                                        <td>#}
+{#                                            {{ log.event_param }}#}
+{#                                        </td>#}
+{##}
+{#                                    </tr>#}
+{#                                {% endfor %}#}
 
                                 </tbody>
                             </table>
                         </div>
+                        <button id="load-more-logs-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_logs();">
+                            항목 더보기 +
+                        </button>
                     </div>
                 </div>
             </div>
@@ -112,5 +115,45 @@
             </footer>
         </div>
     </div>
+    
+    <script>
+    var logs_end_key = null;
+    function load_more_logs(){
+            const user_id = '{{ user_id }}';
+            const event_source = '{{ event_source }}';
+            const event_name = '{{ event_name }}';
+
+            var item = {
+                cmd: 'get_logs',
+                user_id,
+                event_source,
+                event_name,
+            };
+
+            if (logs_end_key != null){
+                item['start_key'] = logs_end_key;
+            }
+            $.post("", item, function (data) {
+                logs_end_key = data['end_key'];
+                if (logs_end_key == null){
+                    $("#load-more-logs-btn").hide();
+                }
+                for (var i = 0; i < data['items'].length; i++){
+                    const item = data['items'][i];
+                    const raw = "<tr>\n" +
+                        "<td scope='row'>" + item.owner  + "</td>\n" +
+                        "<td>" + item['creation_date'] + "</td>\n" +
+                        "<td>" + item.event_source + "</td>\n" +
+                        "<td>" + item.event_name + "</td>\n" +
+                        "<td>" + item.event_param + "</td>\n" +
+                        "</tr>";
+                    $("#log-table>table").append(raw);
+                }
+            });
+        }
+        window.onload = function () {
+            load_more_logs();
+        };
+    </script>
 
 {% endblock %}

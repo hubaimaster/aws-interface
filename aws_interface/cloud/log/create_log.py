@@ -1,7 +1,7 @@
 
 from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -44,8 +44,8 @@ def do(data, resource):
         if success:
             return Response(body)
         else:
-            body['error'] = Error.log_creation_failed
+            body['error'] = error.LOG_CREATION_FAILED
             return Response(body)
     else:
-        body['error'] = Error.invalid_session
+        body['error'] = error.INVALID_SESSION
         return Response(body)

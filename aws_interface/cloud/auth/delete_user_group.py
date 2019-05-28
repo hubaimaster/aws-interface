@@ -1,7 +1,7 @@
 
 from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -22,7 +22,7 @@ def do(data, resource):
     group_name = params['group_name']
 
     if group_name == 'user':
-        body['error'] = Error.default_user_group_cannot_be_modified
+        body['error'] = error.DEFAULT_USER_GROUP_CANNOT_BE_MODIFIED
         return Response(body)
 
     _ = resource.db_delete_item('user-group-{}'.format(group_name))

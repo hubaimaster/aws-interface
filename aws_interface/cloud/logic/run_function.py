@@ -1,7 +1,7 @@
 
 from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 import sys
 import io
 import os
@@ -42,7 +42,7 @@ def do(data, resource):
     items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}])
 
     if len(items) == 0:
-        body['error'] = Error.no_such_function
+        body['error'] = error.NO_SUCH_FUNCTION
         return Response(body)
     else:
         item = items[0]
@@ -71,7 +71,7 @@ def do(data, resource):
                 body['response'] = handler(payload, user)
             body['stdout'] = std_str.getvalue()
         except Exception as ex:
-            body['error'] = Error.function_error
+            body['error'] = error.FUNCTION_ERROR
             body['error']['message'] = body['error']['message'].format(ex)
         os.remove(zip_temp_dir)
 

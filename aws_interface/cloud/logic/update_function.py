@@ -2,7 +2,7 @@
 from cloud.response import Response
 from cloud.permission import has_write_permission
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 from cloud.shortuuid import uuid
 import base64
 
@@ -56,7 +56,7 @@ def do(data, resource):
 
     item_ids, _ = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
     if len(item_ids) == 0:
-        body['error'] = Error.no_such_function
+        body['error'] = error.NO_SUCH_FUNCTION
     else:
         zip_file_b64 = zip_file.encode('utf-8')
         zip_file_b64 = base64.b64decode(zip_file_b64)

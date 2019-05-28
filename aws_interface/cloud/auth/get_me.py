@@ -2,7 +2,7 @@
 from cloud.response import Response
 from cloud.crypto import Hash
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -36,7 +36,7 @@ def do(data, resource):
         item = resource.db_get_item(Hash.sha3_512(session_id))
     except BaseException as ex:
         print(ex)
-        body['error'] = Error.permission_denied
+        body['error'] = error.PERMISSION_DENIED
         return Response(body)
     print('session_item:', item)
     if item:

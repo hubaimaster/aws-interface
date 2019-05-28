@@ -2,7 +2,7 @@
 from cloud.response import Response
 from cloud.permission import has_read_permission
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 import base64
 
 # Define the input output format of the function.
@@ -46,9 +46,9 @@ def do(data, resource):
             body['file_name'] = item.get('file_name', None)
             return Response(body)
         else:
-            body['error'] = Error.permission_denied
+            body['error'] = error.PERMISSION_DENIED
             return Response(body)
     else:
-        body['error'] = Error.invalid_file_key
+        body['error'] = error.INVALID_FILE_KEY
         return Response(body)
 

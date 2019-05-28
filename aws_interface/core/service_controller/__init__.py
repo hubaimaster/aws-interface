@@ -7,7 +7,7 @@ from .logic import LogicServiceController
 from .log import LogServiceController
 
 
-sc_list = [
+SC_LIST = [
     BillServiceController,
     AuthServiceController,
     DatabaseServiceController,
@@ -15,4 +15,4 @@ sc_list = [
     LogicServiceController,
     LogServiceController,
 ]
-sc_dict = dict([(sc.SERVICE_TYPE, sc) for sc in sc_list])
+SC_DICT = {sc.SERVICE_TYPE: sc for sc in SC_LIST}

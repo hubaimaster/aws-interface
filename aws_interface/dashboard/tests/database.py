@@ -9,6 +9,7 @@ class DatabaseTestProcess:
         self.parent.browser.find_element_by_id('create-partition-button').click()
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('partition-name').send_keys(partition)
+        time.sleep(DELAY)
         self.parent.browser.find_element_by_id('add-partition-btn').click()
 
     def _has_partition(self, partition):

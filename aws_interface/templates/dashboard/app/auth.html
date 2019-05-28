@@ -3,45 +3,46 @@
 {% load timetags %}
 {% block content %}
 
-<div class="main-content">
-    <!-- Top navbar -->
-    {% include 'dashboard/app/top-navbar.html' %}
-    <!-- Header -->
-    <input id="view-tag" value="auth" hidden>
-    <div class="header bg-gradient-primary pb-7 pt-5 pt-md-8">
-        <div class="container-fluid">
-            <div class="header-body">
+    <div class="main-content">
+        <!-- Top navbar -->
+        {% include 'dashboard/app/top-navbar.html' %}
+        <!-- Header -->
+        <input id="view-tag" value="auth" hidden>
+        <div class="header bg-gradient-primary pb-7 pt-5 pt-md-8">
+            <div class="container-fluid">
+                <div class="header-body">
 
-                <div class="alert alert-primary" role="alert">
-                    <strong>AWS DynamoDB, AWS Lambda, AWS APIGateway</strong>  를 사용합니다.
-                </div>
+                    <div class="alert alert-primary" role="alert">
+                        <strong>AWS DynamoDB, AWS Lambda, AWS APIGateway</strong>  를 사용합니다.
+                    </div>
 
-                <!-- Card stats -->
-                <div class="row">
-                    <div class="col-xl-6 col-lg-6">
-                        <div class="card card-stats mb-4 mb-xl-0">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <h5 class="card-title text-uppercase text-muted mb-0">총 회원 수</h5>
-                                        <span class="h2 font-weight-bold mb-0">{{ user_count.item.count }} 명</span>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                                            <i class="fas fa-user-friends"></i>
+                    <!-- Card stats -->
+                    <div class="row">
+                        <div class="col-xl-6 col-lg-6">
+                            <div class="card card-stats mb-4 mb-xl-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="card-title text-uppercase text-muted mb-0">총 회원 수</h5>
+                                            <span class="h2 font-weight-bold mb-0">{{ user_count.item.count }} 명</span>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                                                <i class="fas fa-user-friends"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-xl-6 col-lg-6">
-                        <div class="card card-stats mb-4 mb-xl-0">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <h5 class="card-title text-uppercase text-muted mb-0">접속 중인 세션 수</h5>
-                                        <span class="h2 font-weight-bold mb-0">{{ session_count.item.count }} 개</span>
+                        <div class="col-xl-6 col-lg-6">
+                            <div class="card card-stats mb-4 mb-xl-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="card-title text-uppercase text-muted mb-0">접속 중인 세션 수</h5>
+                                            <span class="h2 font-weight-bold mb-0">{{ session_count.item.count }} 개</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -50,726 +51,795 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Page content -->
-    <div class="container-fluid mt--7">
-        <div class="row mt-4">
-            <div class="col-xl-12 mb-5 mb-xl-0">
-                <div class="card shadow">
-                    <div class="card-header border-0">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h3 class="mb-0">
-                                    <span class="badge badge-primary">설정</span>
-                                    회원 그룹
-                                </h3>
-                            </div>
-                            <div class="col text-right">
-                                <a id="create-group-modal" data-toggle="modal" data-target="#modal-put-group" class="btn btn-sm btn-primary">
-                                    <span class="btn-inner--text" style="color: white;">그룹 생성</span>
-                                </a>
-                            </div>
-                            <div class="modal fade" id="modal-put-group" tabindex="-1" role="dialog" aria-labelledby="modal-put-group" aria-hidden="true">
-                                <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title" id="modal-title-default">그룹 생성</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                        <form method="post">{% csrf_token %}
-                                            <input name="cmd" value="put_group" hidden>
-                                            <div class="modal-body">
-                                                <div class="pl-lg-12">
-                                                    <div class="row">
-                                                        <div class="col-lg-12">
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">이름</label>
-                                                                <input id="group-name" name="group_name" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 이름">
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">설명</label>
-                                                                <input id="group-description" name="group_description" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 설명">
+        <!-- Page content -->
+        <div class="container-fluid mt--7">
+            <div class="row mt-4">
+                <div class="col-xl-12 mb-5 mb-xl-0">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">
+                                        <span class="badge badge-primary">설정</span>
+                                        회원 그룹
+                                    </h3>
+                                </div>
+                                <div class="col text-right">
+                                    <a id="create-group-modal" data-toggle="modal" data-target="#modal-put-group" class="btn btn-sm btn-primary">
+                                        <span class="btn-inner--text" style="color: white;">그룹 생성</span>
+                                    </a>
+                                </div>
+                                <div class="modal fade" id="modal-put-group" tabindex="-1" role="dialog" aria-labelledby="modal-put-group" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">그룹 생성</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <form method="post">{% csrf_token %}
+                                                <input name="cmd" value="put_group" hidden>
+                                                <div class="modal-body">
+                                                    <div class="pl-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="input-username">이름</label>
+                                                                    <input id="group-name" name="group_name" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 이름">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="input-username">설명</label>
+                                                                    <input id="group-description" name="group_description" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 설명">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    <p>
+                                                        확인 버튼을 클릭하여 회원 그룹을 생성합니다.
+                                                    </p>
                                                 </div>
-                                                <p>
-                                                    확인 버튼을 클릭하여 회원 그룹을 생성합니다.
-                                                </p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                <button id="create-group" type="submit" class="btn btn-primary">확인</button>
-                                            </div>
-                                        </form>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                                    <button id="create-group" type="submit" class="btn btn-primary">확인</button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
-
                         </div>
-                    </div>
-                    <div class="table-responsive">
-                        <!-- Projects table -->
-                        <table class="table align-items-center table-flush">
-                            <thead class="thead-light">
-                            <tr>
-                                <th scope="col">이름</th>
-                                <th scope="col">설명</th>
-                                <th scope="col">권한</th>
-                                <th scope="col"></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for group in user_groups %}
+                        <div class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
                                 <tr>
-                                    <th name="group-name" scope="row">
-                                        {{ group.name }}
-                                    </th>
-                                    <td name="group-description">
-                                        {{ group.description }}
-                                    </td>
-                                    <td name="group-description">
-                                        <button id="modify-permissions-{{ group.name }}" data-toggle="modal"  data-target="#modal-permissions-{{ group.name }}" class="btn btn-sm btn-info"> 관리 ({{ group.permissions|length }}) </button>
+                                    <th scope="col">이름</th>
+                                    <th scope="col">설명</th>
+                                    <th scope="col">권한</th>
+                                    <th scope="col"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for group in user_groups %}
+                                    <tr>
+                                        <th name="group-name" scope="row">
+                                            {{ group.name }}
+                                        </th>
+                                        <td name="group-description">
+                                            {{ group.description }}
+                                        </td>
+                                        <td name="group-description">
+                                            <button id="modify-permissions-{{ group.name }}" data-toggle="modal"  data-target="#modal-permissions-{{ group.name }}" class="btn btn-sm btn-info"> 관리 ({{ group.permissions|length }}) </button>
 
-                                        <div class="modal fade" id="modal-permissions-{{ group.name }}" tabindex="-1" role="dialog" aria-labelledby="modal-permissions-{{ group.name }}" aria-hidden="true">
-                                            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title" id="modal-title-default">그룹 권한 관리</h4>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">×</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="pl-lg-12">
+                                            <div class="modal fade" id="modal-permissions-{{ group.name }}" tabindex="-1" role="dialog" aria-labelledby="modal-permissions-{{ group.name }}" aria-hidden="true">
+                                                <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title" id="modal-title-default">그룹 권한 관리</h4>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="pl-lg-12">
 
-                                                            <div class="form-group">
-                                                                <label class="form-control-label">권한 추가</label>
-                                                                <div class="row">
-                                                                    <div class="col-9">
-                                                                        <select id="select-permissions-{{ group.name }}" class="form-control">
-                                                                            {% for permission in all_permissions %}
-                                                                                {% if permission not in group.permissions %}
-                                                                                    <option value="{{ permission }}">
-                                                                                        {{ permission }}
-                                                                                    </option>
-                                                                                {% endif %}
-                                                                            {% endfor %}
-                                                                        </select>
-                                                                    </div>
-                                                                    <div class="col-3">
-                                                                        <button class="form-control btn btn-success" onclick="attach_group_permission('{{ group.name }}')">+</button>
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">권한 추가</label>
+                                                                    <div class="row">
+                                                                        <div class="col-9">
+                                                                            <select id="select-permissions-{{ group.name }}" class="form-control">
+                                                                                {% for permission in all_permissions %}
+                                                                                    {% if permission not in group.permissions %}
+                                                                                        <option value="{{ permission }}">
+                                                                                            {{ permission }}
+                                                                                        </option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-3">
+                                                                            <button class="form-control btn btn-success" onclick="attach_group_permission('{{ group.name }}')">+</button>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
 
-                                                            <div class="form-group">
-                                                                <label class="form-control-label">권한 목록</label>
-                                                                <div class="row">
-                                                                    <div class="col-12">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label">보유 권한 목록</label>
+                                                                    <div class="row">
+                                                                        <div class="col-12">
 
-                                                                        <div class="form-group">
-                                                                            <div class="table-responsive">
-                                                                                <table class="table align-items-center table-hover table-flush">
-                                                                                    <thead class="thead-light">
-                                                                                    <tr>
-                                                                                        <th scope="col">권한 이름</th>
-                                                                                        <th scope="col"></th>
-                                                                                    </tr>
-                                                                                    </thead>
-                                                                                    <tbody id="permissions-{{ group }}" style="background: white;">
-                                                                                    {% for permission in group.permissions %}
+                                                                            <div class="form-group">
+                                                                                <div class="table-responsive">
+                                                                                    <table class="table align-items-center table-hover table-flush">
+                                                                                        <thead class="thead-light">
                                                                                         <tr>
-                                                                                            <td>{{ permission }}</td>
-                                                                                            <td>
-                                                                                                <a class="btn btn-danger btn-sm text text-white" style="padding-top:0; padding-bottom:0;" onclick="detach_group_permission('{{ group.name }}', '{{ permission }}');"><i class="fas fa-trash"></i></a>
-                                                                                            </td>
+                                                                                            <th scope="col">권한 이름</th>
+                                                                                            <th scope="col"></th>
                                                                                         </tr>
-                                                                                    {% endfor %}
-                                                                                    </tbody>
-                                                                                </table>
+                                                                                        </thead>
+                                                                                        <tbody id="permissions-{{ group }}" style="background: white;">
+                                                                                        {% for permission in group.permissions %}
+                                                                                            <tr>
+                                                                                                <td>{{ permission }}</td>
+                                                                                                <td>
+                                                                                                    <a class="btn btn-danger btn-sm text text-white" style="padding-top:0; padding-bottom:0;" onclick="detach_group_permission('{{ group.name }}', '{{ permission }}');"><i class="fas fa-trash"></i></a>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        {% endfor %}
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button id="attach-user-group-commit" type="submit" class="btn btn-primary">확인</button>
+                                                        <div class="modal-footer">
+                                                            <button id="attach-user-group-commit" type="submit" class="btn btn-primary">확인</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="col text-right">
-                                            <form role="form" method="post">{% csrf_token %}
-                                                <input name="cmd" value="delete_group" hidden>
-                                                <input name="group_name" value="{{ group.name }}" hidden>
-                                                <button id="remove-group-{{ group.name }}" type="submit" class="btn btn-sm btn-danger">제거</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-xl-12 mb-5 mb-xl-0">
-                <div class="card shadow">
-                    <div class="card-header border-0">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h3 class="mb-0">
-                                    <span class="badge badge-primary">설정</span>
-                                    로그인 방법
-                                </h3>
-                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="col text-right">
+                                                <form role="form" method="post">{% csrf_token %}
+                                                    <input name="cmd" value="delete_group" hidden>
+                                                    <input name="group_name" value="{{ group.name }}" hidden>
+                                                    <button id="remove-group-{{ group.name }}" type="submit" class="btn btn-sm btn-danger">제거</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <!-- Projects table -->
-                        <table class="table align-items-center table-flush">
-                            <thead class="thead-light">
-                            <tr>
-                                <th scope="col">방법</th>
-                                <th scope="col">설명</th>
-                                <th scope="col">기본 그룹</th>
-                                <th scope="col">사용</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <th scope="row">
-                                    이메일/비밀번호 로그인
-                                </th>
-                                <td>
-                                    <a href="">login</a> API를 이용하여 로그인합니다
-                                </td>
-                                <td>
-                                    <select id="email_default_group" class="form-control">
-                                        {% for group in user_groups %}
-                                            {% if group.name == email_login.default_group_name %}
-                                                <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-xl-12 mb-5 mb-xl-0">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">
+                                        <span class="badge badge-primary">설정</span>
+                                        로그인 방법
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">방법</th>
+                                    <th scope="col">설명</th>
+                                    <th scope="col">기본 그룹</th>
+                                    <th scope="col">사용</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <th scope="row">
+                                        이메일/비밀번호 로그인
+                                    </th>
+                                    <td>
+                                        <a href="">login</a> API를 이용하여 로그인합니다
+                                    </td>
+                                    <td>
+                                        <select id="email_default_group" class="form-control">
+                                            {% for group in user_groups %}
+                                                {% if group.name == email_login.default_group_name %}
+                                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                                {% else %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <label class="custom-toggle">
+                                            {% if email_login.enabled %}
+                                                <input id="email_enabled" type="checkbox" checked>
                                             {% else %}
-                                                <option value="{{ group.name }}">{{ group.name }}</option>
+                                                <input id="email_enabled" type="checkbox">
                                             {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td>
-                                    <label class="custom-toggle">
-                                        {% if email_login.enabled %}
-                                            <input id="email_enabled" type="checkbox" checked>
-                                        {% else %}
-                                            <input id="email_enabled" type="checkbox">
-                                        {% endif %}
-                                        <span class="custom-toggle-slider rounded-circle"></span>
-                                    </label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    익명 로그인
-                                </th>
-                                <td>
-                                    <a href="">guest</a> API를 이용하여 로그인합니다
-                                </td>
-                                <td>
-                                    <select id="guest_default_group" class="form-control">
-                                        {% for group in user_groups %}
-                                            {% if group.name == guest_login.default_group_name %}
-                                                <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                            <span class="custom-toggle-slider rounded-circle"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        익명 로그인
+                                    </th>
+                                    <td>
+                                        <a href="">guest</a> API를 이용하여 로그인합니다
+                                    </td>
+                                    <td>
+                                        <select id="guest_default_group" class="form-control">
+                                            {% for group in user_groups %}
+                                                {% if group.name == guest_login.default_group_name %}
+                                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                                {% else %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <label class="custom-toggle">
+                                            {% if guest_login.enabled %}
+                                                <input id="guest_enabled" type="checkbox" checked>
                                             {% else %}
-                                                <option value="{{ group.name }}">{{ group.name }}</option>
+                                                <input id="guest_enabled" type="checkbox">
                                             {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </td>
-                                <td>
-                                    <label class="custom-toggle">
-                                        {% if guest_login.enabled %}
-                                            <input id="guest_enabled" type="checkbox" checked>
-                                        {% else %}
-                                            <input id="guest_enabled" type="checkbox">
-                                        {% endif %}
-                                        <span class="custom-toggle-slider rounded-circle"></span>
-                                    </label>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                            <span class="custom-toggle-slider rounded-circle"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mt-4">
-            <div class="col-xl-12">
-                <div class="card shadow">
-                    <div class="card-header border-0">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h3 class="mb-0">
-                                    가입된 회원
-                                </h3>
-                            </div>
+            <div class="row mt-4">
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">
+                                        가입된 회원
+                                    </h3>
+                                </div>
 
-                            <div class="col text-right">
-                                <a id="create-user-button" data-toggle="modal" data-target="#modal-put-user" class="btn btn-sm btn-primary">
-                                    <span class="btn-inner--text" style="color: white;">회원 생성</span>
-                                </a>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" onclick="delete_checked_users();"><i class="fas fa-trash"></i> 선택 삭제</a>
-                                        <a class="dropdown-item" data-toggle="modal" data-target="#modal-mod-user"><i class="fas fa-user-edit"></i>선택 수정</a>
+                                <div class="col text-right">
+                                    <a id="create-user-button" data-toggle="modal" data-target="#modal-put-user" class="btn btn-sm btn-primary">
+                                        <span class="btn-inner--text" style="color: white;">회원 생성</span>
+                                    </a>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" onclick="delete_checked_users();"><i class="fas fa-trash"></i> 선택 삭제</a>
+                                            <a class="dropdown-item" data-toggle="modal" data-target="#modal-mod-user"><i class="fas fa-user-edit"></i>선택 수정</a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
 
-                            <div class="modal fade" id="modal-put-user" tabindex="-1" role="dialog" aria-labelledby="modal-put-user" aria-hidden="true">
-                                <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title" id="modal-title-default">회원 생성</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
+                                <div class="modal fade" id="modal-put-user" tabindex="-1" role="dialog" aria-labelledby="modal-put-user" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">회원 생성</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <form method="post">{% csrf_token %}
+                                                <input name="cmd" value="put_user" hidden>
+                                                <div class="modal-body">
+                                                    <div class="pl-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="input-username">이메일</label>
+                                                                    <input name="user_email" type="email" id="input-username" class="form-control form-control-alternative" placeholder="example@email.com">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="input-password">비밀번호</label>
+                                                                    <input name="user_password" type="password" id="input-password" class="form-control form-control-alternative" placeholder="******">
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p>
+                                                        확인 버튼을 클릭하여 회원을 생성합니다.
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                                    <button id="create-user-commit" type="submit" class="btn btn-primary">확인</button>
+                                                </div>
+                                            </form>
                                         </div>
-                                        <form method="post">{% csrf_token %}
-                                            <input name="cmd" value="put_user" hidden>
+                                    </div>
+                                </div>
+
+
+                                <div class="modal fade" id="modal-mod-user" tabindex="-1" role="dialog" aria-labelledby="modal-mod-user" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">회원 수정</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
                                             <div class="modal-body">
                                                 <div class="pl-lg-12">
                                                     <div class="row">
                                                         <div class="col-lg-12">
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">이메일</label>
-                                                                <input name="user_email" type="email" id="input-username" class="form-control form-control-alternative" placeholder="example@email.com">
+                                                                <label class="form-control-label" for="user-field-name">수정할 필드 이름</label>
+                                                                <input name="user-field-name" type="text" id="user-field-name" class="form-control form-control-alternative" placeholder="Field name">
                                                             </div>
+
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="input-password">비밀번호</label>
-                                                                <input name="user_password" type="password" id="input-password" class="form-control form-control-alternative" placeholder="******">
+                                                                <label class="form-control-label" for="field-type">수정할 필드 타입</label>
+                                                                <select id="user-field-type" class="form-control">
+                                                                    <option value="S">문자열</option>
+                                                                    <option value="N">숫자</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="user-field-value">수정할 필드 내용</label>
+                                                                <input name="user-field-value" type="text" id="user-field-value" class="form-control form-control-alternative" placeholder="Field value">
                                                             </div>
 
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <p>
-                                                    확인 버튼을 클릭하여 회원을 생성합니다.
+                                                    확인 버튼을 클릭하여 회원을 정보를 수정합니다.
                                                 </p>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                <button id="create-user-commit" type="submit" class="btn btn-primary">확인</button>
+                                                <button id="mod-user-commit" class="btn btn-primary" onclick="set_checked_users();">수정</button>
                                             </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="modal fade" id="modal-mod-user" tabindex="-1" role="dialog" aria-labelledby="modal-mod-user" aria-hidden="true">
-                                <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title" id="modal-title-default">회원 수정</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="pl-lg-12">
-                                                <div class="row">
-                                                    <div class="col-lg-12">
-
-                                                        <div class="form-group">
-                                                            <label class="form-control-label" for="user-field-name">수정할 필드 이름</label>
-                                                            <input name="user-field-name" type="text" id="user-field-name" class="form-control form-control-alternative" placeholder="Field name">
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label class="form-control-label" for="field-type">수정할 필드 타입</label>
-                                                            <select id="user-field-type" class="form-control">
-                                                                <option value="S">문자열</option>
-                                                                <option value="N">숫자</option>
-                                                            </select>
-                                                        </div>
-
-                                                        <div class="form-group">
-                                                            <label class="form-control-label" for="user-field-value">수정할 필드 내용</label>
-                                                            <input name="user-field-value" type="text" id="user-field-value" class="form-control form-control-alternative" placeholder="Field value">
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <p>
-                                                확인 버튼을 클릭하여 회원을 정보를 수정합니다.
-                                            </p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                            <button id="mod-user-commit" class="btn btn-primary" onclick="set_checked_users();">수정</button>
                                         </div>
                                     </div>
                                 </div>
+
+
                             </div>
-
-
                         </div>
-                    </div>
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                        <!-- Projects table -->
-                        <table class="table align-items-center table-flush">
-                            <thead class="thead-light">
-                            <tr>
-                                {% for visible_user_field in visible_user_fields %}
-                                    <th scope="col">{{ visible_user_field }}</th>
-                                {% endfor %}
-                                <th scope="col">+ Extra</th>
-                                <th scope="col">
-
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody style="max-height: 400px; overflow-y: auto;">
-                            {% for user in users.items %}
+                        <div id="user-table" class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
                                 <tr>
-                                    <th scope="row">
-                                        {{ user.id }}
+                                    {% for visible_user_field in visible_user_fields %}
+                                        <th scope="col">{{ visible_user_field }}</th>
+                                    {% endfor %}
+                                    <th scope="col">+ Extra</th>
+                                    <th scope="col">
                                     </th>
-                                    <td>
-                                        {{ user.creation_date|to_date }}
-                                    </td>
-                                    <td name="col-user-email">
-                                        {{ user.email }}
-                                    </td>
-                                    <td>
-                                        {% for group in user.groups %}
-                                            <a onclick="detach_user_group('{{ user.id }}', '{{group}}')" class="btn badge badge-primary">{{ group }}</a>
-                                        {% endfor %}
-                                        <a data-toggle="modal" data-target="#modal-attach-user-group-{{ user.id }}" class="btn badge badge-info">+</a>
-
-                                        <div class="modal fade" id="modal-attach-user-group-{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="modal-attach-user-group-{{ user.id }}" aria-hidden="true">
-                                            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title" id="modal-title-default">그룹 추가</h4>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">×</span>
-                                                        </button>
-                                                    </div>
-                                                    <form method="post">{% csrf_token %}
-                                                        <input name="cmd" value="attach_user_group" hidden>
-                                                        <input name="user_id" value="{{ user.id }}" hidden>
-                                                        <div class="modal-body">
-                                                            <div class="pl-lg-12">
-                                                                <div class="row">
-                                                                    <div class="col-lg-12">
-                                                                        <div class="form-group">
-                                                                            <label class="form-control-label" for="input-username">그룹 이름</label>
-                                                                            <select id="group-name" name="group_name" class="form-control form-control-alternative">
-                                                                                {% for group in user_groups %}
-                                                                                    <option value="{{ group.name }}">{{ group.name }}</option>
-                                                                                {% endfor %}
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <p>
-                                                                확인 버튼을 클릭하여 회원에게 그룹을 부여합니다.
-                                                            </p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                            <button id="attach-user-group-{{ user.id }}" type="submit" class="btn btn-primary">확인</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                    </td>
-                                    <td>
-                                        {% for key, value in user.items %}
-                                            {% if key not in visible_user_fields and key not in none_extra_fields %}
-                                                <h5> {{ key }} : {{ value }} </h5>
-                                            {% endif %}
-                                        {% endfor %}
-
-                                    </td>
-                                    <td>
-                                        <div class="custom-control custom-radio mt--4">
-                                            <input class="custom-control-input" type="radio" name="checkbox-user" id="{{ user.id }}">
-                                            <label class="custom-control-label" for="{{ user.id }}"></label>
-                                        </div>
-                                    </td>
                                 </tr>
-                            {% endfor %}
+                                </thead>
+                                <tbody style="max-height: 400px; overflow-y: auto;">
+{#                                {% for user in users.items %}#}
+{#                                    <tr>#}
+{#                                        <th scope="row">#}
+{#                                            {{ user.id }}#}
+{#                                        </th>#}
+{#                                        <td>#}
+{#                                            {{ user.creation_date|to_date }}#}
+{#                                        </td>#}
+{#                                        <td name="col-user-email">#}
+{#                                            {{ user.email }}#}
+{#                                        </td>#}
+{#                                        <td>#}
+{#                                            {% for group in user.groups %}#}
+{#                                                <a onclick="detach_user_group('{{ user.id }}', '{{group}}')" class="btn badge badge-primary">{{ group }}</a>#}
+{#                                            {% endfor %}#}
+{#                                            <a data-toggle="modal" data-target="#modal-attach-user-group-{{ user.id }}" class="btn badge badge-info">+</a>#}
+{##}
+{#                                            <div class="modal fade" id="modal-attach-user-group-{{ user.id }}" tabindex="-1" role="dialog" aria-labelledby="modal-attach-user-group-{{ user.id }}" aria-hidden="true">#}
+{#                                                <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">#}
+{#                                                    <div class="modal-content">#}
+{#                                                        <div class="modal-header">#}
+{#                                                            <h4 class="modal-title" id="modal-title-default">그룹 추가</h4>#}
+{#                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
+{#                                                                <span aria-hidden="true">×</span>#}
+{#                                                            </button>#}
+{#                                                        </div>#}
+{#                                                        <form method="post">{% csrf_token %}#}
+{#                                                            <input name="cmd" value="attach_user_group" hidden>#}
+{#                                                            <input name="user_id" value="{{ user.id }}" hidden>#}
+{#                                                            <div class="modal-body">#}
+{#                                                                <div class="pl-lg-12">#}
+{#                                                                    <div class="row">#}
+{#                                                                        <div class="col-lg-12">#}
+{#                                                                            <div class="form-group">#}
+{#                                                                                <label class="form-control-label" for="input-username">그룹 이름</label>#}
+{#                                                                                <select id="group-name" name="group_name" class="form-control form-control-alternative">#}
+{#                                                                                    {% for group in user_groups %}#}
+{#                                                                                        <option value="{{ group.name }}">{{ group.name }}</option>#}
+{#                                                                                    {% endfor %}#}
+{#                                                                                </select>#}
+{#                                                                            </div>#}
+{#                                                                        </div>#}
+{#                                                                    </div>#}
+{#                                                                </div>#}
+{#                                                                <p>#}
+{#                                                                    확인 버튼을 클릭하여 회원에게 그룹을 부여합니다.#}
+{#                                                                </p>#}
+{#                                                            </div>#}
+{#                                                            <div class="modal-footer">#}
+{#                                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>#}
+{#                                                                <button id="attach-user-group-{{ user.id }}" type="submit" class="btn btn-primary">확인</button>#}
+{#                                                            </div>#}
+{#                                                        </form>#}
+{#                                                    </div>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{##}
+{##}
+{#                                        </td>#}
+{#                                        <td>#}
+{#                                            {% for key, value in user.items %}#}
+{#                                                {% if key not in visible_user_fields and key not in none_extra_fields %}#}
+{#                                                    <h5> {{ key }} : {{ value }} </h5>#}
+{#                                                {% endif %}#}
+{#                                            {% endfor %}#}
+{##}
+{#                                        </td>#}
+{#                                        <td>#}
+{#                                            <div class="custom-control custom-radio mt--4">#}
+{#                                                <input class="custom-control-input" type="radio" name="checkbox-user" id="{{ user.id }}">#}
+{#                                                <label class="custom-control-label" for="{{ user.id }}"></label>#}
+{#                                            </div>#}
+{#                                        </td>#}
+{#                                    </tr>#}
+{#                                {% endfor %}#}
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button id="load-more-users-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_users();">
+                            항목 더보기 +
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
 
-        <div class="row mt-4">
-            <div class="col-xl-12">
-                <div class="card shadow">
-                    <div class="card-header border-0">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h3 class="mb-0">
-                                    접속 중인 세션
-                                </h3>
-                            </div>
+            <div class="row mt-4">
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">
+                                        접속 중인 세션
+                                    </h3>
+                                </div>
 
-                            <div class="col text-right">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" onclick="delete_checked_sessions();"><i class="fas fa-trash"></i>선택 삭제</a>
+                                <div class="col text-right">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" onclick="delete_checked_sessions();"><i class="fas fa-trash"></i>선택 삭제</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                        <!-- Projects table -->
-                        <table class="table align-items-center table-flush">
-                            <thead class="thead-light">
-                            <tr>
-                                <th scope="col">user_id</th>
-                                <th scope="col">createDate</th>
-                                <th scope="col">sessionType</th>
-                                <th scope="col">session_id (HASH)</th>
-                                <th scope="col">
-                                    <div class="custom-control custom-checkbox mt--4">
-                                        <input class="custom-control-input" type="checkbox" name="checkbox-session" id="check-all-sessions">
-                                        <label class="custom-control-label" for="check-all-sessions"></label>
-                                    </div>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for session in sessions.items %}
+                        <div id="session-table" class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
                                 <tr>
-                                    <th scope="row">
-                                        {{ session.user_id }}
-                                    </th>
-                                    <td>
-                                        {{ session.creation_date|to_date }}
-                                    </td>
-                                    <td>
-                                        {{ session.session_type }}
-
-                                    </td>
-                                    <td>
-                                        {{ session.id }}
-
-                                    </td>
-                                    <td>
+                                    <th scope="col">user_id</th>
+                                    <th scope="col">createDate</th>
+                                    <th scope="col">sessionType</th>
+                                    <th scope="col">session_id (HASH)</th>
+                                    <th scope="col">
                                         <div class="custom-control custom-checkbox mt--4">
-                                            <input class="custom-control-input" type="checkbox" name="checkbox-session" id="{{ session.id }}">
-                                            <label class="custom-control-label" for="{{ session.id }}"></label>
+                                            <input class="custom-control-input" type="checkbox" name="checkbox-session" id="check-all-sessions">
+                                            <label class="custom-control-label" for="check-all-sessions"></label>
                                         </div>
-                                    </td>
+                                    </th>
                                 </tr>
-                            {% endfor %}
+                                </thead>
+                                <tbody>
+{#                                {% for session in sessions.items %}#}
+{#                                    <tr>#}
+{#                                        <th scope="row">#}
+{#                                            {{ session.user_id }}#}
+{#                                        </th>#}
+{#                                        <td>#}
+{#                                            {{ session.creation_date|to_date }}#}
+{#                                        </td>#}
+{#                                        <td>#}
+{#                                            {{ session.session_type }}#}
+{##}
+{#                                        </td>#}
+{#                                        <td>#}
+{#                                            {{ session.id }}#}
+{##}
+{#                                        </td>#}
+{#                                        <td>#}
+{#                                            <div class="custom-control custom-checkbox mt--4">#}
+{#                                                <input class="custom-control-input" type="checkbox" name="checkbox-session" id="{{ session.id }}">#}
+{#                                                <label class="custom-control-label" for="{{ session.id }}"></label>#}
+{#                                            </div>#}
+{#                                        </td>#}
+{#                                    </tr>#}
+{#                                {% endfor %}#}
+                                {# Comment this because of dynamic ajax post code #}
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <button id="load-more-sessions-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_sessions();">
+                            항목 더보기 +
+                        </button>
                     </div>
                 </div>
             </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="row align-items-center justify-content-xl-between">
+                    <div class="col-xl-6">
+                        <div class="copyright text-center text-xl-left text-muted">
+                            &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="row align-items-center justify-content-xl-between">
-                <div class="col-xl-6">
-                    <div class="copyright text-center text-xl-left text-muted">
-                        &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
     </div>
-</div>
 
-<script>
-    function set_email_login(){
-        var email_default_group = $("#email_default_group").val();
-        var email_enabled = $("#email_enabled").is(':checked');
-        $.post("", {
-            cmd: "set_email_login",
-            default_group_name: email_default_group,
-            enabled: email_enabled,
-        }, function (data) {
+    <script>
+        var sessions_end_key = null;
+        var users_end_key = null;
 
-        });
-    }
-    function set_guest_login(){
-        var guest_default_group = $("#guest_default_group").val();
-        var guest_enabled = $("#guest_enabled").is(':checked');
+        function set_email_login(){
+            var email_default_group = $("#email_default_group").val();
+            var email_enabled = $("#email_enabled").is(':checked');
+            $.post("", {
+                cmd: "set_email_login",
+                default_group_name: email_default_group,
+                enabled: email_enabled,
+            }, function (data) {
 
-        $.post("", {
-            cmd: "set_guest_login",
-            default_group_name: guest_default_group,
-            enabled: guest_enabled,
-        }, function (data) {
-
-        });
-    }
-    function delete_sessions(session_ids){
-        $.LoadingOverlay('show', {
-            text:'Deleting sessions...'
-        });
-        $.post("", {
-            cmd: "delete_sessions",
-            'session_ids[]': session_ids,
-        }, function (data) {
-            $.LoadingOverlay('hide');
-            window.location.reload();
-        });
-    }
-    function delete_users(user_ids){
-        $.LoadingOverlay('show', {
-            text:'Deleting users...'
-        });
-        $.post("", {
-            cmd: "delete_users",
-            'user_ids[]': user_ids,
-        }, function (data) {
-            window.location.reload();
-            $.LoadingOverlay('hide');
-        });
-    }
-
-    function set_users(user_ids) {
-        const field_name = $("#user-field-name").val();
-        const field_type = $("#user-field-type").val();
-        const field_value = $("#user-field-value").val();
-        $.LoadingOverlay('show', {
-            text:'Modifying users...'
-        });
-        $.post("", {
-            cmd: "set_users",
-            'user_ids[]': user_ids,
-            'field_name': field_name,
-            'field_type': field_type,
-            'field_value': field_value,
-        }, function (data) {
-            window.location.reload();
-            $.LoadingOverlay('hide');
-        });
-    }
-
-    function delete_checked_sessions(){
-        var session_ids = [];
-        var checkboxs = $("input[name='checkbox-session']");
-        for (var i = 0; i < checkboxs.length; i++){
-            if (checkboxs[i].checked){
-                session_ids.push(checkboxs[i].id);
-            }
+            });
         }
-        delete_sessions(session_ids);
-    }
+        function set_guest_login(){
+            var guest_default_group = $("#guest_default_group").val();
+            var guest_enabled = $("#guest_enabled").is(':checked');
 
-    function delete_checked_users(){
-        var user_ids = [];
-        var checkboxs = $("input[name='checkbox-user']");
-        for (var i = 0; i < checkboxs.length; i++){
-            if (checkboxs[i].checked){
-                user_ids.push(checkboxs[i].id);
-            }
+            $.post("", {
+                cmd: "set_guest_login",
+                default_group_name: guest_default_group,
+                enabled: guest_enabled,
+            }, function (data) {
+
+            });
         }
-        delete_users(user_ids);
-    }
-
-    function set_checked_users() {
-        var user_ids = [];
-        var checkboxs = $("input[name='checkbox-user']");
-        for (var i = 0; i < checkboxs.length; i++){
-            if (checkboxs[i].checked){
-                user_ids.push(checkboxs[i].id);
-            }
+        function delete_sessions(session_ids){
+            $.LoadingOverlay('show', {
+                text:'Deleting sessions...'
+            });
+            $.post("", {
+                cmd: "delete_sessions",
+                'session_ids[]': session_ids,
+            }, function (data) {
+                $.LoadingOverlay('hide');
+                window.location.reload();
+            });
         }
-        set_users(user_ids);
-    }
+        function delete_users(user_ids){
+            $.LoadingOverlay('show', {
+                text:'Deleting users...'
+            });
+            $.post("", {
+                cmd: "delete_users",
+                'user_ids[]': user_ids,
+            }, function (data) {
+                window.location.reload();
+                $.LoadingOverlay('hide');
+            });
+        }
 
-    function detach_group_permission(group_name, permission){
-        $.post("", {
-            cmd: "detach_group_permission",
-            group_name: group_name,
-            permission: permission,
-        }, function (data) {
-            window.location.reload();
-        });
-    }
+        function set_users(user_ids) {
+            const field_name = $("#user-field-name").val();
+            const field_type = $("#user-field-type").val();
+            const field_value = $("#user-field-value").val();
+            $.LoadingOverlay('show', {
+                text:'Modifying users...'
+            });
+            $.post("", {
+                cmd: "set_users",
+                'user_ids[]': user_ids,
+                'field_name': field_name,
+                'field_type': field_type,
+                'field_value': field_value,
+            }, function (data) {
+                window.location.reload();
+                $.LoadingOverlay('hide');
+            });
+        }
 
-    function detach_user_group(user_id, group_name) {
-        $.post("", {
-            cmd: "detach_user_group",
-            group_name: group_name,
-            user_id: user_id,
-        }, function (data) {
-            window.location.reload();
-        });
-    }
+        function delete_checked_sessions(){
+            var session_ids = [];
+            var checkboxs = $("input[name='checkbox-session']");
+            for (var i = 0; i < checkboxs.length; i++){
+                if (checkboxs[i].checked){
+                    session_ids.push(checkboxs[i].id);
+                }
+            }
+            delete_sessions(session_ids);
+        }
 
-    function attach_group_permission(group_name){
-        const permission = $("#select-permissions-" + group_name).val();
-        $.post("", {
-            cmd: "attach_group_permission",
-            group_name: group_name,
-            permission: permission,
-        }, function (data) {
-            window.location.reload();
-        });
-    }
+        function delete_checked_users(){
+            var user_ids = [];
+            var checkboxs = $("input[name='checkbox-user']");
+            for (var i = 0; i < checkboxs.length; i++){
+                if (checkboxs[i].checked){
+                    user_ids.push(checkboxs[i].id);
+                }
+            }
+            delete_users(user_ids);
+        }
 
-    window.onload = function(){
-        $("#email_default_group").change(function () {
-            set_email_login()
-        });
-        $("#email_enabled").change(function () {
-            set_email_login()
-        });
-        $("#guest_default_group").change(function () {
-            set_guest_login()
-        });
-        $("#guest_enabled").change(function () {
-            set_guest_login()
-        });
+        function set_checked_users() {
+            var user_ids = [];
+            var checkboxs = $("input[name='checkbox-user']");
+            for (var i = 0; i < checkboxs.length; i++){
+                if (checkboxs[i].checked){
+                    user_ids.push(checkboxs[i].id);
+                }
+            }
+            set_users(user_ids);
+        }
 
-        $("#check-all-sessions").click(function () {
-            $("input[name='checkbox-session']").prop('checked', this.checked);
-        });
-        $("#check-all-users").click(function () {
-            $("input[name='checkbox-user']").prop('checked', this.checked);
-        });
-    }
-</script>
+        function detach_group_permission(group_name, permission){
+            $.post("", {
+                cmd: "detach_group_permission",
+                group_name: group_name,
+                permission: permission,
+            }, function (data) {
+                window.location.reload();
+            });
+        }
+
+        function detach_user_group(user_id, group_name) {
+            $.post("", {
+                cmd: "detach_user_group",
+                group_name: group_name,
+                user_id: user_id,
+            }, function (data) {
+                window.location.reload();
+            });
+        }
+
+        function attach_group_permission(group_name){
+            const permission = $("#select-permissions-" + group_name).val();
+            $.post("", {
+                cmd: "attach_group_permission",
+                group_name: group_name,
+                permission: permission,
+            }, function (data) {
+                window.location.reload();
+            });
+        }
+
+        function load_more_sessions(){
+            var item = {
+                cmd: 'get_sessions',
+            };
+
+            if (sessions_end_key != null){
+                item['start_key'] = sessions_end_key;
+            }
+            $.post("", item, function (data) {
+                sessions_end_key = data['end_key'];
+                if (sessions_end_key == null){
+                    $("#load-more-sessions-btn").hide();
+                }
+                for (var i = 0; i < data['items'].length; i++){
+                    const session = data['items'][i];
+                    const raw = "<tr>" +
+                        "<th scope='row'>" +
+                        session['user_id'] +
+                        "</th>" +
+                        "<td>" +
+                        session['creation_date'] +
+                        "</td>" +
+                        "<td>" +
+                        session['session_type'] +
+                        "</td>" +
+                        "<td>" +
+                        session['id'] +
+                        "</td>" +
+                        "<td>" +
+                        "<div class='custom-control custom-checkbox mt--4'>" +
+                        "<input class='custom-control-input' type='checkbox' name='checkbox-session' id='" + session['id'] + "'>" +
+                        "<label class='custom-control-label' for='" + session['id'] + "'></label>" +
+                        "</div>" +
+                        "</td>" +
+                        "</tr>";
+                    $("#session-table>table").append(raw);
+                }
+            });
+        }
+
+        function load_more_users(){
+            var item = {
+                cmd: 'get_user_rows',
+            };
+
+            if (users_end_key != null){
+                item['start_key'] = users_end_key;
+            }
+            $.post("", item, function (data) {
+                const user_rows = data['user_rows'];
+                users_end_key = data['end_key'];
+                if (users_end_key == null){
+                    $("#load-more-users-btn").hide();
+                }
+                $("#user-table>table").append(user_rows);
+            });
+        }
+
+        window.onload = function(){
+            $("#email_default_group").change(function () {
+                set_email_login()
+            });
+            $("#email_enabled").change(function () {
+                set_email_login()
+            });
+            $("#guest_default_group").change(function () {
+                set_guest_login()
+            });
+            $("#guest_enabled").change(function () {
+                set_guest_login()
+            });
+
+            $("#check-all-sessions").click(function () {
+                $("input[name='checkbox-session']").prop('checked', this.checked);
+            });
+            $("#check-all-users").click(function () {
+                $("input[name='checkbox-user']").prop('checked', this.checked);
+            });
+            load_more_users();
+            load_more_sessions();
+        }
+    </script>
 
 {% endblock %}

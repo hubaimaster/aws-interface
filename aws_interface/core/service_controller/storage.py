@@ -40,10 +40,11 @@ class StorageServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_b64_info_items(self, start_key):
+    def get_b64_info_items(self, start_key, reverse):
         import cloud.storage.get_b64_info_items as method
         params = {
             'start_key': start_key,
+            'reverse': reverse,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

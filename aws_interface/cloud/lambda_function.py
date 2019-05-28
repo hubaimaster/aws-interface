@@ -1,7 +1,7 @@
 import importlib
 import cloud.auth.get_me as get_me
 from resource import get_resource
-from cloud.message import Error
+import cloud.message.error
 import sys
 import time
 
@@ -93,9 +93,9 @@ def abstracted_handler(params, resource):
         response = {
             'statusCode': 403,
             'body': {
-                'error': Error.forbidden_request
+                'error': cloud.message.error.FORBIDDEN_REQUEST
             },
-            'error': Error.forbidden_request
+            'error': cloud.message.error.FORBIDDEN_REQUEST
         }
         return response
     data = {
@@ -115,9 +115,9 @@ def abstracted_handler(params, resource):
         response = {
             'statusCode': 401,
             'body': {
-                'error': Error.permission_denied
+                'error': cloud.message.error.PERMISSION_DENIED
             },
-            'error': Error.permission_denied
+            'error': cloud.message.error.PERMISSION_DENIED
         }
         return response
     except Exception as ex:
@@ -125,9 +125,9 @@ def abstracted_handler(params, resource):
         response = {
             'statusCode': 400,
             'body': {
-                'error': Error.invalid_request
+                'error': cloud.message.error.INVALID_REQUEST
             },
-            'error': Error.invalid_request
+            'error': cloud.message.error.INVALID_REQUEST
         }
         return response
 

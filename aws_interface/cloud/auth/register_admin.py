@@ -2,7 +2,7 @@
 from cloud.crypto import *
 from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 
 # Define the input output format of the function.
@@ -43,7 +43,7 @@ def do(data, resource):
     items, end_key = resource.db_query('user', instructions)
     users = items
     if len(users) > 0:
-        body['error'] = Error.existing_account
+        body['error'] = error.EXISTING_ACCOUNT
         return Response(body)
     else:
         item = {

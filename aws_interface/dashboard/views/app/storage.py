@@ -52,7 +52,7 @@ class Storage(LoginRequiredMixin, View):
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(file_name)
                 return response
             else:
-                result = storage_api.get_b64_info_items(None)
+                result = storage_api.get_b64_info_items(start_key=None, reverse=True)
                 context['app_id'] = app_id
                 context['b64_info'] = result
                 context['user_groups'] = auth_api.get_user_groups()['groups']
@@ -88,10 +88,9 @@ class Storage(LoginRequiredMixin, View):
                 return JsonResponse(result)
             elif cmd == 'get_b64_info_items':  # For admins
                 start_key = request.POST.get('start_key', None)
-                result = storage_api.get_b64_info_items(start_key)
+                result = storage_api.get_b64_info_items(start_key, reverse=True)
                 return JsonResponse(result)
             elif cmd == 'delete_b64':
                 file_id = request.POST['file_id']
                 result = storage_api.delete_b64(file_id)
                 return JsonResponse(result)
-

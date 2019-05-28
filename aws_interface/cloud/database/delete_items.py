@@ -3,7 +3,7 @@ from cloud.response import Response
 from cloud.permission import has_write_permission
 from concurrent.futures import ThreadPoolExecutor
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -29,7 +29,7 @@ def do(data, resource):
 
     item_ids = params.get('item_ids', [])
     if len(item_ids) > 128:
-        body['error'] = Error.number_of_batch_items_must_be_less_than_128
+        body['error'] = error.NUM_OF_BATCH_ITEMS_MUST_BE_LESS_THAN_128
         return Response(body)
 
     with ThreadPoolExecutor(max_workers=32) as executor:

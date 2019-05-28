@@ -1,3 +1,8 @@
+"""Django live server test code
+Dashboard login and register,
+Auth, Bill, Database, Storage, Log, Logic,
+Download SDK and run test
+"""
 import time
 import platform
 import tempfile
@@ -12,16 +17,16 @@ from selenium.common.exceptions import NoAlertPresentException, NoSuchElementExc
 from selenium.webdriver.chrome.options import Options
 
 
-base_dir = os.path.dirname(os.path.abspath(settings.__file__))
-secret_dir = os.path.join(base_dir, 'secret')
-secret_base_dir = os.path.join(secret_dir, 'base.json')
+BASE_DIR = os.path.dirname(os.path.abspath(settings.__file__))
+SECRET_DIR = os.path.join(BASE_DIR, 'secret')
+SECRET_BASE_DIR = os.path.join(SECRET_DIR, 'base.json')
 
 try:
-    secrets_base = json.load(open(secret_base_dir, 'rt'))
-    ACCESS_KEY = secrets_base['AWS_ACCESS_KEY']
-    SECRET_KEY = secrets_base['AWS_SECRET_KEY']
+    SECRETS_BASE = json.load(open(SECRET_BASE_DIR, 'rt'))
+    ACCESS_KEY = SECRETS_BASE['AWS_ACCESS_KEY']
+    SECRET_KEY = SECRETS_BASE['AWS_SECRET_KEY']
 except Exception:
-    raise BaseException('Could not find secret file {}'.format(secret_base_dir))
+    raise BaseException('Could not find secret file {}'.format(SECRET_BASE_DIR))
 
 
 TEST_STRING = 'testapp'
@@ -42,6 +47,12 @@ PASSWORD = 'TEST_PASSWORD'
 
 class DashboardTestCase(StaticLiveServerTestCase):
     def setUp(self):
+        """
+        Download web drivers and
+        register aws-i and login and
+        create aws-i application
+        :return:
+        """
         self.download_dir = tempfile.mkdtemp()
         self.drive_path = self._download_web_drive()
         self.browser = webdriver.Chrome(chrome_options=self.get_options(), executable_path=self.drive_path)
@@ -52,6 +63,11 @@ class DashboardTestCase(StaticLiveServerTestCase):
         self._create_app()
 
     def get_options(self):
+        """
+        Get options for download functions in web driver
+        Setting about downloaded file's dir and other options
+        :return: options:Options
+        """
         options = Options()
         options.add_experimental_option("prefs", {
             "download.default_directory": self.download_dir,
@@ -62,6 +78,11 @@ class DashboardTestCase(StaticLiveServerTestCase):
         return options
 
     def _download_web_drive(self):
+        """
+        Download each OS version of web drivers from google's web site
+        And return Path of downloaded web driver's zip file
+        :return: path
+        """
         name = 'chromedriver'
         self.temp_dir = tempfile.mkdtemp()
         temp = tempfile.mktemp(suffix='.zip', dir=self.temp_dir)

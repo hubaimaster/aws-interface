@@ -6,10 +6,17 @@ class AuthTestProcess:
         self.parent = parent
 
     def _create_group(self, name, description):
+        """
+        :param name: Group name to create
+        :param description: Group description to create
+        :return:
+        """
         self.parent.browser.find_element_by_id('create-group-modal').click()
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('group-name').send_keys(name)
+        time.sleep(DELAY)
         self.parent.browser.find_element_by_id('group-description').send_keys(description)
+        time.sleep(DELAY)
         self.parent.browser.find_element_by_id('create-group').click()
 
     def _has_user_group(self, name):

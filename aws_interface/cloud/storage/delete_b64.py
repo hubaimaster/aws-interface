@@ -1,8 +1,7 @@
-
 from cloud.response import Response
 from cloud.permission import has_write_permission
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -36,7 +35,7 @@ def do(data, resource):
 
             file_id_to_delete = file_item.get('parent_file_id', None)
         else:
-            body['error'] = Error.permission_denied
+            body['error'] = error.PERMISSION_DENIED
             return Response(body)
 
     return Response(body)

@@ -2,7 +2,7 @@
 from cloud.response import Response
 from cloud.permission import has_write_permission
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 from cloud.shortuuid import uuid
 import base64
 
@@ -61,5 +61,5 @@ def do(data, resource):
         body['function_name'] = function_name
         return Response(body)
     else:
-        body['error'] = Error.existing_function
+        body['error'] = error.EXISTING_FUNCTION
         return Response(body)

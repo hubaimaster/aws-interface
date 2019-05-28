@@ -4,7 +4,7 @@ from cloud.response import Response
 import cloud.auth.get_email_login as get_email_login
 from secrets import token_urlsafe
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -39,7 +39,7 @@ def do(data, resource):
         enabled = False
 
     if not enabled:
-        body['error'] = Error.email_login_invalid
+        body['error'] = error.EMAIL_LOGIN_INVALID
         return Response(body)
 
     instructions = [
@@ -60,7 +60,7 @@ def do(data, resource):
             _ = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
             body['session_id'] = session_id
         else:
-            body['error'] = Error.wrong_password
+            body['error'] = error.WRONG_PASSWORD
     else:
-        body['error'] = Error.no_such_account
+        body['error'] = error.NO_SUCH_ACCOUNT
     return Response(body)

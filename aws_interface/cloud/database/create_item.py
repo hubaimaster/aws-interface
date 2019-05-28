@@ -1,7 +1,7 @@
 
 from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 
 # Define the input output format of the function.
@@ -49,6 +49,6 @@ def do(data, resource):
         resource.db_put_item(partition, item)
         body['item_id'] = item.get('id', None)
         return Response(body)
-    else:
-        body['error'] = Error.no_such_partition
-        return Response(body)
+
+    body['error'] = error.NO_SUCH_PARTITION
+    return Response(body)

@@ -3,7 +3,7 @@ from cloud.crypto import *
 from cloud.response import Response
 import cloud.auth.get_email_login as get_email_login
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -44,7 +44,7 @@ def do(data, resource):
         enabled = False
 
     if not enabled:
-        body['error'] = Error.email_login_invalid
+        body['error'] = error.EMAIL_LOGIN_INVALID
         return Response(body)
 
     instructions = [
@@ -53,7 +53,7 @@ def do(data, resource):
     items, end_key = resource.db_query(partition, instructions)
     users = list(items)
     if len(users) > 0:
-        body['error'] = Error.existing_account
+        body['error'] = error.EXISTING_ACCOUNT
         return Response(body)
     else:
         item = {

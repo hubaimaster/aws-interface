@@ -13,7 +13,10 @@ info = {
         'start_key?': 'str',
     },
     'output_format': {
-        'success': 'bool',
+        'error?': {
+            'code': 'int',
+            'message': 'str'
+        },
         'end_key': 'str',
         'items': 'list',
     }

@@ -1,10 +1,13 @@
-
-from django.shortcuts import render, redirect
+"""Django - Dashboard application view of Auth service
+"""
+from decimal import Decimal
+from django.shortcuts import render, redirect, HttpResponse
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django.template import loader
 from dashboard.views.utils import Util, page_manage
 from core.adapter.django import DjangoAdapter
-from decimal import Decimal
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -22,7 +25,7 @@ class Auth(LoginRequiredMixin, View):
             context['users'] = api.get_users()
             context['visible_user_fields'] = ['id', 'creation_date', 'email', 'groups']
             context['none_extra_fields'] = ['id', 'creation_date', 'email', 'groups',
-                                           'password_hash', 'salt', 'partition', 'login_method']
+                                            'password_hash', 'salt', 'partition', 'login_method']
             context['sessions'] = api.get_sessions()
             context['email_login'] = api.get_email_login()['item']
             context['guest_login'] = api.get_guest_login()['item']
@@ -106,6 +109,32 @@ class Auth(LoginRequiredMixin, View):
                 user_id = request.POST.get('user_id')
                 group_name = request.POST.get('group_name')
                 api.detach_user_group(user_id, group_name)
+            elif cmd == 'get_sessions':
+                start_key = request.POST.get('start_key', None)
+                result = api.get_sessions(start_key=start_key)
+                return JsonResponse(result)
+            elif cmd == 'get_users':
+                start_key = request.POST.get('start_key', None)
+                result = api.get_users(start_key=start_key)
+                return JsonResponse(result)
+            elif cmd == 'get_user_rows':
+                start_key = request.POST.get('start_key', None)
+                result = self._get_user_rows(request, app_id, start_key)
+                return JsonResponse(result)
 
         return redirect(request.path_info)  # Redirect back
 
+    def _get_user_rows(self, request, app_id, start_key=None):
+        adapter = DjangoAdapter(app_id, request)
+        with adapter.open_api_auth() as api:
+            result = api.get_users(start_key)
+            users = result['items']
+            end_key = result.get('end_key')
+            template = loader.get_template('dashboard/app/component/auth_user_table_row.html')
+            context = {
+                'users': users,
+            }
+            return {
+                'user_rows': template.render(context, request),
+                'end_key': end_key
+            }

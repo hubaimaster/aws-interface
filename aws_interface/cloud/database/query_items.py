@@ -2,7 +2,7 @@
 from cloud.response import Response
 from cloud.permission import has_read_permission
 from cloud.permission import Permission, NeedPermission
-from cloud.message import Error
+from cloud.message import error
 import json
 
 # Define the input output format of the function.
@@ -56,5 +56,5 @@ def do(data, resource):
     else:
         body['items'] = None
         body['end_key'] = None
-        body['error'] = Error.no_such_partition
+        body['error'] = error.NO_SUCH_PARTITION
         return Response(body)

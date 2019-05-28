@@ -100,8 +100,6 @@ def page_manage(func):
         try:
             result = func(*args, **kwargs)
         except ClientError as ex:
-            if settings.DEBUG:
-                raise ex
             title = 'Unknown Error'
             desc = '원인을 알 수 없는 에러입니다'
             link = None

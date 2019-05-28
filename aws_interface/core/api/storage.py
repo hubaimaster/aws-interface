@@ -16,5 +16,5 @@ class StorageAPI(API):
     def download_b64(self, file_id):
         return self.service_controller.download_b64(file_id)
 
-    def get_b64_info_items(self, start_key):
-        return self.service_controller.get_b64_info_items(start_key)
+    def get_b64_info_items(self, start_key, reverse=False):
+        return self.service_controller.get_b64_info_items(start_key, reverse)

@@ -206,9 +206,9 @@
 
                             </div>
                         </div>
-                        <div class="table-responsive">
+                        <div id="file-table" class="table-responsive">
                             <!-- Projects table -->
-                            <table id="dir-table" class="table align-items-center table-flush">
+                            <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                 <tr>
                                     <th scope="col">id</th>
@@ -220,20 +220,23 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for item in b64_info.items %}
-                                    <tr>
-                                        <th scope="row"><a href="{% url 'storage' app_id %}?cmd=download_b64&file_id={{ item.id }}">{{ item.id }}</a></th>
-                                        <td>{{ item.file_name }}</td>
-                                        <td>{{ item.owner }}</td>
-                                        <td>{{ item.creation_date|to_date }}</td>
-                                        <td>{{ item.file_size|filesizeformat}}</td>
-                                        <td>
-                                            <button onclick="delete_b64('{{ item.id }}')" class="btn btn-sm btn-danger">제거</button>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
+{#                                {% for item in b64_info.items %}#}
+{#                                    <tr>#}
+{#                                        <th scope="row"><a href="{% url 'storage' app_id %}?cmd=download_b64&file_id={{ item.id }}">{{ item.id }}</a></th>#}
+{#                                        <td>{{ item.file_name }}</td>#}
+{#                                        <td>{{ item.owner }}</td>#}
+{#                                        <td>{{ item.creation_date|to_date }}</td>#}
+{#                                        <td>{{ item.file_size|filesizeformat}}</td>#}
+{#                                        <td>#}
+{#                                            <button onclick="delete_b64('{{ item.id }}')" class="btn btn-sm btn-danger">제거</button>#}
+{#                                        </td>#}
+{#                                    </tr>#}
+{#                                {% endfor %}#}
                                 </tbody>
                             </table>
+                        <button id="load-more-files-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_files();">
+                            항목 더보기 +
+                        </button>
                         </div>
                     </div>
                 </div>
@@ -252,6 +255,8 @@
     </div>
 
     <script>
+
+        var files_end_key = null;
 
         var folder_read_groups = [];
         var folder_write_groups = [];
@@ -380,6 +385,9 @@
         }
 
         function delete_b64(file_id){
+            $.LoadingOverlay('show', {
+                text:'Deleting file...'
+            });
             $.post("", {
                 cmd: 'delete_b64',
                 file_id: file_id,
@@ -388,11 +396,41 @@
             });
         }
 
+        function load_more_files(){
+            var item = {
+                cmd: 'get_b64_info_items',
+            };
+            if (files_end_key != null){
+                item['start_key'] = files_end_key;
+            }
+            $.post("", item, function (data) {
+                files_end_key = data['end_key'];
+                if (files_end_key == null){
+                    $("#load-more-files-btn").hide();
+                }
+                for (var i = 0; i < data['items'].length; i++){
+                    const item = data['items'][i];
+                    const raw = "<tr>\n" +
+                        "<td scope='row'><a href='{% url 'storage' app_id %}?cmd=download_b64&file_id=" + item.id + "'>" + item.id  + "</a></td>\n" +
+                        "<td>" + item['file_name'] + "</td>\n" +
+                        "<td>" + item.owner + "</td>\n" +
+                        "<td>" + item.creation_date + "</td>\n" +
+                        "<td>" + item.file_size + "</td>\n" +
+                        "<td>\n" +
+                        "<button onclick=\"delete_b64('" + item.id + "')\" class='btn btn-sm btn-danger'>제거</button>\n" +
+                        "</td>\n" +
+                        "</tr>";
+                    $("#file-table>table").append(raw);
+                }
+            });
+        }
+
         window.onload = function () {
             render_folder_read_groups();
             render_folder_write_groups();
             render_file_read_groups();
             render_file_write_groups();
+            load_more_files();
             $("#create-folder").click(function () {
                 var folder_name = $("#folder-name").val();
                 if (folder_name == null || folder_name.length == 0){
@@ -420,5 +458,6 @@
             });
         };
     </script>
+
 
 {% endblock %}
