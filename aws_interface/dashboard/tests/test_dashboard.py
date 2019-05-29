@@ -17,7 +17,7 @@ from selenium.common.exceptions import NoAlertPresentException, NoSuchElementExc
 from selenium.webdriver.chrome.options import Options
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(settings.__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(settings.__file__)))
 SECRET_DIR = os.path.join(BASE_DIR, 'secret')
 SECRET_BASE_DIR = os.path.join(SECRET_DIR, 'base.json')
 

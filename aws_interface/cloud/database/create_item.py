@@ -36,9 +36,6 @@ def do(data, resource):
     read_groups = params.get('read_groups', [])
     write_groups = params.get('write_groups', [])
 
-    read_groups.append('admin')
-    write_groups.append('admin')
-
     read_groups = list(set(read_groups))
     write_groups = list(set(write_groups))
 

@@ -46,7 +46,7 @@ def has_run_permission(user, item):
         return False
 
 
-system_partitions = ['user', 'log']
+system_partitions = ['user', 'log', 'logic-function', 'files', 'session']
 
 
 def database_can_not_access_to_item(item):
@@ -236,8 +236,9 @@ class Permission:
             raise PermissionError('Permission denied [{}]'.format(permission))
 
 
-# Decorator to check user permissions
 class NeedPermission:
+    """Class Decorator to check user permissions
+    """
     def __init__(self, permission):
         self.permission = permission
 

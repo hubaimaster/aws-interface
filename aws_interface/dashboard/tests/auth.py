@@ -20,6 +20,11 @@ class AuthTestProcess:
         self.parent.browser.find_element_by_id('create-group').click()
 
     def _has_user_group(self, name):
+        """
+        Make sure it has a member group [name] and return Whether that group exists
+        :param name: Group name to create
+        :return:bool
+        """
         has_group_name = False
         group_names = self.parent.browser.find_elements_by_name('group-name')
         for group_name in group_names:
@@ -77,4 +82,3 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user(email))
         # LOGIN METHOD
-

@@ -8,8 +8,13 @@ import settings
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-
-        base_dir = os.path.dirname(os.path.abspath(settings.__file__))
+        """
+        Create super user that can access to the django admin
+        :param args:
+        :param options:
+        :return:
+        """
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(settings.__file__)))
         secret_dir = os.path.join(base_dir, 'secret')
         secret_base_dir = os.path.join(secret_dir, 'base.json')
 
