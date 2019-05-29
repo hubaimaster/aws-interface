@@ -479,8 +479,15 @@ class DynamoDB:
         return Decimal("%.20f" % time.time())
 
     def put_item(self, table_name, partition, item, item_id=None, creation_date=None, indexing=True):
-        if not item_id:
+        if item_id:
+            response = self.get_item(table_name, item_id=item_id)
+            if 'Item' in response:
+                need_counting = False
+            else:
+                need_counting = True
+        else:
             item_id = str(shortuuid.uuid())
+            need_counting = True
         if not creation_date:
             creation_date = self.time()
         table = self.resource.Table(table_name)
@@ -490,7 +497,9 @@ class DynamoDB:
         response = table.put_item(
             Item=item,
         )
-        self._add_item_count(table_name, '{}-count'.format(partition))
+        if need_counting:
+            """ Counting if the item is a new one """
+            self._add_item_count(table_name, '{}-count'.format(partition))
         if indexing:
             self._delete_inverted_query(table_name, item_id)
             self._put_inverted_query(table_name, partition, item)
