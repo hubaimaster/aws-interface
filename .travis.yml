@@ -1,6 +1,9 @@
 language: python
 python:
 - '3.6'
+env:
+  global:
+    - DJANGO_SETTINGS_MODULE=conf.settings.development
 before_install:
 - openssl aes-256-cbc -K $encrypted_92a5d2eda6d4_key -iv $encrypted_92a5d2eda6d4_iv
   -in secret.tar.enc -out secret.tar -d
