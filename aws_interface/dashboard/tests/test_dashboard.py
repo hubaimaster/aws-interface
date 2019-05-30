@@ -93,6 +93,7 @@ class DashboardTestCase(StaticLiveServerTestCase):
             url = WEB_DRIVE_MAC
         elif system == 'Windows':
             url = WEB_DRIVE_WINDOWS
+            name += '.exe'
         with urlopen(url) as res:
             res_data = res.read()
             with open(temp, 'wb+') as f:
