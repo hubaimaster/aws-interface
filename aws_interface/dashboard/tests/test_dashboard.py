@@ -184,9 +184,9 @@ class DashboardTestCase(StaticLiveServerTestCase):
         from dashboard.tests.sdk import SDKTestProcess
         from dashboard.tests.database import DatabaseTestProcess
         AuthTestProcess(self).do_test()
-        BillTestProcess(self).do_test()
-        DatabaseTestProcess(self).do_test()
-        SDKTestProcess(self).do_test()
+        #BillTestProcess(self).do_test()
+        #DatabaseTestProcess(self).do_test()
+        #SDKTestProcess(self).do_test()
 
     def test(self):
         self.do_test_process()
