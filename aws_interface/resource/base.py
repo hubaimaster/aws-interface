@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from resource.sdk import generate
+from sdk import generate
 from concurrent.futures import ThreadPoolExecutor
 import time
 

@@ -107,10 +107,20 @@ class Database(LoginRequiredMixin, View):
                 partition = request.POST['partition']
                 query = request.POST['query']
                 start_key = request.POST.get('start_key', None)
-
                 query = json.loads(query)
                 instructions = query['instructions']
                 result = database_api.query_items(partition, instructions, start_key)
+                return JsonResponse(result)
+            elif cmd == 'get_policy_code':
+                partition_to_apply = request.POST.get('partition_to_apply')
+                mode = request.POST.get('mode')
+                result = database_api.get_policy_code(partition_to_apply, mode)
+                return JsonResponse(result)
+            elif cmd == 'put_policy':
+                partition_to_apply = request.POST.get('partition_to_apply')
+                mode = request.POST.get('mode')
+                code = request.POST.get('code')
+                result = database_api.put_policy(partition_to_apply, mode, code)
                 return JsonResponse(result)
 
         return redirect(request.path_info)  # Redirect back

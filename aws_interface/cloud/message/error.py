@@ -89,3 +89,11 @@ NO_SUCH_FUNCTION_TEST = {
     'code': 22,
     'message': 'No such function test'
 }
+NO_SUCH_POLICY_MODE = {
+    'code': 23,
+    'message': 'No such policy mode'
+}
+NO_SUCH_ITEM = {
+    'code': 24,
+    'message': 'No such item'
+}

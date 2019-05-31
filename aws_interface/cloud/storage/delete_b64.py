@@ -1,5 +1,5 @@
 from cloud.response import Response
-from cloud.permission import has_write_permission
+from cloud.permission import storage_has_write_permission
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -29,7 +29,7 @@ def do(data, resource):
 
     while file_id_to_delete:
         file_item = resource.db_get_item(file_id_to_delete)
-        if file_item and has_write_permission(user, file_item):
+        if file_item and storage_has_write_permission(user, file_item):
             resource.file_delete_bin(file_id_to_delete)
             resource.db_delete_item(file_id_to_delete)
 

@@ -1,6 +1,6 @@
 
 from cloud.response import Response
-from cloud.permission import has_write_permission
+from cloud.permission import database_has_write_permission
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.shortuuid import uuid

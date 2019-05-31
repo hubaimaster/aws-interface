@@ -1,6 +1,6 @@
 import sys
 from cloud.response import Response
-from cloud.permission import has_write_permission
+from cloud.permission import storage_has_write_permission
 from cloud.permission import Permission, NeedPermission
 from cloud.shortuuid import uuid
 from cloud.message import error
@@ -52,7 +52,7 @@ def do(data, resource):
     if parent_file_id:
         parent_file_info = resource.db_get_item(parent_file_id)
         if parent_file_info:
-            if has_write_permission(user, parent_file_info):
+            if storage_has_write_permission(user, parent_file_info):
                 file_name = parent_file_info.get('file_name', None)
                 parent_file_info['next_file_id'] = file_id
                 file_size += parent_file_info['file_size']

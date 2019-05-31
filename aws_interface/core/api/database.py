@@ -44,3 +44,9 @@ class DatabaseAPI(API):
 
     def query_items(self, partition, query, start_key=None):
         return self.service_controller.query_items(partition, query, start_key)
+
+    def get_policy_code(self, partition_to_apply, mode):
+        return self.service_controller.get_policy_code(partition_to_apply, mode)
+
+    def put_policy(self, partition_to_apply, mode, code):
+        return self.service_controller.put_policy(partition_to_apply, mode, code)

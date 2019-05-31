@@ -138,3 +138,24 @@ class DatabaseServiceController(ServiceController):
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
+
+    @lambda_method
+    def get_policy_code(self, partition_to_apply, mode):
+        import cloud.database.get_policy_code as method
+        params = {
+            'partition_to_apply': partition_to_apply,
+            'mode': mode,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def put_policy(self, partition_to_apply, mode, code):
+        import cloud.database.put_policy as method
+        params = {
+            'partition_to_apply': partition_to_apply,
+            'mode': mode,
+            'code': code,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)

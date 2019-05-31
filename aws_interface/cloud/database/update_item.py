@@ -1,7 +1,8 @@
 
 from cloud.response import Response
-from cloud.permission import has_write_permission, database_can_not_access_to_item
+from cloud.permission import database_can_not_access_to_item
 from cloud.permission import Permission, NeedPermission
+from cloud.database.get_policy_code import match_policy_after_get_policy_code
 from cloud.message import error
 
 # Define the input output format of the function.
@@ -42,7 +43,7 @@ def do(data, resource):
         body['error'] = error.NO_SUCH_PARTITION
         return Response(body)
 
-    if has_write_permission(user, item):
+    if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item):
         resource.db_update_item(item_id, new_item)
     else:
         body['error'] = error.NO_SUCH_PARTITION

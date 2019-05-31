@@ -18,10 +18,6 @@
                     <div class="alert alert-default" role="alert">
                         <strong>Auth </strong> 에 의존합니다.
                     </div>
-                    <div class="alert alert-info" role="alert">
-                        <a class="text-white" href="{% url 'logic' app_id %}">Logic</a> -
-                        <a class="text-white" href="{% url 'logic_edit' app_id function.function_name %}"><strong>{{ function.function_name }}</strong></a>
-                    </div>
                     <!-- Card stats -->
 
                 </div>
@@ -32,23 +28,125 @@
             <div class="row">
                 <div class="col-xl-12">
                     <div class="card shadow">
-                        <div class="card-header border-0">
+                        <div class="card-header border-1">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <h3 class="mb-0">함수 코드 수정</h3>
+                                    <h4 class="mb-0">함수 정보</h4>
                                 </div>
 
                                 <div class="col text-right">
                                     <a data-toggle="modal" data-target="#modal-create-function-test" class="btn btn-sm btn-primary">
-                                        <span class="btn-inner--text" style="color: white;">저장</span>
+                                        <span class="btn-inner--text" style="color: white;">Save</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="function-name">이름</label>
+                                        <input id="function-name" name="function_name" type="text" class="form-control form-control-alternative" placeholder="함수 이름">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="function-description">설명</label>
+                                        <input id="function-description" name="function_description" type="text" id="input-function-description" class="form-control form-control-alternative" placeholder="함수 설명">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-username">런타임</label>
+                                        <select name="function-runtime" id="function-runtime" class="form-control form-control-alternative">
+                                            <option value="python3.6">Python 3.6</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="function-handler">핸들러</label>
+                                        <input id="function-handler" name="function_handler" type="text" class="form-control form-control-alternative" placeholder="함수 핸들러">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row mt-4">
+
+            </div>
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="row align-items-center justify-content-xl-between">
+                    <div class="col-xl-6">
+                        <div class="copyright text-center text-xl-left text-muted">
+                            &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+    <div class="container-fluid mt--7">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-1">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <a class="btn btn-sm btn-white">
+                                        <h4 class="mb-0">path/to/function.py</h4>
+                                    </a>
+                                </div>
+
+                                <div class="col text-right">
+                                    <a class="btn btn-sm btn-default">
+                                        <span class="btn-inner--text" style="color: white;">Undo</span>
+                                    </a>
+                                    <a class="btn btn-sm btn-default">
+                                        <span class="btn-inner--text" style="color: white;">Redo</span>
+                                    </a>
+                                    <a data-toggle="modal" data-target="#modal-create-function-test" class="btn btn-sm btn-primary">
+                                        <span class="btn-inner--text" style="color: white;">Save</span>
                                     </a>
                                 </div>
 
                             </div>
                         </div>
-                        <div>
-                            <textarea id="function_code_editor" style="height: 500px; width: 100%;" name="function_code_editor">
-		                    </textarea>
+
+                        <div id="code-editor" style="height: 500px;">
+                            <!-- CODE EDITOR -->
+                            <style type="text/css" media="screen">
+                                #editor {
+                                    margin: 0;
+                                    margin-top: 73px;
+                                    position: absolute;
+                                    top: 0;
+                                    bottom: 0;
+                                    left: 0;
+                                    right: 0;
+                                }
+                            </style>
+                            <pre id="editor">
+                                function foo(items) {
+                                    var i;
+                                    for (i = 0; i &lt; items.length; i++) {
+                                        alert("Ace Rocks " + items[i]);
+                                    }
+                                }
+                            </pre>
+
+                            <script src="{% static 'ace/src-noconflict/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+                            <script>
+                                const editor = ace.edit("editor");
+                                editor.session.setMode("ace/mode/python");
+                            </script>
                         </div>
                     </div>
                 </div>
@@ -70,111 +168,8 @@
                 </div>
             </footer>
         </div>
+
     </div>
 
-    <script type="text/javascript" src="{% static 'assets/edit_area/edit_area_full.js' %}"></script>
-    <script>
-        editAreaLoader.init({
-            id: "function_code_editor"
-            ,start_highlight: true
-            ,allow_resize: "both"
-            ,allow_toggle: false
-            ,language: "en"
-            ,syntax: "python"
-            ,toolbar: "undo, redo, | , fullscreen , |, select_font, |, syntax_selection "
-            ,syntax_selection_allow: "css,html,js,python,xml"
-            ,is_multi_files: true
-            ,EA_load_callback: "editAreaLoaded"
-            ,show_line_colors: true
-        });
-
-
-        function open_file1(){
-			var new_file= {id: "testfile", text: "$authors= array();\n$news= array();", syntax: 'python', title: 'beautiful title'};
-			editAreaLoader.openFile('function_code_editor', new_file);
-		}
-
-
-        function editAreaLoaded(id) {
-            open_file1();
-        }
-
-
-    </script>
-
-    <script>
-
-        function create_function(function_name, description, handler, runtime, zip_file) {
-            var formData = new FormData();
-            formData.append('cmd', 'create_function');
-            formData.append('function_name', function_name);
-            formData.append('description', description);
-            formData.append('handler', handler);
-            formData.append('runtime', runtime);
-            formData.append('zip_file', zip_file);
-
-            $.ajax({
-                url : '',
-                type : 'POST',
-                data : formData,
-                processData: false,  // tell jQuery not to process the data
-                contentType: false,  // tell jQuery not to set contentType
-                success : function(data) {
-                    window.location.reload();
-                }
-            });
-        }
-
-        function run_function(function_name, payload){
-            $.post("", {
-                cmd: "run_function",
-                function_name: function_name,
-                payload: payload,
-            }, function (data) {
-                $("#result-test-input").val(JSON.stringify(data, null, 4));
-                $("#modal-test-result").modal('show');
-            });
-        }
-
-        window.onload = function () {
-
-            $("#create-function").click(function () {
-                const function_name = $("#function-name").val();
-                const description = $("#function-description").val();
-                const handler = $("#function-handler").val();
-                const runtime = $("#function-runtime").val();
-                const zip_file = $('#function-zipfile')[0].files[0];
-
-                if (function_name == null || function_name.length == 0){
-                    alert("이름을 지정해주세요");
-                    return;
-                }
-                if (zip_file == null || zip_file.length == 0){
-                    alert("파일을 지정해주세요");
-                    return;
-                }
-                create_function(function_name, description, handler, runtime, zip_file);
-                $("#modal-create-function").modal('hide');
-            });
-
-            $("#test_input").change(function () {
-                function is_json(str) {
-                    try {
-                        JSON.parse(str);
-                    } catch (e) {
-                        return false;
-                    }
-                    return true;
-                }
-                const test_input = $("#test_input").val();
-                if (is_json(test_input)){
-                    $("#create-function-test").prop("disabled", false);
-                }else{
-                    $("#create-function-test").prop("disabled", true);
-                }
-            });
-
-        };
-    </script>
 
 {% endblock %}

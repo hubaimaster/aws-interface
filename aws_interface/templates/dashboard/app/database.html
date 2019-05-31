@@ -21,8 +21,75 @@
                 </div>
             </div>
         </div>
+
+
         <!-- Page content -->
         <div class="container-fluid mt--8">
+            {% if partitions|length > 0 %}
+            <div class="row mt-4">
+                <div class="col-xl-12 mb-5 mb-xl-0">
+                    <div class="card shadow">
+                        <div class="card-header border-1">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">
+                                        <div class="dropdown">
+                                            <button id="set-policy-btn" class="btn btn-sm btn-default" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                create
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" onclick="set_policy_mode('create')"><i class="fas fa-file"></i><span>Create</span></a>
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" onclick="set_policy_mode('read')"><i class="fas fa-book-reader"></i><span>Read</span></a>
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" onclick="set_policy_mode('update')"><i class="fas fa-edit"></i><span>Update</span></a>
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" onclick="set_policy_mode('delete')"><i class="fas fa-trash"></i><span>Delete</span></a>
+
+                                            </div>
+                                        </div>
+
+                                        <select id="policy-partition-to-apply" class="form-control-alternative" onchange="set_policy_mode(policy_mode);">
+                                            {% for partition in partitions %}
+                                                <option value="{{ partition.name }}">{{ partition.name }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                          Policy
+                                        <i class="ni ni-support-16" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Update, Delete 별 오퍼레이션이 허락됩니다"></i>
+                                    </h3>
+                                </div>
+                                <div class="col text-right">
+
+                                    <button class="btn btn-sm btn-primary" onclick="save_policy();">Save</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+                            <div id="code-editor" style="height: 250px;">
+                                <!-- CODE EDITOR -->
+                                <style type="text/css" media="screen">
+                                    #editor {
+                                        margin: 0;
+                                        margin-top: 69px;
+                                        position: absolute;
+                                        top: 0;
+                                        bottom: 0;
+                                        left: 0;
+                                        right: 0;
+                                    }
+                                </style>
+                                <pre id="editor">
+
+                                </pre>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <div class="row mt-4">
                 <div class="col-xl-12 mb-5 mb-xl-0">
@@ -35,12 +102,12 @@
                                         <thead class="thead-light">
                                         <tr>
                                             <th scope="col">
-                                                <button id="create-partition-button" scope="row" data-toggle="modal" data-target="#modal-add-partition" class="btn btn-sm">
-                                                    파티션 +
+                                                <button id="create-partition-button" scope="row" data-toggle="modal" data-target="#modal-add-partition" class="btn btn-sm btn-default">
+                                                    Partition +
                                                 </button>
                                                 <div style="text-align: right; float: right;">
                                                     <div class="dropdown">
-                                                        <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <button class="btn btn-sm btn-default btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             <i class="fas fa-ellipsis-v"></i>
                                                         </button>
                                                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
@@ -115,13 +182,13 @@
                                         <thead class="thead-light">
                                         <tr>
                                             <th scope="col">
-                                                <button id="open-add-item-modal" scope="row" class="btn btn-sm">
-                                                    아이템 +
+                                                <button id="open-add-item-modal" scope="row" class="btn btn-sm btn-default">
+                                                    Item +
                                                 </button>
                                                 <text id="item_count"></text>
                                                 <div style="text-align: right; float: right;">
                                                     <div class="dropdown">
-                                                        <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <button class="btn btn-sm btn-default btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             <i class="fas fa-ellipsis-v"></i>
                                                         </button>
                                                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
@@ -319,12 +386,12 @@
                                         <thead class="thead-light">
                                         <tr>
                                             <th scope="col">
-                                                <button id="open-add-field-modal" scope="row" class="btn btn-sm">
-                                                    필드 +
+                                                <button id="open-add-field-modal" scope="row" class="btn btn-sm btn-default">
+                                                    Field +
                                                 </button>
                                                 <div style="text-align: right; float: right;">
                                                     <div class="dropdown">
-                                                        <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <button class="btn btn-sm btn-default btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             <i class="fas fa-ellipsis-v"></i>
                                                         </button>
                                                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
@@ -411,6 +478,8 @@
             </footer>
         </div>
     </div>
+
+    <script src="{% static 'ace/src-noconflict/ace.js' %}" type="text/javascript" charset="utf-8"></script>
 
     <script>
         var partition = null;
@@ -645,6 +714,7 @@
     </script>
 
     <script>
+        var policy_mode = 'read';
         function render_read_groups() {
             $("#read-groups").empty();
             for (var i = 0; i < read_groups.length; i++){
@@ -822,8 +892,8 @@
         function delete_checked_fields() {
             var item_ids = [];
             var checkboxs = $("input[name='checkbox-field']");
-            for (var i = 0; i < checkboxs.length; i++){
-                if (checkboxs[i].checked){
+            for (var i = 0; i < checkboxs.length; i++) {
+                if (checkboxs[i].checked) {
                     item_ids.push(checkboxs[i].value);
                 }
             }
@@ -831,6 +901,43 @@
         }
 
     </script>
+
+    <script>
+        const editor = ace.edit("editor");
+        editor.session.setMode("ace/mode/python");
+
+        function set_policy_mode(mode) {
+            const partition_to_apply = $("#policy-partition-to-apply").val();
+            policy_mode = mode;
+            $("#set-policy-btn").html(mode);
+            $.post("", {
+                'cmd': 'get_policy_code',
+                'mode': mode,
+                'partition_to_apply': partition_to_apply,
+            }, function (data) {
+                editor.setValue(data.code, 1);
+            });
+        }
+
+        function save_policy() {
+            const partition_to_apply = $("#policy-partition-to-apply").val();
+            const code = editor.getValue();
+            $.post("", {
+                'cmd': 'put_policy',
+                'mode': policy_mode,
+                'partition_to_apply': partition_to_apply,
+                'code': code,
+            }, function (data) {
+                if ('error' in data){
+                    alert(data.error.message);
+                }else{
+                    alert('Your policy code has been saved');
+                }
+            });
+        }
+
+    </script>
+
     <script>
         window.onload = function(){
             $("#add-partition-btn").click(function () {
@@ -885,6 +992,7 @@
             });
             render_read_groups();
             render_write_groups();
+            set_policy_mode('create');
         }
     </script>
 

@@ -1,8 +1,9 @@
 
 from cloud.response import Response
-from cloud.permission import has_read_permission
+from cloud.permission import database_has_read_permission
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
+from cloud.database.get_policy_code import match_policy_after_get_policy_code
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -30,7 +31,7 @@ def do(data, resource):
     item_id = params.get('item_id', None)
     item = resource.db_get_item(item_id)
 
-    if has_read_permission(user, item):
+    if match_policy_after_get_policy_code(resource, 'read', item['partition'], user, item):
         body['item'] = item
     else:
         body['error'] = error.PERMISSION_DENIED

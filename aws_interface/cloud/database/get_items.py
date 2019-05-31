@@ -1,6 +1,6 @@
 
 from cloud.response import Response
-from cloud.permission import has_read_permission
+from cloud.database.get_policy_code import match_policy, get_policy_code
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import json
@@ -44,10 +44,10 @@ def do(data, resource):
         start_key = json.loads(start_key)
     if resource.db_has_partition(partition):
         items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit, reverse=reverse)
-
+        policy_code = get_policy_code(resource, partition, 'read')
         filtered = []
         for item in items:
-            if has_read_permission(user, item):
+            if match_policy(policy_code, user, item):
                 filtered.append(item)
         body['items'] = filtered
         body['end_key'] = end_key

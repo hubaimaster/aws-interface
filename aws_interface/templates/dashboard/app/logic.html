@@ -270,7 +270,9 @@
                                 {% for function in functions %}
                                     <tr>
                                         <th scope="row">
+                                            <a href="{% url 'logic_edit' app_id function.function_name %}">
                                             {{ function.function_name }}
+                                            </a>
                                         </th>
                                         <td>
                                             {{ function.description }}

@@ -1,6 +1,6 @@
 
 from cloud.response import Response
-from cloud.permission import has_read_permission
+from cloud.permission import database_has_read_permission
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import base64
@@ -34,7 +34,7 @@ def do(data, resource):
 
     item = resource.db_get_item(file_id)
     if item:
-        if has_read_permission(user, item):
+        if database_has_read_permission(user, item):
             file_id = item['file_id']
             parent_file_id = item.get('parent_file_id', None)
             file_b64 = resource.file_download_bin(file_id)

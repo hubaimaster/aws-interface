@@ -1,7 +1,7 @@
 from functools import wraps
 
 
-def has_read_permission(user, item):
+def database_has_read_permission(user, item):
     if user is None or item is None:
         return False
     user_groups = user.get('groups', [])
@@ -16,7 +16,7 @@ def has_read_permission(user, item):
         return False
 
 
-def has_write_permission(user, item):
+def database_has_write_permission(user, item):
     if user is None or item is None:
         return False
     user_groups = user.get('groups', [])
@@ -31,7 +31,37 @@ def has_write_permission(user, item):
         return False
 
 
-def has_run_permission(user, item):
+def storage_has_read_permission(user, item):
+    if user is None or item is None:
+        return False
+    user_groups = user.get('groups', [])
+    user_id = user.get('id', None)
+    groups = item.get('read_groups', [])
+
+    for user_group in user_groups:
+        if user_group in groups or user_group == 'admin':
+            return True
+        elif 'owner' in groups and user_id == item.get('owner'):
+            return True
+        return False
+
+
+def storage_has_write_permission(user, item):
+    if user is None or item is None:
+        return False
+    user_groups = user.get('groups', [])
+    user_id = user.get('id', None)
+    groups = item.get('write_groups', [])
+
+    for user_group in user_groups:
+        if user_group in groups or user_group == 'admin':
+            return True
+        elif 'owner' in groups and user_id == item.get('owner'):
+            return True
+        return False
+
+
+def logic_has_run_permission(user, item):
     if user is None or item is None:
         return False
     user_groups = user.get('groups', [])
@@ -62,6 +92,10 @@ def database_can_not_access_to_item(item):
 class Permission:
     @classmethod
     def all(cls):
+        """
+        Get list of all permissions
+        :return: [str]
+        """
         all_permissions = []
         permission_cls_list = [
             cls.Run.Auth,
@@ -120,6 +154,8 @@ class Permission:
             get_items = 'run:cloud.database.get_items'
             get_partitions = 'run:cloud.database.get_partitions'
             put_item_field = 'run:cloud.database.put_item_field'
+            get_policy_code = 'run:cloud.database.get_policy_code'
+            put_policy = 'run:cloud.database.put_policy'
             query_items = 'run:cloud.database.query_items'
             update_item = 'run:cloud.database.update_item'
 

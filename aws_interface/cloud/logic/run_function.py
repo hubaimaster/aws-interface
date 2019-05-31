@@ -1,6 +1,6 @@
 
 from cloud.response import Response
-from cloud.permission import Permission, NeedPermission
+from cloud.permission import Permission, NeedPermission, logic_has_run_permission
 from cloud.message import error
 import sys
 import io
@@ -46,6 +46,9 @@ def do(data, resource):
         return Response(body)
     else:
         item = items[0]
+        if not logic_has_run_permission(user, item):
+            body['error'] = error.PERMISSION_DENIED
+            return Response(body)
 
         zip_file_id = item['zip_file_id']
         function_handler = item['handler']
