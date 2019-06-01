@@ -7,7 +7,7 @@ import io
 import os
 import tempfile
 
-from zipimport import zipimporter
+from importlib import import_module, invalidate_caches
 from zipfile import ZipFile
 from contextlib import redirect_stdout
 
@@ -46,9 +46,6 @@ def do(data, resource):
         return Response(body)
     else:
         item = items[0]
-        if not logic_has_run_permission(user, item):
-            body['error'] = error.PERMISSION_DENIED
-            return Response(body)
 
         zip_file_id = item['zip_file_id']
         function_handler = item['handler']
@@ -63,11 +60,12 @@ def do(data, resource):
             zip_temp.write(zip_file_bin)
         with ZipFile(zip_temp_dir) as zip_file:
             zip_file.extractall(extracted_dir)
-
-        importer = zipimporter(zip_temp_dir)
-        module = importer.load_module(function_package)
-        sys.modules[function_package] = module
         try:
+            invalidate_caches()
+            sys.path.insert(0, extracted_dir)
+            module = import_module(function_package)
+
+            sys.path.insert(0, extracted_dir)
             std_str = io.StringIO()
             with redirect_stdout(std_str):
                 handler = getattr(module, function_method)

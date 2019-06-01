@@ -101,7 +101,7 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <a class="btn btn-sm btn-white">
-                                        <h4 class="mb-0">path/to/function.py</h4>
+                                        <h4 id="function-file-path" class="mb-0">{{ current_path }}</h4>
                                     </a>
                                 </div>
 
@@ -112,7 +112,7 @@
                                     <a class="btn btn-sm btn-default">
                                         <span class="btn-inner--text" style="color: white;">Redo</span>
                                     </a>
-                                    <a data-toggle="modal" data-target="#modal-create-function-test" class="btn btn-sm btn-primary">
+                                    <a class="btn btn-sm btn-primary" onclick="save_current_file();">
                                         <span class="btn-inner--text" style="color: white;">Save</span>
                                     </a>
                                 </div>
@@ -133,14 +133,7 @@
                                     right: 0;
                                 }
                             </style>
-                            <pre id="editor">
-                                function foo(items) {
-                                    var i;
-                                    for (i = 0; i &lt; items.length; i++) {
-                                        alert("Ace Rocks " + items[i]);
-                                    }
-                                }
-                            </pre>
+                            <pre id="editor">{{ current_file.content }}</pre>
 
                             <script src="{% static 'ace/src-noconflict/ace.js' %}" type="text/javascript" charset="utf-8"></script>
                             <script>
@@ -168,8 +161,23 @@
                 </div>
             </footer>
         </div>
-
     </div>
+    
+    <script>
+        const function_name = "{{ function.function_name }}";
+        var current_file_path = "{{ current_path }}";
+        function save_current_file() {
+            const file_content = editor.getValue();
+            $.post("", {
+                'cmd': 'put_function_file',
+                'function_name': function_name,
+                'file_path': current_file_path,
+                'file_content': file_content,
+            }, function (data) {
+                alert(JSON.stringify(data));
+            });
+        }
+    </script>
 
 
 {% endblock %}

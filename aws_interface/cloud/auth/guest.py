@@ -1,10 +1,11 @@
 
+from cloud.crypto import *
 from cloud.response import Response
 import cloud.shortuuid as shortuuid
 import cloud.auth.get_guest_login as get_guest_login
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
-
+from secrets import token_urlsafe
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -64,12 +65,12 @@ def do(data, resource):
             'login_method': 'guest_login',
         }
         resource.db_put_item('user', item, item_id=guest_id)
-        session_id = shortuuid.uuid()
+        session_id = token_urlsafe(32)
         session_item = {
             'user_id': guest_id,
             'session_type': 'guest_login',
         }
-        resource.db_put_item('session', session_item, item_id=session_id)
+        _ = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
         body['session_id'] = session_id
         body['guest_id'] = guest_id
         return Response(body)

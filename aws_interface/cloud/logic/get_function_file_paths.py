@@ -11,7 +11,6 @@ import os
 info = {
     'input_format': {
         'function_name': 'str',
-        'file_path': 'str',
     },
     'output_format': {
         'item?': {
@@ -26,14 +25,23 @@ info = {
 }
 
 
-@NeedPermission(Permission.Run.Logic.get_function_file)
+def path_to_dict(path):
+    d = {'name': os.path.basename(path)}
+    if os.path.isdir(path):
+        d['type'] = "directory"
+        d['children'] = [path_to_dict(os.path.join(path, x)) for x in os.listdir(path)]
+    else:
+        d['type'] = "file"
+    return d
+
+
+@NeedPermission(Permission.Run.Logic.get_function_file_paths)
 def do(data, resource):
     partition = 'logic-function'
     body = {}
     params = data['params']
 
     function_name = params.get('function_name')
-    file_path = params.get('file_path')
 
     items, _ = resource.db_query(partition,
                                  [{'option': None, 'field': 'function_name', 'value': function_name,
@@ -47,16 +55,10 @@ def do(data, resource):
         zip_file_id = item['zip_file_id']
         zip_file_bin = resource.file_download_bin(zip_file_id)
         zip_temp_dir = tempfile.mktemp(prefix='/tmp/')
-        extracted_dir = tempfile.mkdtemp(prefix='/tmp/')
 
         with open(zip_temp_dir, 'wb') as zip_temp:
             zip_temp.write(zip_file_bin)
         with ZipFile(zip_temp_dir) as zip_file:
-            zip_file.extractall(extracted_dir)
-        with open(os.path.join(extracted_dir, file_path), 'r') as fp:
-            content = fp.read()
-        body['item'] = {
-            'type': 'text',
-            'content': content
-        }
+            file_paths = zip_file.namelist()
+            body['file_paths'] = file_paths
         return Response(body)

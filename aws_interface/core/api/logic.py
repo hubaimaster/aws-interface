@@ -32,3 +32,12 @@ class LogicAPI(API):
 
     def delete_function_test(self, test_name):
         return self.service_controller.delete_function_test(test_name)
+
+    def get_function_file(self, function_name, file_path):
+        return self.service_controller.get_function_file(function_name, file_path)
+
+    def get_function_file_paths(self, function_name):
+        return self.service_controller.get_function_file_paths(function_name)
+
+    def put_function_file(self, function_name, file_path, file_content, file_type):
+        return self.service_controller.put_function_file(function_name, file_path, file_content, file_type)

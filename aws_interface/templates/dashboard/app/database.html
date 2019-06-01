@@ -26,69 +26,72 @@
         <!-- Page content -->
         <div class="container-fluid mt--8">
             {% if partitions|length > 0 %}
-            <div class="row mt-4">
-                <div class="col-xl-12 mb-5 mb-xl-0">
-                    <div class="card shadow">
-                        <div class="card-header border-1">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h3 class="mb-0">
-                                        <div class="dropdown">
-                                            <button id="set-policy-btn" class="btn btn-sm btn-default" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                create
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                <a class="dropdown-item" onclick="set_policy_mode('create')"><i class="fas fa-file"></i><span>Create</span></a>
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" onclick="set_policy_mode('read')"><i class="fas fa-book-reader"></i><span>Read</span></a>
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" onclick="set_policy_mode('update')"><i class="fas fa-edit"></i><span>Update</span></a>
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" onclick="set_policy_mode('delete')"><i class="fas fa-trash"></i><span>Delete</span></a>
+                <div class="row mt-4">
+                    <div class="col-xl-12 mb-5 mb-xl-0">
+                        <div class="card shadow">
+                            <div class="card-header border-1">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <h3 class="mb-0">
 
+                                        정책함수 <i class="ni ni-support-16" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Update, Delete 별 오퍼레이션이 허락됩니다"></i>
+
+                                            <select id="policy-partition-to-apply" class="form-control-alternative" onchange="set_policy_mode(policy_mode);">
+                                                {% for partition in partitions %}
+                                                    <option value="{{ partition.name }}">{{ partition.name }}</option>
+                                                {% endfor %}
+                                            </select>
+
+
+                                            <div class="dropdown">
+                                                <button id="set-policy-btn" class="btn btn-sm btn-default" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    create
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" onclick="set_policy_mode('create')"><i class="fas fa-file"></i><span>Create</span></a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item" onclick="set_policy_mode('read')"><i class="fas fa-book-reader"></i><span>Read</span></a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item" onclick="set_policy_mode('update')"><i class="fas fa-edit"></i><span>Update</span></a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item" onclick="set_policy_mode('delete')"><i class="fas fa-trash"></i><span>Delete</span></a>
+
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <select id="policy-partition-to-apply" class="form-control-alternative" onchange="set_policy_mode(policy_mode);">
-                                            {% for partition in partitions %}
-                                                <option value="{{ partition.name }}">{{ partition.name }}</option>
-                                            {% endfor %}
-                                        </select>
 
-                                          Policy
-                                        <i class="ni ni-support-16" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Update, Delete 별 오퍼레이션이 허락됩니다"></i>
-                                    </h3>
+
+                                        </h3>
+                                    </div>
+                                    <div class="text-right">
+                                        <button class="btn btn-sm btn-primary" onclick="save_policy();">Save</button>
+                                    </div>
                                 </div>
-                                <div class="col text-right">
 
-                                    <button class="btn btn-sm btn-primary" onclick="save_policy();">Save</button>
-                                </div>
                             </div>
-
-                        </div>
-                        <div>
-                            <div id="code-editor" style="height: 250px;">
-                                <!-- CODE EDITOR -->
-                                <style type="text/css" media="screen">
-                                    #editor {
-                                        margin: 0;
-                                        margin-top: 69px;
-                                        position: absolute;
-                                        top: 0;
-                                        bottom: 0;
-                                        left: 0;
-                                        right: 0;
-                                    }
-                                </style>
-                                <pre id="editor">
+                            <div>
+                                <div id="code-editor" style="height: 250px;">
+                                    <!-- CODE EDITOR -->
+                                    <style type="text/css" media="screen">
+                                        #editor {
+                                            margin: 0;
+                                            margin-top: 69px;
+                                            position: absolute;
+                                            top: 0;
+                                            bottom: 0;
+                                            left: 0;
+                                            right: 0;
+                                        }
+                                    </style>
+                                    <pre id="editor">
 
                                 </pre>
 
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             {% endif %}
 
             <div class="row mt-4">
@@ -373,7 +376,7 @@
                                         </tr>
                                         </thead>
 
-                                        <tbody style="display: block; max-height: 400px; overflow-y: auto;">
+                                        <tbody style="display: block; max-height: 500px; overflow-y: auto;">
 
                                         </tbody>
 
@@ -455,7 +458,7 @@
                                             </th>
                                         </tr>
                                         </thead>
-                                        <tbody style="display: block; max-height: 400px; overflow-y: auto;">
+                                        <tbody style="display: block; max-height: 500px; overflow-y: auto;">
 
                                         </tbody>
                                     </table>
@@ -915,7 +918,7 @@
                 'mode': mode,
                 'partition_to_apply': partition_to_apply,
             }, function (data) {
-                editor.setValue(data.code, 1);
+                editor.setValue(data.code, -1);
             });
         }
 

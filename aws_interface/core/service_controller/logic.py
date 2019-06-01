@@ -83,3 +83,34 @@ class LogicServiceController(ServiceController):
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
+
+    @lambda_method
+    def get_function_file_paths(self, function_name):
+        import cloud.logic.get_function_file_paths as method
+        params = {
+            'function_name': function_name,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_function_file(self, function_name, file_path):
+        import cloud.logic.get_function_file as method
+        params = {
+            'function_name': function_name,
+            'file_path': file_path,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def put_function_file(self, function_name, file_path, function_file, function_type):
+        import cloud.logic.put_function_file as method
+        params = {
+            'function_name': function_name,
+            'file_path': file_path,
+            'file_content': function_file,
+            'file_type': function_type,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)

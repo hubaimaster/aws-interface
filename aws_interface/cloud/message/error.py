@@ -83,7 +83,7 @@ EXISTING_FUNCTION = {
 }
 FUNCTION_ERROR = {
     'code': 21,
-    'message': 'Function has errors: \n{}'
+    'message': 'Function has errors: {}'
 }
 NO_SUCH_FUNCTION_TEST = {
     'code': 22,
@@ -96,4 +96,8 @@ NO_SUCH_POLICY_MODE = {
 NO_SUCH_ITEM = {
     'code': 24,
     'message': 'No such item'
+}
+UNSUPPORTED_FILE_TYPE = {
+    'code': 25,
+    'message': 'Unsupported file type'
 }

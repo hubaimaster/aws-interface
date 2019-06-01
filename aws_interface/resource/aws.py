@@ -118,12 +118,6 @@ class AWSResourceAllocator(ResourceAllocator):
         s3 = S3(self.boto3_session)
         s3.create_bucket(self.app_id)
 
-    def _get_rest_api_url(self):
-        api_name = '{}'.format(self.app_id)
-        api_client = APIGateway(self.boto3_session)
-        api_url = api_client.get_rest_api_url(api_name)
-        return api_url
-
     def _remove_dynamo_db_table(self):
         dynamo = DynamoDB(self.boto3_session)
         dynamo.delete_table(self.app_id)

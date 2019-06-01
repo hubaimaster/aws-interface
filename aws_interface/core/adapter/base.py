@@ -2,6 +2,7 @@ from abc import ABCMeta
 from core.api import *
 from resource import get_resource_allocator
 from contextlib import contextmanager
+from sdk.python3.aws_interface import Client
 
 
 class Adapter(metaclass=ABCMeta):
@@ -72,3 +73,8 @@ class Adapter(metaclass=ABCMeta):
     def terminate_resource(self):
         allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
         allocator.terminate()
+
+    def get_sdk(self):
+        allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
+        client = Client(allocator.get_rest_api_url())
+        return client

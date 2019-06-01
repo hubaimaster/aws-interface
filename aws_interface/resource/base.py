@@ -1,5 +1,4 @@
 from abc import ABCMeta
-from sdk import generate
 from concurrent.futures import ThreadPoolExecutor
 import time
 
@@ -16,6 +15,7 @@ class ResourceAllocator(metaclass=ABCMeta):
         return self.app_id
 
     def generate_sdk(self, platform):
+        from sdk import generate
         return generate(self.get_rest_api_url(), platform)
 
     # API, create and terminate.

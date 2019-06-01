@@ -45,10 +45,16 @@ class Logic(LoginRequiredMixin, View):
                 test_input = request.POST.get('test_input')
                 logic_api.create_function_test(test_name, function_name, test_input)
             elif cmd == 'run_function':
+                # TODO It could be serious problem -> User can invoke dangerous code via run_function
+                #  Using SDK to solve this [ Run on cloud server-less service ]
+                sdk_client = adapter.get_sdk()
+
                 function_name = request.POST.get('function_name')
                 payload = request.POST.get('payload')
                 payload = json.loads(payload)
-                data = logic_api.run_function(function_name, payload)
+                sdk_client.auth_guest()
+                data = sdk_client.logic_run_function(function_name, payload)
+                # data = logic_api.run_function(function_name, payload)
                 return JsonResponse(data)
             elif cmd == 'delete_function_test':
                 test_name = request.POST.get('test_name')
@@ -68,6 +74,36 @@ class LogicEdit(LoginRequiredMixin, View):
 
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_logic() as logic_api:
-            context['function'] = logic_api.get_function(function_name)['item']
+            function = logic_api.get_function(function_name)['item']
+            file_paths = logic_api.get_function_file_paths(function_name).get('file_paths', [])
+            handler_prefix = '/'.join(function['handler'].split('.')[:-1])
+            current_path = None
+            for file_path in file_paths:
+                if file_path.startswith(handler_prefix):
+                    current_path = file_path
+
+            context['function'] = function
+            context['file_paths'] = file_paths
+            context['current_path'] = current_path
+            context['current_file'] = logic_api.get_function_file(function_name, current_path)['item']
 
         return render(request, 'dashboard/app/logic_edit.html', context=context)
+
+    def post(self, request, app_id, function_name):
+        context = Util.get_context(request)
+        context['app_id'] = app_id
+        cmd = request.POST.get('cmd', None)
+        adapter = DjangoAdapter(app_id, request)
+        with adapter.open_api_logic() as logic_api:
+            if cmd == 'get_function_file':
+                function_name = request.POST.get('function_name')
+                file_path = request.POST.get('file_path')
+                result = logic_api.get_function_file(function_name, file_path)
+                return JsonResponse(result)
+            if cmd == 'put_function_file':
+                function_name = request.POST.get('function_name')
+                file_path = request.POST.get('file_path')
+                file_content = request.POST.get('file_content')
+                file_type = request.POST.get('file_type', 'text')
+                result = logic_api.put_function_file(function_name, file_path, file_content, file_type)
+                return JsonResponse(result)

@@ -5,8 +5,10 @@ import os
 
 
 class Client:
-    def __init__(self):
+    def __init__(self, url=None):
         self.url = '{{REST_API_URL}}'
+        if url:
+            self.url = url
         self.session_id = None
         self.guest_id = None
 

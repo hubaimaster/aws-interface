@@ -1,0 +1,83 @@
+
+from cloud.response import Response
+from cloud.permission import Permission, NeedPermission
+from cloud.message import error
+from zipfile import ZipFile
+from shortuuid import uuid
+import tempfile
+import os
+
+
+
+# Define the input output format of the function.
+# This information is used when creating the *SDK*.
+info = {
+    'input_format': {
+        'function_name': 'str',
+        'file_path': 'str',
+        'file_content': 'str',
+        'file_type': '"text" | "bin" | "image" | "video"',
+    },
+    'output_format': {
+        'error?': {
+            'code': 'int',
+            'message': 'str',
+        },
+    }
+}
+
+SUPPORT_TYPES = ['text']
+
+
+@NeedPermission(Permission.Run.Logic.put_function_file)
+def do(data, resource):
+    partition = 'logic-function'
+    body = {}
+    params = data['params']
+
+    function_name = params.get('function_name')
+    file_path = params.get('file_path')
+    file_content = params.get('file_content')
+    file_type = params.get('file_type', 'text')
+
+    print(params)
+
+    if file_type not in SUPPORT_TYPES:
+        body['error'] = error.UNSUPPORTED_FILE_TYPE
+        return Response(body)
+
+    items, _ = resource.db_query(partition,
+                                 [{'option': None, 'field': 'function_name', 'value': function_name,
+                                   'condition': 'eq'}])
+
+    if len(items) == 0:
+        body['message'] = 'function_name: {} did not exist'.format(function_name)
+        return Response(body)
+    else:
+        item = items[0]
+        zip_file_id = item['zip_file_id']
+        zip_file_bin = resource.file_download_bin(zip_file_id)
+        zip_temp_dir = tempfile.mktemp(prefix='/tmp/')
+        extracted_dir = tempfile.mkdtemp(prefix='/tmp/')
+
+        with open(zip_temp_dir, 'wb') as zip_temp:
+            zip_temp.write(zip_file_bin)
+        with ZipFile(zip_temp_dir) as zip_file:
+            zip_file.extractall(extracted_dir)
+        with open(os.path.join(extracted_dir, file_path), 'w+') as fp:
+            fp.write(file_content)
+        with ZipFile(zip_temp_dir, 'w') as zip_file:
+            for root, dirs, files in os.walk(extracted_dir):
+                for file in files:
+                    file_name = os.path.join(root, file)
+                    zip_file.write(file_name, file)
+
+        zip_file_id = uuid()
+        with open(zip_temp_dir, 'rb') as zip_file:
+            zip_file_bin = zip_file.read()
+            resource.file_upload_bin(zip_file_id, zip_file_bin)
+            resource.file_delete_bin(item['zip_file_id'])  # Remove previous zip file
+            item['zip_file_id'] = zip_file_id  # Set new file's id
+            resource.db_update_item(item['id'], item)
+
+        return Response(body)
