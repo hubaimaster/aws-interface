@@ -15,6 +15,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import select
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(settings.__file__)))
