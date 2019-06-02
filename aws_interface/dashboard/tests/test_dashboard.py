@@ -15,6 +15,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import select
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(settings.__file__)))
@@ -93,6 +94,7 @@ class DashboardTestCase(StaticLiveServerTestCase):
             url = WEB_DRIVE_MAC
         elif system == 'Windows':
             url = WEB_DRIVE_WINDOWS
+            name += '.exe'
         with urlopen(url) as res:
             res_data = res.read()
             with open(temp, 'wb+') as f:
@@ -183,9 +185,9 @@ class DashboardTestCase(StaticLiveServerTestCase):
         from dashboard.tests.sdk import SDKTestProcess
         from dashboard.tests.database import DatabaseTestProcess
         AuthTestProcess(self).do_test()
-        BillTestProcess(self).do_test()
-        DatabaseTestProcess(self).do_test()
-        SDKTestProcess(self).do_test()
+        #BillTestProcess(self).do_test()
+        #DatabaseTestProcess(self).do_test()
+        #SDKTestProcess(self).do_test()
 
     def test(self):
         self.do_test_process()
