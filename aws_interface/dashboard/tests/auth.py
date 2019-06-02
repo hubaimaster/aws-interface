@@ -87,7 +87,7 @@ class AuthTestProcess:
 
     def _has_authorization(self, user_group, authorization_name):
         """
-        Add [authorization_name] to [user_group]
+        Check if [user_group] has [authorization_name]
         :param authorization_name:
         :return:
         """
