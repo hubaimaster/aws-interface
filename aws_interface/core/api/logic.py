@@ -12,8 +12,8 @@ class LogicAPI(API):
     def delete_function(self, function_name):
         return self.service_controller.delete_function(function_name)
 
-    def update_function(self, function_name, description, zip_file=None, run_groups=[]):
-        return self.service_controller.update_function(function_name, description, zip_file, run_groups)
+    def update_function(self, function_name, description, runtime=None, handler=None, zip_file=None, runnable=None):
+        return self.service_controller.update_function(function_name, description, runtime, handler, zip_file, runnable)
 
     def get_functions(self):
         return self.service_controller.get_functions()

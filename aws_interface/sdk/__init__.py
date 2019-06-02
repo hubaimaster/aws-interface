@@ -30,12 +30,10 @@ def generate(rest_api_url, platform):
         raise ValueError('platform should be one of {}'.format(PLATFORMS))
 
     template_dir = os.path.dirname(os.path.abspath(__file__))
-    template_dir = os.path.join(template_dir, '../sdk')
     template_dir = os.path.join(template_dir, platform)
 
     working_dir = tempfile.mkdtemp()
     sdk_dir = os.path.join(working_dir, 'sdk')
-
     shutil.copytree(template_dir, sdk_dir)
 
     _replace_template_key(sdk_dir, 'REST_API_URL', rest_api_url)

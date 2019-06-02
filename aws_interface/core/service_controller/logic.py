@@ -33,6 +33,20 @@ class LogicServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
+    def update_function(self, function_name, description, runtime, handler, zip_file, runnable):
+        import cloud.logic.update_function as method
+        params = {
+            'function_name': function_name,
+            'description': description,
+            'runtime': runtime,
+            'handler': handler,
+            'zip_file': zip_file,
+            'runnable': runnable,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
     def delete_function(self, function_name):
         import cloud.logic.delete_function as method
         params = {

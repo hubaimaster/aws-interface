@@ -8,7 +8,6 @@ import tempfile
 import os
 
 
-
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
@@ -66,11 +65,9 @@ def do(data, resource):
             zip_file.extractall(extracted_dir)
         with open(os.path.join(extracted_dir, file_path), 'w+') as fp:
             fp.write(file_content)
-        with ZipFile(zip_temp_dir, 'w') as zip_file:
-            for root, dirs, files in os.walk(extracted_dir):
-                for file in files:
-                    file_name = os.path.join(root, file)
-                    zip_file.write(file_name, file)
+        with ZipFile(zip_temp_dir, 'a') as zip_file:
+            file_name = os.path.join(extracted_dir, file_path)
+            zip_file.write(file_name, file_path)
 
         zip_file_id = uuid()
         with open(zip_temp_dir, 'rb') as zip_file:

@@ -10,13 +10,11 @@ import base64
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'session_id': 'str',
-
         'function_name': 'str',
-        'runtime': 'str',
+        'runtime?': 'str',
         'description?': 'str',
         'zip_file?': 'bytes',
-        'run_groups': 'list',
+        'run_groups?': 'list',
         'runnable?': 'bool',
     },
     'output_format': {
@@ -38,29 +36,36 @@ def do(data, resource):
     function_name = params.get('function_name')
     description = params.get('description', None)
     zip_file = params.get('zip_file', None)
-    runtime = params.get('runtime')
-    handler = params.get('handler')
-    run_groups = params.get('run_groups')
-    runnable = params.get('runnable', True)
+    runtime = params.get('runtime', None)
+    handler = params.get('handler', None)
+    run_groups = params.get('run_groups', None)
+    runnable = params.get('runnable', None)
 
-    zip_file_id = uuid()
+    items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'condition': 'eq',
+                                              'value': function_name}])
 
-    item = dict()
-    item['function_name'] = function_name
-    item['description'] = description
-    item['handler'] = handler
-    item['runtime'] = runtime
-    item['run_groups'] = run_groups
-    item['runnable'] = runnable
-    item['zip_file_id'] = zip_file_id
+    if items:
+        item = items[0]
+        if description:
+            item['description'] = description
+        if handler:
+            item['handler'] = handler
+        if runtime:
+            item['runtime'] = runtime
+        if run_groups is not None:
+            item['run_groups'] = run_groups
+        if runnable is not None:
+            item['runnable'] = runnable
+        if zip_file:
+            zip_file_id = uuid()
+            zip_file_b64 = zip_file.encode('utf-8')
+            zip_file_b64 = base64.b64decode(zip_file_b64)
+            resource.file_upload_bin(zip_file_id, zip_file_b64)
+            item['zip_file_id'] = zip_file_id
 
-    item_ids, _ = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
-    if len(item_ids) == 0:
-        body['error'] = error.NO_SUCH_FUNCTION
-    else:
-        zip_file_b64 = zip_file.encode('utf-8')
-        zip_file_b64 = base64.b64decode(zip_file_b64)
-        resource.file_upload_bin(zip_file_id, zip_file_b64)
-        resource.db_put_item(partition, item, item_ids[0])
+        resource.db_update_item(item['id'], item)
         body['function_name'] = function_name
+        return Response(body)
+    else:
+        body['error'] = error.NO_SUCH_FUNCTION
         return Response(body)

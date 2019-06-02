@@ -346,12 +346,16 @@
         }
 
         function run_function(function_name, payload){
+            $.LoadingOverlay('show', {
+                text:'Running function...'
+            });
             $.post("", {
                 cmd: "run_function",
                 function_name: function_name,
                 payload: payload,
             }, function (data) {
                 $("#result-test-input").val(JSON.stringify(data, null, 4));
+                $.LoadingOverlay('hide');
                 $("#modal-test-result").modal('show');
             });
         }

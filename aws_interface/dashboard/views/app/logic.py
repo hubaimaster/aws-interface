@@ -4,6 +4,7 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from dashboard.views.utils import Util, page_manage
+from dashboard.views.app.overview import Overview
 from core.adapter.django import DjangoAdapter
 import json
 import base64
@@ -85,7 +86,7 @@ class LogicEdit(LoginRequiredMixin, View):
             context['function'] = function
             context['file_paths'] = file_paths
             context['current_path'] = current_path
-            context['current_file'] = logic_api.get_function_file(function_name, current_path)['item']
+            context['current_file'] = logic_api.get_function_file(function_name, current_path).get('item')
 
         return render(request, 'dashboard/app/logic_edit.html', context=context)
 
@@ -100,10 +101,23 @@ class LogicEdit(LoginRequiredMixin, View):
                 file_path = request.POST.get('file_path')
                 result = logic_api.get_function_file(function_name, file_path)
                 return JsonResponse(result)
-            if cmd == 'put_function_file':
+            elif cmd == 'put_function_file':
                 function_name = request.POST.get('function_name')
                 file_path = request.POST.get('file_path')
                 file_content = request.POST.get('file_content')
                 file_type = request.POST.get('file_type', 'text')
                 result = logic_api.put_function_file(function_name, file_path, file_content, file_type)
+                Overview.allocate_resource_in_background(adapter, request)
                 return JsonResponse(result)
+            elif cmd == 'update_function':
+                function_name = request.POST.get('function_name', None)
+                description = request.POST.get('description', None)
+                handler = request.POST.get('handler', None)
+                runtime = request.POST.get('runtime', None)
+                result = logic_api.update_function(function_name=function_name, description=description,
+                                                   handler=handler, runtime=runtime)
+                return JsonResponse(result)
+            elif cmd == 'get_function_file_paths':
+                function_name = request.POST.get('function_name')
+                item = logic_api.get_function_file_paths(function_name)
+                return JsonResponse(item)

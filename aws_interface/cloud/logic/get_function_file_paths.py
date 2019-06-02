@@ -60,5 +60,6 @@ def do(data, resource):
             zip_temp.write(zip_file_bin)
         with ZipFile(zip_temp_dir) as zip_file:
             file_paths = zip_file.namelist()
-            body['file_paths'] = file_paths
+            file_paths = [file_path for file_path in file_paths if not file_path.endswith('/')]
+            body['file_paths'] = list(set(file_paths))
         return Response(body)

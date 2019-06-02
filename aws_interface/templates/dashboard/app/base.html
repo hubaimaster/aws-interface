@@ -118,11 +118,12 @@
             <h6 class="navbar-heading text-muted">개발</h6>
 
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a id="link-bill" class="nav-link" href="{%  url 'bill' app_id %}">
-                        <i class="ni ni-money-coins text-yellow"></i>Bill
-                    </a>
-                </li>
+{#                Billing will show bill in aws-i (Now is AWS)#}
+{#                <li class="nav-item">#}
+{#                    <a id="link-bill" class="nav-link" href="{%  url 'bill' app_id %}">#}
+{#                        <i class="ni ni-money-coins text-yellow"></i>Bill#}
+{#                    </a>#}
+{#                </li>#}
                 <li class="nav-item">
                     <a id="link-auth" class="nav-link" href="{%  url 'auth' app_id %}">
                         <i class="ni ni-single-02 text-blue"></i> Auth
@@ -153,6 +154,7 @@
                 </li>
 
             </ul>
+{#            Beta test application do not support analytics#}
             <!-- Divider -->
             <hr class="my-3">
             <!-- Heading -->

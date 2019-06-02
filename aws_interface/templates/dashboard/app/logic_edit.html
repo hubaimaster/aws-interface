@@ -36,7 +36,7 @@
 
                                 <div class="col text-right">
                                     <a data-toggle="modal" data-target="#modal-create-function-test" class="btn btn-sm btn-primary">
-                                        <span class="btn-inner--text" style="color: white;">Save</span>
+                                        <span class="btn-inner--text" style="color: white;" onclick="save_function_info();">Save</span>
                                     </a>
                                 </div>
                             </div>
@@ -46,13 +46,15 @@
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="function-name">이름</label>
-                                        <input id="function-name" name="function_name" type="text" class="form-control form-control-alternative" placeholder="함수 이름">
+                                        <input id="function-name" name="function_name" type="text" class="form-control form-control-alternative"
+                                               placeholder="함수 이름" value="{{ function.function_name }}" disabled>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="function-description">설명</label>
-                                        <input id="function-description" name="function_description" type="text" id="input-function-description" class="form-control form-control-alternative" placeholder="함수 설명">
+                                        <input id="function-description" name="function_description" type="text" id="input-function-description" class="form-control form-control-alternative"
+                                               placeholder="함수 설명" value="{{ function.description }}">
                                     </div>
                                 </div>
                             </div>
@@ -68,7 +70,8 @@
                                 <div class="col-lg-6">
                                     <div class="form-group">
                                         <label class="form-control-label" for="function-handler">핸들러</label>
-                                        <input id="function-handler" name="function_handler" type="text" class="form-control form-control-alternative" placeholder="함수 핸들러">
+                                        <input id="function-handler" name="function_handler" type="text" class="form-control form-control-alternative"
+                                               placeholder="함수 핸들러" value="{{ function.handler }}">
                                     </div>
                                 </div>
                             </div>
@@ -93,7 +96,7 @@
             </footer>
         </div>
 
-    <div class="container-fluid mt--7">
+        <div class="container-fluid mt--7">
             <div class="row">
                 <div class="col-xl-12">
                     <div class="card shadow">
@@ -101,22 +104,20 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <a class="btn btn-sm btn-white">
-                                        <h4 id="function-file-path" class="mb-0">{{ current_path }}</h4>
+                                        <h4 id="function-file-path" class="mb-0" data-toggle="modal" data-target="#modal-show-files">{{ current_path }}</h4>
                                     </a>
                                 </div>
-
-                                <div class="col text-right">
+                                <div class="text-right">
                                     <a class="btn btn-sm btn-default">
-                                        <span class="btn-inner--text" style="color: white;">Undo</span>
+                                        <span class="btn-inner--text" style="color: white;" onclick="editor.undo();">Undo</span>
                                     </a>
                                     <a class="btn btn-sm btn-default">
-                                        <span class="btn-inner--text" style="color: white;">Redo</span>
+                                        <span class="btn-inner--text" style="color: white;" onclick="editor.redo();">Redo</span>
                                     </a>
                                     <a class="btn btn-sm btn-primary" onclick="save_current_file();">
                                         <span class="btn-inner--text" style="color: white;">Save</span>
                                     </a>
                                 </div>
-
                             </div>
                         </div>
 
@@ -143,7 +144,38 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div class="modal fade" id="modal-show-files" tabindex="-1" role="dialog" aria-labelledby="modal-show-files" aria-hidden="true">
+                <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="modal-title-default">파일 목록</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="pl-lg-12">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <div class="table-responsive">
+                                                <table id="table-file-paths" >
+                                                    <tbody>
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
@@ -162,7 +194,7 @@
             </footer>
         </div>
     </div>
-    
+
     <script>
         const function_name = "{{ function.function_name }}";
         var current_file_path = "{{ current_path }}";
@@ -174,9 +206,54 @@
                 'file_path': current_file_path,
                 'file_content': file_content,
             }, function (data) {
-                alert(JSON.stringify(data));
+                alert('File saved');
             });
         }
+        function save_function_info() {
+            const function_name = $("#function-name").val();
+            const function_runtime = $("#function-runtime").val();
+            const function_handler = $("#function-handler").val();
+            const function_description = $("#function-description").val();
+            $.post("", {
+                'cmd': 'update_function',
+                'function_name': function_name,
+                'runtime': function_runtime,
+                'description': function_description,
+            }, function (data) {
+                alert('Function saved');
+            });
+        }
+        function load_function_file_paths() {
+            $.post("", {
+                'cmd': 'get_function_file_paths',
+                'function_name': function_name,
+            }, function (data) {
+                $("#table-file-paths>tbody").empty();
+                for (const file_path of data.file_paths){
+                    const row = "<tr><td><button class=\"btn btn-white btn-sm shadow-none\" onclick=\"load_function_file('" + file_path + "')\">" + file_path + "</button></td></tr>";
+                    $("#table-file-paths").append(row);
+                }
+            });
+        }
+
+        function load_function_file(file_path){
+            $("#modal-show-files").modal('hide');
+            $.post("", {
+                'cmd': 'get_function_file',
+                'function_name': function_name,
+                'file_path': file_path,
+            }, function (data) {
+                if ("item" in data){
+                    $("#function-file-path").html(file_path);
+                    current_file_path = file_path;
+                    editor.setValue(data.item.content);
+                    editor.getSession().setUndoManager(new ace.UndoManager())
+                }
+            });
+        }
+        window.onload = function () {
+            load_function_file_paths();
+        };
     </script>
 
 

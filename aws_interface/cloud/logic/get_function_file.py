@@ -1,6 +1,7 @@
 
 from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
+from cloud.message import error
 from zipfile import ZipFile
 import tempfile
 import os
@@ -39,16 +40,16 @@ def do(data, resource):
                                  [{'option': None, 'field': 'function_name', 'value': function_name,
                                    'condition': 'eq'}])
 
-    if len(items) == 0:
-        body['message'] = 'function_name: {} did not exist'.format(function_name)
+    if not file_path:
+        body['error'] = error.NO_SUCH_FILE
         return Response(body)
-    else:
+
+    if items:
         item = items[0]
         zip_file_id = item['zip_file_id']
         zip_file_bin = resource.file_download_bin(zip_file_id)
         zip_temp_dir = tempfile.mktemp(prefix='/tmp/')
         extracted_dir = tempfile.mkdtemp(prefix='/tmp/')
-
         with open(zip_temp_dir, 'wb') as zip_temp:
             zip_temp.write(zip_file_bin)
         with ZipFile(zip_temp_dir) as zip_file:
@@ -60,3 +61,6 @@ def do(data, resource):
             'content': content
         }
         return Response(body)
+
+    body['error'] = 'function_name: {} did not exist'.format(function_name)
+    return Response(body)

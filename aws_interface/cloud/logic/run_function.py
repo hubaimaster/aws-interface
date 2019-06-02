@@ -7,7 +7,7 @@ import io
 import os
 import tempfile
 
-from importlib import import_module, invalidate_caches
+from importlib import import_module
 from zipfile import ZipFile
 from contextlib import redirect_stdout
 
@@ -61,11 +61,10 @@ def do(data, resource):
         with ZipFile(zip_temp_dir) as zip_file:
             zip_file.extractall(extracted_dir)
         try:
-            invalidate_caches()
+            #  Comment removing cache because of a performance issue
+            #  invalidate_caches()
             sys.path.insert(0, extracted_dir)
             module = import_module(function_package)
-
-            sys.path.insert(0, extracted_dir)
             std_str = io.StringIO()
             with redirect_stdout(std_str):
                 handler = getattr(module, function_method)

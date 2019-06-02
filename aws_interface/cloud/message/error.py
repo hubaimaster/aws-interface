@@ -101,3 +101,7 @@ UNSUPPORTED_FILE_TYPE = {
     'code': 25,
     'message': 'Unsupported file type'
 }
+NO_SUCH_FILE = {
+    'code': 26,
+    'message': 'No such file'
+}
