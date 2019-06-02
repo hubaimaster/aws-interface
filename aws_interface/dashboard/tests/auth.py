@@ -130,11 +130,18 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user_group(group_name))
         time.sleep(DELAY)
+        self.parent.assertFalse(self._has_authorization(group_name, 'run:cloud.auth.login'))
+        time.sleep(DELAY)
         self._add_authorization(group_name, 'run:cloud.auth.login')
         time.sleep(DELAY)
-        self._has_authorization(group_name, 'run:cloud.auth.login')
+        self.parent.assertTrue(self._has_authorization(group_name, 'run:cloud.auth.login'))
         time.sleep(DELAY)
-        """
+        self.parent.assertFalse(self._has_authorization(group_name, 'run:cloud.auth.logout'))
+        time.sleep(DELAY)
+        self._add_authorization(group_name, 'run:cloud.auth.logout')
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._has_authorization(group_name, 'run:cloud.auth.logout'))
+        time.sleep(DELAY)
         self.parent.browser.find_element_by_id('remove-group-{}'.format(group_name)).click()
         time.sleep(DELAY)
         self.parent.assertFalse(self._has_user_group(group_name))
@@ -143,4 +150,3 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user(email))
         # LOGIN METHOD
-        """
