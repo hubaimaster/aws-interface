@@ -1,4 +1,5 @@
 from dashboard.tests.test_dashboard import *
+import sys
 
 class AuthTestProcess:
     def __init__(self, parent):
@@ -68,22 +69,20 @@ class AuthTestProcess:
         :param authorization_name:
         :return:
         """
-        print("add_authorization start")
         self.parent.assertTrue(self._has_user_group(user_group))
-        auth_group = self.parent.browser.find_element_by_css_selector("table[class='table align-items-center table-flush']")
-        print("auth_group found")
-        permission_window = None
-        for group in auth_group.find_elements_by_tag_name('tr'):
-            if group.find_element_by_name('group-name').text == user_group:
-                print("found user_group")
-                permission_window = group.find_element_by_id('modify-permissions-user')
+        auth_groups = self.parent.browser.find_element_by_css_selector("table[class='table align-items-center table-flush']")
+        group = None
+        for group in auth_groups.find_elements_by_css_selector("th[name='group-name']"):
+            if group.text.strip() == user_group:
                 break
-        permission_window.click()
+
+        group = group.find_element_by_xpath('..')
+        group.find_element_by_id('modify-permissions-{}'.format(user_group)).click()
         time.sleep(DELAY)
-        addable_authorizations = select.Select(permission_window.find_element_by_id('select-permissions-user'))
+        addable_authorizations = select.Select(group.find_element_by_id('select-permissions-{}'.format(user_group)))
         addable_authorizations.select_by_value(authorization_name)
         time.sleep(DELAY)
-        permission_window.find_element_by_class_name('form-control btn btn-success').click()
+        group.find_element_by_css_selector("button[class='form-control btn btn-success']").click()
         time.sleep(DELAY)
 
     def _has_authorization(self, user_group, authorization_name):
@@ -92,19 +91,19 @@ class AuthTestProcess:
         :param authorization_name:
         :return:
         """
-        auth_group = self.parent.browser.find_element_by_class_name('table align-items-center table-flush')
-        permission_window = None
-        for group in auth_group.find_elements_by_tag_name('tr'):
-            if group.find_element_by_name('group-name').text == user_group:
-                permission_window = group.find_element_by_id('modify-permissions-user')
+        self.parent.assertTrue(self._has_user_group(user_group))
+        auth_groups = self.parent.browser.find_element_by_css_selector("table[class='table align-items-center table-flush']")
+        group = None
+        for group in auth_groups.find_elements_by_css_selector("th[name='group-name']"):
+            if group.text.strip() == user_group:
                 break
-        permission_window.click()
+        group = group.find_element_by_xpath('..')
+        group.find_element_by_id('modify-permissions-{}'.format(user_group)).click()
         time.sleep(DELAY)
-        for authorization in permission_window.find_element_by_tag_name('tr'):
-            if authorization.text.split() == authorization_name:
+        for authorization in group.find_elements_by_tag_name('tr'):
+            if authorization.text.strip() == authorization_name:
                 return True
         return False
-
 
     def do_test(self):
         group_name = 'TEST-GROUP'
@@ -132,6 +131,9 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self._add_authorization(group_name, 'run:cloud.auth.login')
         time.sleep(DELAY)
+        self._has_authorization(group_name, 'run:cloud.auth.login')
+        time.sleep(DELAY)
+        """
         self.parent.browser.find_element_by_id('remove-group-{}'.format(group_name)).click()
         time.sleep(DELAY)
         self.parent.assertFalse(self._has_user_group(group_name))
@@ -140,3 +142,4 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user(email))
         # LOGIN METHOD
+        """
