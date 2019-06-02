@@ -74,4 +74,3 @@ def do(data, resource):
         body['session_id'] = session_id
         body['guest_id'] = guest_id
         return Response(body)
-
