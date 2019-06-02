@@ -1,6 +1,7 @@
 from dashboard.tests.test_dashboard import *
 import sys
 
+
 class AuthTestProcess:
     def __init__(self, parent):
         self.parent = parent
