@@ -109,11 +109,12 @@ class AuthTestProcess:
             if authorization.text.strip() == authorization_name:
                 result = True
                 break
-        group.find_element_by_id('attach-user-group-commit').click()
-        print("authorization check")
+        group.find_element_by_class_name('close').click()
+        # group.find_element_by_id('attach-user-group-commit').click()
+        time.sleep(DELAY)
         return result
 
-    
+
     def do_test(self):
         group_name = 'TEST-GROUP'
         group_desc = 'Group for testing'
@@ -138,7 +139,7 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user_group(group_name))
         time.sleep(DELAY)
-        #self.parent.assertFalse(self._has_authorization(group_name, 'run:cloud.auth.login'))
+        self.parent.assertFalse(self._has_authorization(group_name, 'run:cloud.auth.login'))
         time.sleep(DELAY)
         self._add_authorization(group_name, 'run:cloud.auth.login')
         time.sleep(LONG_DELAY)
@@ -147,7 +148,7 @@ class AuthTestProcess:
         self.parent.assertFalse(self._has_authorization(group_name, 'run:cloud.auth.logout'))
         time.sleep(DELAY)
         self._add_authorization(group_name, 'run:cloud.auth.logout')
-        time.sleep(DELAY)
+        time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_authorization(group_name, 'run:cloud.auth.logout'))
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('remove-group-{}'.format(group_name)).click()
