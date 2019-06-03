@@ -114,6 +114,19 @@ class AuthTestProcess:
         time.sleep(DELAY)
         return result
 
+    def _remove_authorization(self, user_group, authorization_name):
+        """
+        Remove [authorization_name] from [user_group]
+        :param authorization_name:
+        :return:
+        """
+        self.parent.assertTrue(self._has_authorization(user_group, authorization_name))
+        group = self._open_authorization(user_group)
+        for authorization in group.find_elements_by_tag_name('tr'):
+            if authorization.text.strip() == authorization_name:
+                authorization.find_element_by_css_selector("a[class='btn btn-danger btn-sm text text-white']").click()
+                break
+        print("remove done ")
 
     def do_test(self):
         group_name = 'TEST-GROUP'
@@ -150,6 +163,10 @@ class AuthTestProcess:
         self._add_authorization(group_name, 'run:cloud.auth.logout')
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_authorization(group_name, 'run:cloud.auth.logout'))
+        time.sleep(DELAY)
+        self._remove_authorization(group_name, 'run:cloud.auth.login')
+        time.sleep(LONG_DELAY)
+        self.parent.assertFalse(self._has_authorization(group_name, 'run:cloud.auth.login'))
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('remove-group-{}'.format(group_name)).click()
         time.sleep(DELAY)
