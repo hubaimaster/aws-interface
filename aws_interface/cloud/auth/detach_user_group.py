@@ -30,5 +30,5 @@ def do(data, resource):
     groups = list(set(groups))
     user['groups'] = groups
 
-    _ = resource.db_put_item('user', user, user_id)
+    _ = resource.db_update_item(user_id, user)
     return Response(body)
