@@ -3,8 +3,9 @@
 def _get_header(content_type='application/json'):
     api_gateway_response_header = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With',
+        'Access-Control-Allow-Headers': '*',
         'Access-Control-Allow-Credentials': True,
+        'Access-Control-Allow-Methods': 'POST,OPTIONS',
         'Content-Type': content_type
     }
     return api_gateway_response_header

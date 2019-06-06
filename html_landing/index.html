@@ -122,17 +122,22 @@
           <div class="col px-0">
             <div class="row">
               <div class="col-lg-6">
-                <h1 class="display-3  text-white">몇번의 클릭만으로
-                  <span>API를 구성하고</span>
-                  <span>SDK를 배포하세요</span>
+                <h1 class="display-3  text-white">클릭 몇번으로
+                  <span>강력한 백엔드를 만들고</span>
+                  <span>손쉽게 관리하세요</span>
                 </h1>
-                <p class="lead  text-white">AWSInterface 를 사용하면 Amazon Web Service 에 대한 깊은 이해 없이도 몇번의 클릭만으로 간단하게 API를 구성하고, 여러 시스템에서 동작하는 SDK를 배포할 수 있습니다.</p>
+                <p class="lead  text-white">AWSInterface 를 사용하면 분산 컴퓨팅에 대한 이해 없이도 클릭 몇번만으로 간단하게 초대용량 트래픽을 감당할 수 있는 백엔드 서비스를 구성할 수 있습니다.</p>
                 <div class="btn-wrapper">
                   <a href="https://console.aws-interface.com" class="btn btn-info btn-icon mb-3 mb-sm-0">
                     <span class="btn-inner--icon" style="color: white;"><i class="ni ni-spaceship"></i></span>
                     <span class="btn-inner--text" style="color: white;">지금 바로 시작하기</span>
                   </a>
 
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="rounded embed-responsive embed-responsive-16by9">
+                  <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/1ksiOHKHyxo?rel=0" allowfullscreen></iframe>
                 </div>
               </div>
             </div>
@@ -158,11 +163,11 @@
                     <div class="icon icon-shape icon-shape-primary rounded-circle mb-4">
                       <i class="ni ni-check-bold"></i>
                     </div>
-                    <h6 class="text-primary text-uppercase">AWSI 가입하기</h6>
-                    <p class="description mt-3">지금바로 시작하기를 누르고 AWS IAM 키를 제공하여
-                    AWS Interface 를 시작합니다. 가입 후 가이드 문서를 참조하여 간단한 사용 방법과
+                    <h6 class="text-primary text-uppercase">가입하기</h6>
+                    <p class="description mt-3">지금바로 시작하기를 누르고 AWS 에서 IAM 키를 발급받아서
+                    AWS Interface 를 시작합니다. 가이드 문서를 참조하여 간단한 사용 방법과
                     작동 방식에 대해 알아봅니다.</p>
-                    <br><br>
+                    <br>
                     <a target="_blank" href="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/start_awsi.pdf" class="btn btn-primary mt-4">더 알아보기</a>
                   </div>
                 </div>
@@ -173,12 +178,12 @@
                     <div class="icon icon-shape icon-shape-success rounded-circle mb-4">
                       <i class="ni ni-istanbul"></i>
                     </div>
-                    <h6 class="text-success text-uppercase">서비스 구성하기</h6>
+                    <h6 class="text-success text-uppercase">대시보드 설정</h6>
                     <p class="description mt-3">대시보드에서 원하는 서비스 구성을 작성하고 저장합니다.
-                      게시물이나 그 외 모델을 작성하고 접근 권한을 설정합니다.
-                      또 회원가입 사용 여부와 회원가입 시 어떤 정보를 입력 받을지 그리고 비밀번호 형식과 인증 방식등을 정할 수 있습니다.
-                      서비스 구성을 완료하면 호출가능한 API가 생성됩니다.</p>
-                    <a target="_blank" href="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/awsi_concept.pdf" class="btn btn-success mt-4">더 알아보기</a>
+                      클릭만으로 원하는 Database 파티션을 만들고 접근 권한을 수정하고. 서버리스 로직을 직접 작성하거나,
+                      회원가입 시 어떤 정보를 입력 받을지 그리고 비밀번호 형식과 인증 방식등을 정할 수 있습니다.
+                    </p>
+
                   </div>
                 </div>
               </div>
@@ -188,12 +193,10 @@
                     <div class="icon icon-shape icon-shape-warning rounded-circle mb-4">
                       <i class="ni ni-planet"></i>
                     </div>
-                    <h6 class="text-warning text-uppercase">백엔드 서비스 SDK 내려받기</h6>
-                    <p class="description mt-3">앞서 구성한 백엔드 서비스의 API를 클라이언트에서 호출할 수 있도록
-                      자동 생성된 개발 환경별 SDK를 내려받습니다.
-                      자동 생성된 SDK는 HTTPS 프로토콜을 통해 백엔드 서비스의 API를 호출합니다.</p>
-                    </br>
-                    <a href="#" class="btn btn-warning mt-4">더 알아보기</a>
+                    <h6 class="text-warning text-uppercase">배포 후 모니터링</h6>
+                    <p class="description mt-3"> 대시보드에서 설정을 마친후 Overview 화면에서
+                      원하는 언어의 SDK 를 다운받아 클라이언트에 추가합니다. 그 후 얼마나 많은 회원들이
+                    가입했는지 어떤 활동을 하고 있는지 등을 모니터링합니다.</p>
                   </div>
                 </div>
               </div>
@@ -214,7 +217,7 @@
                 <i class="ni ni-settings-gear-65"></i>
               </div>
               <h3>주요기능</h3>
-              <p>AWSInterface는 서비스 구성과 API 생성 그리고 SDK 배포 뿐 아니라</br>서비스 관리와 모니터링 기능을 포함하고 있습니다.</p>
+              <p>클릭 한번에 회원 관리 데이터베이스 관리 미디어 관리 </br>특수로직 관리 및 모니터링 등 모든 핵심 기능이 해결됩니다.</p>
               <ul class="list-unstyled mt-5">
                 <li class="py-2">
                   <div class="d-flex align-items-center">
@@ -224,7 +227,7 @@
                       </div>
                     </div>
                     <div>
-                      <h6 class="mb-0">서비스를 구성하고 업데이트 합니다.</h6>
+                      <h6 class="mb-0">클릭한번에 백엔드가 만들어집니다.</h6>
                     </div>
                   </div>
                 </li>
@@ -236,7 +239,7 @@
                       </div>
                     </div>
                     <div>
-                      <h6 class="mb-0">서비스 구성과 SDK를 관리합니다.</h6>
+                      <h6 class="mb-0">대시보드로 서비스를 관리합니다.</h6>
                     </div>
                   </div>
                 </li>
@@ -248,7 +251,7 @@
                       </div>
                     </div>
                     <div>
-                      <h6 class="mb-0">서비스 로그를 모니터링 합니다.</h6>
+                      <h6 class="mb-0">트래픽은 걱정하지 마세요 :)</h6>
                     </div>
                   </div>
                 </li>
@@ -324,6 +327,8 @@
         </svg>
       </div>
     </section>
+
+
     <section class="section section-lg">
       <div class="container">
         <div class="row justify-content-center text-center mb-lg">
@@ -402,22 +407,103 @@
         </div>
       </div>
     </section>
+
+
+
+        <section class="section section-lg bg-gradient-default">
+          <div class="container pt-lg pb-300">
+            <div class="row text-center justify-content-center">
+              <div class="col-lg-10">
+                <h2 class="display-3 text-white">모바일 서비스에 적합한 백엔드를<br> 가장 빠르게 만들 수 있습니다</h2>
+                <p class="lead text-white">짧은 시간에 초대용량 트래픽을 감당하는 백엔드를 만들어 보세요.</p>
+              </div>
+            </div>
+            <div class="row row-grid mt-5">
+              <div class="col-lg-4">
+                <div class="icon icon-lg icon-shape bg-gradient-white shadow rounded-circle text-primary">
+                  <i class="ni ni-settings text-primary"></i>
+                </div>
+                <h5 class="text-white mt-3">반복되는 개발 환경 구축은 이제 그만</h5>
+                <p class="text-white mt-3">개발환경 구축, 백엔드 코드 작성 그리고 배포 이 모든 과정이 AWSI 에 의해 자동으로 진행됩니다.</p>
+              </div>
+              <div class="col-lg-4">
+                <div class="icon icon-lg icon-shape bg-gradient-white shadow rounded-circle text-primary">
+                  <i class="ni ni-ruler-pencil text-primary"></i>
+                </div>
+                <h5 class="text-white mt-3">트래픽은 더이상 걱정할 필요가 없습니다</h5>
+                <p class="text-white mt-3">자동으로 작성된 백엔드 로직은 유연하게 확장가능한 서버리스 아키텍쳐에 탑재됩니다.</p>
+              </div>
+              <div class="col-lg-4">
+                <div class="icon icon-lg icon-shape bg-gradient-white shadow rounded-circle text-primary">
+                  <i class="ni ni-atom text-primary"></i>
+                </div>
+                <h5 class="text-white mt-3">서비스의 본질에 집중하세요</h5>
+                <p class="text-white mt-3">백엔드 개발시간을 혁신적으로 줄여줘 서비스 본질에 대해 고민할 시간을 확보할 수 있습니다.</p>
+              </div>
+            </div>
+          </div>
+          <!-- SVG separator -->
+          <div class="separator separator-bottom separator-skew zindex-100">
+            <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1" xmlns="http://www.w3.org/2000/svg">
+              <polygon class="fill-white" points="2560 0 2560 100 0 100"></polygon>
+            </svg>
+          </div>
+        </section>
+        <section class="section section-lg pt-lg-0 section-contact-us">
+          <div class="container">
+            <div class="row justify-content-center mt--300">
+              <div class="col-lg-8">
+                <div class="card bg-gradient-secondary shadow">
+                  <div class="card-body p-lg-5">
+                    <h4 class="mb-1">궁금한게 있으세요?</h4>
+                    <p class="mt-0">뭐든지 상관 없습니다 연락주세요.</p>
+                    <div class="form-group mt-5">
+                      <div class="input-group input-group-alternative">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="ni ni-user-run"></i></span>
+                        </div>
+                        <input id="name" class="form-control" placeholder="Your name" type="text">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="input-group input-group-alternative">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                        </div>
+                        <input id="email" class="form-control" placeholder="Your email address" type="email">
+                      </div>
+                    </div>
+                    <div class="form-group mb-4">
+                      <textarea id="content" class="form-control form-control-alternative" name="name" rows="4" cols="80" placeholder="Type a message..."></textarea>
+                    </div>
+                    <div>
+                      <button id="send-email-btn" type="button" class="btn btn-default btn-round btn-block btn-lg">이메일 보내기</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
     <section class="section section-lg pt-0">
       <div class="container">
         <div class="card bg-gradient-warning shadow-lg border-0">
           <div class="p-5">
             <div class="row align-items-center">
               <div class="col-lg-8">
-                <h3 class="text-white">AWSInterface 오픈소스에 관심 있으세요?</h3>
-                <p class="lead text-white mt-3">더 많은 엔지니어들이 모이면 더 좋은 서비스가 탄생할거에요.</br>
-                  복잡하지만 훌륭한 기술을 누구나 이용할 수 있게 하고 싶습니다.</p>
+                <h3 class="text-white">클릭만으로 백엔드 한번 만들어 보실래요?</h3>
+                <p class="lead text-white mt-3">아무런 준비도 필요 없습니다.</br>
+                  가벼운 마음으로 지금 시작하세요.</p>
               </div>
               <div class="col-lg-3 ml-lg-auto">
-                <a href="https://github.com/hubaimaster/aws-interface" target="_blank" class="btn btn-neutral btn-icon">
+                <a href="https://console.aws-interface.com" target="_blank" class="btn btn-neutral btn-icon">
                   <span class="btn-inner--icon">
-                    <i class="fa fa-github"></i>
+                    <i class="ni ni-spaceship"></i>
                   </span>
-                  <span class="nav-link-inner--text">View on Github</span>
+                  <span class="nav-link-inner--text">지금 바로 시작하기</span>
                 </a>
               </div>
             </div>
@@ -431,13 +517,7 @@
   <footer class="footer has-cards">
 
     <div class="container">
-      <div class="row row-grid align-items-center my-md">
-        <div class="col-lg-12">
-          <h6 class="text-primary font-weight-light mb-2">AWSInterface는 <b>Dobermann I&T</b> 에서 개발한 서비스입니다.</h6>
-        </div>
 
-      </div>
-      <hr>
       <div class="row align-items-center justify-content-md-between">
         <div class="col-md-6">
           <div class="copyright">
@@ -461,6 +541,19 @@
   <script>
   $("#tuto-board").click(function(){
     alert("곧 지원될 예정입니다.");
+  });
+  $("#send-email-btn").click(function(){
+    var email = $("#email").val();
+    var name = $("#name").val();
+    var content = $("#content").val();
+    if (email.length == 0 || name.length == 0 || content.length == 0){
+      alert("항목을 전부 채워주세요");
+      return;
+    }
+    var subject = "Dear AWSI, sender:" + email + ", name:" + name;
+    var body = content;
+    var link = 'mailto:kchdully@gmail.com?subject=' + subject + '&body=' + body;
+    window.location.href = link;
   });
   </script>
 </body>

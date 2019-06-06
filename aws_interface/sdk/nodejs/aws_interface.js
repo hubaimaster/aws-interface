@@ -1,10 +1,26 @@
 const request = require('request');
-const base_url = '{{REST_API_URL}}';
 
 class Client{
 
     constructor() {
-        this.session_id = null;
+        this.set_session_id(null);
+        this.set_base_url('{{REST_API_URL}}');
+    }
+
+    get_base_url(){
+        return this.base_url;
+    }
+
+    set_base_url(base_url){
+        this.base_url = base_url;
+    }
+
+    get_session_id(){
+        return this.session_id;
+    }
+
+    set_session_id(session_id){
+        this.session_id = session_id;
     }
 
     static _get(object, key, default_value=null) {
@@ -17,10 +33,10 @@ class Client{
             data = {};
         }
         data['module_name'] = 'cloud.' + service_type + '.' + function_name;
-        if (this.session_id != null){
-            data['session_id'] = this.session_id;
+        if (this.get_session_id() != null){
+            data['session_id'] = this.get_session_id();
         }
-        this._post(base_url, data, callback);
+        this._post(this.get_base_url(), data, callback);
     }
 
     _post(url, data, callback){
@@ -94,7 +110,7 @@ class Client{
             'password': password,
         }, function (data) {
             if ('session_id' in data){
-                self.session_id = Client._get(data,'session_id');
+                self.set_session_id(Client._get(data,'session_id'));
             }
             callback(data);
         });
@@ -114,7 +130,7 @@ class Client{
 
     auth_logout(callback) {
         this._auth('logout', {
-            'session_id': this.session_id,
+            'session_id': this.get_session_id(),
         }, callback);
     }
 
@@ -123,7 +139,7 @@ class Client{
         this._auth('guest', {
             'guest_id': guest_id,
         }, function (data) {
-            self.session_id = Client._get(data,'session_id');
+            self.set_session_id(Client._get(data,'session_id'));
             callback(data);
         });
     }

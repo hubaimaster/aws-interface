@@ -114,7 +114,7 @@ class APIGateway:
         uri = self.get_uri(uri_data)
 
         integration_response_param = {
-            'method.response.header.Access-Control-Allow-Headers': '\'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With\'',
+            'method.response.header.Access-Control-Allow-Headers': '\'*\'',
             'method.response.header.Access-Control-Allow-Methods': '\'POST,OPTIONS\'',
             'method.response.header.Access-Control-Allow-Origin': '\'*\''
         }
@@ -139,14 +139,20 @@ class APIGateway:
         # CORS OPTION
         self.put_method(rest_api_id, resource_id, 'OPTIONS')
         self.put_method_response(rest_api_id, resource_id, 'OPTIONS', method_response_param)
-        self.put_integration(rest_api_id, resource_id, 'OPTIONS', uri)
+        self.put_integration(rest_api_id, resource_id, 'OPTIONS', uri, {
+            'application/json': '{"statusCode": 200}'
+        }, 'MOCK')
+
         self.put_integration_response(rest_api_id, resource_id, 'OPTIONS', integration_response_param)
+        self.put_integration_response(rest_api_id, resource_id, 'POST', integration_response_param)
 
         print('create_deployment'.center(80, '-'))
         api_client.create_deployment(
             restApiId=rest_api_id,
             stageName=stage_name,
         )
+
+
 
     def put_method(self, rest_api_id, resource_id, method_type, auth_type='NONE'):
         try:
@@ -181,14 +187,15 @@ class APIGateway:
                "{aws-acct-id}:function:{lambda-function-name}/invocations".format(**uri_data)
         return uri
 
-    def put_integration(self, rest_api_id, resource_id, method_type, uri):
+    def put_integration(self, rest_api_id, resource_id, method_type, uri, requestTemplates={}, type="AWS"):
         integration_resp = self.client.put_integration(
             restApiId=rest_api_id,
             resourceId=resource_id,
             httpMethod=method_type,
-            type="AWS",
+            type=type,
             integrationHttpMethod=method_type,
             uri=uri,
+            requestTemplates=requestTemplates,
         )
         return integration_resp
 

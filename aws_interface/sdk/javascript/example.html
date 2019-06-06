@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example</title>
+</head>
+<body>
+    <script src="aws_interface.js"></script>
+
+    <script>
+      var awsi = new Client();
+      awsi.auth_login('test@email.com', 'password1234', function(data){
+          alert(JSON.stringify(data));
+      });
+    </script>
+</body>
+</html>

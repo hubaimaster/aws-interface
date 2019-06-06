@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group 'com.awsinterface'
+version '0.0.1'
+
+sourceCompatibility = 1.8
+
+jar {
+    manifest{
+        attributes "Main-Class": "AWSInterface"
+    }
+    from{
+        configurations.compile.collect {it.isDirectory()? it: zipTree(it)}
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'com.squareup.okhttp3:okhttp:4.0.0-alpha01'
+    compile 'com.squareup.okio:okio:2.2.2'
+    compile 'com.google.code.gson:gson:2.8.5'
+}

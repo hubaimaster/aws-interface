@@ -1,292 +1,308 @@
-var awsi = (function () {
-  var apiInstance;
 
-  function create () {
-    document.write("<script src='jquery.min.js'></script>");
+class Client{
 
-    function _request(method, url, data, success){
-      if (getSessionId() != null){
-        data['session_id'] = getSessionId();
-      }
-      $.ajax({
-        method : method,
-        url : url,
-        data: data,
-        success : success,
-        error : function(e) {
-            alert("error: " + JSON.stringify(e));
+    constructor() {
+        this.set_session_id(null);
+        this.set_base_url('{{REST_API_URL}}');
+    }
+
+    get_base_url(){
+        return this.base_url;
+    }
+
+    set_base_url(base_url){
+        this.base_url = base_url;
+    }
+
+    get_session_id(){
+        return this.session_id;
+    }
+
+    set_session_id(session_id){
+        this.session_id = session_id;
+    }
+
+    static _get(object, key, default_value=null) {
+        var result = object[key];
+        return (typeof result !== "undefined") ? result : default_value;
+    }
+
+    _call_api(service_type, function_name, data, callback) {
+        if (data == null){
+            data = {};
         }
-      });
-    }
-
-    function _get(url, data, success){
-      _request("GET", url, data, success);
-    }
-
-    function _post(url, data, success){
-      _request("POST", url, data, success);
-    }
-
-    function _get_rest_api_url(recipe_key){
-      var url = '{{REST_API_URL}}';
-      return url;
-    }
-    
-    function _auth(api_name, data, success) {
-      var api_url = _get_rest_api_url('auth');
-      data['cloud_api_name'] = api_name;
-      _post(api_url, data, success);
-    }
-
-    function _database(api_name, data, success) {
-      var api_url = _get_rest_api_url('database');
-      data['cloud_api_name'] = api_name;
-      _post(api_url, data, success);
-    }
-
-    function _storage(api_name, data, success) {
-      var api_url = _get_rest_api_url('storage');
-      data['cloud_api_name'] = api_name;
-      _post(api_url, data, success);
-    }
-
-    function hasSession(){
-      var session_id = getSessionId();
-      if (session_id == null || session_id.length == 0){
-        return false;
-      }else{
-        return true;
-      }
-    }
-
-    function setCookie(name, value, days) {
-      var expires = "";
-      if (days) {
-          var date = new Date();
-          date.setTime(date.getTime() + (days*24*60*60*1000));
-          expires = "; expires=" + date.toUTCString();
-      }
-      document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-    }
-
-    function getCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0;i < ca.length;i++) {
-            var c = ca[i];
-            while (c.charAt(0)==' ') c = c.substring(1,c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        data['module_name'] = 'cloud.' + service_type + '.' + function_name;
+        if (this.get_session_id() != null){
+            data['session_id'] = this.get_session_id();
         }
-        return null;
+        this._post(this.get_base_url(), data, callback);
     }
 
-    function eraseCookie(name) {
-        document.cookie = name+'=; Max-Age=-99999999;';
+    _post(url, data, callback){
+        var req = new XMLHttpRequest();
+        req.open("POST", url, true);
+        req.setRequestHeader("Accept", "application/json");
+        req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        req.onreadystatechange = function (aEvt) {
+          if (req.readyState == 4) {
+            var json = JSON.parse(req.responseText);
+            var body = null;
+            var error = null;
+            if ("body" in json){
+              body = json["body"];
+            }
+            if ("error" in json){
+              error = json["error"];
+              console.error(error);
+            }
+            callback(body);
+          }
+        };
+        req.send(JSON.stringify(data));
     }
 
-    function getSessionId(){
-      var session_id = getCookie('session_id');
-      return session_id;
-    }
+    _auth(api_name, data, callback) {
+        let self = this;
+        this._call_api('auth', api_name, data, function (data) {
+            self.log_create_log('auth', api_name, null, function (data) {
 
-    function login(email, password, callback){
-        _auth('login', {
-            email: email,
-            password: password,
-        }, function (response) {
-            setCookie('session_id', response.item.session_id, 1);
-            callback(response);
+            });
+            callback(data);
         });
     }
 
-    function logout(callback){
-        _auth('logout', {
+    _database(api_name, data, callback) {
+        let self = this;
+        this._call_api('database', api_name, data, function (data) {
+            self.log_create_log('database', api_name, null, function (data) {
 
-        }, function (response) {
-            eraseCookie('session_id');
-            callback(response);
+            });
+            callback(data);
         });
     }
 
-    function register(email, password, callback){
-        _auth('register', {
-            email: email,
-            password: password,
-        }, function (response) {
-            callback(response);
+    _storage(api_name, data, callback) {
+        let self = this;
+        this._call_api('storage', api_name, data, function (data) {
+            self.log_create_log('storage', api_name, null, function (data) {
+
+            });
+            callback(data);
         });
     }
 
-    function guest(guest_id, callback){
-        _auth('guest', {
-            guest_id: guest_id,
-        }, function (response) {
-            callback(response);
+    _logic(api_name, data, callback) {
+        this._call_api('logic', api_name, data, callback);
+    }
+
+    _log(api_name, data, callback) {
+        this._call_api('log', api_name, data, callback);
+    }
+
+    auth_register(email, password, extra={}, callback) {
+        this._auth('register', {
+            'email': email,
+            'password': password,
+            'extra': extra,
+        }, callback);
+    }
+
+    auth_login(email, password, callback) {
+        let self = this;
+        this._auth('login', {
+            'email': email,
+            'password': password,
+        }, function (data) {
+            if ('session_id' in data){
+                self.set_session_id(Client._get(data,'session_id'));
+            }
+            callback(data);
         });
     }
 
-    function get_user(user_id, callback) {
-        _auth('get_user', {
-            user_id: user_id,
-        }, function (response) {
-            callback(response);
+    auth_get_user(user_id, callback) {
+        this._auth('get_user', {
+            'user_id': user_id,
+        }, callback);
+    }
+
+    auth_get_users(start_key=null, callback) {
+        this._auth('get_users', {
+            'start_key': start_key,
+        }, callback);
+    }
+
+    auth_logout(callback) {
+        this._auth('logout', {
+            'session_id': this.get_session_id(),
+        }, callback);
+    }
+
+    auth_guest(guest_id=null, callback) {
+        let self = this;
+        this._auth('guest', {
+            'guest_id': guest_id,
+        }, function (data) {
+            self.set_session_id(Client._get(data,'session_id'));
+            callback(data);
         });
     }
 
-    function set_user(user_id, field_pairs, callback) {
-        _auth('set_user', {
-            user_id: user_id,
-            field_pairs: field_pairs,
-        }, function (response) {
-            callback(response);
-        });
+    database_create_item(item, partition, read_groups, write_groups, callback) {
+        this._database('create_item', {
+            'item': item,
+            'partition': partition,
+            'read_groups': read_groups,
+            'write_groups': write_groups,
+        }, callback);
     }
-    
-    function create_item(partition, item, read_permissions, write_permissions, callback) {
-        _database('create_item', {
-            item: item,
-            partition: partition,
-            read_permissions: read_permissions,
-            write_permissions: write_permissions,
-        }, function (response) {
-            callback(response);
+
+    database_delete_item(item_id, callback) {
+        this._database('delete_item', {
+            'item_id': item_id,
+        }, callback);
+    }
+
+    database_get_item(item_id, callback) {
+        this._database('get_item', {
+            'item_id': item_id,
+        }, callback);
+    }
+
+    database_get_items(partition, start_key=null, limit=100, callback) {
+        this._database('get_items', {
+            'partition': partition,
+            'start_key': start_key,
+            'limit': limit,
+        }, callback);
+    }
+
+    database_put_item_field(item_id, field_name, field_value, callback) {
+        this._database('put_item_field', {
+            'item_id': item_id,
+            'field_name': field_name,
+            'field_value': field_value,
+        }, callback);
+    }
+
+    database_update_item(item_id, item, read_groups, write_groups, callback) {
+        this._database('update_item', {
+            'item_id': item_id,
+            'item': item,
+            'read_groups': read_groups,
+            'write_groups': write_groups,
+        }, callback);
+    }
+
+    database_query_items(partition, query, start_key=null, limit=100, reverse=false, callback) {
+        this._database('query_items', {
+            'partition': partition,
+            'query': query,
+            'start_key': start_key,
+            'limit': limit,
+            'reverse': reverse,
+        }, callback);
+    }
+
+    storage_delete_b64(file_id, callback) {
+        this._storage('delete_b64', {
+            'file_id': file_id,
+        }, callback);
+    }
+
+    storage_download_b64_chunk(file_id, callback) {
+        this._storage('download_b64', {
+            'file_id': file_id,
+        }, callback);
+    }
+
+    storage_upload_b64_chunk(parent_file_id, file_name, file_b64, read_groups, write_groups, callback) {
+        this._storage('upload_b64', {
+            'parent_file_id': parent_file_id,
+            'file_name': file_name,
+            'file_b64': file_b64,
+            'read_groups': read_groups,
+            'write_groups': write_groups,
+        }, callback);
+    }
+
+    storage_delete_file(file_id, callback) {
+        this.storage_delete_b64(file_id, callback);
+    }
+
+    storage_download_file(file_id, callback_file) {
+        let self = this;
+        var string_file_b64 = null;
+        var file_name = 'file';
+        function download(file_id, callback){
+            self.storage_download_b64_chunk(file_id, function (result) {
+                file_id = Client._get(result, 'parent_file_id', null);
+                file_name = Client._get(result,'file_name', file_name);
+                if (string_file_b64 != null){
+                    string_file_b64 = Client._get(result, 'file_b64') + string_file_b64;
+                }else{
+                    string_file_b64 = Client._get(result, 'file_b64');
+                }
+                if (file_id == null){
+                    callback(string_file_b64, result);
+                }else{
+                    download(file_id, callback);
+                }
+            });
+        }
+        download(file_id, function (string_file_b64, result) {
+            if (string_file_b64 == null){
+                callback_file(null);
+                console.error(result);
+            }else{
+                let file_bin = Buffer.from(string_file_b64, 'base64');
+                callback_file(file_bin);
+            }
         });
     }
 
-    function delete_item(item_id, callback) {
-        _database('delete_item', {
-            item_id: item_id,
-        }, function (response) {
-            callback(response);
-        });
+    storage_upload_file(bin, read_groups, write_groups, callback) {
+        let self = this;
+        function *div_chunks(text, n){
+            for (var i = 0; i < text.length; i+= n){
+                yield text.slice(i, i + n);
+            }
+        }
+        var buff = Buffer.from(bin, 'utf8');
+        let base64_data = buff.toString('base64');
+        var raw_base64 = Buffer.from(base64_data, 'utf8');
+        var base64_chunks = div_chunks(raw_base64, 1024 * 1024 * 4);
+        var parent_file_id = null;
+        let file_name = "file";
+        function upload(parent_file_id, base64_chunk, callback){
+            base64_chunk = base64_chunk.toString();
+            self.storage_upload_b64_chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups, function (data) {
+                var parent_file_id = data['file_id'];
+                var next_base64_chunk = base64_chunks.next();
+                if (next_base64_chunk.done){
+                    callback(data);
+                }else{
+                    upload(parent_file_id, next_base64_chunk.value, callback);
+                }
+            });
+        }
+        upload(parent_file_id, base64_chunks.next().value, callback);
     }
 
-    function get_item(item_id, callback) {
-        _database('get_item', {
-            item_id: item_id,
-        }, function (response) {
-            callback(response);
-        });
-    }
-    
-    function get_items(partition, callback) {
-        _database('get_items', {
-            partition: partition    
-        }, function (response) {
-            callback(response);
-        });
+    log_create_log(event_source, event_name, event_param, callback) {
+        this._log('create_log', {
+            'event_source': event_source,
+            'event_name': event_name,
+            'event_param': event_param,
+        }, callback);
     }
 
-    function put_item_field(item_id, field_name, field_value, callback) {
-        _database('put_item_field', {
-            item_id: item_id,
-            field_name: field_name,
-            field_value: field_value,
-        }, function (response) {
-            callback(response);
-        });
+    logic_run_function(function_name, payload, callback){
+        this._logic('logic', {
+            'function_name': function_name,
+            'payload': payload,
+        }, callback);
     }
 
-    function update_item(item_id, item, read_groups, write_groups, callback) {
-        _database('update_item', {
-            item_id: item_id,
-            item: item,
-            read_groups: read_groups,
-            write_groups: write_groups,
-        }, function (response) {
-            callback(response);
-        });
-    }
-
-    function create_folder(parent_path, folder_name, read_groups, write_groups, callback) {
-        _storage('create_folder', {
-            parent_path: parent_path,
-            folder_name: folder_name,
-            read_groups: read_groups,
-            write_groups: write_groups,
-        }, function (response) {
-            callback(response);
-        });
-    }
-
-    function delete_path(path, callback) {
-        _storage('delete_path', {
-            path: path,
-        }, function (response) {
-            callback(response);
-        });
-    }
-    
-    function download_file(file_path, callback) {
-        _storage('download_file', {
-            file_path: file_path,
-        }, function (response) {
-            callback(response);
-        });
-    }
-
-    function get_folder_list(path, start_key, callback) {
-        _storage('get_folder_list', {
-            path: path,
-            start_key: start_key,
-        }, function (response) {
-            callback(response);
-        });
-    }
-
-    function upload_file(parent_path, file_bin, file_name, read_groups, write_groups, callback) {
-        var formData = new FormData();
-        formData.append('file_bin', file_bin);
-        formData.append('parent_path', parent_path);
-        formData.append('file_name', file_name);
-        formData.append('read_groups', JSON.stringify(read_groups));
-        formData.append('write_groups', JSON.stringify(write_groups));
-        _storage('upload_file', formData, function (response) {
-            callback(response);
-        });
-    }
-
-    return {
-        hasSession: hasSession,
-        auth: {
-            login: login,
-            logout: logout,
-            register: register,
-            guest: guest,
-            get_user: get_user,
-            set_user: set_user,
-        },
-        database: {
-            create_item: create_item,
-            delete_item: delete_item,
-            get_item: get_item,
-            get_items: get_items,
-            put_item_field: put_item_field,
-            update_item: update_item,
-        },
-        storage: {
-            create_folder: create_folder,
-            delete_path: delete_path,
-            download_file: download_file,
-            get_folder_list: get_folder_list,
-            upload_file: upload_file,
-        },
-    };
-  }
-
-  return {
-    getInstance: function() {
-      if(!apiInstance) {
-        apiInstance = create();
-      }
-      return apiInstance;
-    }
-  };
-
-  function Singleton () {
-    if(!apiInstance) {
-      apiInstance = intialize();
-    }
-  };
-
-})();
+}
