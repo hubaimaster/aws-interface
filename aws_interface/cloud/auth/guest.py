@@ -24,6 +24,16 @@ info = {
 }
 
 
+def put_guest_session(resource, guest_id):
+    session_id = token_urlsafe(32)
+    session_item = {
+        'user_id': guest_id,
+        'session_type': 'guest_login',
+    }
+    resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
+    return session_id
+
+
 @NeedPermission(Permission.Run.Auth.guest)
 def do(data, resource):
     body = {}
@@ -46,11 +56,9 @@ def do(data, resource):
     if guest_id:
         item = resource.db_get_item(guest_id)
         if item:
-            session_item = {
-                'user_id': guest_id,
-                'session_type': 'guest_login',
-            }
-            resource.db_put_item('session', session_item)
+            session_id = put_guest_session(resource, guest_id)
+            body['session_id'] = session_id
+            body['guest_id'] = guest_id
             return Response(body)
         else:
             body['error'] = error.NO_SUCH_GUEST
@@ -65,12 +73,7 @@ def do(data, resource):
             'login_method': 'guest_login',
         }
         resource.db_put_item('user', item, item_id=guest_id)
-        session_id = token_urlsafe(32)
-        session_item = {
-            'user_id': guest_id,
-            'session_type': 'guest_login',
-        }
-        _ = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
+        session_id = put_guest_session(resource, guest_id)
         body['session_id'] = session_id
         body['guest_id'] = guest_id
         return Response(body)

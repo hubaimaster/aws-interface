@@ -258,10 +258,8 @@ class AWSI {
             storage_download_b64(file_id: file_id) { (response) in
                 if let response = response{
                     let stringFileBase64Chunk = response["file_b64"] as! String + stringFileBase64
-                    if response.keys.contains("parent_file_id"){
-                        if let parent_file_id = response["parent_file_id"] as? String{
-                            download(file_id: parent_file_id, stringFileBase64: stringFileBase64Chunk)
-                        }
+                    if let parent_file_id = response["parent_file_id"] as? String{
+                        download(file_id: parent_file_id, stringFileBase64: stringFileBase64Chunk)
                     }else{
                         let data = Data(base64Encoded: stringFileBase64Chunk)
                         callback(data)
@@ -293,6 +291,7 @@ class AWSI {
                 }
             }
         }
+        upload(count: 0, parent_file_id: nil)
     }
 
     func log_create_log(event_source: String, event_name: String, event_param: [String: Any]?, callback: @escaping (_ response: [String: Any]?)->Void){

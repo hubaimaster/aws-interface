@@ -196,18 +196,18 @@ class Client:
             file_obj.write(file_bin)
 
     def storage_upload_file(self, file_path, read_groups, write_groups):
-        def div_chunks(text, n):
-            for i in range(0, len(text) - 1, n):
-                yield text[i:i + n]
-
+        def div_chunks(file_path_to_chunk, n):
+            with open(file_path_to_chunk, 'rb') as file_obj:
+                while True:
+                    raw_bytes = file_obj.read(n)
+                    if raw_bytes:
+                        b64_chunk = base64.b64encode(raw_bytes)
+                        b64_chunk = b64_chunk.decode('utf-8')
+                        yield b64_chunk
+                    else:
+                        break
         file_name = os.path.basename(file_path)
-        with open(file_path, 'rb') as file_obj:
-            raw_base64 = file_obj.read()
-
-        raw_base64 = base64.b64encode(raw_base64)
-        raw_base64 = raw_base64.decode('utf-8')
-
-        base64_chunks = div_chunks(raw_base64, 1024 * 1024 * 6)  # 4mb
+        base64_chunks = div_chunks(file_path, 1024 * 1024 * 3)
         parent_file_id = None
         for base64_chunk in base64_chunks:
             result = self._storage_upload_b64_chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups)
