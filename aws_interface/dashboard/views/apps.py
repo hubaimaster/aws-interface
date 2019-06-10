@@ -26,7 +26,7 @@ class Apps(LoginRequiredMixin, View):
     def post(self, request):
         cmd = request.POST.get('cmd', None)
         if cmd == 'create_app':
-            Util.create_app(request)
+            self.create_app(request)
             return redirect('apps')
         elif cmd == 'remove_app':
             app_id = request.POST['app_id']
@@ -41,3 +41,20 @@ class Apps(LoginRequiredMixin, View):
                 print(ex)
                 Util.add_alert(request, 'Failed to remove application')
             return redirect('apps')
+
+    @classmethod
+    def create_app(cls, request):
+        name = request.POST['name']
+        if not name or len(name) < 3:
+            Util.add_alert(request, '이름은 3글자 이상입니다')
+            return redirect('apps')
+        user = request.user
+        app = App.objects.filter(user=request.user, name=name)
+        if app:
+            Util.add_alert(request, '같은 이름의 어플리케이션이 존재합니다')
+            return redirect('apps')
+        app = App()
+        app.name = name
+        app.user = user
+        app.save()
+        Util.add_alert(request, '새로운 어플리케이션이 생성되었습니다')

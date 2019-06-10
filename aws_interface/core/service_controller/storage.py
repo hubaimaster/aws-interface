@@ -49,3 +49,21 @@ class StorageServiceController(ServiceController):
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
 
+    @lambda_method
+    def get_policy_code(self, mode):
+        import cloud.storage.get_policy_code as method
+        params = {
+            'mode': mode,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def put_policy(self, mode, code):
+        import cloud.storage.put_policy as method
+        params = {
+            'mode': mode,
+            'code': code,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)

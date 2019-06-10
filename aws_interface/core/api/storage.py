@@ -18,3 +18,9 @@ class StorageAPI(API):
 
     def get_b64_info_items(self, start_key, reverse=False):
         return self.service_controller.get_b64_info_items(start_key, reverse)
+
+    def get_policy_code(self, mode):
+        return self.service_controller.get_policy_code(mode)
+
+    def put_policy(self, mode, code):
+        return self.service_controller.put_policy(mode, code)

@@ -1,6 +1,6 @@
 import sys
 from cloud.response import Response
-from cloud.permission import storage_has_write_permission
+from cloud.storage.get_policy_code import match_policy_after_get_policy_code
 from cloud.permission import Permission, NeedPermission
 from cloud.shortuuid import uuid
 from cloud.message import error
@@ -17,7 +17,9 @@ info = {
         'file_b64': 'str',
 
         'read_groups': 'list',
-        'write_groups': 'list'
+        'write_groups': 'list',
+
+        'meta_info?': 'map',
     },
     'output_format': {
         'file_id': 'str',
@@ -44,6 +46,8 @@ def do(data, resource):
     read_groups = params.get('read_groups', [])
     write_groups = params.get('write_groups', [])
 
+    meta_info = params.get('meta_info', {})
+
     file_id = '{}'.format(uuid())
     parent_file_info = None
 
@@ -52,7 +56,7 @@ def do(data, resource):
     if parent_file_id:
         parent_file_info = resource.db_get_item(parent_file_id)
         if parent_file_info:
-            if storage_has_write_permission(user, parent_file_info):
+            if match_policy_after_get_policy_code(resource, 'create', 'files', user, parent_file_info):
                 file_name = parent_file_info.get('file_name', None)
                 parent_file_info['next_file_id'] = file_id
                 file_size += parent_file_info['file_size']
@@ -68,15 +72,21 @@ def do(data, resource):
         'file_size': file_size,
         'read_groups': read_groups,
         'write_groups': write_groups,
+        'meta_info': meta_info,
     }
 
-    resource.db_put_item('files', file_info, file_id)
-    if parent_file_id and parent_file_info:
-        resource.db_update_item(parent_file_id, parent_file_info)
+    if match_policy_after_get_policy_code(resource, 'create', 'files', user, file_info):
+        resource.db_put_item('files', file_info, file_id)
+        if parent_file_id and parent_file_info:
+            resource.db_update_item(parent_file_id, parent_file_info)
 
-    file_b64 = file_b64.encode('utf-8')
-    file_b64 = base64.b64decode(file_b64)
-    resource.file_upload_bin(file_id, file_b64)
+        file_b64 = file_b64.encode('utf-8')
+        file_b64 = base64.b64decode(file_b64)
+        resource.file_upload_bin(file_id, file_b64)
 
-    body['file_id'] = file_id
-    return Response(body)
+        body['file_id'] = file_id
+        return Response(body)
+    else:
+        body['error'] = error.PERMISSION_DENIED
+        return Response(body)
+

@@ -1,6 +1,6 @@
 from cloud.response import Response
-from cloud.permission import storage_has_write_permission
 from cloud.permission import Permission, NeedPermission
+from cloud.storage.get_policy_code import match_policy_after_get_policy_code
 from cloud.message import error
 
 # Define the input output format of the function.
@@ -29,7 +29,8 @@ def do(data, resource):
 
     while file_id_to_delete:
         file_item = resource.db_get_item(file_id_to_delete)
-        if file_item and storage_has_write_permission(user, file_item):
+
+        if file_item and match_policy_after_get_policy_code(resource, 'delete', 'files', user, file_item):
             resource.file_delete_bin(file_id_to_delete)
             resource.db_delete_item(file_id_to_delete)
 

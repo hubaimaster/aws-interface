@@ -187,6 +187,8 @@ class Permission:
             download_b64 = 'run:cloud.storage.download_b64'
             get_b64_info_items = 'run:cloud.storage.get_b64_info_items'
             upload_b64 = 'run:cloud.storage.upload_b64'
+            get_policy_code = 'run:cloud.storage.get_policy_code'
+            put_policy = 'run:cloud.storage.put_policy'
 
     default_user_permissions = [
         Run.Auth.get_me,

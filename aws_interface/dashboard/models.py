@@ -2,6 +2,7 @@
 import uuid
 from django.db import models
 from dashboard.security.crypto import AESCipher
+import settings.base as settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 import cloud.shortuuid as shortuuid
 import json
@@ -124,3 +125,29 @@ class Log(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     level = models.CharField(max_length=255)
     event = models.TextField()
+
+
+class Tracker(models.Model):
+    """ It has meta information such as a bundle of events to be tracked and user funnel information.
+        Created one per session
+    """
+    id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
+    creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE)
+    funnel = models.CharField(max_length=255, null=True)
+
+    def __str__(self):
+        return '{}/{}-{}'.format(self.creation_date.month, self.creation_date.day, self.id)
+
+
+class Event(models.Model):
+    """ Create when case of *.html file presented or click something [Used in tracking package]
+    """
+    id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
+    creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE)
+    description = models.CharField(max_length=255, editable=False)  # Short description of event
+    target = models.CharField(max_length=255, editable=False)  # page_register | page_apps | btn_* | input_*
+    action = models.CharField(max_length=255)  # view | click | ...
+    amount = models.FloatField(default=0)  # Used for events such as payments
+    tracker = models.ForeignKey(Tracker, on_delete=models.CASCADE)

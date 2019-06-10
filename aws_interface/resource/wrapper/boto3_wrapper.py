@@ -797,6 +797,7 @@ class S3:
 
     def delete_bucket(self, bucket_name):
         try:
+            bucket_name = self.to_dns_name(bucket_name)
             response = self.client.delete_bucket(
                 Bucket=bucket_name
             )

@@ -1,6 +1,6 @@
 
 from cloud.response import Response
-from cloud.permission import database_has_read_permission
+from cloud.storage.get_policy_code import match_policy_after_get_policy_code
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import base64
@@ -34,7 +34,7 @@ def do(data, resource):
 
     item = resource.db_get_item(file_id)
     if item:
-        if database_has_read_permission(user, item):
+        if match_policy_after_get_policy_code(resource, 'read', 'files', user, item):
             file_id = item['file_id']
             parent_file_id = item.get('parent_file_id', None)
             file_b64 = resource.file_download_bin(file_id)
@@ -44,6 +44,7 @@ def do(data, resource):
             body['file_b64'] = file_b64
             body['parent_file_id'] = parent_file_id
             body['file_name'] = item.get('file_name', None)
+            body['meta_info'] = item.get('meta_info', {})
             return Response(body)
         else:
             body['error'] = error.PERMISSION_DENIED
@@ -51,4 +52,3 @@ def do(data, resource):
     else:
         body['error'] = error.INVALID_FILE_KEY
         return Response(body)
-

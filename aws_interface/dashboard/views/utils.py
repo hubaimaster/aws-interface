@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect
 from botocore.errorfactory import ClientError
 from numbers import Number
 from dashboard.models import App, Log
+from dashboard.management.tracking import Tracking
 import traceback
-import settings
 
 
 class Util:
@@ -66,25 +66,10 @@ class Util:
         return True
 
     @classmethod
-    def create_app(cls, request):
-        name = request.POST['name']
-        if not name or len(name) < 3:
-            Util.add_alert(request, '이름은 3글자 이상입니다')
-            return redirect('apps')
-        user = request.user
-        app = App.objects.filter(user=request.user, name=name)
-        if app:
-            Util.add_alert(request, '같은 이름의 어플리케이션이 존재합니다')
-            return redirect('apps')
-        app = App()
-        app.name = name
-        app.user = user
-        app.save()
-        Util.add_alert(request, '새로운 어플리케이션이 생성되었습니다')
-
-    @classmethod
     def log(cls, level, user, event):
         level = level.lower()
+        if not user.is_authenticated:
+            user = None
         log = Log(level=level, user=user, event=event)
         log.save()
 
@@ -93,6 +78,8 @@ def page_manage(func):
     def wrap(*args, **kwargs):
         try:  # Logging
             request = args[1]
+            url = str(request.build_absolute_uri())
+            Tracking(request).view_url(url)
             event = 'func:{}, args:{}, kwargs:{}'.format(func, args, kwargs)
             Util.log('info', request.user, event)
         except Exception as ex:
@@ -106,7 +93,6 @@ def page_manage(func):
             link_desc = None
 
             request = args[1]
-
             context = Util.get_context(request)
             url = str(request.build_absolute_uri())
 

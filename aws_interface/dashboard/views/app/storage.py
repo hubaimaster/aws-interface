@@ -94,3 +94,12 @@ class Storage(LoginRequiredMixin, View):
                 file_id = request.POST['file_id']
                 result = storage_api.delete_b64(file_id)
                 return JsonResponse(result)
+            elif cmd == 'get_policy_code':
+                mode = request.POST.get('mode')
+                result = storage_api.get_policy_code(mode)
+                return JsonResponse(result)
+            elif cmd == 'put_policy':
+                mode = request.POST.get('mode')
+                code = request.POST.get('code')
+                result = storage_api.put_policy(mode, code)
+                return JsonResponse(result)
