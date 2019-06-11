@@ -57,9 +57,9 @@ class AuthTestProcess:
         :return :
         """
         emails = self.parent.browser.find_elements_by_name('col-user-email')
+        print("check user")
         for email in emails:
             email = email.text
-            print('email:', email)
             if target_email == email:
                 return True
         return False
@@ -93,7 +93,6 @@ class AuthTestProcess:
         addable_authorizations.select_by_value(authorization_name)
         time.sleep(DELAY)
         group.find_element_by_css_selector("button[class='form-control btn btn-success']").click()
-        time.sleep(DELAY)
         print("authorization added")
 
     def _has_authorization(self, user_group, authorization_name):
@@ -111,7 +110,6 @@ class AuthTestProcess:
                 break
         group.find_element_by_class_name('close').click()
         # group.find_element_by_id('attach-user-group-commit').click()
-        time.sleep(DELAY)
         return result
 
     def _remove_authorization(self, user_group, authorization_name):
@@ -127,6 +125,38 @@ class AuthTestProcess:
                 authorization.find_element_by_css_selector("a[class='btn btn-danger btn-sm text text-white']").click()
                 break
         print("remove done ")
+
+    def _select_login_method(self, select_id, value, toggle_id):
+        """
+        select [value] at select box with [select_id] and toggle button with [toggle_id]
+        :param select_id: id of select box
+        :param value: value to select
+        :param toggle_id: id of toggle button
+        :return:
+        """
+        select_box = select.Select(self.parent.browser.find_element_by_id(select_id))
+        select_box.select_by_value(value)
+        time.sleep(DELAY)
+        toggle_button = self.parent.browser.find_element_by_id(toggle_id)
+        toggle_button = toggle_button.find_element_by_xpath('..')
+        toggle_button.click()
+        time.sleep(DELAY)
+        self.parent.browser.refresh()
+        print("{} selected from {}".format(value, select_id))
+
+    def _check_login_method(self, select_id, value, toggle_id):
+        """
+        Check if [value] is selected in select box with [select_id] and if switch with [toggle_id] is toggled
+        :param select_id: id of select box
+        :param value: value that should be selected
+        :param toggle_id: id of toggle button
+        :return:
+        """
+        select_box = select.Select(self.parent.browser.find_element_by_id(select_id))
+        selected_option = select_box.first_selected_option.get_attribute("value")
+        self.parent.assertTrue(selected_option == value)
+        self.parent.assertFalse(self.parent.browser.find_element_by_id(toggle_id).is_selected())
+        print("checked login")
 
     def do_test(self):
         group_name = 'TEST-GROUP'
@@ -152,6 +182,7 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user_group(group_name))
         time.sleep(DELAY)
+        """
         self.parent.assertFalse(self._has_authorization(group_name, 'run:cloud.auth.login'))
         time.sleep(DELAY)
         self._add_authorization(group_name, 'run:cloud.auth.login')
@@ -172,7 +203,20 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self.parent.assertFalse(self._has_user_group(group_name))
         time.sleep(LONG_DELAY)
+        
         self._create_user(email, password)
-        time.sleep(LONG_DELAY)
+        time.sleep(DELAY)
         self.parent.assertTrue(self._has_user(email))
+        time.sleep(DELAY)
+        """
         # LOGIN METHOD
+        self._select_login_method("email_default_group", group_name, "email_enabled")
+        time.sleep(DELAY)
+        self._check_login_method("email_default_group", group_name, "email_enabled")
+        time.sleep(DELAY)
+        self._select_login_method("guest_default_group", group_name, "guest_enabled")
+        time.sleep(DELAY)
+        self._check_login_method("guest_default_group", group_name, "guest_enabled")
+        time.sleep(DELAY)
+        self._check_user_count(1)
+        time.sleep(DELAY)
