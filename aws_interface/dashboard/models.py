@@ -137,7 +137,7 @@ class Tracker(models.Model):
     funnel = models.CharField(max_length=255, null=True)
 
     def __str__(self):
-        return '{}/{}-{}'.format(self.creation_date.month, self.creation_date.day, self.id)
+        return '[{}/{}] [{}] [{}]'.format(self.creation_date.month, self.creation_date.day, self.funnel, self.id)
 
 
 class Event(models.Model):

@@ -275,7 +275,7 @@ class AWSI {
 
     func storage_upload_file(file_data: Data, file_name: String, read_groups: [String], write_groups: [String], callback: @escaping (_ response: [String: Any]?)->Void){
         let rawBase64String = file_data.base64EncodedString()
-        let stringChunks = rawBase64String.split(by: 1024 * 1024 * 5)
+        let stringChunks = rawBase64String.split(by: 1024 * 1024 * 6)
 
         func upload(count: Int, parent_file_id: String?){
             let b64String = stringChunks[count]

@@ -12,7 +12,8 @@ class Tracking(object):
     def __init__(self, request):
         self.request = request
         self._enroll_session(request)
-        self._put_tracker()
+        funnel = request.META.get('HTTP_REFERER', None)
+        self._put_tracker(funnel)
 
     def _enroll_session(self, request):
         self.session = request.session

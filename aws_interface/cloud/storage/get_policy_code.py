@@ -24,15 +24,17 @@ SERVICE = 'storage'
 
 def match_policy_after_get_policy_code(resource, mode, partition, user, item):
     policy_code = get_policy_code(resource, partition, mode)
-    exec(policy_code)
-    result = eval('has_permission(user, item)')
+    result = match_policy(policy_code, user, item)
     return result
 
 
 def match_policy(policy_code, user, item):
-    exec(policy_code)
-    result = eval('has_permission(user, item)')
-    return result
+    if 'admin' in user.get('groups', []):
+        return True
+    else:
+        exec(policy_code)
+        result = eval('has_permission(user, item)')
+        return result
 
 
 def get_policy_code(resource, partition, mode):
