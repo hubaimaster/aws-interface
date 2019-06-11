@@ -34,41 +34,11 @@ class AuthTestProcess:
                 has_group_name = True
         return has_group_name
 
-    def _create_user(self, email, password):
-        """
-        Create user with [email] and [password] in auth
-        :param email:
-        :param password:
-        :return:
-        """
-        self.parent.browser.find_element_by_id('create-user-button').click()
-        time.sleep(DELAY)
-        self.parent.browser.find_element_by_id('input-username').send_keys(email)
-        time.sleep(DELAY)
-        self.parent.browser.find_element_by_id('input-password').send_keys(password)
-        time.sleep(DELAY)
-        self.parent.browser.find_element_by_id('create-user-commit').click()
-
-    def _has_user(self, target_email):
-        """
-        Check if there exists a user with [target_email].
-        Return boolean
-        :param target_email:
-        :return :
-        """
-        emails = self.parent.browser.find_elements_by_name('col-user-email')
-        print("check user")
-        for email in emails:
-            email = email.text
-            if target_email == email:
-                return True
-        return False
-
     def _open_authorization(self, user_group):
         """
         Open authorization management modal of [user_group]
-        :param user_group:
-        :return:
+        :param user_group: name of user_group to manage authoirzation
+        :return: selenium.webdriver.remote.webelement.WebElement
         """
         auth_groups = self.parent.browser.find_element_by_css_selector("table[class='table align-items-center table-flush']")
         group = None
@@ -99,7 +69,7 @@ class AuthTestProcess:
         """
         Check if [user_group] has [authorization_name]
         :param authorization_name:
-        :return:
+        :return: bool
         """
         self.parent.assertTrue(self._has_user_group(user_group))
         group = self._open_authorization(user_group)
@@ -158,6 +128,62 @@ class AuthTestProcess:
         self.parent.assertFalse(self.parent.browser.find_element_by_id(toggle_id).is_selected())
         print("checked login")
 
+    def _create_user(self, email, password):
+        """
+        Create user with [email] and [password] in auth
+        :param email:
+        :param password:
+        :return:
+        """
+        self.parent.browser.find_element_by_id('create-user-button').click()
+        time.sleep(DELAY)
+        self.parent.browser.find_element_by_id('input-username').send_keys(email)
+        time.sleep(DELAY)
+        self.parent.browser.find_element_by_id('input-password').send_keys(password)
+        time.sleep(DELAY)
+        self.parent.browser.find_element_by_id('create-user-commit').click()
+
+    def _has_user_email(self, target_email):
+        """
+        Check if there exists a user with [target_email].
+        :param target_email:
+        :return : bool
+        """
+        emails = self.parent.browser.find_elements_by_name('col-user-email')
+        for email in emails:
+            email = email.text
+            if email.strip() == target_email:
+                return True
+        return False
+
+    def _check_user_count(self,count):
+        """
+        Check the number of user
+        :param count: number of user
+        :return: bool
+        """
+        user_count_box = self.parent.browser.find_element_by_class_name("card-body")
+        count_on_page = int(user_count_box.find_element_by_css_selector('span').text.strip().split()[0])
+        print(count_on_page)
+        return self.parent.assertTrue(count_on_page == count)
+
+    def _has_group_in_user(self, group_name):
+        """
+        Check if group_name is in signed_up user list
+        :param group_name: name of group
+        :return: bool
+        """
+        result = False
+        user_table = self.parent.browser.find_element_by_id("user-table")
+        for tr in user_table.find_elements_by_tag_name("tr")[1:]:
+            groups = tr.find_elements_by_tag_name("td")[2]
+            if(groups.find_element_by_tag_name('a').text.strip()==group_name):
+                result = True
+                break
+        print("checked user group in user")
+        return result
+
+
     def do_test(self):
         group_name = 'TEST-GROUP'
         group_desc = 'Group for testing'
@@ -203,11 +229,6 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self.parent.assertFalse(self._has_user_group(group_name))
         time.sleep(LONG_DELAY)
-        
-        self._create_user(email, password)
-        time.sleep(DELAY)
-        self.parent.assertTrue(self._has_user(email))
-        time.sleep(DELAY)
         """
         # LOGIN METHOD
         self._select_login_method("email_default_group", group_name, "email_enabled")
@@ -218,5 +239,12 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self._check_login_method("guest_default_group", group_name, "guest_enabled")
         time.sleep(DELAY)
+        #USER
+        self._create_user(email, password)
+        time.sleep(LONG_DELAY)
+        self.parent.assertTrue(self._has_user_email(email))
+        time.sleep(DELAY)
         self._check_user_count(1)
+        time.sleep(DELAY)
+        self._has_group_in_user(group_name)
         time.sleep(DELAY)
