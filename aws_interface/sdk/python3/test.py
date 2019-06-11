@@ -1,4 +1,4 @@
-import aws_interface
+from sdk.python3 import aws_interface
 
 EMAIL = 'email@example.com'
 PASSWORD = 'password_for_test'
