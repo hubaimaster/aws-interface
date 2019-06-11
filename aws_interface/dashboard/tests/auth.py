@@ -183,7 +183,6 @@ class AuthTestProcess:
         print("checked user group in user")
         return result
 
-
     def do_test(self):
         group_name = 'TEST-GROUP'
         group_desc = 'Group for testing'
