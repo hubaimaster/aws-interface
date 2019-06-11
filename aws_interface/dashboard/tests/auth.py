@@ -177,7 +177,7 @@ class AuthTestProcess:
         user_table = self.parent.browser.find_element_by_id("user-table")
         for tr in user_table.find_elements_by_tag_name("tr")[1:]:
             groups = tr.find_elements_by_tag_name("td")[2]
-            if(groups.find_element_by_tag_name('a').text.strip()==group_name):
+            if groups.find_element_by_tag_name('a').text.strip() == group_name:
                 result = True
                 break
         print("checked user group in user")
