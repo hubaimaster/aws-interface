@@ -109,8 +109,11 @@ class DashboardTestCase(StaticLiveServerTestCase):
         time.sleep(DELAY)
         self.browser.find_element_by_id('email').send_keys(EMAIL)
         self.browser.find_element_by_id('password').send_keys(PASSWORD)
+        self.browser.find_element_by_id('password-check').send_keys(PASSWORD)
+        time.sleep(DELAY)
         self.browser.find_element_by_id('access_key').send_keys(ACCESS_KEY)
         self.browser.find_element_by_id('secret_key').send_keys(SECRET_KEY)
+        time.sleep(DELAY)
         self.browser.find_element_by_id('register').click()
         time.sleep(DELAY)
         alert_text = self.browser.switch_to.alert.text

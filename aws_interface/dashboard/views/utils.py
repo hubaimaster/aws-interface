@@ -110,7 +110,7 @@ def page_manage(func):
             elif code == 'AccessDeniedException':
                 title = '등록된 IAM AccessKey 의 권한이 부족합니다'
                 desc = '아래 가이드 링크를 참고하여 AdminUser 권한을 추가합니다'
-                link = 'guide'
+                link = 'https://aws-interface.com/docs/start_awsi.pdf'
                 link_desc = 'AWS IAM AccessKey 권한 추가하기'
                 error_type = 'invalid_access_key'
             elif code == 'ResourceNotFoundException':
@@ -129,6 +129,7 @@ def page_manage(func):
             context['link'] = link
             context['link_desc'] = link_desc
             context['code'] = code
+            context['app_id'] = kwargs.get('app_id', None)
 
             return render(request, 'dashboard/error.html', context=context)
         return result

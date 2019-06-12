@@ -1,96 +1,54 @@
+{% extends 'dashboard/app/base.html' %}
 {% load staticfiles %}
-<!DOCTYPE html>
-<html>
+{% block content %}
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no">
-    <meta name="description" content="클릭으로 만드는 백엔드 서비스">
-    <meta name="author" content="김창환, 허남규">
-    <meta property="og:image" content="{%  static 'assets/img/theme/laptop-meta.jpg' %}"/>
-    <title>AWS Interface | Login</title>
-    <!-- Favicon -->
-    <link href="{%  static 'assets/img/brand/favicon.png' %}" rel="icon" type="image/png">
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
-    <!-- Icons -->
-    <link href="{%  static 'assets/vendor/nucleo/css/nucleo.css' %}" rel="stylesheet">
-    <link href="{%  static 'assets/vendor/@fortawesome/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
-    <!-- Argon CSS -->
-    <link type="text/css" href="{%  static 'assets/css/argon.css' %}" rel="stylesheet">
+    <div class="main-content">
+        <!-- Top navbar -->
+        {% include 'dashboard/app/top-navbar.html' %}
+        <!-- Header -->
+        <input id="view-tag" value="error" hidden>
+        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 600px; background-image: url({% static 'assets/img/theme/laptop.jpg' %}); background-size: cover; background-position: center top;">
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134607667-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'UA-134607667-1');
-    </script>
-
-</head>
-
-<body class="bg-default">
-<div class="main-content">
-    <!-- Header -->
-    <div class="header bg-gradient-primary py-7 py-lg-8">
-        <div class="container">
-            <div class="header-body text-center mb-7">
-                <div class="row justify-content-center">
-                    <div class="col-lg-12 col-md-12">
-                        {% if error_type == 'allocating' %}
-                            <h1 class="text-white">자원 할당중</h1>
-                        {% else %}
-                            <h1 class="text-white">오류</h1>
-                        {% endif %}
-                        <h2 class="text-lead text-light">{{ title }}</h2>
-                        <h3 class="text-lead text-light">{{ desc }}</h3>
-                        <h5>{{ error }}</h5>
+            <!-- Mask -->
+            <span class="mask bg-gradient-default opacity-8"></span>
+            <!-- Header container -->
+            <div class="container-fluid align-items-center">
+                <div class="row">
+                    <div class="col-lg-9 col-md-9">
+                        <h1 class="display-2 text-white">Error :(</h1>
+                        <p class="text-white mt-0 mb-5">{{ code }}</p>
+                        <h2 class="text-white">{{ title }}</h2>
+                        <p class="text-white mt-0 mb-5">{{ desc }}</p>
                         {% if link %}
-                            <a href="{{ link }}" class="btn btn-primary text-white">{{ link_desc }}</a>
+                            <a class="btn btn-outline-white" href="{{ link }}">{{ link_desc }}</a>
+                        {% endif %}
+                        {% if error_type == 'allocating' %}
+                            <script>
+                                setTimeout(function(){
+                                   window.location.reload();
+                                }, 5000);
+                            </script>
                         {% endif %}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="separator separator-bottom separator-skew zindex-100">
-            <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                <polygon class="fill-default" points="2560 0 2560 100 0 100"></polygon>
-            </svg>
-        </div>
-    </div>
 
-</div>
-<!-- Footer -->
-<footer class="py-5">
-    <div class="container">
-        <div class="row align-items-center justify-content-xl-between">
-            <div class="col-xl-6">
-                <div class="copyright text-center text-xl-left text-muted">
-                    &copy; 2018 <a href="http://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
-                </div>
+        <!-- Page content -->
+        <div class="container-fluid mt--10">
+
             </div>
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="row align-items-center justify-content-xl-between">
+                    <div class="col-xl-6">
+                        <div class="copyright text-center text-xl-left text-muted">
+                            &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
-</footer>
-<!-- Argon Scripts -->
-<!-- Core -->
-<script src="{% static "assets/vendor/jquery/dist/jquery.min.js" %}"></script>
-<script src="{% static "assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js" %}"></script>
-<!-- Argon JS -->
-<script src="{% static "assets/js/argon.js" %}"></script>
 
-<script type="text/javascript">
-    $(function(){
-        {% if alert %}
-            alert('{{ alert }}');
-        {% endif %}
-    });
-
-</script>
-
-
-</body>
-
-</html>
+{% endblock %}

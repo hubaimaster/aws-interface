@@ -38,36 +38,10 @@
             <a class="navbar-brand" href="{%  url 'index' %}">
                 <img src="{% static "assets/img/brand/white.png" %}" />
             </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse-main" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbar-collapse-main">
-                <!-- Collapse header -->
-                <div class="navbar-collapse-header d-md-none">
-                    <div class="row">
-                        <div class="col-6 collapse-brand">
-                            <a href="{% url 'index' %}">
-                                <img src="{% static "assets/img/brand/blue.png" %}">
-                            </a>
-                        </div>
-                        <div class="col-6 collapse-close">
-                            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse-main" aria-controls="sidenav-main" aria-expanded="false" aria-label="Toggle sidenav">
-                                <span></span>
-                                <span></span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Navbar items -->
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-icon" href="{% url 'login' %}">
-                            <i class="ni ni-key-25"></i>
-                            <span class="nav-link-inner--text">로그인</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <a class="btn btn-outline-white" href="{% url 'login' %}">
+                <i class="ni ni-key-25"></i>
+                <span class="nav-link-inner--text">로그인</span>
+            </a>
         </div>
     </nav>
     <!-- Header -->
@@ -76,8 +50,8 @@
             <div class="header-body text-center mb-7">
                 <div class="row justify-content-center">
                     <div class="col-lg-5 col-md-6">
-                        <h1 class="text-white">환영합니다</h1>
-                        <h4 class="text-light">백엔드 인증 정보는 암호화 되어 저장됩니다</h4>
+                        <h1 class="text-white">클릭으로 백엔드 만들어 볼까요?</h1>
+                        <h3 class="text-white">앞서가는 기업들은 이미 사용하고 있습니다</h3>
                     </div>
                 </div>
             </div>
@@ -95,12 +69,10 @@
             <div class="col-lg-6 col-md-8">
                 <div class="card bg-secondary shadow border-0">
                     <div class="card-body px-lg-5 py-lg-5">
-                        <div class="text-center text-muted mb-4">
-                            <h3>기본 회원 정보</h3>
-                        </div>
 
                         <form role="form" method="post">{% csrf_token %}
                             <div class="form-group">
+                                <label class="form-control-label">이메일</label>
                                 <div class="input-group input-group-alternative mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="ni ni-email-83"></i></span>
@@ -109,6 +81,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="form-control-label">비밀번호</label>
                                 <div class="input-group input-group-alternative">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
@@ -117,66 +90,86 @@
                                 </div>
                             </div>
 
+                            <div class="form-group">
+                                <label class="form-control-label">비밀번호 확인</label>
+                                <div class="input-group input-group-alternative">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ni ni-check-bold"></i></span>
+                                    </div>
+                                    <input id="password-check" name="password_check" class="form-control" placeholder="Password check" type="password">
+                                </div>
+                            </div>
+
                             <div class="dropdown-divider"></div>
-                            <div class="text-left text-muted mb-3 mt-3">
-                                <h4>백엔드 인증 정보 <a target="_blank" href="https://aws-interface.com/docs/start_awsi.pdf"><i class="ni ni-support-16" data-toggle="tooltip" data-placement="top" title="클릭하여 알아보기"></i></a></h4>
-                                <div class="text-left text-muted">
-                                    <select id="vendor" name="vendor">
-                                        <option value="aws">Amazon Web Service (AWS)</option>
-                                    </select>
 
-                                </div>
-                            </div>
+                            <a id="open-backend-auth-info-link" data-toggle="collapse" href="#backend-auth-info" role="link" aria-expanded="false" aria-controls="backend-auth-info">
+                                <i class="ni ni-bold-down"></i> <label><b style="color:black;">백엔드 인증 정보</b></label>
+                            </a>
+                            <a target="_blank" href="https://aws-interface.com/docs/start_awsi.pdf"><i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="클릭하여 알아보기"></i></a>
 
-                            <div class="form-group">
-                                <div class="input-group input-group-alternative mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="ni ni-active-40"></i></span>
+                            <div class="collapse" id="backend-auth-info">
+                                <div class="text-left text-muted mb-3 mt-3">
+                                    <div class="text-left text-muted">
+                                        <select id="vendor" name="vendor">
+                                            <option value="aws">Amazon Web Service (AWS)</option>
+                                        </select>
+
                                     </div>
-                                    <input id="access_key" name="aws_access_key" class="form-control" placeholder="Access key" type="text">
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="input-group input-group-alternative mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="ni ni-key-25"></i></span>
+
+                                <div class="form-group">
+                                    <label class="form-control-label">액세스 키</label>
+                                    <div class="input-group input-group-alternative mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-active-40"></i></span>
+                                        </div>
+                                        <input id="access_key" name="aws_access_key" class="form-control" placeholder="Access key" type="text">
                                     </div>
-                                    <input id="secret_key" name="aws_secret_key" class="form-control" placeholder="Secret key" type="password" autocomplete="off">
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="input-group input-group-alternative mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="ni ni-world"></i></span>
+                                <div class="form-group">
+                                    <label class="form-control-label">시크릿 액세스 키</label>
+                                    <div class="input-group input-group-alternative mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-key-25"></i></span>
+                                        </div>
+                                        <input id="secret_key" name="aws_secret_key" class="form-control" placeholder="Secret access key" type="password" autocomplete="off">
                                     </div>
-                                    <select id="region" name="aws_region" class="form-control">
-                                        <option value="ap-northeast-2">ap-northeast-2 아시아 태평양(서울)</option>
-                                        <option value="us-east-2">us-east-2 미국 동부(오하이오)</option>
-                                        <option value="us-east-1">us-east-1	미국 동부(버지니아 북부)</option>
-                                        <option value="us-west-1">us-west-1 미국 서부(캘리포니아 북부)</option>
-                                        <option value="us-west-2">us-west-2 미국 서부(오레곤)</option>
-                                        <option value="ap-east-1">ap-east-1 아시아 태평양(홍콩)</option>
-                                        <option value="ap-south-1">ap-south-1 아시아 태평양(뭄바이)</option>
-                                        <option value="ap-southeast-1">ap-southeast-1 아시아 태평양(싱가포르)</option>
-                                        <option value="ap-southeast-2">ap-southeast-2 아시아 태평양(시드니)</option>
-                                        <option value="ap-northeast-1">ap-northeast-1 아시아 태평양(도쿄)</option>
-                                        <option value="ca-central-1">ca-central-1 캐나다(중부)</option>
-                                        <option value="cn-north-1">cn-north-1 중국(베이징)</option>
-                                        <option value="cn-northwest-1">cn-northwest-1 중국(닝샤)</option>
-                                        <option value="eu-central-1">eu-central-1 EU(프랑크푸르트)</option>
-                                        <option value="eu-west-1">eu-west-1 EU(아일랜드)</option>
-                                        <option value="eu-west-2">eu-west-2 EU(런던)</option>
-                                        <option value="eu-west-3">eu-west-3 EU(파리)</option>
-                                        <option value="eu-north-1">eu-north-1 EU(스톡홀름)</option>
-                                        <option value="sa-east-1">sa-east-1 남아메리카(상파울루)</option>
-                                        <option value="us-gov-east-1">us-gov-east-1 AWS GovCloud (미국 동부)</option>
-                                        <option value="us-gov-west-1">us-gov-west-1 AWS GovCloud (US)</option>
-                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label">접속 리전</label>
+                                    <div class="input-group input-group-alternative mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-world"></i></span>
+                                        </div>
+                                        <select id="region" name="aws_region" class="form-control">
+                                            <option value="ap-northeast-2">ap-northeast-2 아시아 태평양(서울)</option>
+                                            <option value="us-east-2">us-east-2 미국 동부(오하이오)</option>
+                                            <option value="us-east-1">us-east-1	미국 동부(버지니아 북부)</option>
+                                            <option value="us-west-1">us-west-1 미국 서부(캘리포니아 북부)</option>
+                                            <option value="us-west-2">us-west-2 미국 서부(오레곤)</option>
+                                            <option value="ap-east-1">ap-east-1 아시아 태평양(홍콩)</option>
+                                            <option value="ap-south-1">ap-south-1 아시아 태평양(뭄바이)</option>
+                                            <option value="ap-southeast-1">ap-southeast-1 아시아 태평양(싱가포르)</option>
+                                            <option value="ap-southeast-2">ap-southeast-2 아시아 태평양(시드니)</option>
+                                            <option value="ap-northeast-1">ap-northeast-1 아시아 태평양(도쿄)</option>
+                                            <option value="ca-central-1">ca-central-1 캐나다(중부)</option>
+                                            <option value="cn-north-1">cn-north-1 중국(베이징)</option>
+                                            <option value="cn-northwest-1">cn-northwest-1 중국(닝샤)</option>
+                                            <option value="eu-central-1">eu-central-1 EU(프랑크푸르트)</option>
+                                            <option value="eu-west-1">eu-west-1 EU(아일랜드)</option>
+                                            <option value="eu-west-2">eu-west-2 EU(런던)</option>
+                                            <option value="eu-west-3">eu-west-3 EU(파리)</option>
+                                            <option value="eu-north-1">eu-north-1 EU(스톡홀름)</option>
+                                            <option value="sa-east-1">sa-east-1 남아메리카(상파울루)</option>
+                                            <option value="us-gov-east-1">us-gov-east-1 AWS GovCloud (미국 동부)</option>
+                                            <option value="us-gov-west-1">us-gov-west-1 AWS GovCloud (US)</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="text-center">
-                                <button id="register" type="submit" class="btn btn-primary mt-4">가입하기</button>
+                                <button id="register" type="submit" class="btn btn-primary mt-4 btn-block" disabled>회원 가입</button>
                             </div>
 
                         </form>
@@ -210,6 +203,40 @@
         {% if alert %}
             alert('{{alert}}');
         {% endif %}
+    });
+</script>
+
+<script>
+    function validatePassword(){
+        const password = $("#password").val();
+        const passwordCheck = $("#password-check").val();
+        const accessKey = $("#access_key").val();
+        const secretKey = $("#secret_key").val();
+
+        if (accessKey.length > 5 && secretKey.length > 5){
+            $("#register").attr('disabled', false);
+        }else{
+            $("#register").attr('disabled', true);
+        }
+        if (password.length >= 7 && password == passwordCheck){
+            const accord = $("#open-backend-auth-info-link");
+            const isExpanded = accord.attr("aria-expanded");
+            if (isExpanded == 'false'){
+                accord.click();
+            }
+        }
+    }
+    $("#password-check").on('input', function () {
+        validatePassword();
+    });
+    $("#password").on('input', function () {
+        validatePassword();
+    });
+    $("#access_key").on('input', function () {
+        validatePassword();
+    });
+    $("#secret_key").on('input', function () {
+        validatePassword();
     });
 </script>
 
