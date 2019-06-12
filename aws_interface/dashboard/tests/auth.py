@@ -8,6 +8,7 @@ class AuthTestProcess:
 
     def _create_group(self, name, description):
         """
+        Create group with [name] and [description]
         :param name: Group name to create
         :param description: Group description to create
         :return:
@@ -23,7 +24,7 @@ class AuthTestProcess:
 
     def _has_user_group(self, name):
         """
-        Make sure it has a member group [name] and return Whether that group exists
+        Check if group [name] exists
         :param name: Group name to create
         :return: bool
         """
@@ -98,7 +99,7 @@ class AuthTestProcess:
 
     def _select_login_method(self, select_id, value, toggle_id):
         """
-        select [value] at select box with [select_id] and toggle button with [toggle_id]
+        Change login method in [select_id] to [value] and toggle button with [toggle_id]
         :param select_id: id of select box
         :param value: value to select
         :param toggle_id: id of toggle button
@@ -116,7 +117,7 @@ class AuthTestProcess:
 
     def _check_login_method(self, select_id, value, toggle_id):
         """
-        Check if [value] is selected in select box with [select_id] and if switch with [toggle_id] is toggled
+        Check whether [value] is selected in select box with [select_id] and whether switch with [toggle_id] is toggled
         :param select_id: id of select box
         :param value: value that should be selected
         :param toggle_id: id of toggle button
@@ -156,7 +157,7 @@ class AuthTestProcess:
                 return True
         return False
 
-    def _check_user_count(self,count):
+    def _check_user_count(self, count):
         """
         Check the number of user
         :param count: number of user
@@ -177,9 +178,10 @@ class AuthTestProcess:
         user_table = self.parent.browser.find_element_by_id("user-table")
         for tr in user_table.find_elements_by_tag_name("tr")[1:]:
             groups = tr.find_elements_by_tag_name("td")[2]
-            if groups.find_element_by_tag_name('a').text.strip() == group_name:
-                result = True
-                break
+            for group in groups.find_elements_by_tag_name('a'):
+                if group.text.strip() == group_name:
+                    result = True
+                    break
         print("checked user group in user")
         return result
 
@@ -192,10 +194,11 @@ class AuthTestProcess:
         add_button = self.parent.browser.find_element_by_css_selector("a[data-target^='#modal-attach-user-group']")
         add_button.click()
         time.sleep(DELAY)
-        pop_up = add_button.find_element_by_xpath('..')
-        select_box = select.Select(pop_up.find_element_by_id('group-name'))
+        modal = add_button.find_element_by_xpath('..')
+        select_box = select.Select(modal.find_element_by_id('group-name'))
         select_box.select_by_value(group_name)
-        pop_up.find_element_by_css_selector("button[id^='attach-user-group']").click()
+        modal.find_element_by_css_selector("button[id^='attach-user-group']").click()
+        time.sleep(DELAY)
         print("added {} on GROUPS column".format(group_name))
 
     def _remove_group_in_user(self, group_name):
@@ -204,11 +207,14 @@ class AuthTestProcess:
         :param group_name: name of group to remove
         :return:
         """
-        groups = self.parent.browser.find_elements_by_css_selector("a[onclick^='#detach_user_group")
+        groups = self.parent.browser.find_elements_by_css_selector("a[onclick^='detach_user_group']")
         for group in groups:
+            print(group.text)
             if group.text.strip() == group_name:
                 group.click()
+                print("{} is removed!".format(group.text))
                 break
+        time.sleep(LONG_DELAY * 4)
         print("removed {} from GROUPS column".format(group_name))
 
     def do_test(self):
@@ -272,8 +278,7 @@ class AuthTestProcess:
         """
         #USER
         self._create_user(email, password)
-        time.sleep(LONG_DELAY)
-        time.sleep(LONG_DELAY)
+        time.sleep(LONG_DELAY * 4)
         self.parent.assertTrue(self._has_user_email(email))
         time.sleep(DELAY)
         self._check_user_count(1)
@@ -285,7 +290,8 @@ class AuthTestProcess:
         self._check_user_count(1)
         time.sleep(DELAY)
         self.parent.assertTrue(self._has_group_in_user(group_name))
-        time.sleep(DELAY)
+        time.sleep(LONG_DELAY)
         self._remove_group_in_user(group_name)
-        time.sleep(DELAY)
+        time.sleep(LONG_DELAY * 4)
         self.parent.assertFalse(self._has_group_in_user(group_name))
+        time.sleep(DELAY)
