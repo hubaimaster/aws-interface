@@ -262,12 +262,11 @@ class AuthTestProcess:
         for tr in user_table.find_elements_by_tag_name("tr")[1:]:
             groups = tr.find_elements_by_tag_name("td")[3]
             for extra in groups.find_elements_by_tag_name('h5'):
-                print(extra.text)
                 if extra.text.strip() == "{} : {}".format(extra_name, extra_value):
-                    result = True
+                    print(extra.text)
+                    return True
                 break
-        print("checked extra")
-        return
+        return False
 
     def do_test(self):
         group_name = 'TEST-GROUP'
@@ -358,7 +357,7 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self._modify_selected(field_name, field_type, field_value)
         time.sleep(LONG_DELAY * 6)
-        self._has_extra(field_name, field_value)
+        self.parent.assertTrue(self._has_extra(field_name, field_value))
         time.sleep(DELAY)
         self._click_checkbox_and_delete_selected_in_user()
         time.sleep(LONG_DELAY * 6)
