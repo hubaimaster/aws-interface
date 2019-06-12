@@ -217,11 +217,83 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY * 4)
         print("removed {} from GROUPS column".format(group_name))
 
+    def _click_checkbox_and_modify_selected_in_user(self):
+        """
+        Click checkbox in signed-up user table and open 'modify selected' modal
+        :return:
+        """
+        try:
+            print("click with css_selector")
+            radio_button = self.parent.browser.find_element_by_name('checkbox-user')
+            self.parent.browser.execute_script("arguments[0].checked = true;", radio_button)
+        except:
+            try:
+                print("css_selector in error")
+                self.parent.browser.find_element_by_css_selector('div[class="custom-control custom-radio mt--4"]').click()
+            except:
+                print("javascript also error")
+        user_table = self.parent.browser.find_element_by_id('create-user-button')
+        user_table = user_table.find_element_by_xpath('..')
+        user_table.find_element_by_id('dropdownMenuButton').click()
+        user_table.find_element_by_css_selector("a[data-target='#modal-mod-user']").click()
+        print("Opened modify_selected modal")
+
+    def _click_checkbox_and_delete_selected_in_user(self):
+        """
+        Click checkbox in signed-up user table and open 'delete selected' modal
+        :return:
+        """
+        try:
+            print("click with css_selector")
+            radio_button = self.parent.browser.find_element_by_name('checkbox-user')
+            self.parent.browser.execute_script("arguments[0].checked = true;", radio_button)
+            print(radio_button.is_selected())
+        except:
+            try:
+                print("css_selector in error")
+                self.parent.browser.find_element_by_css_selector('div[class="custom-control custom-radio mt--4"]').click()
+            except:
+                print("javascript also error")
+
+        user_table = self.parent.browser.find_element_by_id('create-user-button')
+        user_table = user_table.find_element_by_xpath('..')
+        user_table.find_element_by_id('dropdownMenuButton').click()
+        user_table.find_element_by_css_selector("a[onclick='delete_checked_users();']").click()
+        print("Opened delete_selected modal")
+
+    def _modify_selected(self, field_name, field_type, field_value):
+        """
+        Modify field name to [field_name], field type tio [field_type], field value to [field_value]
+        :param field_name: modified field name
+        :param field_type: modified field type
+        :param field_value: modified field value
+        :return:
+        """
+        self.parent.browser.find_element_by_name('user-field-name').send_keys(field_name)
+        field_type_dropdown = select.Select(self.parent.browser.find_element_by_id('user-field-type'))
+        field_type_dropdown.select_by_value(field_type)
+        self.parent.browser.find_element_by_name('user-field-value').send_keys(field_value)
+        self.parent.browser.find_element_by_id('mod-user-commit').click()
+
+    def _has_extra(self, extra_name, extra_value):
+        user_table = self.parent.browser.find_element_by_id("user-table")
+        for tr in user_table.find_elements_by_tag_name("tr")[1:]:
+            groups = tr.find_elements_by_tag_name("td")[3]
+            for extra in groups.find_element_by_tag_name('a').text.split('\n'):
+                if extra.strip() == "{} : {}".format(extra_name, extra_value):
+                    result = True
+                break
+        print("checked extra")
+        return
+
     def do_test(self):
         group_name = 'TEST-GROUP'
         group_desc = 'Group for testing'
         email = 'test@email.com'
         password = 'testpassword1234'
+        field_name = "extra_test"
+        field_type = "S"
+        field_value = "Test"
 
         time.sleep(DELAY)
         start_time = time.time()
@@ -236,12 +308,13 @@ class AuthTestProcess:
 
         self.parent.assert_view_tag('auth')
         time.sleep(LONG_DELAY)
+
         # USER GROUP
+        """
         self._create_group(group_name, group_desc)
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user_group(group_name))
         time.sleep(DELAY)
-        """
         self.parent.assertFalse(self._has_authorization(group_name, 'run:cloud.auth.login'))
         time.sleep(DELAY)
         self._add_authorization(group_name, 'run:cloud.auth.login')
@@ -281,6 +354,7 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY * 4)
         self.parent.assertTrue(self._has_user_email(email))
         time.sleep(DELAY)
+        """
         self._check_user_count(1)
         time.sleep(DELAY)
         self.parent.assertTrue(self._has_group_in_user("user"))
@@ -295,3 +369,16 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY * 4)
         self.parent.assertFalse(self._has_group_in_user(group_name))
         time.sleep(DELAY)
+        """
+        self.parent.browser.maximize_window()
+        """
+        self._click_checkbox_and_modify_selected_in_user()
+        time.sleep(DELAY)
+        self._modify_selected(field_name, field_type, field_value)
+        time.sleep(LONG_DELAY * 6)
+        self._has_extra(field_name, field_value)
+        time.sleep(DELAY)
+        self._click_checkbox_and_delete_selected_in_user()
+        time.sleep(DELAY)
+        self.parent.assertFalse(self._has_user_email(email))
+        """
