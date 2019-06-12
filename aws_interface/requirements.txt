@@ -33,3 +33,4 @@ urllib3==1.24.2
 wcwidth==0.1.7
 websocket-client==0.56.0
 pymysql
+selenium
