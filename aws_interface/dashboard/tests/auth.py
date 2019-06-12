@@ -214,7 +214,6 @@ class AuthTestProcess:
                 group.click()
                 print("{} is removed!".format(group.text))
                 break
-        time.sleep(LONG_DELAY * 4)
         print("removed {} from GROUPS column".format(group_name))
 
     def _click_checkbox_and_modify_selected_in_user(self):
@@ -222,16 +221,8 @@ class AuthTestProcess:
         Click checkbox in signed-up user table and open 'modify selected' modal
         :return:
         """
-        try:
-            print("click with css_selector")
-            radio_button = self.parent.browser.find_element_by_name('checkbox-user')
-            self.parent.browser.execute_script("arguments[0].checked = true;", radio_button)
-        except:
-            try:
-                print("css_selector in error")
-                self.parent.browser.find_element_by_css_selector('div[class="custom-control custom-radio mt--4"]').click()
-            except:
-                print("javascript also error")
+        radio_button = self.parent.browser.find_element_by_name('checkbox-user')
+        self.parent.browser.execute_script("arguments[0].checked = true;", radio_button)
         user_table = self.parent.browser.find_element_by_id('create-user-button')
         user_table = user_table.find_element_by_xpath('..')
         user_table.find_element_by_id('dropdownMenuButton').click()
@@ -243,23 +234,13 @@ class AuthTestProcess:
         Click checkbox in signed-up user table and open 'delete selected' modal
         :return:
         """
-        try:
-            print("click with css_selector")
-            radio_button = self.parent.browser.find_element_by_name('checkbox-user')
-            self.parent.browser.execute_script("arguments[0].checked = true;", radio_button)
-            print(radio_button.is_selected())
-        except:
-            try:
-                print("css_selector in error")
-                self.parent.browser.find_element_by_css_selector('div[class="custom-control custom-radio mt--4"]').click()
-            except:
-                print("javascript also error")
-
+        radio_button = self.parent.browser.find_element_by_name('checkbox-user')
+        self.parent.browser.execute_script("arguments[0].checked = true;", radio_button)
         user_table = self.parent.browser.find_element_by_id('create-user-button')
         user_table = user_table.find_element_by_xpath('..')
         user_table.find_element_by_id('dropdownMenuButton').click()
         user_table.find_element_by_css_selector("a[onclick='delete_checked_users();']").click()
-        print("Opened delete_selected modal")
+        print("Deleted")
 
     def _modify_selected(self, field_name, field_type, field_value):
         """
@@ -274,13 +255,15 @@ class AuthTestProcess:
         field_type_dropdown.select_by_value(field_type)
         self.parent.browser.find_element_by_name('user-field-value').send_keys(field_value)
         self.parent.browser.find_element_by_id('mod-user-commit').click()
+        print("Modified")
 
     def _has_extra(self, extra_name, extra_value):
         user_table = self.parent.browser.find_element_by_id("user-table")
         for tr in user_table.find_elements_by_tag_name("tr")[1:]:
             groups = tr.find_elements_by_tag_name("td")[3]
-            for extra in groups.find_element_by_tag_name('a').text.split('\n'):
-                if extra.strip() == "{} : {}".format(extra_name, extra_value):
+            for extra in groups.find_elements_by_tag_name('h5'):
+                print(extra.text)
+                if extra.text.strip() == "{} : {}".format(extra_name, extra_value):
                     result = True
                 break
         print("checked extra")
@@ -371,7 +354,6 @@ class AuthTestProcess:
         time.sleep(DELAY)
         """
         self.parent.browser.maximize_window()
-        """
         self._click_checkbox_and_modify_selected_in_user()
         time.sleep(DELAY)
         self._modify_selected(field_name, field_type, field_value)
@@ -379,6 +361,5 @@ class AuthTestProcess:
         self._has_extra(field_name, field_value)
         time.sleep(DELAY)
         self._click_checkbox_and_delete_selected_in_user()
-        time.sleep(DELAY)
+        time.sleep(LONG_DELAY * 6)
         self.parent.assertFalse(self._has_user_email(email))
-        """
