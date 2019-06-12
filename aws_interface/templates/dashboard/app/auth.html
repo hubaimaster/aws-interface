@@ -580,6 +580,10 @@
             const field_name = $("#user-field-name").val();
             const field_type = $("#user-field-type").val();
             const field_value = $("#user-field-value").val();
+            if (field_type == 'N' && !$.isNumeric(field_value)){
+                alert("Numeric types can only contain numeric variables");
+                return;
+            }
             $.LoadingOverlay('show', {
                 text:'Modifying users...'
             });
@@ -639,13 +643,16 @@
         }
 
         function detach_user_group(user_id, group_name) {
-            $.post("", {
-                cmd: "detach_user_group",
-                group_name: group_name,
-                user_id: user_id,
-            }, function (data) {
-                window.location.reload();
-            });
+            if (confirm('그룹을 삭제하시겠습니까?')){
+                $.post("", {
+                    cmd: "detach_user_group",
+                    group_name: group_name,
+                    user_id: user_id,
+                }, function (data) {
+                    window.location.reload();
+                });
+            }
+
         }
 
         function attach_group_permission(group_name){

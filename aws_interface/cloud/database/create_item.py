@@ -16,6 +16,7 @@ info = {
         'write_groups': 'list',
     },
     'output_format': {
+        'item_id?': 'str',
         'error?': {
             'code': 'int',
             'message': 'str'
