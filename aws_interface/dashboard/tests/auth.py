@@ -25,7 +25,7 @@ class AuthTestProcess:
         """
         Make sure it has a member group [name] and return Whether that group exists
         :param name: Group name to create
-        :return:bool
+        :return: bool
         """
         has_group_name = False
         group_names = self.parent.browser.find_elements_by_name('group-name')
@@ -38,7 +38,7 @@ class AuthTestProcess:
         """
         Open authorization management modal of [user_group]
         :param user_group: name of user_group to manage authoirzation
-        :return: selenium.webdriver.remote.webelement.WebElement
+        :return: group: selenium.webdriver.remote.webelement.WebElement object of row with name [user_group]
         """
         auth_groups = self.parent.browser.find_element_by_css_selector("table[class='table align-items-center table-flush']")
         group = None
@@ -183,6 +183,34 @@ class AuthTestProcess:
         print("checked user group in user")
         return result
 
+    def _add_group_in_user(self, group_name):
+        """
+        Add [group_name] to Groups column of signed-up user
+        :param group_name: name of group to add
+        :return:
+        """
+        add_button = self.parent.browser.find_element_by_css_selector("a[data-target^='#modal-attach-user-group']")
+        add_button.click()
+        time.sleep(DELAY)
+        pop_up = add_button.find_element_by_xpath('..')
+        select_box = select.Select(pop_up.find_element_by_id('group-name'))
+        select_box.select_by_value(group_name)
+        pop_up.find_element_by_css_selector("button[id^='attach-user-group']").click()
+        print("added {} on GROUPS column".format(group_name))
+
+    def _remove_group_in_user(self, group_name):
+        """
+        Remove [group_name] from GROUPS column of signed-up user
+        :param group_name: name of group to remove
+        :return:
+        """
+        groups = self.parent.browser.find_elements_by_css_selector("a[onclick^='#detach_user_group")
+        for group in groups:
+            if group.text.strip() == group_name:
+                group.click()
+                break
+        print("removed {} from GROUPS column".format(group_name))
+
     def do_test(self):
         group_name = 'TEST-GROUP'
         group_desc = 'Group for testing'
@@ -228,7 +256,6 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self.parent.assertFalse(self._has_user_group(group_name))
         time.sleep(LONG_DELAY)
-        """
         # LOGIN METHOD
         self._select_login_method("email_default_group", group_name, "email_enabled")
         time.sleep(DELAY)
@@ -238,12 +265,27 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self._check_login_method("guest_default_group", group_name, "guest_enabled")
         time.sleep(DELAY)
+        self._select_login_method("email_default_group", group_name, "email_enabled")
+        time.sleep(DELAY)
+        self._select_login_method("guest_default_group", group_name, "guest_enabled")
+        time.sleep(DELAY)
+        """
         #USER
         self._create_user(email, password)
+        time.sleep(LONG_DELAY)
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user_email(email))
         time.sleep(DELAY)
         self._check_user_count(1)
         time.sleep(DELAY)
-        self._has_group_in_user(group_name)
+        self.parent.assertTrue(self._has_group_in_user("user"))
         time.sleep(DELAY)
+        self._add_group_in_user(group_name)
+        time.sleep(LONG_DELAY)
+        self._check_user_count(1)
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._has_group_in_user(group_name))
+        time.sleep(DELAY)
+        self._remove_group_in_user(group_name)
+        time.sleep(DELAY)
+        self.parent.assertFalse(self._has_group_in_user(group_name))
