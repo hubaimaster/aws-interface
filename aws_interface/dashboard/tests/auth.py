@@ -258,6 +258,12 @@ class AuthTestProcess:
         print("Modified")
 
     def _has_extra(self, extra_name, extra_value):
+        """
+        Check if [extra_name] : [extra_value] appear in extra column
+        :param extra_name: field name that should appear
+        :param extra_value: field value that should appear
+        :return:
+        """
         user_table = self.parent.browser.find_element_by_id("user-table")
         for tr in user_table.find_elements_by_tag_name("tr")[1:]:
             groups = tr.find_elements_by_tag_name("td")[3]
