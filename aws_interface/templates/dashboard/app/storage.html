@@ -30,27 +30,17 @@
                         <div class="card shadow">
                             <div class="card-header border-1">
                                 <div class="row align-items-center">
-                                    <div class="col">
+                                    <div class="col-auto">
                                         <h3 class="mb-0">
 
                                         정책함수 <i class="ni ni-support-16" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Delete 별 오퍼레이션이 허락됩니다"></i>
 
-                                            <div class="dropdown">
-                                                <button id="set-policy-btn" class="btn btn-sm btn-default" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    create
-                                                </button>
-                                                <div class="dropdown-menu dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                    <a class="dropdown-item" onclick="set_policy_mode('create')"><i class="fas fa-file"></i><span>Create</span></a>
-                                                    <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item" onclick="set_policy_mode('read')"><i class="fas fa-book-reader"></i><span>Read</span></a>
-                                                    <div class="dropdown-divider"></div>
-{#                                                    <a class="dropdown-item" onclick="set_policy_mode('update')"><i class="fas fa-edit"></i><span>Update</span></a>#}
-{#                                                    <div class="dropdown-divider"></div>#}
-                                                    <a class="dropdown-item" onclick="set_policy_mode('delete')"><i class="fas fa-trash"></i><span>Delete</span></a>
-
-                                                </div>
-                                            </div>
-
+                                             모드:
+                                            <select class="form-control-alternative" onchange="set_policy_mode(this.value);">
+                                                <option value="create"><span>Create</span></option>
+                                                <option value="read"><span>Read</span></option>
+                                                <option value="delete"><span>Delete</span></option>
+                                            </select>
 
                                         </h3>
                                     </div>

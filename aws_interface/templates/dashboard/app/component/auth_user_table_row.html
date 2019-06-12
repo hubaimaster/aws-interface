@@ -13,7 +13,7 @@
         </td>
         <td>
             {% for group in user.groups %}
-                <a onclick="detach_user_group('{{ user.id }}', '{{group}}')" class="btn badge badge-primary">{{ group }}</a>
+                <a onclick="detach_user_group('{{ user.id }}', '{{group}}')" class="btn badge badge-primary">{{ group }} <i class="fa fa-trash"></i></a>
             {% endfor %}
             <a data-toggle="modal" data-target="#modal-attach-user-group-{{ user.id }}" class="btn badge badge-info">+</a>
 

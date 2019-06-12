@@ -212,7 +212,7 @@ class AuthTestProcess:
             print(group.text)
             if group.text.strip() == group_name:
                 group.click()
-                print("{} is removed!".format(group.text))
+                self.parent.browser.switch_to.alert.accept()
                 break
         print("removed {} from GROUPS column".format(group_name))
 
@@ -296,13 +296,12 @@ class AuthTestProcess:
 
         self.parent.assert_view_tag('auth')
         time.sleep(LONG_DELAY)
-
         # USER GROUP
-        """
         self._create_group(group_name, group_desc)
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_user_group(group_name))
         time.sleep(DELAY)
+        """
         self.parent.assertFalse(self._has_authorization(group_name, 'run:cloud.auth.login'))
         time.sleep(DELAY)
         self._add_authorization(group_name, 'run:cloud.auth.login')
@@ -339,10 +338,9 @@ class AuthTestProcess:
         """
         #USER
         self._create_user(email, password)
-        time.sleep(LONG_DELAY * 4)
+        time.sleep(LONG_DELAY * 6)
         self.parent.assertTrue(self._has_user_email(email))
         time.sleep(DELAY)
-        """
         self._check_user_count(1)
         time.sleep(DELAY)
         self.parent.assertTrue(self._has_group_in_user("user"))
@@ -357,7 +355,6 @@ class AuthTestProcess:
         time.sleep(LONG_DELAY * 4)
         self.parent.assertFalse(self._has_group_in_user(group_name))
         time.sleep(DELAY)
-        """
         self.parent.browser.maximize_window()
         self._click_checkbox_and_modify_selected_in_user()
         time.sleep(DELAY)
