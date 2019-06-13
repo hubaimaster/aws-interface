@@ -354,17 +354,6 @@
             file_write_groups.push('{{ group.name }}');
         {% endfor %}
 
-        function create_folder(parent_path, folder_name, read_groups, write_groups) {
-            $.post("", {
-                cmd: "create_folder",
-                parent_path: parent_path,
-                folder_name: folder_name,
-                'read_groups[]': read_groups,
-                'write_groups[]': write_groups,
-            }, function (data) {
-                window.location.reload();
-            });
-        }
         function upload_file(parent_path, file_name, file_bin, read_groups, write_groups) {
             var formData = new FormData();
             formData.append('cmd', 'upload_b64');
@@ -388,7 +377,7 @@
             $("#file-read-groups").empty();
             for (var i = 0; i < file_read_groups.length; i++){
                 var group = file_read_groups[i];
-                var tag = "<a onclick=\"remove_file_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+                var tag = "<a onclick=\"remove_file_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
                 $("#file-read-groups").append(tag);
             }
         }
@@ -396,7 +385,7 @@
             $("#file-write-groups").empty();
             for (var i = 0; i < file_write_groups.length; i++){
                 var group = file_write_groups[i];
-                var tag = "<a onclick=\"remove_file_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+                var tag = "<a onclick=\"remove_file_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
                 $("#file-write-groups").append(tag);
             }
         }
@@ -423,48 +412,6 @@
         function remove_file_write_group(group_name) {
             file_write_groups.remove(group_name);
             render_file_write_groups();
-        }
-
-
-        function render_folder_read_groups() {
-            $("#folder-read-groups").empty();
-            for (var i = 0; i < folder_read_groups.length; i++){
-                var group = folder_read_groups[i];
-                var tag = "<a onclick=\"remove_folder_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
-                $("#folder-read-groups").append(tag);
-            }
-        }
-        function render_folder_write_groups() {
-            $("#folder-write-groups").empty();
-            for (var i = 0; i < folder_write_groups.length; i++){
-                var group = folder_write_groups[i];
-                var tag = "<a onclick=\"remove_folder_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
-                $("#folder-write-groups").append(tag);
-            }
-        }
-        function put_folder_read_group(group_name) {
-            if (folder_read_groups.includes(group_name)){
-                alert("이미 해당 그룹이 존재합니다");
-            }else{
-                folder_read_groups.push(group_name);
-                render_folder_read_groups();
-            }
-        }
-        function remove_folder_read_group(group_name) {
-            folder_read_groups.remove(group_name);
-            render_folder_read_groups();
-        }
-        function put_folder_write_group(group_name) {
-            if (folder_write_groups.includes(group_name)){
-                alert("이미 해당 그룹이 존재합니다");
-            }else{
-                folder_write_groups.push(group_name);
-                render_folder_write_groups();
-            }
-        }
-        function remove_folder_write_group(group_name) {
-            folder_write_groups.remove(group_name);
-            render_folder_write_groups();
         }
 
         function delete_b64(file_id){
@@ -509,23 +456,11 @@
         }
 
         window.onload = function () {
-            render_folder_read_groups();
-            render_folder_write_groups();
             render_file_read_groups();
             render_file_write_groups();
             load_more_files();
             set_policy_mode('create');
 
-            $("#create-folder").click(function () {
-                var folder_name = $("#folder-name").val();
-                if (folder_name == null || folder_name.length == 0){
-                    alert("폴더 이름을 채워주세요");
-                    return;
-                }
-                create_folder('{{ folder_path }}', folder_name, folder_read_groups, folder_write_groups);
-                $("#modal-put-folder").modal('hide');
-                $("#folder-name").val(null);
-            });
             $("#upload-file").click(function () {
                 var parent_path = $("#folder-parent-path").val();
                 var file_bin = $('#file-bin')[0].files[0];

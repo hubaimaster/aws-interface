@@ -707,7 +707,7 @@
             $("#read-groups").empty();
             for (var i = 0; i < read_groups.length; i++){
                 var group = read_groups[i];
-                var tag = "<a onclick=\"remove_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+                var tag = "<a onclick=\"remove_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
                 $("#read-groups").append(tag);
             }
         }
@@ -715,7 +715,7 @@
             $("#write-groups").empty();
             for (var i = 0; i < write_groups.length; i++){
                 var group = write_groups[i];
-                var tag = "<a onclick=\"remove_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+                var tag = "<a onclick=\"remove_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
                 $("#write-groups").append(tag);
             }
         }
