@@ -21,7 +21,7 @@ def do(data, resource):
     params = data['params']
     group_name = params['group_name']
 
-    if group_name == 'user':
+    if group_name in Permission.DEFAULT_USER_GROUPS:
         body['error'] = error.DEFAULT_USER_GROUP_CANNOT_BE_MODIFIED
         return Response(body)
 
