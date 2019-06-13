@@ -12,6 +12,11 @@ class Client:
         self.session_id = None
         self.guest_id = None
 
+    @classmethod
+    def _post(cls, url, data):
+        response = requests.post(url, data)
+        return response
+
     def _call_api(self, service_type, function_name, data=None):
         if not data:
             data = {}
@@ -19,7 +24,7 @@ class Client:
         if self.session_id:
             data['session_id'] = self.session_id
         data = json.dumps(data)
-        resp = _post(self.url, data)
+        resp = self._post(self.url, data)
         return resp.json().get('body', {'error': '404', 'message': 'NO RESPONSE'})
 
     def _auth(self, api_name, data):
@@ -88,9 +93,7 @@ class Client:
         self.session_id = response.get('session_id', None)
         return response
 
-    # def auth_delete_user(self):
-
-    def database_create_item(self, item, partition, read_groups, write_groups):
+    def database_create_item(self, partition, item, read_groups, write_groups):
         response = self._database('create_item', {
             'item': item,
             'partition': partition,
@@ -228,11 +231,6 @@ class Client:
             'event_param': event_param,
         })
         return response
-
-
-def _post(url, data):
-    response = requests.post(url, data)
-    return response
 
 
 def examples():
