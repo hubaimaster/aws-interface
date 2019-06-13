@@ -6,6 +6,11 @@ class DatabaseTestProcess:
         self.parent = parent
 
     def _create_partition(self, partition):
+        """
+        Create partition with name [partition]
+        :param partition: name of partition
+        :return:
+        """
         self.parent.browser.find_element_by_id('create-partition-button').click()
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('partition-name').send_keys(partition)
@@ -13,6 +18,11 @@ class DatabaseTestProcess:
         self.parent.browser.find_element_by_id('add-partition-btn').click()
 
     def _has_partition(self, partition):
+        """
+        Check if partition with name [partition] exists.
+        :param partition:
+        :return: bool
+        """
         partition_obj = self.parent.browser.find_element_by_id('partition-{}'.format(partition))
         if partition_obj:
             return True
