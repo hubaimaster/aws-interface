@@ -29,6 +29,7 @@ class AuthTestProcess:
         :return: bool
         """
         has_group_name = False
+        self._click_load_more_users_button()
         group_names = self.parent.browser.find_elements_by_name('group-name')
         for group_name in group_names:
             if group_name.text == name:
@@ -150,6 +151,7 @@ class AuthTestProcess:
         :param target_email:
         :return : bool
         """
+        self._click_load_more_users_button()
         emails = self.parent.browser.find_elements_by_name('col-user-email')
         for email in emails:
             email = email.text
@@ -165,7 +167,7 @@ class AuthTestProcess:
         """
         user_count_box = self.parent.browser.find_element_by_class_name("card-body")
         count_on_page = int(user_count_box.find_element_by_css_selector('span').text.strip().split()[0])
-        print(count_on_page)
+        print("number of user : {}".format(count_on_page))
         return self.parent.assertTrue(count_on_page == count)
 
     def _has_group_in_user(self, group_name):
@@ -175,6 +177,7 @@ class AuthTestProcess:
         :return: bool
         """
         result = False
+        self._click_load_more_users_button()
         user_table = self.parent.browser.find_element_by_id("user-table")
         for tr in user_table.find_elements_by_tag_name("tr")[1:]:
             groups = tr.find_elements_by_tag_name("td")[2]
@@ -182,7 +185,7 @@ class AuthTestProcess:
                 if group.text.strip() == group_name:
                     result = True
                     break
-        print("checked user group in user")
+        print("group [{}] is in signed-up user".format(group_name))
         return result
 
     def _add_group_in_user(self, group_name):
@@ -191,6 +194,7 @@ class AuthTestProcess:
         :param group_name: name of group to add
         :return:
         """
+        self._click_load_more_users_button()
         add_button = self.parent.browser.find_element_by_css_selector("a[data-target^='#modal-attach-user-group']")
         add_button.click()
         time.sleep(DELAY)
@@ -207,10 +211,11 @@ class AuthTestProcess:
         :param group_name: name of group to remove
         :return:
         """
+        self._click_load_more_users_button()
         groups = self.parent.browser.find_elements_by_css_selector("a[onclick^='detach_user_group']")
         for group in groups:
-            print(group.text)
             if group.text.strip() == group_name:
+                print("[{}] is found".format(group.text.strip()))
                 group.click()
                 self.parent.browser.switch_to.alert.accept()
                 break
@@ -221,8 +226,11 @@ class AuthTestProcess:
         Click checkbox in signed-up user table and open 'modify selected' modal
         :return:
         """
+        self._click_load_more_users_button()
         radio_button = self.parent.browser.find_element_by_name('checkbox-user')
         self.parent.browser.execute_script("arguments[0].checked = true;", radio_button)
+        print("checkbox is checekd : {}".format(str(self.parent.browser.find_element_by_name('checkbox-user').is_selected())))
+        time.sleep(LONG_DELAY)
         user_table = self.parent.browser.find_element_by_id('create-user-button')
         user_table = user_table.find_element_by_xpath('..')
         user_table.find_element_by_id('dropdownMenuButton').click()
@@ -234,13 +242,16 @@ class AuthTestProcess:
         Click checkbox in signed-up user table and open 'delete selected' modal
         :return:
         """
+        self._click_load_more_users_button()
         radio_button = self.parent.browser.find_element_by_name('checkbox-user')
         self.parent.browser.execute_script("arguments[0].checked = true;", radio_button)
+        print("checkbox is checekd : {}".format(str(self.parent.browser.find_element_by_name('checkbox-user').is_selected())))
+        time.sleep(LONG_DELAY)
         user_table = self.parent.browser.find_element_by_id('create-user-button')
         user_table = user_table.find_element_by_xpath('..')
         user_table.find_element_by_id('dropdownMenuButton').click()
         user_table.find_element_by_css_selector("a[onclick='delete_checked_users();']").click()
-        print("Deleted")
+        print("Deleted selected user")
 
     def _modify_selected(self, field_name, field_type, field_value):
         """
@@ -255,7 +266,7 @@ class AuthTestProcess:
         field_type_dropdown.select_by_value(field_type)
         self.parent.browser.find_element_by_name('user-field-value').send_keys(field_value)
         self.parent.browser.find_element_by_id('mod-user-commit').click()
-        print("Modified")
+        print("Modified selected")
 
     def _has_extra(self, extra_name, extra_value):
         """
@@ -264,15 +275,26 @@ class AuthTestProcess:
         :param extra_value: field value that should appear
         :return:
         """
+        self._click_load_more_users_button()
         user_table = self.parent.browser.find_element_by_id("user-table")
         for tr in user_table.find_elements_by_tag_name("tr")[1:]:
             groups = tr.find_elements_by_tag_name("td")[3]
             for extra in groups.find_elements_by_tag_name('h5'):
                 if extra.text.strip() == "{} : {}".format(extra_name, extra_value):
-                    print(extra.text)
+                    print("[{}] is in extra column".format(extra.text))
                     return True
                 break
         return False
+
+    def _click_load_more_users_button(self):
+        """
+        If there exists 'load-more-users-btn', click it.
+        :return:
+        """
+        load_more = self.parent.browser.find_element_by_id('load-more-users-btn')
+        if not load_more.get_attribute('style') == "display: none;":
+            load_more.click()
+            time.sleep(LONG_DELAY)
 
     def do_test(self):
         group_name = 'TEST-GROUP'
@@ -287,10 +309,16 @@ class AuthTestProcess:
         start_time = time.time()
         self.parent.browser.find_element_by_id('link-auth').click()
         time.sleep(LONG_DELAY)
-        while self.parent.get_view_tag() != 'auth':
-            self.parent.browser.refresh()
-            time.sleep(LONG_DELAY * 4)
-            print('Wait...')
+        while True:
+            try :
+                if self.parent.get_view_tag() == 'auth':
+                    break
+                self.parent.browser.refresh()
+                time.sleep(LONG_DELAY * 4)
+                print('Wait...')
+            except StaleElementReferenceException as e:
+                print(e)
+                pass
         duration = time.time() - start_time
         print('duration: {} s'.format(duration))
 
@@ -331,14 +359,14 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self._check_login_method("guest_default_group", group_name, "guest_enabled")
         time.sleep(DELAY)
-        self._select_login_method("email_default_group", group_name, "email_enabled")
+        self._select_login_method("email_default_group", 'user', "email_enabled")
         time.sleep(DELAY)
-        self._select_login_method("guest_default_group", group_name, "guest_enabled")
+        self._select_login_method("guest_default_group", 'user, "guest_enabled")
         time.sleep(DELAY)
         """
         #USER
         self._create_user(email, password)
-        time.sleep(LONG_DELAY * 6)
+        time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._has_user_email(email))
         time.sleep(DELAY)
         self._check_user_count(1)
@@ -352,10 +380,9 @@ class AuthTestProcess:
         self.parent.assertTrue(self._has_group_in_user(group_name))
         time.sleep(LONG_DELAY)
         self._remove_group_in_user(group_name)
-        time.sleep(LONG_DELAY * 4)
+        time.sleep(LONG_DELAY)
         self.parent.assertFalse(self._has_group_in_user(group_name))
         time.sleep(DELAY)
-        self.parent.browser.maximize_window()
         self._click_checkbox_and_modify_selected_in_user()
         time.sleep(DELAY)
         self._modify_selected(field_name, field_type, field_value)

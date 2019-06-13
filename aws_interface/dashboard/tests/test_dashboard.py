@@ -13,7 +13,7 @@ import settings
 from urllib.request import urlopen
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
-from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException
+from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import select
 
@@ -57,8 +57,8 @@ class DashboardTestCase(StaticLiveServerTestCase):
         self.download_dir = tempfile.mkdtemp()
         self.drive_path = self._download_web_drive()
         self.browser = webdriver.Chrome(chrome_options=self.get_options(), executable_path=self.drive_path)
-        self.browser.set_window_size(1024, 768)
         self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
         self._set_register()
         self._set_login()
         self._create_app()
@@ -187,9 +187,9 @@ class DashboardTestCase(StaticLiveServerTestCase):
         from dashboard.tests.bill import BillTestProcess
         from dashboard.tests.sdk import SDKTestProcess
         from dashboard.tests.database import DatabaseTestProcess
-        #AuthTestProcess(self).do_test()
+        AuthTestProcess(self).do_test()
         #BillTestProcess(self).do_test()
-        DatabaseTestProcess(self).do_test()
+        #DatabaseTestProcess(self).do_test()
         #SDKTestProcess(self).do_test()
 
     def test(self):

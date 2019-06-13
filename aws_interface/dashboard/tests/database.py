@@ -31,6 +31,7 @@ class DatabaseTestProcess:
 
     def do_test(self):
         PARTITION_NAME = 'test'
+
         time.sleep(DELAY)
         start_time = time.time()
         self.parent.browser.find_element_by_id('link-database').click()
@@ -45,6 +46,6 @@ class DatabaseTestProcess:
         self.parent.assert_view_tag('database')
         time.sleep(LONG_DELAY)
         self._create_partition(PARTITION_NAME)
-        time.sleep(LONG_DELAY)
+        time.sleep(LONG_DELAY * 4)
         self.parent.assertTrue(self._has_partition(PARTITION_NAME))
         time.sleep(DELAY)
