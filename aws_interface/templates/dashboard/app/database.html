@@ -34,7 +34,7 @@
                                     <div class="col-auto">
                                         <h4 class="mb-0">
 
-                                        정책함수 <i class="ni ni-support-16" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Update, Delete 별 오퍼레이션이 허락됩니다"></i>
+                                        정책함수 <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Update, Delete 별 오퍼레이션이 허락됩니다"></i>
 
                                             <select id="policy-partition-to-apply" class="form-control-alternative" onchange="set_policy_mode(policy_mode);">
                                                 {% for partition in partitions %}
@@ -150,7 +150,7 @@
                                         {% for partition in partitions %}
                                             <tr>
                                                 <th id="{{ partition.name }}" name="partition" scope="row" onclick="set_partition('{{ partition.name }}');">
-                                                    {{ partition.name }}
+                                                    <a href="#" onmouseover="style='text-decoration:underline'" onmouseout="style='text-decoration:none'">{{ partition.name }}</a>
                                                     <div style="text-align: right; float: right;">
                                                         <div class="custom-control custom-checkbox mt--3">
                                                             <input class="custom-control-input" type="checkbox" name="checkbox-partition" id="partition-{{ partition.name }}" value="{{ partition.name }}">
@@ -515,7 +515,7 @@
                     var iid = items[i]["id"];
                     var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\">" +
                         "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" +
-                        "<text>"  + iid + "</text>" +
+                        "<text><a href=\"#\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">"  + iid + "</a></text>" +
                         "<div style=\"text-align: right; float: right;\">" +
                         "<div class=\"custom-control custom-checkbox mt--3\">" +
                         "<input class=\"custom-control-input\" type=\"checkbox\" name=\"checkbox-item\" id=\"item-" + iid + "\" value=\"" + iid + "\">" +
@@ -530,7 +530,7 @@
         }
         function append_more_button() {
             var more = "<tr name='more-item' style=\"display:table; width:100%; table-layout:fixed;\">" +
-                "<th style='vertical-align:middle;' onclick=\"append_more_items();\" scope=\"row\">항목 더 보기 +" +
+                "<th style='vertical-align:middle;' onclick=\"append_more_items();\" scope=\"row\"><a href=\"#\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">항목 더 보기 + </a>" +
                 "</th></tr>";
             $("#item-table").append(more);
         }
@@ -707,7 +707,7 @@
             $("#read-groups").empty();
             for (var i = 0; i < read_groups.length; i++){
                 var group = read_groups[i];
-                var tag = "<a onclick=\"remove_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+                var tag = "<a onclick=\"remove_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
                 $("#read-groups").append(tag);
             }
         }
@@ -715,7 +715,7 @@
             $("#write-groups").empty();
             for (var i = 0; i < write_groups.length; i++){
                 var group = write_groups[i];
-                var tag = "<a onclick=\"remove_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + "</a>\n";
+                var tag = "<a onclick=\"remove_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
                 $("#write-groups").append(tag);
             }
         }

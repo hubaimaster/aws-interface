@@ -27,7 +27,7 @@ def do(data, resource):
     if not description:
         description = None
 
-    if group_name == 'user':
+    if group_name in Permission.DEFAULT_USER_GROUPS:
         body['error'] = error.DEFAULT_USER_GROUP_CANNOT_BE_MODIFIED
         return Response(body)
     group_id = 'user-group-{}'.format(group_name)

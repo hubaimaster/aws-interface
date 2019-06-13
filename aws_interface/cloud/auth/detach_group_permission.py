@@ -23,6 +23,10 @@ def do(data, resource):
     group_name = params['group_name']
     permission = params.get('permission')
 
+    if group_name == 'admin':
+        body['error'] = error.ADMIN_GROUP_CANNOT_BE_MODIFIED
+        return Response(body)
+
     item = resource.db_get_item('user-group-{}'.format(group_name))
     item_permissions = item.get('permissions', [])
     item_permissions.remove(permission)

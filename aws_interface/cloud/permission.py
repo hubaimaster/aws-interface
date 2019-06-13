@@ -90,6 +90,8 @@ def database_can_not_access_to_item(item):
 
 
 class Permission:
+    DEFAULT_USER_GROUPS = ['user', 'admin']
+
     @classmethod
     def all(cls):
         """

@@ -41,9 +41,12 @@ def do(data, resource):
     read_groups = list(set(read_groups))
     write_groups = list(set(write_groups))
 
-    item['read_groups'] = read_groups
-    item['write_groups'] = write_groups
-    item['owner'] = user_id
+    if 'read_groups' not in read_groups:
+        item['read_groups'] = read_groups
+    if 'write_groups' not in item:
+        item['write_groups'] = write_groups
+    if 'owner' not in item:
+        item['owner'] = user_id
     # Check partition has been existed
     if resource.db_get_item(partition):
         if match_policy_after_get_policy_code(resource, 'create', partition, user, item):

@@ -105,3 +105,7 @@ NO_SUCH_FILE = {
     'code': 26,
     'message': 'No such file'
 }
+ADMIN_GROUP_CANNOT_BE_MODIFIED = {
+    'code': 27,
+    'message': 'An admin group can not be modified'
+}
