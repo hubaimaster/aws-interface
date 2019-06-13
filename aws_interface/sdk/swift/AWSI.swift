@@ -148,7 +148,7 @@ class AWSI {
         }
     }
 
-    func database_create_item(item: [String: Any], partition: String, read_groups:[String], write_groups:[String], callback: @escaping (_ response: [String: Any]?)->Void){
+    func database_create_item(partition: String, item: [String: Any], read_groups:[String], write_groups:[String], callback: @escaping (_ response: [String: Any]?)->Void){
         let data: [String: Any] = [
             "item": item,
             "partition": partition,

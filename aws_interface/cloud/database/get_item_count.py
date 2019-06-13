@@ -33,6 +33,6 @@ def do(data, resource):
 
     count = resource.db_get_count(partition, field, value)
     body['item'] = {
-        'count': count
+        'count': int(count)
     }
     return Response(body)

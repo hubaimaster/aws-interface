@@ -472,7 +472,7 @@ class DynamoDB:
 
         if partition:
             self._add_item_count(table_name, '{}-count'.format(partition), value_to_add=-1)
-            for field, value in item.items():
+            for field, value in item.get('Item', {}).items():
                 self._add_item_count(table_name, '{}-{}-{}-count'.format(partition, field, value), value_to_add=-1)
         self._delete_inverted_query(table_name, item_id)
         return response

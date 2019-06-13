@@ -144,7 +144,7 @@ class Client{
         });
     }
 
-    database_create_item(item, partition, read_groups, write_groups, callback) {
+    database_create_item(partition, item, read_groups, write_groups, callback) {
         this._database('create_item', {
             'item': item,
             'partition': partition,

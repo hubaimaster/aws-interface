@@ -149,7 +149,7 @@ class Client{
         });
     }
 
-    database_create_item(item, partition, read_groups, write_groups, callback) {
+    database_create_item(partition, item, read_groups, write_groups, callback) {
         this._database('create_item', {
             'item': item,
             'partition': partition,
@@ -169,7 +169,7 @@ class Client{
             'item_id': item_id,
         }, callback);
     }
-    
+
     database_get_item_count(partition, field=null, value=null, callback) {
         this._database('get_item_count', {
             'item_id': item_id,

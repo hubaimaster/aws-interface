@@ -252,9 +252,9 @@ def examples():
     response = client.auth_login(email, password)
     print('auth_login response: {}'.format(response))
 
-    response = client.database_create_item({
+    response = client.database_create_item('test', {
         'type': 'test',
-    }, 'test', read_groups=['owner'], write_groups=['owner'])
+    }, read_groups=['owner'], write_groups=['owner'])
     print('database_create_item response: {}'.format(response))
 
     response = client.storage_upload_file('aws_interface.py', read_groups=['owner'], write_groups=['owner'])
@@ -263,3 +263,5 @@ def examples():
     client.storage_download_file(response['file_id'], 'download')
 
 
+if __name__ == '__main__':
+    examples()

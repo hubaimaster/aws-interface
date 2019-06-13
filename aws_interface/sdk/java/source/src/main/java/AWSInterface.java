@@ -154,7 +154,7 @@ public final class AWSInterface {
         }));
     }
 
-    public void databaseCreateItem(HashMap<String, Object> item, String partition, ArrayList<String> readGroups, ArrayList<String> writeGroups, CallbackFunction callbackFunction){
+    public void databaseCreateItem(String partition, HashMap<String, Object> item, ArrayList<String> readGroups, ArrayList<String> writeGroups, CallbackFunction callbackFunction){
         HashMap<String, Object> data = new HashMap<>();
         data.put("item", item);
         data.put("partition", partition);
@@ -163,7 +163,7 @@ public final class AWSInterface {
         database("create_item", data, callbackFunction);
     }
 
-    public void databaseCreateItem(HashMap<String, Object> item, String partition, CallbackFunction callbackFunction){
+    public void databaseCreateItem(String partition, HashMap<String, Object> item, CallbackFunction callbackFunction){
         HashMap<String, Object> data = new HashMap<>();
         data.put("item", item);
         data.put("partition", partition);
