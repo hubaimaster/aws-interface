@@ -182,6 +182,14 @@ public final class AWSInterface {
         database("get_item", data, callbackFunction);
     }
 
+    public void databaseGetItemCount(String partition, String field, String value, CallbackFunction callbackFunction){
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("partition", partition);
+        data.put("field", field);
+        data.put("value", value);
+        database("get_item_count", data, callbackFunction);
+    }
+
     public void databaseGetItems(String partition, String startKey, int limit, CallbackFunction callbackFunction){
         HashMap<String, Object> data = new HashMap<>();
         data.put("partition", partition);

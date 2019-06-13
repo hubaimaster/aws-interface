@@ -114,6 +114,14 @@ class Client:
         })
         return response
 
+    def database_get_item_count(self, partition, field=None, value=None):
+        response = self._database('get_item_count', {
+            'partition': partition,
+            'field': field,
+            'value': value,
+        })
+        return response
+
     def database_get_items(self, partition, start_key=None, limit=None):
         response = self._database('get_items', {
             'partition': partition,

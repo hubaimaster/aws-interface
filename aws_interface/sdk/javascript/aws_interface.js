@@ -169,6 +169,14 @@ class Client{
             'item_id': item_id,
         }, callback);
     }
+    
+    database_get_item_count(partition, field=null, value=null, callback) {
+        this._database('get_item_count', {
+            'item_id': item_id,
+            'field': field,
+            'value': value,
+        }, callback);
+    }
 
     database_get_items(partition, start_key=null, limit=100, callback) {
         this._database('get_items', {

@@ -61,7 +61,7 @@ class Client{
         let self = this;
         this._call_api('auth', api_name, data, function (data) {
             self.log_create_log('auth', api_name, null, function (data) {
-                
+
             });
             callback(data);
         });
@@ -162,6 +162,14 @@ class Client{
     database_get_item(item_id, callback) {
         this._database('get_item', {
             'item_id': item_id,
+        }, callback);
+    }
+
+    database_get_item_count(partition, field=null, value=null, callback) {
+        this._database('get_item_count', {
+            'item_id': item_id,
+            'field': field,
+            'value': value,
         }, callback);
     }
 

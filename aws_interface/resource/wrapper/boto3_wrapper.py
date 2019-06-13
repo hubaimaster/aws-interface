@@ -472,6 +472,8 @@ class DynamoDB:
 
         if partition:
             self._add_item_count(table_name, '{}-count'.format(partition), value_to_add=-1)
+            for field, value in item.items():
+                self._add_item_count(table_name, '{}-{}-{}-count'.format(partition, field, value), value_to_add=-1)
         self._delete_inverted_query(table_name, item_id)
         return response
 
@@ -507,6 +509,8 @@ class DynamoDB:
         if need_counting:
             """ Counting if the item is a new one """
             self._add_item_count(table_name, '{}-count'.format(partition))
+            for field, value in item.items():
+                self._add_item_count(table_name, '{}-{}-{}-count'.format(partition, field, value))
         if indexing:
             self._delete_inverted_query(table_name, item_id)
             self._put_inverted_query(table_name, partition, item)
@@ -546,7 +550,6 @@ class DynamoDB:
         response = self.get_items_with_key_expression(table_name, index_name, key_expression, start_key, limit,
                                                       reverse)
         return response
-
 
     def get_inverted_queries(self, table_name, partition, field, operand, operation, order_by, order_min, order_max, start_key=None, limit=100, reverse=False):
         if operation == 'in' or operation == 'eq':

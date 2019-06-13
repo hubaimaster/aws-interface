@@ -172,6 +172,15 @@ class AWSI {
         database(function_name: "get_item", data: data, callback: callback)
     }
 
+    func database_get_item_count(partition: String, field: String?=nil, value: Any?=nil, callback: @escaping (_ response: [String: Any]?)->Void){
+        let data: [String: Any] = [
+            "item_id": item_id,
+            "field": field,
+            "value": value,
+        ]
+        database(function_name: "get_item_count", data: data, callback: callback)
+    }
+
     func database_get_items(partition: String, start_key: String?=nil, limit: Int=100, callback: @escaping (_ response: [String: Any]?)->Void){
         var data: [String: Any] = [
             "partition": partition,

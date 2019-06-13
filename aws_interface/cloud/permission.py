@@ -205,6 +205,7 @@ class Permission:
         Run.Database.delete_item,
         Run.Database.delete_items,
         Run.Database.get_item,
+        Run.Database.get_item_count,
         Run.Database.get_items,
         Run.Database.put_item_field,
         Run.Database.query_items,

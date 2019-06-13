@@ -82,10 +82,12 @@ class DatabaseServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_item_count(self, partition):
+    def get_item_count(self, partition, field, value):
         import cloud.database.get_item_count as method
         params = {
             'partition': partition,
+            'field': field,
+            'value': value,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
