@@ -67,14 +67,14 @@ class User(AbstractUser):
     # the following methods use raw_password, hence should only be
     # at login or registration
 
-    def encrypt(self, raw_password, string):
+    def _encrypt(self, raw_password, string):
         # uses raw_password, hence can only be done at login or registration
         from dashboard.security.crypto import AESCipher
         aes = AESCipher(raw_password + self.salt)
         assert (self.check_password(raw_password))
         return aes.encrypt(string)
 
-    def decrypt(self, raw_password, string):
+    def _decrypt(self, raw_password, string):
         aes = AESCipher(raw_password + self.salt)
         assert (self.check_password(raw_password))
         return aes.decrypt(string)
@@ -82,28 +82,28 @@ class User(AbstractUser):
     def set_credential(self, raw_password, vendor, credential):
         assert (self.check_password(raw_password))
         if self.c_credentials:
-            credentials = self.decrypt(raw_password, self.c_credentials)
+            credentials = self._decrypt(raw_password, self.c_credentials)
             credentials = json.loads(credentials)
         else:
             credentials = dict()
         credentials[vendor] = credential
         credentials = json.dumps(credentials)
-        self.c_credentials = self.encrypt(raw_password, credentials)
+        self.c_credentials = self._encrypt(raw_password, credentials)
 
     def get_credential(self, raw_password, vendor):
         assert (self.check_password(raw_password))
-        credentials = self.decrypt(raw_password, self.c_credentials)
+        credentials = self._decrypt(raw_password, self.c_credentials)
         credentials = json.loads(credentials)
         return credentials.get(vendor, None)
 
     def set_credentials(self, raw_password, credentials):
         assert (self.check_password(raw_password))
         credentials = json.dumps(credentials)
-        self.c_credentials = self.encrypt(raw_password, credentials)
+        self.c_credentials = self._encrypt(raw_password, credentials)
 
     def get_credentials(self, raw_password):
         assert (self.check_password(raw_password))
-        credentials = self.decrypt(raw_password, self.c_credentials)
+        credentials = self._decrypt(raw_password, self.c_credentials)
         credentials = json.loads(credentials)
         return credentials
 

@@ -16,8 +16,8 @@
                 <div class="row">
                     <div class="col-lg-9 col-md-9">
                         <h1 class="display-2 text-white">{{ app_name }}</h1>
-                        <h2 class="text-white">AWS-Interface 에 오신걸 환영합니다</h2>
-                        <p class="text-white mt-0 mb-5">간단한 설정을 통해 강력한 백엔드 서비스를 순식간에 생성할 수 있습니다.</p>
+                        <h2 class="text-white">환영합니다 :)</h2>
+                        <p class="text-white mt-0 mb-5">강력한 백엔드를 생성하고 손쉽게 관리할 수 있습니다.</p>
 
                         <div class="dropdown">
                             <button id="show-sdk-button" class="btn btn-info mt-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -68,24 +68,6 @@
         <!-- Page content -->
         <div class="container-fluid mt--8">
             <div class="row mt-3">
-                <div class="col-xl-6 mb-5 mb-xl-0">
-                    <div class="card card-stats shadow">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <h4>지출 요금 확인</h4>
-                                    <h1 class="mb-0">Bill</h1>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="ni ni-money-coins text-yellow"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <a href="{% url 'bill' app_id %}" class="btn btn-sm btn-primary text-white">바로가기</a>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="col-xl-6 mb-5 mb-xl-0">
                     <div class="card card-stats shadow">
@@ -106,9 +88,6 @@
                     </div>
                 </div>
 
-            </div>
-
-            <div class="row mt-3">
                 <div class="col-xl-6 mb-5 mb-xl-0">
                     <div class="card card-stats shadow">
                         <div class="card-body">
@@ -127,6 +106,10 @@
                         </div>
                     </div>
                 </div>
+
+            </div>
+
+            <div class="row mt-3">
 
                 <div class="col-xl-6 mb-5 mb-xl-0">
                     <div class="card card-stats shadow">
@@ -147,9 +130,6 @@
                     </div>
                 </div>
 
-            </div>
-
-            <div class="row mt-3">
                 <div class="col-xl-6 mb-5 mb-xl-0">
                     <div class="card card-stats shadow">
                         <div class="card-body">
@@ -169,6 +149,10 @@
                     </div>
                 </div>
 
+            </div>
+
+            <div class="row mt-3">
+
                 <div class="col-xl-6 mb-5 mb-xl-0">
                     <div class="card card-stats shadow">
                         <div class="card-body">
@@ -183,7 +167,7 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <a href="{% url 'logic' app_id %}" class="btn btn-sm btn-primary text-white">바로가기</a>
+                            <a href="{% url 'log' app_id %}" class="btn btn-sm btn-primary text-white">바로가기</a>
                         </div>
                     </div>
                 </div>

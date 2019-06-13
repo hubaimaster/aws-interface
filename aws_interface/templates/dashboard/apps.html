@@ -66,16 +66,10 @@
                     <li class="nav-item">
                         <a class="nav-link nav-link-icon" href="{%  url 'accesskey' %}">
                             <i class="ni ni-settings"></i>
-                            <span class="nav-link-inner--text">회원 정보 변경</span>
+                            <span class="nav-link-inner--text">인증 정보 변경</span>
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-icon" href="{%  url 'logout' %}">
-                            <i class="ni ni-lock-circle-open"></i>
-                            <span class="nav-link-inner--text">로그아웃</span>
-                        </a>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -86,20 +80,19 @@
             <div class="header-body text-left mb-7">
                 <div class="row justify-content-left">
                     <div class="col-lg-8 col-md-8">
-                        <h1 class="text-white">AWS Interface 에 오신것을 환영합니다!</h1>
-                        <p class="text-lead text-light">간단하게 강력한 어플리케이션을 만들고
-                            </br>분석을 통해 더 좋은 서비스를 빌드하세요.</p>
+                        <h1 class="text-white">환영합니다 :)</h1>
+                        <h2 class="text-lead text-white">간단하게 강력한 백엔드를 생성하고 관리하세요</h2>
                     </div>
                 </div>
-                <a id="create-new-project" data-toggle="modal" data-target="#modal-create-app" class="btn btn-dark btn-icon mb-3 mb-sm-0">
+                <a id="create-new-project" data-toggle="modal" data-target="#modal-create-app" class="btn btn-default btn-icon mb-3 mb-sm-0">
                     <span class="btn-inner--icon" style="color: white;"><i class="ni ni-app"></i></span>
-                    <span class="btn-inner--text" style="color: white;">새로운 어플리케이션 만들기</span>
+                    <span class="btn-inner--text" style="color: white;">새로운 백엔드 만들기</span>
                 </a>
                 <div class="modal fade" id="modal-create-app" tabindex="-1" role="dialog" aria-labelledby="modal-create-app" aria-hidden="true">
                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title" id="modal-title-default">어플리케이션 만들기</h4>
+                                <h4 class="modal-title" id="modal-title-default">백엔드 만들기</h4>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">×</span>
                                 </button>
@@ -111,8 +104,8 @@
                                         <div class="row">
                                             <div class="col-lg-12">
                                                 <div class="form-group">
-                                                    <label class="form-control-label" for="input-username">어플리케이션 이름</label>
-                                                    <input name="name" type="text" id="input-username" class="form-control form-control-alternative" placeholder="어플리케이션 이름">
+                                                    <label class="form-control-label" for="input-username">백엔드 이름</label>
+                                                    <input name="name" type="text" id="input-username" class="form-control form-control-alternative" placeholder="백엔드 이름">
                                                 </div>
                                             </div>
                                         </div>
