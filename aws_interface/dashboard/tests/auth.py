@@ -310,7 +310,7 @@ class AuthTestProcess:
         self.parent.browser.find_element_by_id('link-auth').click()
         time.sleep(LONG_DELAY)
         while True:
-            try :
+            try:
                 if self.parent.get_view_tag() == 'auth':
                     break
                 self.parent.browser.refresh()
