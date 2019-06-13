@@ -1,5 +1,5 @@
 from dashboard.tests.test_dashboard import *
-
+import sys
 
 class DatabaseTestProcess:
     def __init__(self, parent):
@@ -54,25 +54,22 @@ class DatabaseTestProcess:
                     """
         add_code = """
                 var element = arguments[0];
-                var sp_text = document.createTextNode('{}');
-                element.appendChild( sp_text );
+                var div = document.createElement( 'div' );
+                div.innerHTML='{}';
+                element.appendChild( div );
                 """
         policy_function = self.parent.browser.find_element_by_id('code-editor')
         policy_function = policy_function.find_element_by_css_selector('div[class="ace_layer ace_text-layer"')
         for div in policy_function.find_elements_by_tag_name('div'):
             self.parent.browser.execute_script(remove_code, div)
         try:
-            self.parent.browser.execute_script(add_code.format(code), policy_function)
-            print(self.parent.browser.find_element_by_css_selector('div[class="ace_layer ace_text-layer"').text)
-        except:
-            try :
-                print("error occured when writing code 111")
-                print(self.parent.browser.find_element_by_css_selector('div[class="ace_content"').text)
-                policy_function = self.parent.browser.find_element_by_css_selector('div[class="ace_content"')
-                self.parent.browser.execute_script(add_code.format(code), policy_function)
-            except:
-                print("error occured when writing code 222")
-                time.sleep(LONG_DELAY * 4)
+            for line in code.split('\n'):
+                self.parent.browser.execute_script(add_code.format(line), policy_function)
+        except :
+            print(sys.exc_info()[0])
+            print(sys.exc_info()[1])
+            print("Code not written")
+            return
         print("Wrote code")
 
     def _click_save_button(self):
@@ -83,7 +80,7 @@ class DatabaseTestProcess:
         self.parent.browser.find_element_by_css_selector('button[onclick="save_policy();"]').click()
         time.sleep(DELAY)
         self.parent.browser.switch_to.alert.accept()
-        print("save clicked")
+        print("save button clicked")
 
     def _has_code_in_policy_function(self, code):
         """
@@ -95,44 +92,52 @@ class DatabaseTestProcess:
         policy_function = self.parent.browser.find_element_by_id('code-editor')
         policy_function = policy_function.find_element_by_css_selector('div[class="ace_layer ace_text-layer"')
         print(policy_function.text)
-        return policy_function.text == code
+        written_function = [line.strip() for line in policy_function.text.split()]
+        code_list = [line.strip() for line in code.split()]
+        for i in range(len(code_list)):
+            if written_function[i] != code_list[i]:
+                return False
+        return False
 
     def _open_add_item_modal(self, partition_name):
         """
-        Check the checkbox of [partition_name] and open item+ modal
+        Click parition [partition_name] and open item + modal
         :param partition_name: name of partition that checkbox should be checked
         :return:
         """
-        checkbox = self.parent.browser.find_element_by_id("partition-{}".format(partition_name))
-        self.parent.browser.execute_script("arguments[0].checked = true;", checkbox)
-        print(str(checkbox.is_selected()))
+        self.parent.browser.find_element_by_id('{}'.format(partition_name)).click()
         time.sleep(LONG_DELAY)
         self.parent.browser.find_element_by_id("open-add-item-modal").click()
+        time.sleep(DELAY)
         add_item_modal = self.parent.browser.find_element_by_id('modal-add-item')
-        try :
-            print(type(self.parent.assertTrue(add_item_modal.get_attribute('aria-hidden'))))
-            self.parent.assertTrue(add_item_modal.get_attribute('aria-hidden'))
-            print("it is returned as string")
-        except :
-            self.parent.assertTrue(add_item_modal.get_attribute('aria-hidden')=="true")
-        print("added_item")
+        for style in add_item_modal.get_attribute('style').split(';'):
+            if style.strip() == 'display: block':
+                print("add item modal open checked")
+                return True
+        return False
 
     def do_test(self):
         PARTITION_NAME = 'test'
         MODE = 'update'
         CODE = """
             def has_permission(user, item):
-                            return False
+                return False
             """
 
         time.sleep(DELAY)
         start_time = time.time()
         self.parent.browser.find_element_by_id('link-database').click()
         time.sleep(LONG_DELAY)
-        while self.parent.get_view_tag() != 'database':
-            self.parent.browser.refresh()
-            time.sleep(LONG_DELAY * 4)
-            print('Wait...')
+        while True:
+            try:
+                if self.parent.get_view_tag() == 'database':
+                    break
+                self.parent.browser.refresh()
+                time.sleep(LONG_DELAY * 4)
+                print('Wait...')
+            except StaleElementReferenceException as e:
+                print(e)
+                pass
         duration = time.time() - start_time
         print('duration: {} s'.format(duration))
 
@@ -144,10 +149,10 @@ class DatabaseTestProcess:
         time.sleep(DELAY)
         self._select_parition_and_mode_in_policy_function(PARTITION_NAME, MODE)
         time.sleep(DELAY)
-        self._write_policy_function(CODE)
+        #self._write_policy_function(CODE)
         time.sleep(LONG_DELAY)
         self._click_save_button()
         time.sleep(LONG_DELAY)
         #self.parent.assertTrue(self._has_code_in_policy_function(CODE))
-        time.sleep(LONG_DELAY * 4)
-        self._open_add_item_modal(PARTITION_NAME)
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._open_add_item_modal(PARTITION_NAME))

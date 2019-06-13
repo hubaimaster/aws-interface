@@ -1,5 +1,4 @@
 from dashboard.tests.test_dashboard import *
-import sys
 
 
 class AuthTestProcess:
