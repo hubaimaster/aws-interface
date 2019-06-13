@@ -24,11 +24,7 @@ class DatabaseTestProcess:
         :return: bool
         """
         partition_obj = self.parent.browser.find_element_by_id('partition-{}'.format(partition))
-        if partition_obj:
-            return True
-        else:
-            return False
-
+        return partition_obj
     def _select_parition_and_mode_in_policy_function(self, partition_name, mode):
         """
         Select [parition_name] and [mode] in policy function
@@ -65,7 +61,7 @@ class DatabaseTestProcess:
         try:
             for line in code.split('\n'):
                 self.parent.browser.execute_script(add_code.format(line), policy_function)
-        except :
+        except:
             print(sys.exc_info()[0])
             print(sys.exc_info()[1])
             print("Code not written")
