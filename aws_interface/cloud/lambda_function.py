@@ -44,6 +44,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.database.delete_item',
     'cloud.database.delete_items',
     'cloud.database.get_item',
+    'cloud.database.get_item_count',
     'cloud.database.get_items',
     'cloud.database.get_items',
     'cloud.database.put_item_field',

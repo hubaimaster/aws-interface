@@ -8,6 +8,8 @@ from cloud.permission import Permission, NeedPermission
 info = {
     'input_format': {
         'partition': 'str',
+        'field?': 'str',
+        'value?': 'any'
     },
     'output_format': {
         'item': {
@@ -26,9 +28,11 @@ def do(data, resource):
     body = {}
     params = data['params']
     partition = params['partition']
+    field = params.get('field', None)
+    value = params.get('value', None)
 
-    count = resource.db_get_count(partition)
+    count = resource.db_get_count(partition, field, value)
     body['item'] = {
-        'count': count
+        'count': int(count)
     }
     return Response(body)

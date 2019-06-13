@@ -93,7 +93,7 @@ class Resource(metaclass=ABCMeta):
     def db_update_item(self, item_id, item):
         raise NotImplementedError
 
-    def db_get_count(self, partition):
+    def db_get_count(self, partition, field=None, value=None):
         raise NotImplementedError
 
     def db_get_item_id_and_orders(self, partition, field, value, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):

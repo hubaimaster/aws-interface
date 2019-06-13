@@ -27,8 +27,8 @@ class DatabaseAPI(API):
     def get_items(self, partition, reverse=True, start_key=None):  # New item will be on the top
         return self.service_controller.get_items(partition, reverse, start_key)
 
-    def get_item_count(self, partition):
-        return self.service_controller.get_item_count(partition)
+    def get_item_count(self, partition, field=None, value=None):
+        return self.service_controller.get_item_count(partition, field, value)
 
     def create_partition(self, partition):
         return self.service_controller.create_partition(partition)

@@ -154,7 +154,7 @@ public final class AWSInterface {
         }));
     }
 
-    public void databaseCreateItem(HashMap<String, Object> item, String partition, ArrayList<String> readGroups, ArrayList<String> writeGroups, CallbackFunction callbackFunction){
+    public void databaseCreateItem(String partition, HashMap<String, Object> item, ArrayList<String> readGroups, ArrayList<String> writeGroups, CallbackFunction callbackFunction){
         HashMap<String, Object> data = new HashMap<>();
         data.put("item", item);
         data.put("partition", partition);
@@ -163,7 +163,7 @@ public final class AWSInterface {
         database("create_item", data, callbackFunction);
     }
 
-    public void databaseCreateItem(HashMap<String, Object> item, String partition, CallbackFunction callbackFunction){
+    public void databaseCreateItem(String partition, HashMap<String, Object> item, CallbackFunction callbackFunction){
         HashMap<String, Object> data = new HashMap<>();
         data.put("item", item);
         data.put("partition", partition);
@@ -180,6 +180,14 @@ public final class AWSInterface {
         HashMap<String, Object> data = new HashMap<>();
         data.put("item_id", itemId);
         database("get_item", data, callbackFunction);
+    }
+
+    public void databaseGetItemCount(String partition, String field, String value, CallbackFunction callbackFunction){
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("partition", partition);
+        data.put("field", field);
+        data.put("value", value);
+        database("get_item_count", data, callbackFunction);
     }
 
     public void databaseGetItems(String partition, String startKey, int limit, CallbackFunction callbackFunction){

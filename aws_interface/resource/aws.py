@@ -222,9 +222,20 @@ class AWSResource(Resource):
         result = dynamo.update_item(self.app_id, item_id, item)
         return bool(result)
 
-    def db_get_count(self, partition):
+    def db_get_count(self, partition, field=None, value=None):
+        """
+        Returns the number of items that satisfy the condition field == value
+        :param partition: Partition to count
+        :param field: Field name to check out
+        :param value: Field value to find out
+        :return:
+        """
         dynamo = DynamoDB(self.boto3_session)
-        item = dynamo.get_item_count(self.app_id, '{}-count'.format(partition)).get('Item', {'count': 0})
+        if field and value:
+            count_id = '{}-{}-{}-count'.format(partition, field, value)
+        else:
+            count_id = '{}-count'.format(partition)
+        item = dynamo.get_item_count(self.app_id, count_id).get('Item', {'count': 0})
         count = item.get('count')
         return count
 
