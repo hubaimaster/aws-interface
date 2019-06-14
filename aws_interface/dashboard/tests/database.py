@@ -75,11 +75,9 @@ class DatabaseTestProcess:
         code = code.replace('\\t', ' ')
         function_list = [line.strip() for line in policy_function.split()]
         code_list = [line.strip() for line in code.split()]
-        print(function_list)
-        print(code_list)
         for i in range(len(code_list)):
             if function_list[i] != code_list[i]:
-                print("There is difference")
+                print("policy function and code is different")
                 return False
         return True
 
@@ -122,7 +120,7 @@ class DatabaseTestProcess:
         readable_users = self.parent.browser.find_element_by_id('read-groups')
         for user in readable_users.find_elements_by_tag_name('a'):
             if user.text.strip() == user_name:
-                print("has user [{}]".format(user_name))
+                print("has [{}]".format(user_name))
                 return True
         return False
 
@@ -137,7 +135,7 @@ class DatabaseTestProcess:
         add_button.find_element_by_id('dropdownMenuButton').click()
         for item in add_button.find_elements_by_css_selector('a[class="dropdown-item"]'):
             if item.text.strip().lower() == user_name:
-                print("found [{}]".format(user_name))
+                print("Added [{}]".format(user_name))
                 item.click()
                 return
 
@@ -156,22 +154,89 @@ class DatabaseTestProcess:
         """
         item_count = self.parent.browser.find_element_by_id('item_count').text
         item_count = item_count.split('/')[-1].strip()
+        print("item count is {}".format(item_count))
         return int(item_count)
 
-    def _click_item_and_check_fields(self):
+    def _click_item_and_check_fields(self, field_list):
         """
         Click the top locating item and check if fields exist
         :return:
         """
         item_table = self.parent.browser.find_element_by_id('item-table')
         item_table.find_element_by_name('item').click()
-        time.sleep(LONG_DELAY)
+        time.sleep(LONG_DELAY * 2 )
+        field_table = self.parent.browser.find_element_by_id('field-table')
+        item_fields = [label.text.strip() for label in field_table.find_elements_by_tag_name('label')]
+        result = True
+        for field in field_list:
+            if field not in item_fields:
+                result = False
+        return result
+
+    def _add_field(self, field_name, field_type, field_value):
+        """
+        Add field with name [field_name], type [field_type], and value [field_value]
+        :param field_name: name of field to add
+        :param field_type: type of field to add
+        :param field_value: value of field to add
+        :return:
+        """
+        self.parent.browser.find_element_by_id('open-add-field-modal').click()
+        time.sleep(DELAY)
+        self.parent.browser.find_element_by_id('field-name').send_keys(field_name)
+        time.sleep(DELAY)
+        select_box = select.Select(self.parent.browser.find_element_by_id('field-type'))
+        select_box.select_by_value(field_type)
+        time.sleep(DELAY)
+        self.parent.browser.find_element_by_id('field-value').send_keys(field_value)
+        time.sleep(DELAY)
+        self.parent.browser.find_element_by_id('add-field-btn').click()
+        print("Added field with [{}], [{}], and [{}]".format(field_name, field_type, field_value))
+
+    def _has_field(self, field_name, field_value):
+        """
+        Check if there exists field with name [field_name] and value [field_value]
+        :param field_name: name of field to check
+        :param field_value: value of field to check
+        :return:
+        """
+        field_table = self.parent.browser.find_element_by_id('field-table')
+        for field in field_table.find_elements_by_tag_name('field'):
+            if field.find_element_by_tag_name('label').text.strip() == field_name:
+                if field.find_element_by_tag_name('textarea').text.strip() == field_value:
+                    print("[{}] with [{}] exists".format(field_name, field_value))
+                    return True
+        return False
+
+    def _remove_field(self, field_name):
+        """
+        Remove [field_name] from field table
+        :param field_name: name of field to remove
+        :return:
+        """
+        checkbox = self.parent.browser.find_element_by_id('field-{}'.format(field_name))
+        try :
+            checkbox.click()
+        except:
+            print("click was in error")
+            self.parent.browser.execute_script("arguments[0].checked = true;", checkbox)
+        time.sleep(DELAY)
+        print("Is it selected? {}".format(checkbox.is_selected()))
+        field_table = self.parent.browser.find_element_by_id('field-table')
+        field_table.find_element_by_id('dropdownMenuButton').click()
+        time.sleep(DELAY)
+        field_table.find_element_by_css_selector('a[onclick="delete_checked_fields();"]').click()
+        time.sleep("[{}] is removed".format(field_name))
 
     def do_test(self):
         PARTITION_NAME = 'test'
         MODE = 'update'
         CODE = "def has_permission(user, item):\\n\\treturn False"
         USER_NAME = "user"
+        FIELD_LIST = ['read_groups', 'write_groups', 'owner', 'id', 'partition', 'creation_date']
+        FIELD_NAME = "test-field"
+        FIELD_TYPE = "S"
+        FIELD_VALUE = "test-value"
 
         time.sleep(DELAY)
         start_time = time.time()
@@ -202,20 +267,29 @@ class DatabaseTestProcess:
         time.sleep(DELAY)
         self._save_policy_function()
         time.sleep(LONG_DELAY)
-        self._has_code_in_policy_function(PARTITION_NAME, MODE, CODE)
-        #self.parent.assertTrue(self._has_code_in_policy_function(PARTITION_NAME, MODE, CODE))
+        #self._has_code_in_policy_function(PARTITION_NAME, MODE, CODE)
+        self.parent.assertTrue(self._has_code_in_policy_function(PARTITION_NAME, MODE, CODE))
         time.sleep(DELAY)
         self.parent.assertTrue(self._open_add_item_modal(PARTITION_NAME))
         time.sleep(DELAY)
         self._remove_readable_user(USER_NAME)
-        time.sleep(DELAY)
+        time.sleep(LONG_DELAY)
         self.parent.assertFalse(self._has_readable_user(USER_NAME))
         time.sleep(DELAY)
         self._add_readable_user(USER_NAME)
-        time.sleep(DELAY)
+        time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._has_readable_user(USER_NAME))
         time.sleep(DELAY)
         self._click_accept_item()
-        time.sleep(LONG_DELAY)
+        time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._get_item_count() == 1)
         time.sleep(DELAY)
+        self.parent.assertTrue(self._click_item_and_check_fields(FIELD_LIST))
+        time.sleep(DELAY)
+        self._add_field(FIELD_NAME, FIELD_TYPE, FIELD_VALUE)
+        time.sleep(LONG_DELAY * 2 )
+        self.parent.assertTrue(self._has_field(FIELD_NAME, FIELD_VALUE))
+        time.sleep(DELAY)
+        self._remove_field()(FIELD_NAME)
+        time.sleep(LONG_DELAY * 2)
+        self.parent.assertFalse(self._has_field(FIELD_NAME, FIELD_VALUE))
