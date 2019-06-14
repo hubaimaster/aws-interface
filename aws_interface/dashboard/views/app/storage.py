@@ -3,6 +3,7 @@ from django.shortcuts import render, HttpResponse
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
+from django.template import loader
 from dashboard.views.utils import Util, page_manage
 from core.adapter.django import DjangoAdapter
 
@@ -102,4 +103,19 @@ class Storage(LoginRequiredMixin, View):
                 mode = request.POST.get('mode')
                 code = request.POST.get('code')
                 result = storage_api.put_policy(mode, code)
+                return JsonResponse(result)
+            elif cmd == 'get_file_rows':
+                start_key = request.POST.get('start_key', None)
+                result = storage_api.get_b64_info_items(start_key, reverse=True)
+                template = loader.get_template('dashboard/app/component/storage_file_table_row.html')
+                files = result.get('items', [])
+                end_key = result.get('end_key', None)
+                context = {
+                    'app_id': app_id,
+                    'files': files,
+                }
+                result = {
+                    'file_rows': template.render(context, request),
+                    'end_key': end_key
+                }
                 return JsonResponse(result)
