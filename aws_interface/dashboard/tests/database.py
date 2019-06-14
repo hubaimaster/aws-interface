@@ -11,7 +11,7 @@ class DatabaseTestProcess:
         :param partition: name of partition
         :return:
         """
-        self.parent.browser.find_element_by_id('create-partition-button').click()
+        self.parent.browser.find_element_by_id('open-put-partition-button').click()
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('partition-name').send_keys(partition)
         time.sleep(DELAY)
@@ -63,7 +63,7 @@ class DatabaseTestProcess:
         """
         Check if [code] exists in policy function
         :param code: code to check existence
-        :return:
+        :return: bool
         """
         self.parent.browser.refresh()
         time.sleep(DELAY)
@@ -89,7 +89,7 @@ class DatabaseTestProcess:
         """
         self.parent.browser.find_element_by_id('{}'.format(partition_name)).click()
         time.sleep(LONG_DELAY)
-        self.parent.browser.find_element_by_id("open-add-item-modal").click()
+        self.parent.browser.find_element_by_id("open-put-item-modal").click()
         time.sleep(DELAY)
         add_item_modal = self.parent.browser.find_element_by_id('modal-add-item')
         for style in add_item_modal.get_attribute('style').split(';'):
@@ -115,7 +115,7 @@ class DatabaseTestProcess:
         """
         Check if [user_name] exists in readable users group
         :param user_name: naem of user group to check
-        :return:
+        :return: bool
         """
         readable_users = self.parent.browser.find_element_by_id('read-groups')
         for user in readable_users.find_elements_by_tag_name('a'):
@@ -150,7 +150,7 @@ class DatabaseTestProcess:
     def _get_item_count(self):
         """
         Return number of items
-        :return:
+        :return: int: number of items
         """
         item_count = self.parent.browser.find_element_by_id('item_count').text
         item_count = item_count.split('/')[-1].strip()
@@ -181,7 +181,7 @@ class DatabaseTestProcess:
         :param field_value: value of field to add
         :return:
         """
-        self.parent.browser.find_element_by_id('open-add-field-modal').click()
+        self.parent.browser.find_element_by_id('open-put-field-modal').click()
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('field-name').send_keys(field_name)
         time.sleep(DELAY)
@@ -198,35 +198,46 @@ class DatabaseTestProcess:
         Check if there exists field with name [field_name] and value [field_value]
         :param field_name: name of field to check
         :param field_value: value of field to check
-        :return:
+        :return: bool
         """
         field_table = self.parent.browser.find_element_by_id('field-table')
-        for field in field_table.find_elements_by_tag_name('field'):
+        for field in field_table.find_elements_by_name('field'):
             if field.find_element_by_tag_name('label').text.strip() == field_name:
                 if field.find_element_by_tag_name('textarea').text.strip() == field_value:
                     print("[{}] with [{}] exists".format(field_name, field_value))
                     return True
         return False
 
-    def _remove_field(self, field_name):
+    def _has_item(self):
         """
-        Remove [field_name] from field table
-        :param field_name: name of field to remove
+        Check if there exists any item in item-table
+        :return: bool
+        """
+        item_table = self.parent.browser.find_element_by_id('item-table')
+        return item_table.find_elements_by_name('item')
+
+    def _remove_element(self, element_type, element_name):
+        """
+        Remove [element_name] from [element_type] table
+        :param element_type: type of element
+        :param element_name: name of element to remove
         :return:
         """
-        checkbox = self.parent.browser.find_element_by_id('field-{}'.format(field_name))
-        try :
-            checkbox.click()
-        except:
-            print("click was in error")
-            self.parent.browser.execute_script("arguments[0].checked = true;", checkbox)
+        if element_type == "item":
+            element_table = self.parent.browser.find_element_by_id('{}-table'.format(element_type))
+            check_box = element_table.find_element_by_name(element_type)
+            check_box = check_box.find_element_by_name('checkbox-{}'.format(element_type))
+        else:
+            check_box = self.parent.browser.find_element_by_id('{}-{}'.format(element_type, element_name))
+        self.parent.browser.execute_script("arguments[0].checked = true;", check_box)
         time.sleep(DELAY)
-        print("Is it selected? {}".format(checkbox.is_selected()))
-        field_table = self.parent.browser.find_element_by_id('field-table')
-        field_table.find_element_by_id('dropdownMenuButton').click()
+        print("Is check box selected? : {}".format(check_box.is_selected()))
+        element_table = self.parent.browser.find_element_by_id('open-put-{}-modal'.format(element_type))
+        element_table = element_table.find_element_by_xpath('..')
+        element_table.find_element_by_id('dropdownMenuButton').click()
         time.sleep(DELAY)
-        field_table.find_element_by_css_selector('a[onclick="delete_checked_fields();"]').click()
-        time.sleep("[{}] is removed".format(field_name))
+        element_table.find_element_by_css_selector('a[onclick="delete_checked_{}s();"]'.format(element_type)).click()
+        print("[{}] type [{}] is removed".format(element_type, element_name))
 
     def do_test(self):
         PARTITION_NAME = 'test'
@@ -290,6 +301,14 @@ class DatabaseTestProcess:
         time.sleep(LONG_DELAY * 2 )
         self.parent.assertTrue(self._has_field(FIELD_NAME, FIELD_VALUE))
         time.sleep(DELAY)
-        self._remove_field()(FIELD_NAME)
+        self._remove_element("field", FIELD_NAME)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertFalse(self._has_field(FIELD_NAME, FIELD_VALUE))
+        time.sleep(DELAY)
+        self._remove_element("item", None)
+        time.sleep(LONG_DELAY * 2)
+        self.parent.assertFalse(self._has_item())
+        time.sleep(DELAY)
+        self._remove_element("partition", PARTITION_NAME)
+        time.sleep(LONG_DELAY * 2)
+        self.parent.assertFalse(self._has_partition(PARTITION_NAME))
