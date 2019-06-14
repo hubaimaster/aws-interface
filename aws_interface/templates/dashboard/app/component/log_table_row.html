@@ -1,0 +1,21 @@
+{% load timetags %}
+
+{% for log in items %}
+    <tr>
+        <th scope="row">
+            {{ log.owner }}
+        </th>
+        <td>
+            {{ log.creation_date|to_date }}
+        </td>
+        <td>
+            {{ log.event_source }}
+        </td>
+        <td>
+            {{ log.event_name }}
+        </td>
+        <td>
+            {{ log.event_param }}
+        </td>
+    </tr>
+{% endfor %}

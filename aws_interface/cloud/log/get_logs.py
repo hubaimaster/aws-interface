@@ -11,6 +11,7 @@ info = {
         'event_name?': 'str',
         'user_id?': 'str',
         'start_key?': 'str',
+        'reverse?': 'bool',
     },
     'output_format': {
         'error?': {
@@ -33,6 +34,7 @@ def do(data, resource):
     event_name = params.get('event_name', None)
     user_id = params.get('user_id', None)
     start_key = params.get('start_key', None)
+    reverse = params.get('reverse', False)
 
     operation = None
     instructions = []
@@ -41,9 +43,9 @@ def do(data, resource):
             instructions.append((operation, (field_name, 'eq', value)))
             operation = 'and'
     if len(instructions) > 0:
-        items, end_key = resource.db_query(partition, instructions, start_key=start_key, reverse=True)
+        items, end_key = resource.db_query(partition, instructions, start_key=start_key, reverse=reverse)
     else:
-        items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, reverse=True)
+        items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, reverse=reverse)
     body['end_key'] = end_key
     body['items'] = items
     return Response(body)

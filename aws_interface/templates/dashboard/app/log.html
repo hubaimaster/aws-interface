@@ -70,26 +70,6 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-{#                                {% for log in logs %}#}
-{#                                    <tr>#}
-{#                                        <th scope="row">#}
-{#                                            {{ log.owner }}#}
-{#                                        </th>#}
-{#                                        <td>#}
-{#                                            {{ log.creationDate|to_date }}#}
-{#                                        </td>#}
-{#                                        <td>#}
-{#                                            {{ log.event_source }}#}
-{#                                        </td>#}
-{#                                        <td>#}
-{#                                            {{ log.event_name }}#}
-{#                                        </td>#}
-{#                                        <td>#}
-{#                                            {{ log.event_param }}#}
-{#                                        </td>#}
-{##}
-{#                                    </tr>#}
-{#                                {% endfor %}#}
 
                                 </tbody>
                             </table>
@@ -124,7 +104,7 @@
             const event_name = '{{ event_name }}';
 
             var item = {
-                cmd: 'get_logs',
+                cmd: 'get_log_rows',
                 user_id,
                 event_source,
                 event_name,
@@ -138,17 +118,8 @@
                 if (logs_end_key == null){
                     $("#load-more-logs-btn").hide();
                 }
-                for (var i = 0; i < data['items'].length; i++){
-                    const item = data['items'][i];
-                    const raw = "<tr>\n" +
-                        "<td scope='row'>" + item.owner  + "</td>\n" +
-                        "<td>" + item['creation_date'] + "</td>\n" +
-                        "<td>" + item.event_source + "</td>\n" +
-                        "<td>" + item.event_name + "</td>\n" +
-                        "<td>" + item.event_param + "</td>\n" +
-                        "</tr>";
-                    $("#log-table>table").append(raw);
-                }
+                const rows = data['rows'];
+                $("#log-table>table").append(rows);
             });
         }
         window.onload = function () {
