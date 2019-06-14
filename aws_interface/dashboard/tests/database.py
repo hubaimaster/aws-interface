@@ -25,6 +25,7 @@ class DatabaseTestProcess:
         """
         partition_obj = self.parent.browser.find_element_by_id('partition-{}'.format(partition))
         return partition_obj
+
     def _select_parition_and_mode_in_policy_function(self, partition_name, mode):
         """
         Select [parition_name] and [mode] in policy function
@@ -36,7 +37,7 @@ class DatabaseTestProcess:
         partition_select_box.select_by_value(partition_name)
         mode_select_box = select.Select(self.parent.browser.find_element_by_id('policy-mode'))
         mode_select_box.select_by_value(mode)
-        print("{} and {} selected".format(partition_name, mode))
+        print("[{}] and [{}] selected".format(partition_name, mode))
 
     def _write_policy_function(self, code):
         """
@@ -44,60 +45,47 @@ class DatabaseTestProcess:
         :param code: code to write in policy_function
         :return:
         """
-        remove_code = """
-                    var element = arguments[0];
-                    element.parentNode.removeChild(element);
-                    """
-        add_code = """
-                var element = arguments[0];
-                var div = document.createElement( 'div' );
-                div.innerHTML='{}';
-                element.appendChild( div );
-                """
-        policy_function = self.parent.browser.find_element_by_id('code-editor')
-        policy_function = policy_function.find_element_by_css_selector('div[class="ace_layer ace_text-layer"')
-        for div in policy_function.find_elements_by_tag_name('div'):
-            self.parent.browser.execute_script(remove_code, div)
-        try:
-            for line in code.split('\n'):
-                self.parent.browser.execute_script(add_code.format(line), policy_function)
-        except:
-            print(sys.exc_info()[0])
-            print(sys.exc_info()[1])
-            print("Code not written")
-            return
+        ace_script = "editor.setValue('{}',-1);".format(code)
+        self.parent.browser.execute_script(ace_script)
         print("Wrote code")
 
-    def _click_save_button(self):
+    def _save_policy_function(self):
         """
-        Click save_button in policy_function
+        Click save button in policy_function
         :return:
         """
         self.parent.browser.find_element_by_css_selector('button[onclick="save_policy();"]').click()
         time.sleep(DELAY)
         self.parent.browser.switch_to.alert.accept()
-        print("save button clicked")
+        print("Save button clicked")
 
-    def _has_code_in_policy_function(self, code):
+    def _has_code_in_policy_function(self, partition_name, mode, code):
         """
         Check if [code] exists in policy function
         :param code: code to check existence
         :return:
         """
         self.parent.browser.refresh()
+        time.sleep(DELAY)
+        self._select_parition_and_mode_in_policy_function(partition_name, mode)
+        time.sleep(LONG_DELAY)
         policy_function = self.parent.browser.find_element_by_id('code-editor')
-        policy_function = policy_function.find_element_by_css_selector('div[class="ace_layer ace_text-layer"')
-        print(policy_function.text)
-        written_function = [line.strip() for line in policy_function.text.split()]
+        policy_function = policy_function.find_element_by_css_selector('div[class="ace_layer ace_text-layer"]').text.strip()
+        code = code.replace('\\n', ' ')
+        code = code.replace('\\t', ' ')
+        function_list = [line.strip() for line in policy_function.split()]
         code_list = [line.strip() for line in code.split()]
+        print(function_list)
+        print(code_list)
         for i in range(len(code_list)):
-            if written_function[i] != code_list[i]:
+            if function_list[i] != code_list[i]:
+                print("There is difference")
                 return False
-        return False
+        return True
 
     def _open_add_item_modal(self, partition_name):
         """
-        Click parition [partition_name] and open item + modal
+        Click partiton [partition_name] and open item+ modal
         :param partition_name: name of partition that checkbox should be checked
         :return:
         """
@@ -108,17 +96,82 @@ class DatabaseTestProcess:
         add_item_modal = self.parent.browser.find_element_by_id('modal-add-item')
         for style in add_item_modal.get_attribute('style').split(';'):
             if style.strip() == 'display: block':
-                print("add item modal open checked")
+                print("Checked item+ modal is open")
                 return True
         return False
+
+    def _remove_readable_user(self, user_name):
+        """
+        Remove [user_name] from readable users group
+        :param user_name: name of user group to remove
+        :return:
+        """
+        readable_users = self.parent.browser.find_element_by_id('read-groups')
+        for user in readable_users.find_elements_by_tag_name('a'):
+            if user.text.strip() == user_name:
+                user.click()
+                print("clicked [{}]".format(user_name))
+                return
+
+    def _has_readable_user(self, user_name):
+        """
+        Check if [user_name] exists in readable users group
+        :param user_name: naem of user group to check
+        :return:
+        """
+        readable_users = self.parent.browser.find_element_by_id('read-groups')
+        for user in readable_users.find_elements_by_tag_name('a'):
+            if user.text.strip() == user_name:
+                print("has user [{}]".format(user_name))
+                return True
+        return False
+
+    def _add_readable_user(self, user_name):
+        """
+        Add [user_name] to readable users group
+        :param user_name: name of user group to add
+        :return:
+        """
+        readable_users = self.parent.browser.find_element_by_id('read-groups')
+        add_button = readable_users.find_element_by_xpath('..')
+        add_button.find_element_by_id('dropdownMenuButton').click()
+        for item in add_button.find_elements_by_css_selector('a[class="dropdown-item"]'):
+            if item.text.strip().lower() == user_name:
+                print("found [{}]".format(user_name))
+                item.click()
+                return
+
+    def _click_accept_item(self):
+        """
+        Click accept button from item+ modal
+        :return:
+        """
+        self.parent.browser.find_element_by_id('add-item-btn').click()
+        print("Accept button clicked")
+
+    def _get_item_count(self):
+        """
+        Return number of items
+        :return:
+        """
+        item_count = self.parent.browser.find_element_by_id('item_count').text
+        item_count = item_count.split('/')[-1].strip()
+        return int(item_count)
+
+    def _click_item_and_check_fields(self):
+        """
+        Click the top locating item and check if fields exist
+        :return:
+        """
+        item_table = self.parent.browser.find_element_by_id('item-table')
+        item_table.find_element_by_name('item').click()
+        time.sleep(LONG_DELAY)
 
     def do_test(self):
         PARTITION_NAME = 'test'
         MODE = 'update'
-        CODE = """
-            def has_permission(user, item):
-                return False
-            """
+        CODE = "def has_permission(user, item):\\n\\treturn False"
+        USER_NAME = "user"
 
         time.sleep(DELAY)
         start_time = time.time()
@@ -145,10 +198,24 @@ class DatabaseTestProcess:
         time.sleep(DELAY)
         self._select_parition_and_mode_in_policy_function(PARTITION_NAME, MODE)
         time.sleep(DELAY)
-        #self._write_policy_function(CODE)
+        self._write_policy_function(CODE)
+        time.sleep(DELAY)
+        self._save_policy_function()
         time.sleep(LONG_DELAY)
-        self._click_save_button()
-        time.sleep(LONG_DELAY)
-        #self.parent.assertTrue(self._has_code_in_policy_function(CODE))
+        self._has_code_in_policy_function(PARTITION_NAME, MODE, CODE)
+        #self.parent.assertTrue(self._has_code_in_policy_function(PARTITION_NAME, MODE, CODE))
         time.sleep(DELAY)
         self.parent.assertTrue(self._open_add_item_modal(PARTITION_NAME))
+        time.sleep(DELAY)
+        self._remove_readable_user(USER_NAME)
+        time.sleep(DELAY)
+        self.parent.assertFalse(self._has_readable_user(USER_NAME))
+        time.sleep(DELAY)
+        self._add_readable_user(USER_NAME)
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._has_readable_user(USER_NAME))
+        time.sleep(DELAY)
+        self._click_accept_item()
+        time.sleep(LONG_DELAY)
+        self.parent.assertTrue(self._get_item_count() == 1)
+        time.sleep(DELAY)
