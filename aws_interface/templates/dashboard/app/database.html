@@ -34,14 +34,14 @@
                                     <div class="col-auto">
                                         <h4 class="mb-0">
 
-                                        정책함수 <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Update, Delete 별 오퍼레이션이 허락됩니다"></i>
+                                            정책함수 <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Update, Delete 별 오퍼레이션이 허락됩니다"></i>
 
                                             <select id="policy-partition-to-apply" class="form-control-alternative" onchange="set_policy_mode(policy_mode);">
                                                 {% for partition in partitions %}
                                                     <option value="{{ partition.name }}">{{ partition.name }}</option>
                                                 {% endfor %}
                                             </select>
-                                        모드:
+                                            모드:
                                             <select id="policy-mode" class="form-control-alternative" onchange="set_policy_mode(this.value);">
                                                 <option value="create"><span>Create</span></option>
                                                 <option value="read"><span>Read</span></option>
@@ -193,77 +193,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
-                                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h4 class="modal-title" id="modal-title-default">아이템 추가</h4>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                    <span aria-hidden="true">×</span>
-                                                                </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <div class="pl-lg-12">
-                                                                    <div class="row">
-                                                                        <div class="col-lg-12">
-                                                                            <div class="form-group">
-                                                                                <label class="form-control-label">아이디</label>
-                                                                                <input type="text" class="form-control form-control-alternative" placeholder="자동생성" disabled>
-                                                                            </div>
 
-                                                                            <div class="form-group">
-                                                                                <label class="form-control-label" for="input-username">아이템을 읽을 수 있는 그룹</label>
-                                                                                <div id="read-groups" class="mb-2">
-
-                                                                                </div>
-                                                                                <div class="dropdown">
-                                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                        그룹 추가
-                                                                                    </button>
-                                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                                        {% for group in user_groups %}
-                                                                                            <a class="dropdown-item" onclick="put_read_group('{{ group.name }}');">{{ group.name }}</a>
-                                                                                        {% endfor %}
-                                                                                        <div class="dropdown-divider"></div>
-                                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-
-                                                                            <div class="form-group">
-                                                                                <label class="form-control-label" for="input-username">아이템을 쓰기 혹은 삭제 할 수 있는 그룹</label>
-                                                                                <div id="write-groups" class="mb-2">
-
-                                                                                </div>
-                                                                                <div class="dropdown">
-                                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                        그룹 추가
-                                                                                    </button>
-                                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                                        {% for group in user_groups %}
-                                                                                            <a class="dropdown-item" onclick="put_write_group('{{ group.name }}');">{{ group.name }}</a>
-                                                                                        {% endfor %}
-                                                                                        <div class="dropdown-divider"></div>
-                                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <p>
-                                                                    확인 버튼을 클릭하여 아이템을 생성합니다. </br>
-                                                                </p>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                                <button id="add-item-btn" class="btn btn-primary">확인</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                                 <div class="modal fade" id="modal-query-item" tabindex="-1" role="dialog" aria-labelledby="modal-query-item" aria-hidden="true">
                                                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                                         <div class="modal-content">
@@ -366,6 +296,79 @@
                                         </tbody>
 
                                     </table>
+                                </div>
+
+                                <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">아이템 추가</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="pl-lg-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label">아이디</label>
+                                                                <input type="text" class="form-control form-control-alternative" placeholder="자동생성" disabled>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="input-username">아이템을 읽을 수 있는 그룹</label>
+                                                                <div id="read-groups" class="mb-2">
+
+                                                                </div>
+
+                                                                <div class="dropdown">
+                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        그룹 추가
+                                                                    </button>
+                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                        {% for group in user_groups %}
+                                                                            <a class="dropdown-item" href="#" onclick="put_read_group('{{ group.name }}');">{{ group.name }}</a>
+                                                                        {% endfor %}
+                                                                        <div class="dropdown-divider"></div>
+                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="input-username">아이템을 쓰기 혹은 삭제 할 수 있는 그룹</label>
+                                                                <div id="write-groups" class="mb-2">
+
+                                                                </div>
+                                                                <div class="dropdown">
+                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        그룹 추가
+                                                                    </button>
+                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                        {% for group in user_groups %}
+                                                                            <a class="dropdown-item" href="#" onclick="put_write_group('{{ group.name }}');">{{ group.name }}</a>
+                                                                        {% endfor %}
+                                                                        <div class="dropdown-divider"></div>
+                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p>
+                                                    확인 버튼을 클릭하여 아이템을 생성합니다. <br>
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                                                <button id="add-item-btn" class="btn btn-primary">확인</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding: 0;">
