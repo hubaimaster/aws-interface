@@ -9,5 +9,5 @@ class LogAPI(API):
     def create_log(self, event_source, event_name, event_param):
         return self.service_controller.create_log(event_source, event_name, event_param)
 
-    def get_logs(self, event_source=None, event_name=None, event_param=None, user_id=None, start_key=None):
-        return self.service_controller.get_logs(event_source, event_name, event_param, user_id, start_key)
+    def get_logs(self, event_source=None, event_name=None, event_param=None, user_id=None, start_key=None, reverse=False):
+        return self.service_controller.get_logs(event_source, event_name, event_param, user_id, start_key, reverse)
