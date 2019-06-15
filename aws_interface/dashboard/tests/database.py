@@ -11,7 +11,7 @@ class DatabaseTestProcess:
         :param partition: name of partition
         :return:
         """
-        self.parent.browser.find_element_by_id('open-put-partition-button').click()
+        self.parent.browser.find_element_by_id('create-partition-button').click()
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('partition-name').send_keys(partition)
         time.sleep(DELAY)
@@ -25,6 +25,9 @@ class DatabaseTestProcess:
         """
         partition_obj = self.parent.browser.find_element_by_id('partition-{}'.format(partition))
         return partition_obj
+
+    def _add_id_on_partition_table(self):
+        return
 
     def _select_parition_and_mode_in_policy_function(self, partition_name, mode):
         """
@@ -89,7 +92,7 @@ class DatabaseTestProcess:
         """
         self.parent.browser.find_element_by_id('{}'.format(partition_name)).click()
         time.sleep(LONG_DELAY)
-        self.parent.browser.find_element_by_id("open-put-item-modal").click()
+        self.parent.browser.find_element_by_id("open-add-item-modal").click()
         time.sleep(DELAY)
         add_item_modal = self.parent.browser.find_element_by_id('modal-add-item')
         for style in add_item_modal.get_attribute('style').split(';'):
@@ -181,7 +184,7 @@ class DatabaseTestProcess:
         :param field_value: value of field to add
         :return:
         """
-        self.parent.browser.find_element_by_id('open-put-field-modal').click()
+        self.parent.browser.find_element_by_id('open-add-field-modal').click()
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('field-name').send_keys(field_name)
         time.sleep(DELAY)
@@ -301,6 +304,7 @@ class DatabaseTestProcess:
         time.sleep(LONG_DELAY * 2 )
         self.parent.assertTrue(self._has_field(FIELD_NAME, FIELD_VALUE))
         time.sleep(DELAY)
+        """
         self._remove_element("field", FIELD_NAME)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertFalse(self._has_field(FIELD_NAME, FIELD_VALUE))
@@ -312,3 +316,4 @@ class DatabaseTestProcess:
         self._remove_element("partition", PARTITION_NAME)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertFalse(self._has_partition(PARTITION_NAME))
+        """
