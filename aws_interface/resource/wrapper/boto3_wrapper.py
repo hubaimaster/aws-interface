@@ -657,6 +657,8 @@ class DynamoDB:
         creation_date = item.get('creation_date', self.time())
         with table.batch_writer() as batch:
             for field, value in item.items():
+                if len(str(value)) > 1024:  # Index size max is 1024
+                    continue
                 for operand in self._eq_operands(value):
                     self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date)
 

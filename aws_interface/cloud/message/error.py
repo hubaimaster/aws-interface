@@ -109,3 +109,11 @@ ADMIN_GROUP_CANNOT_BE_MODIFIED = {
     'code': 27,
     'message': 'An admin group can not be modified'
 }
+NO_SUCH_LOGIN_METHOD = {
+    'code': 28,
+    'message': 'No such login method',
+}
+REGISTER_POLICY_VIOLATION = {
+    'code': 29,
+    'message': 'Register policy violation',
+}

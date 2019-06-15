@@ -62,6 +62,7 @@ class DashboardTestCase(StaticLiveServerTestCase):
         self._set_register()
         self._set_login()
         self._create_app()
+        self.is_init = True
 
     def get_options(self):
         """

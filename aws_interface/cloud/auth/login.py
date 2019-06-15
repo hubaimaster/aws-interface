@@ -1,7 +1,7 @@
 
 from cloud.crypto import *
 from cloud.response import Response
-import cloud.auth.get_email_login as get_email_login
+from cloud.auth.get_login_method import do as get_login_method
 from secrets import token_urlsafe
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -31,7 +31,8 @@ def do(data, resource):
     email = params.get('email', None)
     password = params.get('password', None)
 
-    login_conf = get_email_login.do(data, resource)['body']['item']
+    data['params']['login_method'] = 'email_login'
+    login_conf = get_login_method(data, resource)['body']['item']
     enabled = login_conf['enabled']
     if enabled == 'true':
         enabled = True
@@ -43,7 +44,8 @@ def do(data, resource):
         return Response(body)
 
     instructions = [
-        (None, ('email', 'eq', email))
+        (None, ('email', 'eq', email)),
+        ('and', ('login_method', 'eq', 'email_login')),
     ]
     items, end_key = resource.db_query('user', instructions)
     if len(items) > 0:

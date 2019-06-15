@@ -100,6 +100,7 @@ def page_manage(func):
             event = '{}\n{}'.format(event, traceback.format_exc())
 
             Util.log('error', request.user, event)
+            print(event)
 
             code = ex.response.get('Error', {}).get('Code', None)
             error_type = None
