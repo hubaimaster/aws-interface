@@ -90,86 +90,6 @@
                                     </a>
 
                                 </div>
-                                <div class="modal fade" id="modal-put-folder" tabindex="-1" role="dialog" aria-labelledby="modal-put-folder" aria-hidden="true">
-                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="modal-title-default">폴더 생성</h4>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-
-                                            <div class="modal-body">
-                                                <div class="pl-lg-12">
-                                                    <div class="row">
-                                                        <div class="col-lg-12">
-
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="folder-parent-path">생성 위치</label>
-                                                                <input name="folder-parent-path" type="text" id="folder-parent-path" class="form-control form-control-alternative" placeholder="/" disabled>
-                                                            </div>
-
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="folder-name">이름</label>
-                                                                <input name="folder-name" type="text" id="folder-name" class="form-control form-control-alternative" placeholder="폴더 이름">
-                                                            </div>
-
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">폴더 내부 목록을 조회 할 수 있는 그룹</label>
-                                                                <div id="folder-read-groups" class="mb-2">
-
-                                                                </div>
-
-                                                                <div class="dropdown">
-                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        그룹 추가
-                                                                    </button>
-                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                        {% for group in user_groups %}
-                                                                            <a class="dropdown-item" onclick="put_folder_read_group('{{ group.name }}');">{{ group.name }} </a>
-                                                                        {% endfor %}
-                                                                        <div class="dropdown-divider"></div>
-                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">폴더를 삭제하거나 내부에 파일을 쓰기 또는 삭제 할 수 있는 그룹</label>
-                                                                <div id="folder-write-groups" class="mb-2">
-
-                                                                </div>
-
-                                                                <div class="dropdown">
-                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        그룹 추가
-                                                                    </button>
-                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                        {% for group in user_groups %}
-                                                                            <a class="dropdown-item" onclick="put_folder_write_group('{{ group.name }}');">{{ group.name }}</a>
-                                                                        {% endfor %}
-                                                                        <div class="dropdown-divider"></div>
-                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <p>
-                                                    확인 버튼을 클릭하여 폴더를 생성합니다.
-                                                </p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                <button id="create-folder" class="btn btn-primary">확인</button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
 
                                 <div class="modal fade" id="modal-upload-file" tabindex="-1" role="dialog" aria-labelledby="modal-upload-file" aria-hidden="true">
                                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
@@ -207,7 +127,7 @@
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         {% for group in user_groups %}
-                                                                            <a class="dropdown-item" onclick="put_file_read_group('{{ group.name }}');">{{ group.name }}</a>
+                                                                            <a class="dropdown-item" href="#" onclick="put_file_read_group('{{ group.name }}');">{{ group.name }}</a>
                                                                         {% endfor %}
                                                                         <div class="dropdown-divider"></div>
                                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -227,7 +147,7 @@
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         {% for group in user_groups %}
-                                                                            <a class="dropdown-item" onclick="put_file_write_group('{{ group.name }}');">{{ group.name }}</a>
+                                                                            <a class="dropdown-item" href="#" onclick="put_file_write_group('{{ group.name }}');">{{ group.name }}</a>
                                                                         {% endfor %}
                                                                         <div class="dropdown-divider"></div>
                                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -268,18 +188,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-{#                                {% for item in b64_info.items %}#}
-{#                                    <tr>#}
-{#                                        <th scope="row"><a href="{% url 'storage' app_id %}?cmd=download_b64&file_id={{ item.id }}">{{ item.id }}</a></th>#}
-{#                                        <td>{{ item.file_name }}</td>#}
-{#                                        <td>{{ item.owner }}</td>#}
-{#                                        <td>{{ item.creation_date|to_date }}</td>#}
-{#                                        <td>{{ item.file_size|filesizeformat}}</td>#}
-{#                                        <td>#}
-{#                                            <button onclick="delete_b64('{{ item.id }}')" class="btn btn-sm btn-danger">제거</button>#}
-{#                                        </td>#}
-{#                                    </tr>#}
-{#                                {% endfor %}#}
+
                                 </tbody>
                             </table>
                         <button id="load-more-files-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_files();">
@@ -428,7 +337,7 @@
 
         function load_more_files(){
             var item = {
-                cmd: 'get_b64_info_items',
+                cmd: 'get_file_rows',
             };
             if (files_end_key != null){
                 item['start_key'] = files_end_key;
@@ -438,20 +347,8 @@
                 if (files_end_key == null){
                     $("#load-more-files-btn").hide();
                 }
-                for (var i = 0; i < data['items'].length; i++){
-                    const item = data['items'][i];
-                    const raw = "<tr>\n" +
-                        "<td scope='row'><a href='{% url 'storage' app_id %}?cmd=download_b64&file_id=" + item.id + "'>" + item.id  + "</a></td>\n" +
-                        "<td>" + item['file_name'] + "</td>\n" +
-                        "<td>" + item.owner + "</td>\n" +
-                        "<td>" + item.creation_date + "</td>\n" +
-                        "<td>" + item.file_size + "</td>\n" +
-                        "<td>\n" +
-                        "<button onclick=\"delete_b64('" + item.id + "')\" class='btn btn-sm btn-danger'>제거</button>\n" +
-                        "</td>\n" +
-                        "</tr>";
-                    $("#file-table>table").append(raw);
-                }
+                const rows = data['file_rows'];
+                $("#file-table>table").append(rows);
             });
         }
 

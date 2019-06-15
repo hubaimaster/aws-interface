@@ -4,7 +4,7 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from core.adapter.django import DjangoAdapter
 from django.http import JsonResponse
-
+from django.template import loader
 from dashboard.views.utils import Util, page_manage
 
 
@@ -35,15 +35,28 @@ class Log(LoginRequiredMixin, View):
             return render(request, 'dashboard/app/log.html', context=context)
 
     def post(self, request, app_id):
-        adapter = DjangoAdapter(app_id, request)
         cmd = request.POST.get('cmd', None)
-        if cmd == 'get_logs':
-            start_key = request.POST.get('start_key', None)
-            event_source = request.POST.get('event_source', None)
-            event_name = request.POST.get('event_name', None)
-            event_param = request.POST.get('event_param', None)
-            user_id = request.POST.get('user_id', None)
-
-            with adapter.open_api_log() as log:
+        adapter = DjangoAdapter(app_id, request)
+        with adapter.open_api_log() as log:
+            if cmd == 'get_logs':
+                start_key = request.POST.get('start_key', None)
+                event_source = request.POST.get('event_source', None)
+                event_name = request.POST.get('event_name', None)
+                event_param = request.POST.get('event_param', None)
+                user_id = request.POST.get('user_id', None)
                 log_result = log.get_logs(event_source, event_name, event_param, user_id, start_key)
                 return JsonResponse(log_result)
+            elif cmd == 'get_log_rows':
+                start_key = request.POST.get('start_key', None)
+                result = log.get_logs(start_key, reverse=True)
+                template = loader.get_template('dashboard/app/component/log_table_row.html')
+                items = result.get('items', [])
+                end_key = result.get('end_key', None)
+                context = {
+                    'items': items,
+                }
+                result = {
+                    'rows': template.render(context, request),
+                    'end_key': end_key
+                }
+                return JsonResponse(result)
