@@ -1,5 +1,5 @@
 from dashboard.tests.test_dashboard import *
-import sys
+
 
 class DatabaseTestProcess:
     def __init__(self, parent):
@@ -23,7 +23,7 @@ class DatabaseTestProcess:
         :param partition:
         :return: bool
         """
-        partitions = self.parent.browser.find_elements_by_name('partition'.format(partition_name))
+        partitions = self.parent.browser.find_elements_by_name('partition')
         for partition in partitions:
             if partition.text.strip() == partition_name:
                 print("[{}] exists".format(partition_name))
@@ -178,14 +178,14 @@ class DatabaseTestProcess:
         """
         item_table = self.parent.browser.find_element_by_id('item-table')
         item_table.find_element_by_name('item').click()
-        time.sleep(LONG_DELAY * 2 )
+        time.sleep(LONG_DELAY * 2)
         field_table = self.parent.browser.find_element_by_id('field-table')
         item_fields = [label.text.strip() for label in field_table.find_elements_by_tag_name('label')]
         result = True
         for field in field_list:
             if field not in item_fields:
                 result = False
-        print("{} are in fiedls".format(field_list))
+        print("{} are in fields".format(field_list))
         return result
 
     def _add_field(self, field_name, field_type, field_value):
@@ -273,8 +273,7 @@ class DatabaseTestProcess:
                 self.parent.browser.refresh()
                 time.sleep(LONG_DELAY * 4)
                 print('Wait...')
-            except StaleElementReferenceException as e:
-                print(e)
+            except StaleElementReferenceException:
                 pass
         duration = time.time() - start_time
         print('duration: {} s'.format(duration))
@@ -311,7 +310,7 @@ class DatabaseTestProcess:
         self.parent.assertTrue(self._click_item_and_check_fields(FIELD_LIST))
         time.sleep(DELAY)
         self._add_field(FIELD_NAME, FIELD_TYPE, FIELD_VALUE)
-        time.sleep(LONG_DELAY * 2 )
+        time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._has_field(FIELD_NAME, FIELD_VALUE))
         time.sleep(DELAY)
         self._remove_element("field", FIELD_NAME)
