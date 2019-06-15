@@ -24,6 +24,8 @@ def do(data, resource):
             'description': 'Default user group',
             'permissions': Permission.default_user_permissions,
         },
+    }
+    admin_groups = {
         'admin': {
             'name': 'admin',
             'description': 'Admin has full control of the system',
@@ -37,6 +39,9 @@ def do(data, resource):
         if group_name not in [group_item['name'] for group_item in group_items]:
             has_default_groups = False
             resource.db_put_item('user_group', default_groups[group_name], 'user-group-{}'.format(group_name))
+
+    for group_name in admin_groups:
+        resource.db_put_item('user_group', admin_groups[group_name], 'user-group-{}'.format(group_name))
 
     if not has_default_groups:
         group_items, _ = resource.db_get_items_in_partition('user_group', limit=10000)

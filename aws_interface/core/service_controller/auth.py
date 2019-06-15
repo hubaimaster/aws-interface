@@ -155,36 +155,23 @@ class AuthServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
-    def set_email_login(self, enabled, default_group_name):
-        import cloud.auth.set_email_login as method
+    def set_login_method(self, login_method, enabled, default_group_name, register_policy_code):
+        import cloud.auth.set_login_method as method
         params = {
+            'login_method': login_method,
             'enabled': enabled,
-            'default_group_name': default_group_name
+            'default_group_name': default_group_name,
+            'register_policy_code': register_policy_code,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
 
     @lambda_method
-    def set_guest_login(self, enabled, default_group_name):
-        import cloud.auth.set_guest_login as method
+    def get_login_method(self, login_method):
+        import cloud.auth.get_login_method as method
         params = {
-            'enabled': enabled,
-            'default_group_name': default_group_name
+            'login_method': login_method,
         }
-        data = make_data(self.app_id, params)
-        return method.do(data, self.resource)
-
-    @lambda_method
-    def get_email_login(self):
-        import cloud.auth.get_email_login as method
-        params = {}
-        data = make_data(self.app_id, params)
-        return method.do(data, self.resource)
-
-    @lambda_method
-    def get_guest_login(self):
-        import cloud.auth.get_guest_login as method
-        params = {}
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
 

@@ -28,6 +28,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.auth.get_users',
     'cloud.auth.guest',
     'cloud.auth.login',
+    'cloud.auth.login_facebook',
     'cloud.auth.logout',
     'cloud.auth.put_user_group',
     'cloud.auth.register',
@@ -126,7 +127,8 @@ def abstracted_handler(params, resource):
         response = {
             'statusCode': 400,
             'body': {
-                'error': cloud.message.error.INVALID_REQUEST
+                'error': cloud.message.error.INVALID_REQUEST,
+                'description': '{}'.format(ex)
             },
             'error': cloud.message.error.INVALID_REQUEST
         }

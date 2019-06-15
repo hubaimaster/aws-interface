@@ -77,4 +77,3 @@ def do(data, resource):
     else:
         body['error'] = error.NO_SUCH_POLICY_MODE
     return Response(body)
-

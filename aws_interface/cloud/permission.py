@@ -135,14 +135,15 @@ class Permission:
             get_users = 'run:cloud.auth.get_users'
             guest = 'run:cloud.auth.guest'
             login = 'run:cloud.auth.login'
+            login_facebook = 'run:cloud.auth.login_facebook'
             logout = 'run:cloud.auth.logout'
             put_user_group = 'run:cloud.auth.put_user_group'
             register = 'run:cloud.auth.register'
             register_admin = 'run:cloud.auth.register_admin'
-            set_email_login = 'run:cloud.auth.set_email_login'
-            set_guest_login = 'run:cloud.auth.set_guest_login'
+            set_login_method = 'run:cloud.auth.set_login_method'
             set_user = 'run:cloud.auth.set_user'
             set_me = 'run:cloud.auth.set_me'
+            get_login_method = 'run:cloud.auth.get_login_method'
 
         class Database:
             create_item = 'run:cloud.database.create_item'
@@ -197,6 +198,7 @@ class Permission:
         Run.Auth.get_session,
         Run.Auth.guest,
         Run.Auth.login,
+        Run.Auth.login_facebook,
         Run.Auth.logout,
         Run.Auth.register,
         Run.Auth.set_me,
@@ -225,7 +227,9 @@ class Permission:
         Run.Auth.register,
         Run.Auth.guest,
         Run.Auth.login,
-        Run.Log.create_log
+        Run.Auth.login_facebook,
+        Run.Auth.get_login_method,
+        Run.Log.create_log,
     ]
 
     def __init__(self, data, resource):
@@ -239,27 +243,12 @@ class Permission:
             groups = user.get('groups', [])
             for group_name in groups:
                 group = self.resource.db_get_item('user-group-{}'.format(group_name))
+                permissions = []
                 if group:
-                    permissions = group.get('permissions', None)
-                else:
-                    permissions = None
-                if permissions:
-                    if permission in permissions:
-                        has_permission = True
-                elif group_name == 'user':
-                    # If user do not have permissions field. It's a version update issue
-                    # Put new user group that have default_user_permissions
-                    from cloud.auth.put_user_group import do
-                    data = {
-                        'params': {
-                            'name': group_name,
-                            'description': 'Default user group',
-                            'permissions': Permission.default_user_permissions,
-                        }
-                    }
-                    do(data, self.resource)
-                    return self.has(permission)
-                elif group_name == 'admin':
+                    permissions = group.get('permissions', [])
+                if permission in permissions:
+                    has_permission = True
+                if group_name == 'admin':
                     has_permission = True
         else:  # No session
             if permission in Permission.unknown_user_permissions:

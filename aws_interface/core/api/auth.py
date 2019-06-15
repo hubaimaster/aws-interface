@@ -14,17 +14,11 @@ class AuthAPI(API):
     def delete_user_group(self, name):
         return self.service_controller.delete_user_group(name)
 
-    def set_email_login(self, enabled, default_group_name):
-        return self.service_controller.set_email_login(enabled, default_group_name)
+    def set_login_method(self, login_method, enabled, default_group_name, register_policy_code):
+        return self.service_controller.set_login_method(login_method, enabled, default_group_name, register_policy_code)
 
-    def set_guest_login(self, enabled, default_group_name):
-        return self.service_controller.set_guest_login(enabled, default_group_name)
-
-    def get_email_login(self):
-        return self.service_controller.get_email_login()
-
-    def get_guest_login(self):
-        return self.service_controller.get_guest_login()
+    def get_login_method(self, login_method):
+        return self.service_controller.get_login_method(login_method)
 
     def create_user(self, email, password, extra):
         return self.service_controller.create_user(email, password, extra)

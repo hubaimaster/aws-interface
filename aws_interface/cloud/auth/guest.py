@@ -2,7 +2,7 @@
 from cloud.crypto import *
 from cloud.response import Response
 import cloud.shortuuid as shortuuid
-import cloud.auth.get_guest_login as get_guest_login
+from cloud.auth.get_login_method import do as get_login_method
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from secrets import token_urlsafe
@@ -41,7 +41,9 @@ def do(data, resource):
 
     guest_id = params.get('guest_id', None)
 
-    login_conf = get_guest_login.do(data, resource)['body']['item']
+    data['params']['login_method'] = 'guest_login'
+    login_conf = get_login_method(data, resource)['body']['item']
+
     default_group_name = login_conf['default_group_name']
     enabled = login_conf['enabled']
     if enabled == 'true':

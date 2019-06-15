@@ -27,8 +27,11 @@ class Auth(LoginRequiredMixin, View):
             context['none_extra_fields'] = ['id', 'creation_date', 'email', 'groups',
                                             'password_hash', 'salt', 'partition', 'login_method']
             context['sessions'] = api.get_sessions()
-            context['email_login'] = api.get_email_login()['item']
-            context['guest_login'] = api.get_guest_login()['item']
+
+            context['email_login'] = api.get_login_method('email_login')['item']
+            context['guest_login'] = api.get_login_method('guest_login')['item']
+            context['facebook_login'] = api.get_login_method('facebook_login')['item']
+
             context['all_permissions'] = api.get_all_permissions()['permissions']
 
         return render(request, 'dashboard/app/auth.html', context=context)
@@ -51,23 +54,16 @@ class Auth(LoginRequiredMixin, View):
                 name = request.POST['group_name']
                 description = request.POST['group_description']
                 api.put_user_group(name, description)
-            elif cmd == 'set_email_login':
+            elif cmd == 'set_login_method':
+                login_method = request.POST['login_method']
                 default_group = request.POST['default_group_name']
                 enabled = request.POST['enabled']
+                register_policy_code = request.POST.get('register_policy_code', None)
                 if enabled == 'true':
                     enabled = True
                 else:
                     enabled = False
-                api.set_email_login(enabled, default_group)
-            elif cmd == 'set_guest_login':
-                default_group = request.POST['default_group_name']
-                enabled = request.POST['enabled']
-                if enabled == 'true':
-                    enabled = True
-                else:
-                    enabled = False
-                api.set_guest_login(enabled, default_group)
-
+                api.set_login_method(login_method, enabled, default_group, register_policy_code)
             elif cmd == 'put_user':
                 email = request.POST['user_email']
                 password = request.POST['user_password']
