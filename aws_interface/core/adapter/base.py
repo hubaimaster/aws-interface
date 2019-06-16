@@ -7,7 +7,7 @@ from sdk.python3.aws_interface import Client
 
 class Adapter(metaclass=ABCMeta):
     """
-    allocation_status: 'busy' | 'able' | 'need'
+    allocation_status: 'busy' | 'able'
     """
     allocation_status = 'able'
 
@@ -60,13 +60,16 @@ class Adapter(metaclass=ABCMeta):
         return allocator.generate_sdk(platform)
 
     def allocate_resource(self):
-        allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
-        allocator.create()
-        return True
+        if self.allocation_status == 'able':
+            self.allocation_status = 'busy'
+            allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
+            allocator.create()
+            self.allocation_status = 'able'
+            return True
 
     def get_allocation_status(self):
         """
-        :return: 'busy' | 'able' | 'need'
+        :return: 'busy' | 'able'
         """
         return self.allocation_status
 

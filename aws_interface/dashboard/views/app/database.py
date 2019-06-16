@@ -6,6 +6,7 @@ from django.http import JsonResponse
 
 from core.adapter.django import DjangoAdapter
 from dashboard.views.utils import Util, page_manage
+from dashboard.views.app.overview import allocate_resource_in_background
 from decimal import Decimal
 import json
 
@@ -17,6 +18,7 @@ class Database(LoginRequiredMixin, View):
         context['app_id'] = app_id
 
         adapter = DjangoAdapter(app_id, request)
+        allocate_resource_in_background(adapter)
         with adapter.open_api_auth() as auth_api, adapter.open_api_database() as database_api:
             partitions = database_api.get_partitions().get('items', [])
             partition_dict = {}

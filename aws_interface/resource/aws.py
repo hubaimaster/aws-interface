@@ -56,16 +56,16 @@ class AWSResourceAllocator(ResourceAllocator):
         self.boto3_session = get_boto3_session(credential)
 
     def create(self):
+        self._create_bucket()
         self._create_dynamo_db_table()
         self._create_lambda_function()
         self._create_rest_api_connection()
-        self._create_bucket()
 
     def terminate(self):
+        self._remove_bucket()
         self._remove_dynamo_db_table()
         self._remove_lambda_function()
         self._remove_rest_api_connection()
-        self._remove_bucket()
 
     def get_rest_api_url(self):
         api_gateway = APIGateway(self.boto3_session)

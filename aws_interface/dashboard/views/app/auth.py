@@ -1,12 +1,13 @@
 """Django - Dashboard application view of Auth service
 """
 from decimal import Decimal
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.template import loader
 from dashboard.views.utils import Util, page_manage
+from dashboard.views.app.overview import allocate_resource_in_background
 from core.adapter.django import DjangoAdapter
 from concurrent.futures import ThreadPoolExecutor
 
@@ -18,6 +19,7 @@ class Auth(LoginRequiredMixin, View):
         context['app_id'] = app_id
 
         adapter = DjangoAdapter(app_id, request)
+        allocate_resource_in_background(adapter)
         with adapter.open_api_auth() as api:
             context['user_groups'] = api.get_user_groups()['groups']
             context['user_count'] = api.get_user_count()
