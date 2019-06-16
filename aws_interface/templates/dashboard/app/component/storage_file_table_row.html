@@ -8,7 +8,7 @@
         <td>{{ file.creation_date|to_date}} </td>
         <td>{{ file.file_size|filesizeformat }} </td>
         <td>
-            <button onclick="delete_b64('{{ item.id }}')" class='btn btn-sm btn-danger'>제거</button>
+            <button onclick="delete_b64('{{ file.id }}')" class='btn btn-sm btn-danger'>제거</button>
         </td>
     </tr>
 {% endfor %}

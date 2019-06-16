@@ -17,10 +17,10 @@ class Client:
         response = requests.post(url, data)
         return response
 
-    def _call_api(self, service_type, function_name, data=None):
+    def call_api(self, service_name, api_name, data=None):
         if not data:
             data = {}
-        data['module_name'] = 'cloud.{}.{}'.format(service_type, function_name)
+        data['module_name'] = 'cloud.{}.{}'.format(service_name, api_name)
         if self.session_id:
             data['session_id'] = self.session_id
         data = json.dumps(data)
@@ -29,21 +29,21 @@ class Client:
 
     def _auth(self, api_name, data):
         self.log_create_log('auth', api_name, None)
-        return self._call_api('auth', api_name, data)
+        return self.call_api('auth', api_name, data)
 
     def _database(self, api_name, data):
         self.log_create_log('database', api_name, None)
-        return self._call_api('database', api_name, data)
+        return self.call_api('database', api_name, data)
 
     def _storage(self, api_name, data):
         self.log_create_log('storage', api_name, None)
-        return self._call_api('storage', api_name, data)
+        return self.call_api('storage', api_name, data)
 
     def _logic(self, api_name, data):
-        return self._call_api('logic', api_name, data)
+        return self.call_api('logic', api_name, data)
 
     def _log(self, api_name, data):
-        return self._call_api('log', api_name, data)
+        return self.call_api('log', api_name, data)
 
     def auth_register(self, email, password, extra={}):
         response = self._auth('register', {
@@ -57,6 +57,13 @@ class Client:
         response = self._auth('login', {
             'email': email,
             'password': password
+        })
+        self.session_id = response.get('session_id', None)
+        return response
+
+    def auth_login_facebook(self, access_token):
+        response = self._auth('login_facebook', {
+            'access_token': access_token,
         })
         self.session_id = response.get('session_id', None)
         return response
@@ -247,14 +254,12 @@ def examples():
     client = Client()
 
     response = client.auth_register(email, password)
-    print('auth_register response: {}'.format(response))
+    print('authRegister response: {}'.format(response))
 
     response = client.auth_login(email, password)
     print('auth_login response: {}'.format(response))
 
-    response = client.database_create_item('test', {
-        'type': 'test',
-    }, read_groups=['owner'], write_groups=['owner'])
+    response = client.database_create_item('test', {'type': 'test'}, read_groups=['owner'], write_groups=['owner'])
     print('database_create_item response: {}'.format(response))
 
     response = client.storage_upload_file('aws_interface.py', read_groups=['owner'], write_groups=['owner'])

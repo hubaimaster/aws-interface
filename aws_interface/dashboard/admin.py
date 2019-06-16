@@ -33,7 +33,7 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ('id', 'tracker', 'creation_date', 'user', 'action', 'target')
     ordering = ['creation_date']
     search_fields = ['id', 'tracker', 'creation_date', 'user', 'action', 'target']
-    list_filter = ['tracker', 'user', 'action', 'target']
+    list_filter = ['user', 'tracker', 'action', 'target']
 
 
 admin.site.register(User, UserAdmin)

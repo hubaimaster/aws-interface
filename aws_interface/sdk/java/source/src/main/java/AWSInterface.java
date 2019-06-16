@@ -49,8 +49,8 @@ public final class AWSInterface {
         });
     }
 
-    private void callAPI(String serviceType, String functionName, HashMap<String, Object> data, CallbackFunction callbackFunction){
-        String module_name = "cloud." + serviceType + "." + functionName;
+    public void callAPI(String serviceName, String apiName, HashMap<String, Object> data, CallbackFunction callbackFunction){
+        String module_name = "cloud." + serviceName + "." + apiName;
         data.put("session_id", sessionId);
         data.put("module_name", module_name);
         String json = new Gson().toJson(data);
@@ -103,6 +103,17 @@ public final class AWSInterface {
         data.put("email", email);
         data.put("password", password);
         auth("login", data, ((response, hasError) -> {
+            if (response.has("session_id")){
+                this.sessionId = response.get("session_id").getAsString();
+            }
+            callbackFunction.callback(response, hasError);
+        }));
+    }
+
+    public void authLoginFacebook(String accessToken, CallbackFunction callbackFunction){
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("access_token", accessToken);
+        auth("login_facebook", data, ((response, hasError) -> {
             if (response.has("session_id")){
                 this.sessionId = response.get("session_id").getAsString();
             }
@@ -180,6 +191,12 @@ public final class AWSInterface {
         HashMap<String, Object> data = new HashMap<>();
         data.put("item_id", itemId);
         database("get_item", data, callbackFunction);
+    }
+
+    public void databaseGetItemCount(String partition, CallbackFunction callbackFunction){
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("partition", partition);
+        database("get_item_count", data, callbackFunction);
     }
 
     public void databaseGetItemCount(String partition, String field, String value, CallbackFunction callbackFunction){

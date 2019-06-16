@@ -6,7 +6,7 @@ from secrets import token_urlsafe
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.auth.get_login_method import match_policy
-from requests import get
+from botocore.vendored.requests import get
 import json
 
 # Define the input output format of the function.

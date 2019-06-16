@@ -127,7 +127,7 @@
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         {% for group in user_groups %}
-                                                                            <a class="dropdown-item" href="#" onclick="put_file_read_group('{{ group.name }}');">{{ group.name }}</a>
+                                                                            <a class="dropdown-item" href="#!" onclick="put_file_read_group('{{ group.name }}');">{{ group.name }}</a>
                                                                         {% endfor %}
                                                                         <div class="dropdown-divider"></div>
                                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -147,7 +147,7 @@
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         {% for group in user_groups %}
-                                                                            <a class="dropdown-item" href="#" onclick="put_file_write_group('{{ group.name }}');">{{ group.name }}</a>
+                                                                            <a class="dropdown-item" href="#!" onclick="put_file_write_group('{{ group.name }}');">{{ group.name }}</a>
                                                                         {% endfor %}
                                                                         <div class="dropdown-divider"></div>
                                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>

@@ -3,15 +3,15 @@ class Client{
 
     constructor() {
         this.set_session_id(null);
-        this.set_base_url('{{REST_API_URL}}');
+        this.setBaseUrl('{{REST_API_URL}}');
     }
 
-    get_base_url(){
-        return this.base_url;
+    getBaseUrl(){
+        return this.baseUrl;
     }
 
-    set_base_url(base_url){
-        this.base_url = base_url;
+    setBaseUrl(baseUrl){
+        this.baseUrl = baseUrl;
     }
 
     get_session_id(){
@@ -22,20 +22,20 @@ class Client{
         this.session_id = session_id;
     }
 
-    static _get(object, key, default_value=null) {
+    static _get(object, key, defaultValue=null) {
         var result = object[key];
-        return (typeof result !== "undefined") ? result : default_value;
+        return (typeof result !== "undefined") ? result : defaultValue;
     }
 
-    _call_api(service_type, function_name, data, callback) {
+    callAPI(service_name, api_name, data, callback) {
         if (data == null){
             data = {};
         }
-        data['module_name'] = 'cloud.' + service_type + '.' + function_name;
+        data['module_name'] = 'cloud.' + service_name + '.' + api_name;
         if (this.get_session_id() != null){
             data['session_id'] = this.get_session_id();
         }
-        this._post(this.get_base_url(), data, callback);
+        this._post(this.getBaseUrl(), data, callback);
     }
 
     _post(url, data, callback){
@@ -45,27 +45,27 @@ class Client{
         req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
         req.onreadystatechange = function (aEvt) {
-          if (req.readyState == 4) {
-            var json = JSON.parse(req.responseText);
-            var body = null;
-            var error = null;
-            if ("body" in json){
-              body = json["body"];
+            if (req.readyState == 4) {
+                var json = JSON.parse(req.responseText);
+                var body = null;
+                var error = null;
+                if ("body" in json){
+                    body = json["body"];
+                }
+                if ("error" in json){
+                    error = json["error"];
+                    console.error(error);
+                }
+                callback(body);
             }
-            if ("error" in json){
-              error = json["error"];
-              console.error(error);
-            }
-            callback(body);
-          }
         };
         req.send(JSON.stringify(data));
     }
 
     _auth(api_name, data, callback) {
         let self = this;
-        this._call_api('auth', api_name, data, function (data) {
-            self.log_create_log('auth', api_name, null, function (data) {
+        this.callAPI('auth', api_name, data, function (data) {
+            self.logCreateLog('auth', api_name, null, function (data) {
 
             });
             callback(data);
@@ -74,8 +74,8 @@ class Client{
 
     _database(api_name, data, callback) {
         let self = this;
-        this._call_api('database', api_name, data, function (data) {
-            self.log_create_log('database', api_name, null, function (data) {
+        this.callAPI('database', api_name, data, function (data) {
+            self.logCreateLog('database', api_name, null, function (data) {
 
             });
             callback(data);
@@ -84,8 +84,8 @@ class Client{
 
     _storage(api_name, data, callback) {
         let self = this;
-        this._call_api('storage', api_name, data, function (data) {
-            self.log_create_log('storage', api_name, null, function (data) {
+        this.callAPI('storage', api_name, data, function (data) {
+            self.logCreateLog('storage', api_name, null, function (data) {
 
             });
             callback(data);
@@ -93,14 +93,14 @@ class Client{
     }
 
     _logic(api_name, data, callback) {
-        this._call_api('logic', api_name, data, callback);
+        this.callAPI('logic', api_name, data, callback);
     }
 
     _log(api_name, data, callback) {
-        this._call_api('log', api_name, data, callback);
+        this.callAPI('log', api_name, data, callback);
     }
 
-    auth_register(email, password, extra={}, callback) {
+    authRegister(email, password, extra={}, callback) {
         this._auth('register', {
             'email': email,
             'password': password,
@@ -108,7 +108,7 @@ class Client{
         }, callback);
     }
 
-    auth_login(email, password, callback) {
+    authLogin(email, password, callback) {
         let self = this;
         this._auth('login', {
             'email': email,
@@ -121,25 +121,37 @@ class Client{
         });
     }
 
-    auth_get_user(user_id, callback) {
+    authLoginFacebook(access_token, callback) {
+        let self = this;
+        this._auth('login_facebook', {
+            'access_token': access_token,
+        }, function (data) {
+            if ('session_id' in data){
+                self.set_session_id(Client._get(data,'session_id'));
+            }
+            callback(data);
+        });
+    }
+
+    authGetUser(user_id, callback) {
         this._auth('get_user', {
             'user_id': user_id,
         }, callback);
     }
 
-    auth_get_users(start_key=null, callback) {
+    authGetUsers(start_key=null, callback) {
         this._auth('get_users', {
             'start_key': start_key,
         }, callback);
     }
 
-    auth_logout(callback) {
+    authLogout(callback) {
         this._auth('logout', {
             'session_id': this.get_session_id(),
         }, callback);
     }
 
-    auth_guest(guest_id=null, callback) {
+    authGuest(guest_id=null, callback) {
         let self = this;
         this._auth('guest', {
             'guest_id': guest_id,
@@ -149,7 +161,7 @@ class Client{
         });
     }
 
-    database_create_item(partition, item, read_groups, write_groups, callback) {
+    databaseCreateItem(partition, item, read_groups, write_groups, callback) {
         this._database('create_item', {
             'item': item,
             'partition': partition,
@@ -158,19 +170,19 @@ class Client{
         }, callback);
     }
 
-    database_delete_item(item_id, callback) {
+    databaseDeleteItem(item_id, callback) {
         this._database('delete_item', {
             'item_id': item_id,
         }, callback);
     }
 
-    database_get_item(item_id, callback) {
+    databaseGetItem(item_id, callback) {
         this._database('get_item', {
             'item_id': item_id,
         }, callback);
     }
 
-    database_get_item_count(partition, field=null, value=null, callback) {
+    databaseGetItemCount(partition, field=null, value=null, callback) {
         this._database('get_item_count', {
             'item_id': item_id,
             'field': field,
@@ -178,7 +190,7 @@ class Client{
         }, callback);
     }
 
-    database_get_items(partition, start_key=null, limit=100, callback) {
+    databaseGetItems(partition, start_key=null, limit=100, callback) {
         this._database('get_items', {
             'partition': partition,
             'start_key': start_key,
@@ -186,7 +198,7 @@ class Client{
         }, callback);
     }
 
-    database_put_item_field(item_id, field_name, field_value, callback) {
+    databasePutItemField(item_id, field_name, field_value, callback) {
         this._database('put_item_field', {
             'item_id': item_id,
             'field_name': field_name,
@@ -194,7 +206,7 @@ class Client{
         }, callback);
     }
 
-    database_update_item(item_id, item, read_groups, write_groups, callback) {
+    databaseUpdateItem(item_id, item, read_groups, write_groups, callback) {
         this._database('update_item', {
             'item_id': item_id,
             'item': item,
@@ -203,7 +215,7 @@ class Client{
         }, callback);
     }
 
-    database_query_items(partition, query, start_key=null, limit=100, reverse=false, callback) {
+    databaseQueryItems(partition, query, start_key=null, limit=100, reverse=false, callback) {
         this._database('query_items', {
             'partition': partition,
             'query': query,
@@ -213,19 +225,19 @@ class Client{
         }, callback);
     }
 
-    storage_delete_b64(file_id, callback) {
+    storageDeleteB64(file_id, callback) {
         this._storage('delete_b64', {
             'file_id': file_id,
         }, callback);
     }
 
-    storage_download_b64_chunk(file_id, callback) {
+    storageDownloadB64Chunk(file_id, callback) {
         this._storage('download_b64', {
             'file_id': file_id,
         }, callback);
     }
 
-    storage_upload_b64_chunk(parent_file_id, file_name, file_b64, read_groups, write_groups, callback) {
+    storageUploadB64Chunk(parent_file_id, file_name, file_b64, read_groups, write_groups, callback) {
         this._storage('upload_b64', {
             'parent_file_id': parent_file_id,
             'file_name': file_name,
@@ -235,16 +247,16 @@ class Client{
         }, callback);
     }
 
-    storage_delete_file(file_id, callback) {
-        this.storage_delete_b64(file_id, callback);
+    storageDeleteFile(file_id, callback) {
+        this.storageDeleteB64(file_id, callback);
     }
 
-    storage_download_file(file_id, callback_file) {
+    storageDownloadFile(file_id, callback_file) {
         let self = this;
         var string_file_b64 = null;
         var file_name = 'file';
         function download(file_id, callback){
-            self.storage_download_b64_chunk(file_id, function (result) {
+            self.storageDownloadB64Chunk(file_id, function (result) {
                 file_id = Client._get(result, 'parent_file_id', null);
                 file_name = Client._get(result,'file_name', file_name);
                 if (string_file_b64 != null){
@@ -270,7 +282,7 @@ class Client{
         });
     }
 
-    storage_upload_file(bin, read_groups, write_groups, callback) {
+    storageUploadFile(bin, read_groups, write_groups, callback) {
         let self = this;
         function *div_chunks(text, n){
             for (var i = 0; i < text.length; i+= n){
@@ -285,7 +297,7 @@ class Client{
         let file_name = "file";
         function upload(parent_file_id, base64_chunk, callback){
             base64_chunk = base64_chunk.toString();
-            self.storage_upload_b64_chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups, function (data) {
+            self.storageUploadB64Chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups, function (data) {
                 var parent_file_id = data['file_id'];
                 var next_base64_chunk = base64_chunks.next();
                 if (next_base64_chunk.done){
@@ -298,7 +310,7 @@ class Client{
         upload(parent_file_id, base64_chunks.next().value, callback);
     }
 
-    log_create_log(event_source, event_name, event_param, callback) {
+    logCreateLog(event_source, event_name, event_param, callback) {
         this._log('create_log', {
             'event_source': event_source,
             'event_name': event_name,
@@ -306,7 +318,7 @@ class Client{
         }, callback);
     }
 
-    logic_run_function(function_name, payload, callback){
+    logicRunFunction(function_name, payload, callback){
         this._logic('logic', {
             'function_name': function_name,
             'payload': payload,
