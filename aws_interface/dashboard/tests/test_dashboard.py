@@ -16,6 +16,7 @@ from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import select
+from botocore.exceptions import ClientError
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(settings.__file__)))
@@ -140,6 +141,7 @@ class DashboardTestCase(StaticLiveServerTestCase):
             overlay_count = len(self.browser.find_elements_by_class_name('loadingoverlay'))
             if overlay_count == 0:
                 break
+        time.sleep(LONG_DELAY * 6)
 
     def _is_alert_presented(self):
         try:
@@ -188,11 +190,13 @@ class DashboardTestCase(StaticLiveServerTestCase):
         from dashboard.tests.bill import BillTestProcess
         from dashboard.tests.database import DatabaseTestProcess
         from dashboard.tests.storage import StorageTestProcess
+        from dashboard.tests.logic import LogicTestProcess
         from dashboard.tests.sdk import SDKTestProcess
         #AuthTestProcess(self).do_test()
         #BillTestProcess(self).do_test()
-        #DatabaseTestProcess(self).do_test()
+        DatabaseTestProcess(self).do_test()
         StorageTestProcess(self).do_test()
+        #LogicTestProcess(self).do_test()
         #SDKTestProcess(self).do_test()
 
     def test(self):

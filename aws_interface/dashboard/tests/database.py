@@ -313,6 +313,7 @@ class DatabaseTestProcess:
         time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._has_field(FIELD_NAME, FIELD_VALUE))
         time.sleep(DELAY)
+        """
         self._remove_element("field", FIELD_NAME)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertFalse(self._has_field(FIELD_NAME, FIELD_VALUE))
@@ -326,3 +327,4 @@ class DatabaseTestProcess:
         self._remove_element("partition", PARTITION_NAME)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertFalse(self._has_partition(PARTITION_NAME))
+        """
