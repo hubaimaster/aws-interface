@@ -363,7 +363,7 @@ class AuthTestProcess:
         self._select_login_method("guest_default_group", 'user, "guest_enabled")
         time.sleep(DELAY)
         """
-        #USER
+        # USER
         self._create_user(email, password)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._has_user_email(email))
