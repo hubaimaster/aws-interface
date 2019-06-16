@@ -150,7 +150,7 @@
                                         {% for partition in partitions %}
                                             <tr>
                                                 <th id="{{ partition.name }}" name="partition" scope="row" onclick="set_partition('{{ partition.name }}');">
-                                                    <a href="#" onmouseover="style='text-decoration:underline'" onmouseout="style='text-decoration:none'">{{ partition.name }}</a>
+                                                    <a href="#!" onmouseover="style='text-decoration:underline'" onmouseout="style='text-decoration:none'">{{ partition.name }}</a>
                                                     <div style="text-align: right; float: right;">
                                                         <div class="custom-control custom-checkbox mt--3">
                                                             <input class="custom-control-input" type="checkbox" name="checkbox-partition" id="partition-{{ partition.name }}" value="{{ partition.name }}">
@@ -328,7 +328,7 @@
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         {% for group in user_groups %}
-                                                                            <a class="dropdown-item" href="#" onclick="put_read_group('{{ group.name }}');">{{ group.name }}</a>
+                                                                            <a class="dropdown-item" href="#!" onclick="put_read_group('{{ group.name }}');">{{ group.name }}</a>
                                                                         {% endfor %}
                                                                         <div class="dropdown-divider"></div>
                                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -348,7 +348,7 @@
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         {% for group in user_groups %}
-                                                                            <a class="dropdown-item" href="#" onclick="put_write_group('{{ group.name }}');">{{ group.name }}</a>
+                                                                            <a class="dropdown-item" href="#!" onclick="put_write_group('{{ group.name }}');">{{ group.name }}</a>
                                                                         {% endfor %}
                                                                         <div class="dropdown-divider"></div>
                                                                         <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
@@ -518,7 +518,7 @@
                     var iid = items[i]["id"];
                     var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\">" +
                         "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" +
-                        "<text><a href=\"#\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">"  + iid + "</a></text>" +
+                        "<text><a href=\"#!\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">"  + iid + "</a></text>" +
                         "<div style=\"text-align: right; float: right;\">" +
                         "<div class=\"custom-control custom-checkbox mt--3\">" +
                         "<input class=\"custom-control-input\" type=\"checkbox\" name=\"checkbox-item\" id=\"item-" + iid + "\" value=\"" + iid + "\">" +
@@ -533,7 +533,7 @@
         }
         function append_more_button() {
             var more = "<tr name='more-item' style=\"display:table; width:100%; table-layout:fixed;\">" +
-                "<th style='vertical-align:middle;' onclick=\"append_more_items();\" scope=\"row\"><a href=\"#\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">항목 더 보기 + </a>" +
+                "<th style='vertical-align:middle;' onclick=\"append_more_items();\" scope=\"row\"><a href=\"#!\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">항목 더 보기 + </a>" +
                 "</th></tr>";
             $("#item-table").append(more);
         }
