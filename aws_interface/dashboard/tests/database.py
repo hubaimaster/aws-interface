@@ -1,5 +1,5 @@
 from dashboard.tests.test_dashboard import *
-import sys
+
 
 class DatabaseTestProcess:
     def __init__(self, parent):
@@ -17,16 +17,27 @@ class DatabaseTestProcess:
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('add-partition-btn').click()
 
-    def _has_partition(self, partition):
+    def _has_partition(self, partition_name):
         """
-        Check if partition with name [partition] exists.
+        Check if partition with name [partition_name] exists.
         :param partition:
         :return: bool
         """
-        partition_obj = self.parent.browser.find_element_by_id('partition-{}'.format(partition))
-        return partition_obj
+        partitions = self.parent.browser.find_elements_by_name('partition')
+        for partition in partitions:
+            if partition.text.strip() == partition_name:
+                print("[{}] exists".format(partition_name))
+                return True
+        return False
 
     def _add_id_on_partition_table(self):
+        """
+        Add id 'partition-table' to partition table
+        :return:
+        """
+        partition_table = self.parent.browser.find_element_by_tag_name('table')
+        self.parent.browser.execute_script("arguments[0].id = 'partition-table'", partition_table)
+        print("Added id partition-table on partition table")
         return
 
     def _select_parition_and_mode_in_policy_function(self, partition_name, mode):
@@ -167,13 +178,14 @@ class DatabaseTestProcess:
         """
         item_table = self.parent.browser.find_element_by_id('item-table')
         item_table.find_element_by_name('item').click()
-        time.sleep(LONG_DELAY * 2 )
+        time.sleep(LONG_DELAY * 2)
         field_table = self.parent.browser.find_element_by_id('field-table')
         item_fields = [label.text.strip() for label in field_table.find_elements_by_tag_name('label')]
         result = True
         for field in field_list:
             if field not in item_fields:
                 result = False
+        print("{} are in fields".format(field_list))
         return result
 
     def _add_field(self, field_name, field_type, field_value):
@@ -226,17 +238,15 @@ class DatabaseTestProcess:
         :param element_name: name of element to remove
         :return:
         """
+        element_table = self.parent.browser.find_element_by_id('{}-table'.format(element_type))
         if element_type == "item":
-            element_table = self.parent.browser.find_element_by_id('{}-table'.format(element_type))
             check_box = element_table.find_element_by_name(element_type)
             check_box = check_box.find_element_by_name('checkbox-{}'.format(element_type))
         else:
-            check_box = self.parent.browser.find_element_by_id('{}-{}'.format(element_type, element_name))
+            check_box = element_table.find_element_by_id('{}-{}'.format(element_type, element_name))
         self.parent.browser.execute_script("arguments[0].checked = true;", check_box)
         time.sleep(DELAY)
         print("Is check box selected? : {}".format(check_box.is_selected()))
-        element_table = self.parent.browser.find_element_by_id('open-put-{}-modal'.format(element_type))
-        element_table = element_table.find_element_by_xpath('..')
         element_table.find_element_by_id('dropdownMenuButton').click()
         time.sleep(DELAY)
         element_table.find_element_by_css_selector('a[onclick="delete_checked_{}s();"]'.format(element_type)).click()
@@ -263,8 +273,7 @@ class DatabaseTestProcess:
                 self.parent.browser.refresh()
                 time.sleep(LONG_DELAY * 4)
                 print('Wait...')
-            except StaleElementReferenceException as e:
-                print(e)
+            except StaleElementReferenceException:
                 pass
         duration = time.time() - start_time
         print('duration: {} s'.format(duration))
@@ -301,10 +310,9 @@ class DatabaseTestProcess:
         self.parent.assertTrue(self._click_item_and_check_fields(FIELD_LIST))
         time.sleep(DELAY)
         self._add_field(FIELD_NAME, FIELD_TYPE, FIELD_VALUE)
-        time.sleep(LONG_DELAY * 2 )
+        time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._has_field(FIELD_NAME, FIELD_VALUE))
         time.sleep(DELAY)
-        """
         self._remove_element("field", FIELD_NAME)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertFalse(self._has_field(FIELD_NAME, FIELD_VALUE))
@@ -313,7 +321,8 @@ class DatabaseTestProcess:
         time.sleep(LONG_DELAY * 2)
         self.parent.assertFalse(self._has_item())
         time.sleep(DELAY)
+        self._add_id_on_partition_table()
+        time.sleep(DELAY)
         self._remove_element("partition", PARTITION_NAME)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertFalse(self._has_partition(PARTITION_NAME))
-        """
