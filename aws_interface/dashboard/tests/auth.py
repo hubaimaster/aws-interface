@@ -282,7 +282,7 @@ class AuthTestProcess:
                 if extra.text.strip() == "{} : {}".format(extra_name, extra_value):
                     print("[{}] is in extra column".format(extra.text))
                     return True
-                break
+        print("[{}] [{}] is not in extra column".format(extra_name, extra_value))
         return False
 
     def _click_load_more_users_button(self):
@@ -315,8 +315,7 @@ class AuthTestProcess:
                 self.parent.browser.refresh()
                 time.sleep(LONG_DELAY * 4)
                 print('Wait...')
-            except StaleElementReferenceException as e:
-                print(e)
+            except StaleElementReferenceException:
                 pass
         duration = time.time() - start_time
         print('duration: {} s'.format(duration))

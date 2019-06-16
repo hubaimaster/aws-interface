@@ -186,11 +186,13 @@ class DashboardTestCase(StaticLiveServerTestCase):
     def do_test_process(self):
         from dashboard.tests.auth import AuthTestProcess
         from dashboard.tests.bill import BillTestProcess
-        from dashboard.tests.sdk import SDKTestProcess
         from dashboard.tests.database import DatabaseTestProcess
+        from dashboard.tests.storage import StorageTestProcess
+        from dashboard.tests.sdk import SDKTestProcess
         #AuthTestProcess(self).do_test()
         #BillTestProcess(self).do_test()
-        DatabaseTestProcess(self).do_test()
+        #DatabaseTestProcess(self).do_test()
+        StorageTestProcess(self).do_test()
         #SDKTestProcess(self).do_test()
 
     def test(self):
