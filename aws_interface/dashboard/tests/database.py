@@ -277,6 +277,7 @@ class DatabaseTestProcess:
                 pass
         duration = time.time() - start_time
         print('duration: {} s'.format(duration))
+        print("****START TESTING DATABASE****")
 
         self.parent.assert_view_tag('database')
         time.sleep(LONG_DELAY)
@@ -284,17 +285,18 @@ class DatabaseTestProcess:
         time.sleep(LONG_DELAY * 4)
         self.parent.assertTrue(self._has_partition(PARTITION_NAME))
         time.sleep(DELAY)
+        # Only leave code that is needed for storage testing to save time
         self._select_parition_and_mode_in_policy_function(PARTITION_NAME, MODE)
         time.sleep(DELAY)
         self._write_policy_function(CODE)
         time.sleep(DELAY)
         self._save_policy_function()
         time.sleep(LONG_DELAY)
-        #self._has_code_in_policy_function(PARTITION_NAME, MODE, CODE)
         self.parent.assertTrue(self._has_code_in_policy_function(PARTITION_NAME, MODE, CODE))
         time.sleep(DELAY)
         self.parent.assertTrue(self._open_add_item_modal(PARTITION_NAME))
         time.sleep(DELAY)
+        # Only leave code that is needed for storage testing to save time
         self._remove_readable_user(USER_NAME)
         time.sleep(LONG_DELAY)
         self.parent.assertFalse(self._has_readable_user(USER_NAME))
@@ -307,6 +309,7 @@ class DatabaseTestProcess:
         time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._get_item_count() == 1)
         time.sleep(DELAY)
+        # Only leave code that is needed for storage testing to save time
         self.parent.assertTrue(self._click_item_and_check_fields(FIELD_LIST))
         time.sleep(DELAY)
         self._add_field(FIELD_NAME, FIELD_TYPE, FIELD_VALUE)

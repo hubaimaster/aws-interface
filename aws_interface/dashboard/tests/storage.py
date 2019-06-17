@@ -73,11 +73,11 @@ class StorageTestProcess:
         for tr in file_table.find_elements_by_tag_name('tr')[1:]:
             if tr.find_elements_by_tag_name('td')[1].text.strip() == textfile:
                 file_link = tr.find_element_by_tag_name('a').get_attribute('href')
-                print("Download link : {}".format(file_link))
                 self.parent.browser.get(file_link)
+                print("Download link : {}".format(file_link))
                 print("Downloaded [{}] at {}".format(textfile, self.parent.download_dir))
                 break
-        time.sleep(DELAY)
+        time.sleep(LONG_DELAY * 2)
         with open(os.path.join(self.parent.download_dir, textfile), 'r') as downloaded_file:
             with open(self.file_dir, 'r') as original_file:
                 print("opened file")
@@ -99,6 +99,7 @@ class StorageTestProcess:
 
     def do_test(self):
         TEXTFILE = 'sample.txt'
+        os.path.dirname(os.path.dirname(os.path.abspath(settings.__file__)))
 
         time.sleep(DELAY)
         start_time = time.time()
@@ -115,19 +116,20 @@ class StorageTestProcess:
                 pass
         duration = time.time() - start_time
         print('duration: {} s'.format(duration))
+        print("****START TESTING STORAGE****")
 
         self.parent.assert_view_tag('storage')
         time.sleep(LONG_DELAY)
         self._click_file_upload_button()
-        time.sleep(LONG_DELAY)
-        self._attach_file_on_file_upload_modal(TEXTFILE)
         time.sleep(DELAY)
+        self._attach_file_on_file_upload_modal(TEXTFILE)
+        time.sleep(LONG_DELAY)
         self._click_accept_in_file_upload_modal()
         time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._has_file(TEXTFILE))
         time.sleep(DELAY)
         self.parent.assertTrue(self._download_and_compare_file(TEXTFILE))
         time.sleep(DELAY)
-        # self._remove_file(TEXTFILE)
-        # time.sleep(LONG_DELAY * 6)
-        # self.parent.assertFalse(self._has_file(TEXTFILE))
+        self._remove_file(TEXTFILE)
+        time.sleep(LONG_DELAY * 6)
+        self.parent.assertFalse(self._has_file(TEXTFILE))
