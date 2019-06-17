@@ -313,8 +313,8 @@ class AuthTestProcess:
     def do_test(self):
         GROUP_NAME = 'TEST-GROUP'
         GROUP_DESC = 'Group for testing'
-        EMAIL = 'test@email.com'
-        PASSWORD = 'testpassword1234'
+        TEST_EMAIL = 'test@email.com'
+        TEST_PASSWORD = 'testpassword1234'
         AUTH_LOGIN = 'run:cloud.auth.login'
         AUTH_LOGOUT = 'run:cloud.auth.logout'
         FIELD_NAME = "extra_test"
@@ -352,7 +352,7 @@ class AuthTestProcess:
         self.parent.assertTrue(self._has_authorization(GROUP_NAME, AUTH_LOGIN))
         time.sleep(LONG_DELAY)
         self.parent.assertFalse(self._has_authorization(GROUP_NAME, AUTH_LOGOUT))
-        time.sleep(LONG_DELAY )
+        time.sleep(LONG_DELAY)
         self._add_authorization(GROUP_NAME, AUTH_LOGOUT)
         time.sleep(LONG_DELAY * 3)
         self.parent.assertTrue(self._has_authorization(GROUP_NAME, AUTH_LOGOUT))
@@ -375,9 +375,9 @@ class AuthTestProcess:
         self._select_login_method("guest_default_group", 'user', "guest_enabled")
         time.sleep(DELAY)
         # USER
-        self._create_user(EMAIL, PASSWORD)
+        self._create_user(TEST_EMAIL, TEST_PASSWORD)
         time.sleep(LONG_DELAY * 2)
-        self.parent.assertTrue(self._has_user_email(EMAIL))
+        self.parent.assertTrue(self._has_user_email(TEST_EMAIL))
         time.sleep(DELAY)
         self.parent.assertTrue(self._get_user_count() == 1)
         time.sleep(DELAY)
@@ -401,7 +401,7 @@ class AuthTestProcess:
         time.sleep(DELAY)
         self._click_checkbox_and_delete_selected_in_user()
         time.sleep(LONG_DELAY * 6)
-        self.parent.assertFalse(self._has_user_email(EMAIL))
+        self.parent.assertFalse(self._has_user_email(TEST_EMAIL))
         # USERGROUP - remove
         self._remove_user_group(GROUP_NAME)
         time.sleep(LONG_DELAY * 2)

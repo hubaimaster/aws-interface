@@ -10,28 +10,29 @@ import threading
 import time
 
 
-class Overview(LoginRequiredMixin, View):
-    @classmethod
-    def allocate_resource_in_background(cls, adapter, request):
-        def do_allocation(retry_count=0):
-            try:
-                adapter.allocate_resource()
-            except Exception as ex:
-                print(ex)
-                delay = 15
-                print('System will reallocate resources after {} seconds'.format(delay))
-                time.sleep(delay)
-                if retry_count < 4:
-                    do_allocation(retry_count + 1)
-        background_thread = threading.Thread(target=do_allocation)
-        background_thread.start()
+def allocate_resource_in_background(adapter):
+    def do_allocation(retry_count=0):
+        try:
+            adapter.allocate_resource()
+        except Exception as ex:
+            print(ex)
+            delay = 15
+            print('System will reallocate resources after {} seconds'.format(delay))
+            time.sleep(delay)
+            if retry_count < 4:
+                do_allocation(retry_count + 1)
 
+    background_thread = threading.Thread(target=do_allocation)
+    background_thread.start()
+
+
+class Overview(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
         cmd = request.GET.get('cmd', None)
         platform = request.GET.get('platform', 'python3')
         adapter = DjangoAdapter(app_id, request)
-        self.allocate_resource_in_background(adapter, request)
+        allocate_resource_in_background(adapter)
         if cmd == 'download_sdk':
             Util.log('app-overview', request.user, 'download-sdk-{}'.format(platform))
             sdk_bin = adapter.generate_sdk(platform)

@@ -48,7 +48,6 @@ class StorageTestProcess:
         self.parent.browser.find_element_by_id('upload-file').click()
         print("Uploaded file")
 
-
     def _has_file(self, textfile):
         """
         Check if textfile exists in file table
@@ -97,7 +96,6 @@ class StorageTestProcess:
                 tr.find_element_by_tag_name('button').click()
                 print("Removed [{}]".format(textfile))
                 return
-
 
     def do_test(self):
         TEXTFILE = 'sample.txt'
