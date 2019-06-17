@@ -98,6 +98,7 @@ class StorageTestProcess:
                 print("Removed [{}]".format(textfile))
                 return
 
+
     def do_test(self):
         TEXTFILE = 'sample.txt'
         os.path.dirname(os.path.dirname(os.path.abspath(settings.__file__)))
