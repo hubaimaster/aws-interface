@@ -118,6 +118,7 @@ class StorageTestProcess:
                 pass
         duration = time.time() - start_time
         print('duration: {} s'.format(duration))
+        print("****START TESTING DATABASE****")
 
         self.parent.assert_view_tag('storage')
         time.sleep(LONG_DELAY)

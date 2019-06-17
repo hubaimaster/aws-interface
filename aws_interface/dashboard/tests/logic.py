@@ -37,9 +37,9 @@ class LogicTestProcess:
         self.parent.browser.find_elements_by_id('create-function')[1].click()
         print("Function is set with [{}], [{}], [{}], [{}]".format(function_name, function_runtime, function_desc, function_file, function_handler))
 
-    def _click_and_check_function(self, function_name):
+    def _accept_and_has_function(self, function_name):
         """
-        Check if [function_name] exists in function table
+        Click accept button and check if [function_name] exists in function table
         :param function_name: name of function to check
         :return: bool
         """
@@ -52,6 +52,47 @@ class LogicTestProcess:
                 return True
         return False
 
+    def _open_testcase_modal(self):
+        self.parent.find_element_by_css_selector('a[data-target="#modal-create-function-test"]').click()
+        time.sleep(DELAY)
+        testcase_modal = self.parent.find_element_by_id('modal-create-function-test')
+        for style in testcase_modal.get_attribtue('style').text.split(';'):
+            if style.strip() == 'display: block':
+                print("Testcase modal is opened")
+                return True
+        print("Testcase modal is not opened")
+        return False
+
+    def _set_testcase(self, testcase_name, testcase_function, testcase_pageload):
+        testcase_modal = self.parent.find_element_by_id('modal-create-function-test')
+        testcase_modal.find_element_by_name('test_name').send_keys(testcase_name)
+        time.sleep(DELAY)
+        select_box = select.Select(testcase_modal.parent.find_element_by_name('function_name'))
+        select_box.select_by_value(testcase_function)
+        time.sleep(DELAY)
+        testcase_modal.find_element_by_id('test_input').send_keys(testcase_pageload)
+        time.sleep(DELAY)
+        testcase_modal.find_element_by_id('create-function-test').click()
+
+    def _has_testcase(self, testcase_name):
+        testcase_table = self.parent.find_element_by_tag_name('tbody')
+        for th in testcase_table.find_elements_by_tag_name('th'):
+            if th.text.strip() == testcase_name:
+                print("[{}] exists".format(testcase_name))
+                return True
+        return False
+
+    def _open_test_result(self, testcase_name):
+        css_pattern = 'button[onclick^="run_function"][onclick*="{}"]'.format(testcase_name)
+        self.parent.browser.find_element_by_css_selector(css_pattern).click()
+        time.sleep(LONG_DELAY)
+        test_result = self.parent.browser.find_element_by_id('modal-test-result')
+        for style in test_result.get_attribute('style').split(';'):
+            if style.strip() == 'display: block;':
+                print("Test result modal is open")
+                return True
+        return False
+
 
     def do_test(self):
         FUNCTION_NAME = 'test-function'
@@ -61,6 +102,9 @@ class LogicTestProcess:
         FUNCTION_FILE = 'test.zip'
         FUNCTION_FILE = os.path.join(FUNCTION_DIR, FUNCTION_FILE)
         FUNCTION_HANDLER = 'test.handler'
+        TESTCASE_NAME = 'test-case'
+        TESTCASE_FUNCTION = 'test-function'
+        TESTCASE_PAGELOAD = '{"answer": 10}'
 
         time.sleep(DELAY)
         start_time = time.time()
@@ -83,4 +127,14 @@ class LogicTestProcess:
         self._click_create_function()
         time.sleep(LONG_DELAY)
         self._set_function(FUNCTION_NAME, FUNCTION_RUNTIME, FUNCTION_DESC, FUNCTION_DIR, FUNCTION_HANDLER)
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._accept_and_has_function())
+        time.sleep(DELAY)
+        self._open_testcase_modal()
+        time.sleep(DELAY)
+        self._set_testcase(TESTCASE_NAME, TESTCASE_FUNCTION, TESTCASE_PAGELOAD)
+        time.sleep(LONG_DELAY * 2)
+        self.parent.assertTrue(TESTCASE_NAME)
+        time.sleep(DELAY)
+        self._open_test_result(TESTCASE_NAME)
         time.sleep(DELAY)

@@ -63,6 +63,8 @@ class DashboardTestCase(StaticLiveServerTestCase):
         self._set_register()
         self._set_login()
         self._create_app()
+        print("Delay for allocating resources")
+        time.sleep(LONG_DELAY * 10)
         self.is_init = True
 
     def get_options(self):
@@ -192,7 +194,7 @@ class DashboardTestCase(StaticLiveServerTestCase):
         from dashboard.tests.storage import StorageTestProcess
         from dashboard.tests.logic import LogicTestProcess
         from dashboard.tests.sdk import SDKTestProcess
-        #AuthTestProcess(self).do_test()
+        AuthTestProcess(self).do_test()
         #BillTestProcess(self).do_test()
         DatabaseTestProcess(self).do_test()
         StorageTestProcess(self).do_test()
