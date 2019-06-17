@@ -4,10 +4,11 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from dashboard.views.utils import Util, page_manage
-from dashboard.views.app.overview import Overview
+from dashboard.views.app.overview import allocate_resource_in_background
 from core.adapter.django import DjangoAdapter
 import json
 import base64
+import time
 
 
 class Logic(LoginRequiredMixin, View):
@@ -39,6 +40,8 @@ class Logic(LoginRequiredMixin, View):
                 zip_file_bin = zip_file.read()
                 zip_file_bin = base64.b64encode(zip_file_bin)
                 zip_file_bin = zip_file_bin.decode('utf-8')
+                if not description:
+                    description = None
                 logic_api.create_function(function_name, description, runtime, handler, zip_file_bin, True)
             elif cmd == 'create_function_test':
                 test_name = request.POST.get('test_name')
@@ -46,17 +49,18 @@ class Logic(LoginRequiredMixin, View):
                 test_input = request.POST.get('test_input')
                 logic_api.create_function_test(test_name, function_name, test_input)
             elif cmd == 'run_function':
-                # TODO It could be serious problem -> User can invoke dangerous code via run_function
-                #  Using SDK to solve this [ Run on cloud server-less service ]
-                sdk_client = adapter.get_sdk()
-
-                function_name = request.POST.get('function_name')
-                payload = request.POST.get('payload')
-                payload = json.loads(payload)
-                sdk_client.auth_guest()
-                data = sdk_client.logic_run_function(function_name, payload)
-                # data = logic_api.run_function(function_name, payload)
-                return JsonResponse(data)
+                with adapter.open_sdk() as sdk_client:
+                    # TODO SDK Sign-up Login and authentication takes a lot of time.
+                    #  We are planning to store the SDK ID Password in the session.
+                    function_name = request.POST.get('function_name')
+                    payload = request.POST.get('payload')
+                    payload = json.loads(payload)
+                    sdk_client.auth_guest()
+                    start = time.time()
+                    data = sdk_client.logic_run_function(function_name, payload)
+                    end = time.time()
+                    data['duration'] = end - start
+                    return JsonResponse(data)
             elif cmd == 'delete_function_test':
                 test_name = request.POST.get('test_name')
                 logic_api.delete_function_test(test_name)
@@ -87,7 +91,6 @@ class LogicEdit(LoginRequiredMixin, View):
             context['file_paths'] = file_paths
             context['current_path'] = current_path
             context['current_file'] = logic_api.get_function_file(function_name, current_path).get('item')
-
         return render(request, 'dashboard/app/logic_edit.html', context=context)
 
     def post(self, request, app_id, function_name):
@@ -107,7 +110,7 @@ class LogicEdit(LoginRequiredMixin, View):
                 file_content = request.POST.get('file_content')
                 file_type = request.POST.get('file_type', 'text')
                 result = logic_api.put_function_file(function_name, file_path, file_content, file_type)
-                Overview.allocate_resource_in_background(adapter, request)
+                allocate_resource_in_background(adapter)
                 return JsonResponse(result)
             elif cmd == 'update_function':
                 function_name = request.POST.get('function_name', None)

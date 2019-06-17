@@ -48,8 +48,8 @@ def do(data, resource):
         item = items[0]
         zip_file_id = item['zip_file_id']
         zip_file_bin = resource.file_download_bin(zip_file_id)
-        zip_temp_dir = tempfile.mktemp(prefix='/tmp/')
-        extracted_dir = tempfile.mkdtemp(prefix='/tmp/')
+        zip_temp_dir = tempfile.mktemp()
+        extracted_dir = tempfile.mkdtemp()
         with open(zip_temp_dir, 'wb') as zip_temp:
             zip_temp.write(zip_file_bin)
         with ZipFile(zip_temp_dir) as zip_file:

@@ -3,6 +3,7 @@ from core.api import *
 from resource import get_resource_allocator
 from contextlib import contextmanager
 from sdk.python3.aws_interface import Client
+from shortuuid import uuid
 
 
 class Adapter(metaclass=ABCMeta):
@@ -77,7 +78,35 @@ class Adapter(metaclass=ABCMeta):
         allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
         allocator.terminate()
 
+    @DeprecationWarning
     def get_sdk(self):
+        """
+        This function should be destroyed.
+        You should have to use open_sdk(..) instead.
+        :return:
+        """
         allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
         client = Client(allocator.get_rest_api_url())
         return client
+
+    @contextmanager
+    def open_sdk(self, groups=['admin']):
+        """
+        Return SDK object that has been logged-in as group in groups
+        :param groups: Groups the logged in user belongs to
+        :return: Client
+        """
+        allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
+        client = Client(allocator.get_rest_api_url())
+        with self.open_api_auth() as auth_api:
+            email = '{}@admin.com'.format(uuid())
+            password = '{}'.format(uuid())
+            auth_api.create_user(email, password, {})
+            client.auth_login(email, password)
+            resp = client.auth_get_me()
+            user_id = resp.get('item').get('id')
+            for group in groups:
+                auth_api.attach_user_group(user_id, group)
+            yield client
+            client.auth_logout()
+            auth_api.delete_user(user_id)

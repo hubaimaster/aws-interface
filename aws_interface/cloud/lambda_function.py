@@ -62,6 +62,8 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.logic.delete_function_test',
     'cloud.logic.delete_trigger',
     'cloud.logic.get_function',
+    'cloud.logic.get_function_file',
+    'cloud.logic.get_function_file_paths',
     'cloud.logic.get_function_tests',
     'cloud.logic.get_functions',
     'cloud.logic.get_trigger',

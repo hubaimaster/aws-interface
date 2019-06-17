@@ -764,15 +764,19 @@ class S3:
             print(ex)
 
     def create_bucket(self, bucket_name):
-        bucket_name = self.to_dns_name(bucket_name)
-        response = self.client.create_bucket(
-            ACL='private',
-            Bucket=bucket_name,
-            CreateBucketConfiguration={
-                'LocationConstraint': self.region
-            },
-        )
-        return response
+        try:
+            bucket_name = self.to_dns_name(bucket_name)
+            response = self.client.create_bucket(
+                ACL='private',
+                Bucket=bucket_name,
+                CreateBucketConfiguration={
+                    'LocationConstraint': self.region
+                },
+            )
+            return response
+        except Exception as ex:
+            print(ex)
+
 
     def upload_bin(self, bucket_name, file_name, binary):
         bucket_name = self.to_dns_name(bucket_name)
