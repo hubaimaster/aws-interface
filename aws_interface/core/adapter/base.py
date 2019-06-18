@@ -90,7 +90,7 @@ class Adapter(metaclass=ABCMeta):
         return client
 
     @contextmanager
-    def open_sdk(self, groups=['admin']):
+    def open_sdk(self):
         """
         Return SDK object that has been logged-in as group in groups
         :param groups: Groups the logged in user belongs to
@@ -105,8 +105,7 @@ class Adapter(metaclass=ABCMeta):
             client.auth_login(email, password)
             resp = client.auth_get_me()
             user_id = resp.get('item').get('id')
-            for group in groups:
-                auth_api.attach_user_group(user_id, group)
+            auth_api.attach_user_group(user_id, 'admin')
             yield client
             client.auth_logout()
             auth_api.delete_user(user_id)

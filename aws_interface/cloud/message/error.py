@@ -117,3 +117,7 @@ REGISTER_POLICY_VIOLATION = {
     'code': 29,
     'message': 'Register policy violation',
 }
+EXISTING_TRIGGER = {
+    'code': 30,
+    'message': 'Existing trigger'
+}
