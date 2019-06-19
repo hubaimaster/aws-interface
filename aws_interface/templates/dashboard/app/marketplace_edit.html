@@ -1,0 +1,150 @@
+{% extends 'dashboard/app/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+    <div class="main-content">
+        <!-- Top navbar -->
+        {% include 'dashboard/app/top-navbar.html' %}
+        <!-- Header -->
+        <input id="view-tag" value="guide" hidden>
+        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 600px; background-image: url({% static 'assets/img/theme/market.jpg' %}); background-size: cover; background-position: center top;">
+            <!-- Mask -->
+            <span class="mask bg-gradient-default opacity-8"></span>
+            <!-- Header container -->
+            <div class="container-fluid d-flex align-items-center">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12">
+                        <h3 class="display-3 text-white"><a class="text-white" href="{% url 'marketplace' app_id %}">Marketplace</a> > Upload</h3>
+                        <p class="text-white">서버리스 생태계에 기여해주셔서 감사합니다</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page content -->
+        <div class="container-fluid mt--9">
+
+            <div class="row mt-3">
+                <div class="col-xl-12 mb-3 mb-xl-0">
+
+                    <div class="card card-stats shadow">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <h2 class="text-black"><i class="fa fa-edit"></i> 기본 정보</h2>
+                                    </div>
+                                    <div class="col-4 text-right">
+                                        <button class="btn btn-sm btn-primary text-right">업로드</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card body -->
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label>이름</label>
+                                            <input class="form-control" type="text" placeholder="50자 이내의 표시될 이름">
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div class="form-group">
+                                            <label>간단한 설명</label>
+                                            <input class="form-control" type="text" placeholder="100자 이내의 간단한 설명">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label>카테고리</label>
+                                            <select class="form-control">
+                                                <option id="hello_world">Hello World</option>
+                                                <option id="api_bridge">API Bridge</option>
+                                                <option id="machine_learning">Machine Learning</option>
+                                                <option id="utilities">Utilities</option>
+                                                <option id="messaging">Messaging</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label>로고 이미지 파일</label>
+                                            <input class="form-control" type="file">
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label>업로드할 함수</label>
+                                            <select class="form-control">
+                                                {% for logic in logics %}
+                                                    <option id="{{ logic.function_name }}">logic.function_name</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12 col-md-12 mt-4">
+                    <h2 class="text-black"><i class="fa fa-file-text"></i>  상세 내용 </h2>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-xl-12 mb-3 mb-xl-0">
+
+                    <div class="card card-stats shadow">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div id="content-editor">
+                                    <textarea style="display:none;"># Title</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="row align-items-center justify-content-xl-between">
+                    <div class="col-xl-6">
+                        <div class="copyright text-center text-xl-left text-muted">
+                            &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="{%  static 'assets/vendor/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'editormd/editormd.js' %}"></script>
+
+    <script type="text/javascript">
+        var testEditor;
+        window.onload = function () {
+            testEditor = editormd("content-editor", {
+                width     : "100%",
+                height    : 720,
+                toc       : true,
+                todoList  : true,
+                path      : '{% static 'editormd/lib/' %}',
+            });
+        };
+    </script>
+    <script src="{% static 'editormd/languages/en.js' %}"></script>
+
+{% endblock %}

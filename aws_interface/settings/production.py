@@ -21,3 +21,13 @@ DATABASES['default'] = {
     'HOST': DB_HOST,
     'PORT': DB_PORT,
 }
+
+
+# S3 Storage
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# AWS Access
+AWS_ACCESS_KEY_ID = secrets_base['AWS_ACCESS_KEY']
+AWS_SECRET_ACCESS_KEY = secrets_base['AWS_SECRET_KEY']
+AWS_STORAGE_BUCKET_NAME = 'aws-interface-django-storage'
+AWS_DEFAULT_ACL = None

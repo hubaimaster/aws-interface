@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models.functions import Upper
-from .models import User, App, Log, Tracker, Event
+from .models import User, App, Log, Tracker, Event, MarketplaceLogic
 
 
 class CustomUserAdmin(UserAdmin):
@@ -36,8 +36,13 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ['user', 'tracker', 'action', 'target']
 
 
+class MarketplaceLogicAdmin(admin.ModelAdmin):
+    readonly_fields = ['id', 'creation_date']
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(App, AppAdmin)
 admin.site.register(Log, LogAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Tracker)
+admin.site.register(MarketplaceLogic, MarketplaceLogicAdmin)

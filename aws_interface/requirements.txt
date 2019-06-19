@@ -34,3 +34,5 @@ wcwidth==0.1.7
 websocket-client==0.56.0
 pymysql
 selenium
+django_storages
+Pillow

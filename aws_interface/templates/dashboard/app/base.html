@@ -22,6 +22,7 @@
     <!-- Notify CSS -->
     <link href="{% static 'assets/css/notify-metro.css' %}" rel="stylesheet" />
 
+    <link rel="stylesheet" href="{% static 'editormd/css/editormd.css' %}" />
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134607667-1"></script>
@@ -107,6 +108,12 @@
                 <li class="nav-item">
                     <a id="link-guide" class="nav-link" href="{%  url 'guide' app_id %}">
                         <i class="ni ni-collection text-green"></i> Guide
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a id="link-marketplace" class="nav-link" href="{%  url 'marketplace' app_id %}">
+                        <i class="ni ni-shop text-yellow"></i> Marketplace
                     </a>
                 </li>
 
