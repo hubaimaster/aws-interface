@@ -55,7 +55,6 @@ class Logic(LoginRequiredMixin, View):
                     function_name = request.POST.get('function_name')
                     payload = request.POST.get('payload')
                     payload = json.loads(payload)
-                    sdk_client.auth_guest()
                     start = time.time()
                     data = sdk_client.logic_run_function(function_name, payload)
                     end = time.time()
