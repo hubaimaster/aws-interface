@@ -36,9 +36,9 @@ APP_NAME = '{}'.format(TEST_STRING)
 
 DELAY = 2
 LONG_DELAY = 4
-WEB_DRIVE_LINUX = 'https://chromedriver.storage.googleapis.com/2.46/chromedriver_linux64.zip'
-WEB_DRIVE_MAC = 'https://chromedriver.storage.googleapis.com/2.46/chromedriver_mac64.zip'
-WEB_DRIVE_WINDOWS = 'https://chromedriver.storage.googleapis.com/2.46/chromedriver_win32.zip'
+WEB_DRIVE_LINUX = 'https://chromedriver.storage.googleapis.com/75.0.3770.90/chromedriver_linux64.zip'
+WEB_DRIVE_MAC = 'https://chromedriver.storage.googleapis.com/75.0.3770.90/chromedriver_mac64.zip'
+WEB_DRIVE_WINDOWS = 'https://chromedriver.storage.googleapis.com/75.0.3770.90/chromedriver_win32.zip'
 
 LOGIN_URL = '/login'
 APPS_URL = '/apps'
