@@ -195,10 +195,11 @@ class DashboardTestCase(StaticLiveServerTestCase):
         from dashboard.tests.storage import StorageTestProcess
         from dashboard.tests.logic import LogicTestProcess
         from dashboard.tests.sdk import SDKTestProcess
-        AuthTestProcess(self).do_test()
-        DatabaseTestProcess(self).do_test()
-        StorageTestProcess(self).do_test()
-        #LogicTestProcess(self).do_test()
+        #AuthTestProcess(self).do_test()
+        #DatabaseTestProcess(self).do_test()
+        #StorageTestProcess(self).do_test()
+        #LogTestProcess(self).do_test
+        LogicTestProcess(self).do_test()
         #SDKTestProcess(self).do_test()
 
     def test(self):

@@ -93,6 +93,97 @@ class LogicTestProcess:
                 return True
         return False
 
+    def _get_test_result(self, testcase_function, testcase_payload):
+        DATA = {'cmd': 'run_function', 'function_name': '{{{}}}'.format(testcase_function), 'payload' : '{{}}'.format(testcase_payload)}
+        response = Client().post('', DATA)
+        print(response.context)
+
+    def _click_test_function(self, test_function):
+        function_table = self.parent.browser.find_elements_by_tag_name('tbody')[1]
+        for th in function_table.find_elements_by_tag_name('th'):
+            if th.text.strip() == test_function:
+                print("[{}] is clicked".format(test_function))
+                th.click()
+
+    def _check_function_url(self, test_function):
+        target_url = '/logic/{}'.format(test_function)
+        target_url = self.parent.live_server_url + target_url
+        print("target_url : {}".format(target_url))
+        print("current_url: {}".format(self.parent.browser.current_url))
+        return self.parent.browser.current_url == target_url
+
+    def _get_function_name(self):
+        """
+        Return function_name
+        :return: value of element with id 'function-name'
+        """
+        return self.parent.browser.find_element_by_id('function-name').get_attribute('value')
+
+    def _get_function_description(self):
+        """
+        Return function_description
+        :return: value of element with id 'function-description'
+        """
+        return self.parent.browser.find_element_by_id('function-description').get_attribute('value')
+
+    def _get_function_runtime(self):
+        """
+        Return function_runtime
+        :return: value of element with id 'function-runtime'
+        """
+        select_box = self.parent.browser.find_element_by_id('function-runtime').get_attribute('value')
+        return select_box.first_selected_option.get_attribute('value')
+
+    def _get_function_handler(self):
+        """
+        Return function_handler
+        :return: value of element with id 'function-handler'
+        """
+        return self.parent.browser.find_element_by_id('function-handler').get_attribute('value')
+
+    def _edit_function_description(self, new_desc):
+        """
+        Edit function_description to new_desc
+
+        :return:
+        """
+        self.parent.browser.find_element_by_id('function-description').send_keys(new_desc)
+        time.sleep(DELAY)
+        print("Edited function description to [{}]".format(new_desc))
+
+    def _save_function_info(self):
+        self.parent.browser.find_element_by_css_selector('a[onclick="save_function_info();"]').click()
+        time.sleep(LONG_DELAY)
+        self.browser.switch_to.alert.accept()
+        time.sleep(DELAY)
+        self.parent.browser.refresh()
+        time.sleep(LONG_DELAY)
+        print("Clicked save function info")
+
+    def _clear_function_file(self):
+        ace_script = "editor.setValue('',-1);"
+        self.parent.browser.execute_script(ace_script)
+        print("Cleared function file")
+
+    def _save_function_file(self):
+        self.parent.browser.find_element_by_css_selector('a[onclick="save_current_file();"]').click()
+        time.sleep(LONG_DELAY)
+        self.browser.switch_to.alert.accept()
+        time.sleep(DELAY)
+        self.parent.browser.refresh()
+        time.sleep(LONG_DELAY)
+        print("clicked save function file")
+
+    def _get_function_file(self):
+        ace_script = "editor.getValue();"
+        function_file = self.parent.browser.execute_script(ace_script)
+        print(function_file)
+        return function_file
+
+    def _return_to_logic_module(self):
+        self.parent.browser.find_element_by_id('link-logic').click()
+        print("Clicked module button")
+        time.sleep(LONG_DELAY * 2)
 
     def do_test(self):
         FUNCTION_NAME = 'test-function'
@@ -134,7 +225,37 @@ class LogicTestProcess:
         time.sleep(DELAY)
         self._set_testcase(TESTCASE_NAME, TESTCASE_FUNCTION, TESTCASE_PAGELOAD)
         time.sleep(LONG_DELAY * 2)
-        self.parent.assertTrue(TESTCASE_NAME)
+        self.parent.assertTrue(self._has_testcase(TESTCASE_NAME))
+        time.sleep(DELAY)
+        self._open_test_result(TESTCASE_NAME)
+        time.sleep(DELAY)
+        self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAGELOAD)
+        time.sleep(LONG_DELAY)
+        self.parent.assertTrue(self._click_test_function(TESTCASE_FUNCTION))
+        time.sleep(LONG_DELAY * 2)
+        self.parent.assertTrue(self._check_function_url(FUNCTION_NAME))
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._get_function_name() == FUNCTION_NAME)
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._get_function_runtime() == FUNCTION_RUNTIME)
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._get_function_description() == FUNCTION_DESC)
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._get_function_handler() == FUNCTION_HANDLER)
+        time.sleep(DELAY)
+        self._edit_function_description(FUNCTION_DESC_NEW)
+        time.sleep(DELAY)
+        self._save_function_info()
+        time.sleep(LONG_DELAY * 2)
+        self.parent.assertTrue(self._get_function_description() == FUNCTION_DESC_NEW)
+        time.sleep(DELAY)
+        self._clear_function_file()
+        time.sleep(DELAY)
+        self._save_function_file()
+        time.sleep(DELAY)
+        self.parent.assertTrue(self._get_function_file() == '')
+        time.sleep(DELAY)
+        self._return_to_logic_module()
         time.sleep(DELAY)
         self._open_test_result(TESTCASE_NAME)
         time.sleep(DELAY)
