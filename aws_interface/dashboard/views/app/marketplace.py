@@ -80,3 +80,16 @@ class MarketplaceEdit(LoginRequiredMixin, View):
             return JsonResponse(data={
                 'marketplace_logic_id': marketplace_logic.id
             })
+
+
+class MarketplaceDetail(LoginRequiredMixin, View):
+    @page_manage
+    def get(self, request, app_id, marketplace_logic_id):
+        context = Util.get_context(request)
+        app = App.objects.get(id=app_id, user=request.user)
+        marketplace_logic = MarketplaceLogic.objects.get(id=marketplace_logic_id)
+
+        context['app_id'] = app_id
+        context['app_name'] = app.name
+        context['marketplace_logic'] = marketplace_logic
+        return render(request, 'dashboard/app/marketplace_detail.html', context=context)

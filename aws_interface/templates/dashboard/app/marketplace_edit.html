@@ -107,7 +107,7 @@
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div id="content-editor">
-                                    <textarea style="display:none;"># Title</textarea>
+                                    <textarea style="display:none;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -161,8 +161,8 @@
                 processData: false,  // tell jQuery not to process the data
                 contentType: false,  // tell jQuery not to set contentType
                 success : function(data) {
-                    alert(JSON.stringify(data));
-                    window.location.reload();
+                    const marketplace_logic_id = data.marketplace_logic_id;
+                    window.location.href = "detail/" + marketplace_logic_id;
                 }
             });
         }

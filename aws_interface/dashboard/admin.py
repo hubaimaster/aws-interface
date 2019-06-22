@@ -38,6 +38,8 @@ class EventAdmin(admin.ModelAdmin):
 
 class MarketplaceLogicAdmin(admin.ModelAdmin):
     readonly_fields = ['id', 'creation_date']
+    list_display = ('id', 'title', 'creation_date', 'user', 'description')
+    ordering = ['creation_date']
 
 
 admin.site.register(User, UserAdmin)

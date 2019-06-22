@@ -49,7 +49,7 @@
                                                 <div class="row align-items-center">
                                                     <div class="col-auto">
                                                         <!-- Avatar -->
-                                                        <a href="#!" class="avatar avatar-xl rounded-circle bg-gradient-blue">
+                                                        <a href="{% url 'marketplace_detail' app_id marketplace_logic.id %}" class="avatar avatar-xl rounded-circle bg-gradient-blue">
                                                             {% if marketplace_logic.logo_image %}
                                                                 <img src="{{ marketplace_logic.logo_image.url }}" style="height: 100%; width: 100%;">
                                                             {% else %}
@@ -59,7 +59,7 @@
                                                     </div>
                                                     <div class="col ml--2">
                                                         <h4 class="mb-0">
-                                                            <a href="#!">{{ marketplace_logic.title }}</a>
+                                                            <a href="{% url 'marketplace_detail' app_id marketplace_logic.id %}">{{ marketplace_logic.title }}</a>
                                                         </h4>
                                                         <p class="text-sm text-muted mb-0">{{ marketplace_logic.description }}</p>
                                                         {% if marketplace_logic.verified %}
@@ -107,14 +107,16 @@
                     <div class="card">
                         <!-- Card body -->
                         <div class="card-body">
-                            <a href="#!">
+                            <a href="{% url 'marketplace_detail' app_id marketplace_logic.id %}">
                                 <img src="{{ marketplace_logic.logo_image.url }}" class="rounded-circle img-center img-fluid shadow shadow-lg--hover" style="width: 128px; height: 128px;">
                             </a>
                             <div class="pt-4 text-center">
-                                <h5 class="h3 title">
-                                    <span class="d-block mb-1">{{ marketplace_logic.title }}</span>
-                                    <small class="h4 font-weight-light text-muted">{{ marketplace_logic.description }}</small>
-                                </h5>
+                                <a href="{% url 'marketplace_detail' app_id marketplace_logic.id %}">
+                                    <h5 class="h3 title">
+                                        <span class="d-block mb-1">{{ marketplace_logic.title }}</span>
+                                        <small class="h4 font-weight-light text-muted">{{ marketplace_logic.description }}</small>
+                                    </h5>
+                                </a>
                                 {% if marketplace_logic.verified %}
                                     <span class="text-success">●</span>
                                     <small>인증 됨</small>
@@ -146,7 +148,7 @@
                                     <div class="row align-items-center">
                                         <div class="col-auto">
                                             <!-- Avatar -->
-                                            <a href="#!" class="avatar avatar-xl rounded-circle bg-gradient-blue">
+                                            <a href="{% url 'marketplace_detail' app_id marketplace_logic.id %}" class="avatar avatar-xl rounded-circle bg-gradient-blue">
                                                 {% if marketplace_logic.logo_image %}
                                                     <img src="{{ marketplace_logic.logo_image.url }}" style="height: 100%; width: 100%;">
                                                 {% else %}
@@ -155,10 +157,13 @@
                                             </a>
                                         </div>
                                         <div class="col ml--2">
-                                            <h4 class="mb-0">
-                                                <a href="#!">{{ marketplace_logic.title }}</a>
-                                            </h4>
-                                            <p class="text-sm text-muted mb-0">{{ marketplace_logic.description }}</p>
+                                            <a href="{% url 'marketplace_detail' app_id marketplace_logic.id %}">
+                                                <h4 class="mb-0">
+                                                    {{ marketplace_logic.title }}
+                                                </h4>
+                                                <p class="text-sm text-muted mb-0">{{ marketplace_logic.description }}</p>
+                                            </a>
+
                                             {% if marketplace_logic.verified %}
                                                 <span class="text-success">●</span>
                                                 <small>인증 됨</small>
