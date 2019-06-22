@@ -12,6 +12,7 @@ import json
 import settings
 from urllib.request import urlopen
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import Client
 from selenium import webdriver
 from selenium.common.exceptions import NoAlertPresentException, NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
