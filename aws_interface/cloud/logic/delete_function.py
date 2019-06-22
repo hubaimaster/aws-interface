@@ -1,6 +1,5 @@
 
 from cloud.response import Response
-from cloud.permission import database_has_write_permission
 from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.

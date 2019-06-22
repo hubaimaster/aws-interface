@@ -146,7 +146,25 @@
         };
 
         function uploadMarketplaceLogic(title, description, category, logo_image, function_name, content){
-            alert(title);
+            var formData = new FormData();
+            formData.append('cmd', 'upload_marketplace_logic');
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('category', category);
+            formData.append('logo_image', logo_image);
+            formData.append('function_name', function_name);
+            formData.append('content', content);
+            $.ajax({
+                url : '',
+                type : 'POST',
+                data : formData,
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,  // tell jQuery not to set contentType
+                success : function(data) {
+                    alert(JSON.stringify(data));
+                    window.location.reload();
+                }
+            });
         }
 
         $("#upload-btn").click(function () {
@@ -156,6 +174,18 @@
             const logo_image = $("#logo-image")[0].files[0];
             const function_name = $("#function-name").val();
             const content = editor.getMarkdown();
+            if (title.length < 1){
+                alert('Title must be at least 1 characters.');
+                return;
+            }
+            if (description.length < 1){
+                alert('Description must be at least 1 characters.');
+                return;
+            }
+            if (content.length < 1){
+                alert('Content must be at least 1 characters.');
+                return;
+            }
             uploadMarketplaceLogic(title, description, category, logo_image, function_name, content);
         });
     </script>

@@ -90,6 +90,15 @@ class LogicServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
+    def get_function_zip_b64(self, function_name):
+        import cloud.logic.get_function_zip_b64 as method
+        params = {
+            'function_name': function_name,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
     def delete_function_test(self, test_name):
         import cloud.logic.delete_function_test as method
         params = {

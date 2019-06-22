@@ -1,24 +1,18 @@
 
 from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
-from cloud.message import error
+import base64
+
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'session_id': 'str',
-
         'function_name': 'str',
     },
     'output_format': {
-        'item': {
-            'function_name': 'str',
-            'runtime': 'str',
-            'handler': 'str',
-            'description': 'str',
-            'zip_file_id': 'str',
-            'runnable': 'bool',
+        'item?': {
+            'base64': 'str',
         },
         'error?': {
             'code': 'int',
@@ -28,7 +22,7 @@ info = {
 }
 
 
-@NeedPermission(Permission.Run.Logic.get_function)
+@NeedPermission(Permission.Run.Logic.get_function_zip_b64)
 def do(data, resource):
     partition = 'logic-function'
     body = {}
@@ -41,8 +35,15 @@ def do(data, resource):
                                    'condition': 'eq'}])
 
     if len(items) == 0:
-        body['error'] = error.NO_SUCH_FUNCTION
+        body['message'] = 'function_name: {} did not exist'.format(function_name)
         return Response(body)
     else:
-        body['item'] = items[0]
+        item = items[0]
+        zip_file_id = item['zip_file_id']
+        file_b64 = resource.file_download_bin(zip_file_id)
+        file_b64 = base64.b64encode(file_b64)
+        file_b64 = file_b64.decode('utf-8')
+        body['item'] = {
+            'base64': file_b64,
+        }
         return Response(body)

@@ -176,4 +176,4 @@ Further paragraphs come after blank lines.
 
 - [django](https://github.com/django/django)
 - [argon-design-system](https://github.com/creativetimofficial/argon-design-system)
-
+- [material-design-icons](https://github.com/google/material-design-icons)

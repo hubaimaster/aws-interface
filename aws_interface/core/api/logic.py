@@ -30,6 +30,9 @@ class LogicAPI(API):
     def get_function_tests(self):
         return self.service_controller.get_function_tests()
 
+    def get_function_zip_b64(self, function_name):
+        return self.service_controller.get_function_zip_b64(function_name)
+
     def delete_function_test(self, test_name):
         return self.service_controller.delete_function_test(test_name)
 

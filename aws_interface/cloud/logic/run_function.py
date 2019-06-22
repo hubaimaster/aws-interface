@@ -1,6 +1,6 @@
 
 from cloud.response import Response
-from cloud.permission import Permission, NeedPermission, logic_has_run_permission
+from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import sys
 import io

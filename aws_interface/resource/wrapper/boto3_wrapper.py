@@ -757,11 +757,7 @@ class S3:
         return bucket_name
 
     def init_bucket(self, bucket_name):
-        try:
-            self.create_bucket(bucket_name)
-            print('create_bucket success')
-        except Exception as ex:
-            print(ex)
+        self.create_bucket(bucket_name)
 
     def create_bucket(self, bucket_name):
         try:
@@ -774,9 +770,11 @@ class S3:
                 },
             )
             return response
-        except Exception as ex:
-            print(ex)
-
+        except botocore.exceptions.ClientError as ex:
+            if ex.response['Error']['Code'] == 'BucketAlreadyOwnedByYou':
+                print('Pass: [{}]'.format(ex))
+            else:
+                raise ex
 
     def upload_bin(self, bucket_name, file_name, binary):
         bucket_name = self.to_dns_name(bucket_name)

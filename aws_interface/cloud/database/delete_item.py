@@ -1,6 +1,6 @@
 
 from cloud.response import Response
-from cloud.permission import database_has_write_permission, database_can_not_access_to_item
+from cloud.permission import database_can_not_access_to_item
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
