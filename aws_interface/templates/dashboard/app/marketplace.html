@@ -17,7 +17,7 @@
                         <h1 class="display-2 text-white">Marketplace</h1>
                         <h2 class="text-white">순식간에 확장하세요</h2>
                         <p class="text-white mt-0 mb-5">미리 만들어진 클라우드 함수를 빠르게 서비스에 통합하세요</p>
-                        <a href="{% url 'marketplace_edit' app_id %}" class="btn btn-primary">
+                        <a href="{% url 'marketplace_create' app_id %}" class="btn btn-primary">
                             함수 업로드하기
                             <i class="ni ni-cloud-upload-96 align-baseline"></i>
                         </a>
@@ -108,7 +108,9 @@
                         <!-- Card body -->
                         <div class="card-body">
                             <a href="{% url 'marketplace_detail' app_id marketplace_logic.id %}">
-                                <img src="{{ marketplace_logic.logo_image.url }}" class="rounded-circle img-center img-fluid shadow shadow-lg--hover" style="width: 128px; height: 128px;">
+                                {% if marketplace_logic.logo_image %}
+                                    <img src="{{ marketplace_logic.logo_image.url }}" class="rounded-circle img-center img-fluid shadow shadow-lg--hover" style="width: 128px; height: 128px;">
+                                {% endif %}
                             </a>
                             <div class="pt-4 text-center">
                                 <a href="{% url 'marketplace_detail' app_id marketplace_logic.id %}">

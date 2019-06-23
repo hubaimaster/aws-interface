@@ -166,6 +166,7 @@ class MarketplaceLogic(models.Model):
     content = models.TextField()  # Markdown content
     logo_image = models.ImageField()
     function_zip_file = models.FileField(null=True)
+    function_name = models.CharField(max_length=255, null=True)
     handler = models.CharField(max_length=255)
     runtime = models.CharField(max_length=255)
 

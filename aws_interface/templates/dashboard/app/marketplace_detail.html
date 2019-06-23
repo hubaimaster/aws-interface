@@ -22,18 +22,18 @@
                         {% endif %}
                         <p class="text-white"><i class="ni ni-email-83 base"> {{ marketplace_logic.user.email }}</i></p>
                         <p class="text-white mt-0 mb-5">{{ marketplace_logic.description }}</p>
-                        <a href="{% url 'marketplace_edit' app_id %}" class="btn btn-success">
+                        <a href="#!" onclick="" class="btn btn-success">
                             가져오기
                             <i class="ni ni-cloud-download-95 align-baseline"></i>
                         </a>
                         {% if request.user == marketplace_logic.user %}
-                            <a href="#" class="btn btn-outline-success" data-toggle="modal" data-target="#modal-uploaded-function-list">
+                            <a href="{% url 'marketplace_edit' app_id marketplace_logic.id %}" class="btn btn-outline-success">
                                 수정
                                 <i class="fa fa-edit align-baseline"></i>
                             </a>
                         {% endif %}
                         {% if request.user == marketplace_logic.user %}
-                            <a href="#" class="btn btn-outline-danger" data-toggle="modal" data-target="#modal-uploaded-function-list">
+                            <a href="#!" onclick="delete_marketplace_logic();" class="btn btn-outline-danger">
                                 삭제
                                 <i class="fa fa-trash align-baseline"></i>
                             </a>
@@ -83,6 +83,23 @@
         </div>
     </div>
     <script src="{% static 'markdown/showdown.min.js' %}"></script>
+    <script>
+        function delete_marketplace_logic() {
+            if (confirm('정말 삭제하시겠습니까?')){
+                $.post('', {
+                    cmd: 'delete_marketplace_logic',
+                    id: '{{ marketplace_logic.id }}',
+                }, function (data) {
+                    if (data.error){
+                        alert(data.error);
+                    }else{
+                        alert('삭제되었습니다');
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+    </script>
     <script type="text/javascript">
         function loadContent() {
             const contentView = document.getElementById("markdown-content");

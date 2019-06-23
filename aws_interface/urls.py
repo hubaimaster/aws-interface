@@ -29,7 +29,7 @@ from dashboard.views.app.storage import Storage
 from dashboard.views.app.database import Database
 from dashboard.views.app.logic import Logic, LogicEdit
 from dashboard.views.app.log import Log
-from dashboard.views.app.marketplace import Marketplace, MarketplaceEdit, MarketplaceDetail
+from dashboard.views.app.marketplace import Marketplace, MarketplaceCreate, MarketplaceDetail, MarketplaceEdit
 from dashboard.views.app.guide import Guide
 
 
@@ -47,8 +47,9 @@ urlpatterns = [
     path('<app_id>/overview', Overview.as_view(), name='overview'),
     path('<app_id>/guide', Guide.as_view(), name='guide'),
     path('<app_id>/marketplace', Marketplace.as_view(), name='marketplace'),
-    path('<app_id>/marketplace/edit', MarketplaceEdit.as_view(), name='marketplace_edit'),
+    path('<app_id>/marketplace/create', MarketplaceCreate.as_view(), name='marketplace_create'),
     path('<app_id>/marketplace/detail/<marketplace_logic_id>', MarketplaceDetail.as_view(), name='marketplace_detail'),
+    path('<app_id>/marketplace/edit/<marketplace_logic_id>', MarketplaceEdit.as_view(), name='marketplace_edit'),
     path('<app_id>/auth', Auth.as_view(), name='auth'),
     path('<app_id>/database', Database.as_view(), name='database'),
     path('<app_id>/storage', Storage.as_view(), name='storage'),
