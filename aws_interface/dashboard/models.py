@@ -164,8 +164,8 @@ class MarketplaceLogic(models.Model):
     category = models.CharField(max_length=255)
     description = models.TextField()  # Plain text
     content = models.TextField()  # Markdown content
-    logo_image = models.ImageField()
-    function_zip_file = models.FileField(null=True)
+    logo_image = models.ImageField(null=True, upload_to='marketplace_logic_logo_image')
+    function_zip_file = models.FileField(null=True, upload_to='marketplace_logic_function_zip')
     function_name = models.CharField(max_length=255, null=True)
     handler = models.CharField(max_length=255)
     runtime = models.CharField(max_length=255)
@@ -174,3 +174,15 @@ class MarketplaceLogic(models.Model):
     view_count = models.BigIntegerField(default=0)
     setup_count = models.BigIntegerField(default=0)
     price = models.BigIntegerField(default=0)
+
+
+class MarketplaceLogicComment(models.Model):
+    """ Comment on marketplaceLogic
+    """
+    id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
+    creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
+
+    parent = models.ForeignKey(MarketplaceLogic, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    like_count = models.BigIntegerField(default=0)

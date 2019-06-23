@@ -70,7 +70,10 @@ class MarketplaceCreate(LoginRequiredMixin, View):
             content = request.POST.get('content')
             function_name = request.POST.get('function_name')
             with adapter.open_api_logic() as logic_api:
-                logic_function = logic_api.get_function(function_name)['item']
+                result = logic_api.get_function(function_name)
+                if 'error' in result:
+                    return JsonResponse(result)
+                logic_function = result['item']
                 handler = logic_function['handler']
                 runtime = logic_function['runtime']
                 function_zip_b64 = logic_api.get_function_zip_b64(function_name)['item']['base64']

@@ -69,7 +69,7 @@
                                     <div class="col-4">
                                         <div class="form-group">
                                             <label>로고 이미지 파일</label>
-                                            <input id="logo-image" class="form-control" type="file">
+                                            <input id="logo-image" class="form-control" type="file" accept="image/*">
                                         </div>
                                     </div>
                                     <div class="col-4">
@@ -159,6 +159,10 @@
                 processData: false,  // tell jQuery not to process the data
                 contentType: false,  // tell jQuery not to set contentType
                 success : function(data) {
+                    if (data.error){
+                        alert(data.error.message);
+                        return;
+                    }
                     const marketplace_logic_id = data.marketplace_logic_id;
                     window.location.href = "detail/" + marketplace_logic_id;
                 }
