@@ -33,17 +33,16 @@ class LogicTestProcess:
         self.parent.browser.find_element_by_id('function-zipfile').send_keys(function_file)
         time.sleep(DELAY)
         self.parent.browser.find_element_by_id('function-handler').send_keys(function_handler)
-        time.sleep(DELAY)
-        self.parent.browser.find_elements_by_id('create-function')[1].click()
         print("Function is set with [{}], [{}], [{}], [{}]".format(function_name, function_runtime, function_desc, function_file, function_handler))
 
     def _accept_and_has_function(self, function_name):
         """
-        Click accept button and check if [function_name] exists in function table
-        :param function_name: name of function to check
-        :return: bool
-        """
+                Click accept button and check if [function_name] exists in function table
+                :param function_name: name of function to check
+                :return: bool
+                """
         self.parent.browser.find_element_by_id('create-function').click()
+        print("Accept button clicked")
         time.sleep(LONG_DELAY * 2)
         function_table = self.parent.browser.find_elements_by_tag_name('table')[1]
         for tr in function_table.find_elements_by_tag_name('tr')[1:]:
@@ -52,11 +51,35 @@ class LogicTestProcess:
                 return True
         return False
 
-    def _open_testcase_modal(self):
-        self.parent.find_element_by_css_selector('a[data-target="#modal-create-function-test"]').click()
+    def _has_function(self, function_name):
+        """
+        Check if [function_name] exists in function table
+        :param function_name: name of function to check
+        :return: bool
+        """
+        function_table = self.parent.browser.find_elements_by_tag_name('table')[1]
+        for tr in function_table.find_elements_by_tag_name('tr')[1:]:
+            if tr.find_element_by_tag_name('th').text.strip() == function_name:
+                print("[{}] exists".format(function_name))
+                return True
+        return False
+
+    def _remove_function(self, function_name):
+        function_modal = self.parent.browser.find_elements_by_tag_name('tbody')[1]
+        th = None
+        for th in function_modal.find_elements_by_tag_name('th'):
+            if th.text.strip() == function_name:
+                print("{} is found".format(th.text.strip()))
+                break
+        row = th.find_element_by_xpath('..')
+        row.find_element_by_tag_name('form').click()
+        print("Removed [{}] from function table".format(function_name))
+
+    def _click_create_testcase(self):
+        self.parent.browser.find_element_by_css_selector('a[data-target="#modal-create-function-test"]').click()
         time.sleep(DELAY)
-        testcase_modal = self.parent.find_element_by_id('modal-create-function-test')
-        for style in testcase_modal.get_attribtue('style').text.split(';'):
+        testcase_modal = self.parent.browser.find_element_by_id('modal-create-function-test')
+        for style in testcase_modal.get_attribute('style').split(';'):
             if style.strip() == 'display: block':
                 print("Testcase modal is opened")
                 return True
@@ -64,7 +87,7 @@ class LogicTestProcess:
         return False
 
     def _set_testcase(self, testcase_name, testcase_function, testcase_pageload):
-        testcase_modal = self.parent.find_element_by_id('modal-create-function-test')
+        testcase_modal = self.parent.browser.find_element_by_id('modal-create-function-test')
         testcase_modal.find_element_by_name('test_name').send_keys(testcase_name)
         time.sleep(DELAY)
         select_box = select.Select(testcase_modal.parent.find_element_by_name('function_name'))
@@ -73,9 +96,21 @@ class LogicTestProcess:
         testcase_modal.find_element_by_id('test_input').send_keys(testcase_pageload)
         time.sleep(DELAY)
         testcase_modal.find_element_by_id('create-function-test').click()
+        print("Set testcase with [{}], [{}], [{}]".format(testcase_name, testcase_function, testcase_pageload))
+
+    def _remove_testcase(self, testcase_name):
+        testcase_modal = self.parent.browser.find_element_by_tag_name('tbody')
+        th = None
+        for th in testcase_modal.find_elements_by_tag_name('th'):
+            if th.text.strip() == testcase_name:
+                print("{} is found".format(th.text.strip()))
+                break
+        row = th.find_element_by_xpath('..')
+        row.find_element_by_tag_name('form').click()
+        print("Removed [{}] from testcase table".format(testcase_name))
 
     def _has_testcase(self, testcase_name):
-        testcase_table = self.parent.find_element_by_tag_name('tbody')
+        testcase_table = self.parent.browser.find_element_by_tag_name('tbody')
         for th in testcase_table.find_elements_by_tag_name('th'):
             if th.text.strip() == testcase_name:
                 print("[{}] exists".format(testcase_name))
@@ -83,20 +118,25 @@ class LogicTestProcess:
         return False
 
     def _open_test_result(self, testcase_name):
-        css_pattern = 'button[onclick^="run_function"][onclick*="{}"]'.format(testcase_name)
-        self.parent.browser.find_element_by_css_selector(css_pattern).click()
-        time.sleep(LONG_DELAY)
+        testcase_table = self.parent.browser.find_element_by_tag_name('tbody')
+        tr = None
+        for tr in testcase_table.find_elements_by_tag_name('tr'):
+            if tr.find_element_by_tag_name('th').text.strip() == testcase_name:
+                break
+        tr.find_element_by_tag_name('button').click()
+        print("Clicked run function")
+        self.parent.wait_overlay()
         test_result = self.parent.browser.find_element_by_id('modal-test-result')
         for style in test_result.get_attribute('style').split(';'):
-            if style.strip() == 'display: block;':
+            if style.strip() == 'display: block':
                 print("Test result modal is open")
                 return True
         return False
 
-    def _get_test_result(self, testcase_function, testcase_payload):
-        DATA = {'cmd': 'run_function', 'function_name': '{{{}}}'.format(testcase_function), 'payload' : '{{}}'.format(testcase_payload)}
-        response = Client().post('', DATA)
-        print(response.context)
+    def _get_test_result(self):
+        #print(self.parent.browser.page_source)
+        test_result_modal = self.parent.browser.find_element_by_id('modal-test-result')
+        test_result_modal.find_element_by_tag_name('button').click()
 
     def _click_test_function(self, test_function):
         function_table = self.parent.browser.find_elements_by_tag_name('tbody')[1]
@@ -104,13 +144,11 @@ class LogicTestProcess:
             if th.text.strip() == test_function:
                 print("[{}] is clicked".format(test_function))
                 th.click()
+                break
 
-    def _check_function_url(self, test_function):
-        target_url = '/logic/{}'.format(test_function)
-        target_url = self.parent.live_server_url + target_url
-        print("target_url : {}".format(target_url))
-        print("current_url: {}".format(self.parent.browser.current_url))
-        return self.parent.browser.current_url == target_url
+    def _get_function_url(self, test_function):
+        print("moved to url : {}".format(self.parent.browser.current_url))
+        return self.parent.browser.current_url
 
     def _get_function_name(self):
         """
@@ -131,7 +169,7 @@ class LogicTestProcess:
         Return function_runtime
         :return: value of element with id 'function-runtime'
         """
-        select_box = self.parent.browser.find_element_by_id('function-runtime').get_attribute('value')
+        select_box = select.Select(self.parent.browser.find_element_by_id('function-runtime'))
         return select_box.first_selected_option.get_attribute('value')
 
     def _get_function_handler(self):
@@ -144,17 +182,18 @@ class LogicTestProcess:
     def _edit_function_description(self, new_desc):
         """
         Edit function_description to new_desc
-
         :return:
         """
-        self.parent.browser.find_element_by_id('function-description').send_keys(new_desc)
+        desc_field = self.parent.browser.find_element_by_id('function-description')
+        desc_field.clear()
+        desc_field.send_keys(new_desc)
         time.sleep(DELAY)
         print("Edited function description to [{}]".format(new_desc))
 
     def _save_function_info(self):
-        self.parent.browser.find_element_by_css_selector('a[onclick="save_function_info();"]').click()
+        self.parent.browser.find_element_by_css_selector('span[onclick="save_function_info();"]').click()
         time.sleep(LONG_DELAY)
-        self.browser.switch_to.alert.accept()
+        self.parent.browser.switch_to.alert.accept()
         time.sleep(DELAY)
         self.parent.browser.refresh()
         time.sleep(LONG_DELAY)
@@ -168,7 +207,7 @@ class LogicTestProcess:
     def _save_function_file(self):
         self.parent.browser.find_element_by_css_selector('a[onclick="save_current_file();"]').click()
         time.sleep(LONG_DELAY)
-        self.browser.switch_to.alert.accept()
+        self.parent.browser.switch_to.alert.accept()
         time.sleep(DELAY)
         self.parent.browser.refresh()
         time.sleep(LONG_DELAY)
@@ -189,10 +228,12 @@ class LogicTestProcess:
         FUNCTION_NAME = 'test-function'
         FUNCTION_RUNTIME = 'Python3.6'
         FUNCTION_DESC = 'test-description'
+        FUNCTION_DESC_NEW = 'test-description-mod2'
         FUNCTION_DIR = os.path.dirname(os.path.dirname(os.path.abspath(settings.__file__)))
         FUNCTION_FILE = 'test.zip'
         FUNCTION_FILE = os.path.join(FUNCTION_DIR, FUNCTION_FILE)
         FUNCTION_HANDLER = 'test.handler'
+        FUNCTION_URL = '/logic/{}'.format(FUNCTION_NAME)
         TESTCASE_NAME = 'test-case'
         TESTCASE_FUNCTION = 'test-function'
         TESTCASE_PAGELOAD = '{"answer": 10}'
@@ -214,30 +255,31 @@ class LogicTestProcess:
         print('duration: {} s'.format(duration))
 
         self.parent.assert_view_tag('logic')
-        time.sleep(LONG_DELAY)
+        time.sleep(DELAY)
         self._click_create_function()
         time.sleep(LONG_DELAY)
-        self._set_function(FUNCTION_NAME, FUNCTION_RUNTIME, FUNCTION_DESC, FUNCTION_DIR, FUNCTION_HANDLER)
+        self._set_function(FUNCTION_NAME, FUNCTION_RUNTIME, FUNCTION_DESC, FUNCTION_FILE, FUNCTION_HANDLER)
         time.sleep(DELAY)
-        self.parent.assertTrue(self._accept_and_has_function())
+        self.parent.assertTrue(self._accept_and_has_function(FUNCTION_NAME))
         time.sleep(DELAY)
-        self._open_testcase_modal()
+        self._click_create_testcase()
         time.sleep(DELAY)
         self._set_testcase(TESTCASE_NAME, TESTCASE_FUNCTION, TESTCASE_PAGELOAD)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._has_testcase(TESTCASE_NAME))
         time.sleep(DELAY)
         self._open_test_result(TESTCASE_NAME)
-        time.sleep(DELAY)
-        self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAGELOAD)
         time.sleep(LONG_DELAY)
-        self.parent.assertTrue(self._click_test_function(TESTCASE_FUNCTION))
-        time.sleep(LONG_DELAY * 2)
-        self.parent.assertTrue(self._check_function_url(FUNCTION_NAME))
+        self._get_test_result()
+        #self.parent.assertTrue(self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAGELOAD)['response'])
+        time.sleep(LONG_DELAY)
+        self._click_test_function(FUNCTION_NAME)
+        time.sleep(LONG_DELAY)
+        self.parent.assertTrue(self._get_function_url(FUNCTION_NAME).endswith(FUNCTION_URL))
         time.sleep(DELAY)
         self.parent.assertTrue(self._get_function_name() == FUNCTION_NAME)
         time.sleep(DELAY)
-        self.parent.assertTrue(self._get_function_runtime() == FUNCTION_RUNTIME)
+        self.parent.assertTrue(self._get_function_runtime() == FUNCTION_RUNTIME.lower())
         time.sleep(DELAY)
         self.parent.assertTrue(self._get_function_description() == FUNCTION_DESC)
         time.sleep(DELAY)
@@ -253,9 +295,19 @@ class LogicTestProcess:
         time.sleep(DELAY)
         self._save_function_file()
         time.sleep(DELAY)
-        self.parent.assertTrue(self._get_function_file() == '')
+        self.parent.assertTrue(self._get_function_file() == None)
         time.sleep(DELAY)
         self._return_to_logic_module()
+        time.sleep(LONG_DELAY * 2)
+        self._open_test_result(TESTCASE_FUNCTION)
         time.sleep(DELAY)
-        self._open_test_result(TESTCASE_NAME)
-        time.sleep(DELAY)
+        self._get_test_result()
+        # self.parent.assertTrue(self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAGELOAD)['error'])
+        time.sleep(LONG_DELAY)
+        self._remove_testcase(TESTCASE_NAME)
+        time.sleep(LONG_DELAY)
+        self.parent.assertFalse(self._has_testcase(TESTCASE_NAME))
+        time.sleep(LONG_DELAY * 2)
+        self._remove_function(FUNCTION_NAME)
+        time.sleep(LONG_DELAY * 2)
+        self.parent.assertFalse(self._has_function(FUNCTION_NAME))

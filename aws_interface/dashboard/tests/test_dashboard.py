@@ -188,6 +188,12 @@ class DashboardTestCase(StaticLiveServerTestCase):
         time.sleep(DELAY)
         self.assertEqual(APPS_URL in self.browser.current_url, True)
 
+    def wait_overlay(self):
+        while self.browser.find_elements_by_class_name('loadingoverlay'):
+            time.sleep(LONG_DELAY)
+            print("waiting for page loading")
+        print("Page loaded")
+
     def do_test_process(self):
         from dashboard.tests.auth import AuthTestProcess
         from dashboard.tests.bill import BillTestProcess
@@ -195,7 +201,7 @@ class DashboardTestCase(StaticLiveServerTestCase):
         from dashboard.tests.storage import StorageTestProcess
         from dashboard.tests.logic import LogicTestProcess
         from dashboard.tests.sdk import SDKTestProcess
-        #AuthTestProcess(self).do_test()
+        AuthTestProcess(self).do_test()
         #DatabaseTestProcess(self).do_test()
         #StorageTestProcess(self).do_test()
         #LogTestProcess(self).do_test
