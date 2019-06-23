@@ -216,7 +216,7 @@ class LogicTestProcess:
 
     def _return_to_logic_module(self):
         self.parent.browser.find_element_by_id('link-logic').click()
-        print("Clicked module button")
+        print("Returned to logic module")
         time.sleep(LONG_DELAY * 2)
 
     def do_test(self):
