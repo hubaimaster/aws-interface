@@ -44,12 +44,7 @@ class LogicTestProcess:
         self.parent.browser.find_element_by_id('create-function').click()
         print("Accept button clicked")
         time.sleep(LONG_DELAY * 2)
-        function_table = self.parent.browser.find_elements_by_tag_name('table')[1]
-        for tr in function_table.find_elements_by_tag_name('tr')[1:]:
-            if tr.find_element_by_tag_name('th').text.strip() == function_name:
-                print("[{}] exists".format(function_name))
-                return True
-        return False
+        return self._has_function(function_name)
 
     def _has_function(self, function_name):
         """
