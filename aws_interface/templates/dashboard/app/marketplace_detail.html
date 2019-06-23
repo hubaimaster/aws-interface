@@ -22,7 +22,7 @@
                         {% endif %}
                         <p class="text-white"><i class="ni ni-email-83 base"> {{ marketplace_logic.user.email }}</i></p>
                         <p class="text-white mt-0 mb-5">{{ marketplace_logic.description }}</p>
-                        <a href="#!" onclick="" class="btn btn-success">
+                        <a href="#!" data-toggle="modal" data-target="#modal-setup-marketplace-logic" class="btn btn-success">
                             가져오기
                             <i class="ni ni-cloud-download-95 align-baseline"></i>
                         </a>
@@ -48,10 +48,45 @@
             </div>
         </div>
 
+        <div class="modal fade" id="modal-setup-marketplace-logic" tabindex="-1" role="dialog" aria-labelledby="modal-setup-marketplace-logic" aria-hidden="true">
+            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="modal-title-default">함수 가져오기</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="pl-lg-12">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-username">함수 이름</label>
+                                        <input id="function-name" type="text" class="form-control form-control-alternative" placeholder="{{ marketplace_logic.function_name }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p>
+                            {% if marketplace_logic.verified %}
+                                확인 버튼을 클릭하여 함수를 Logic 으로 가져옵니다.
+                            {% else %}
+                                <b>미인증 함수</b>를 가져오면 백엔드에 <b>심각한 문제</b>가 발생할수도 있습니다.
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
+                        <button id="setup-marketplace-logic" onclick="setup_marketplace_logic()" type="submit" class="btn btn-primary">가져오기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <!-- Page content -->
         <div class="container-fluid mt--8">
-
-
             <div class="row mt-3">
                 <div class="col-xl-12 mb-3 mb-xl-3">
                     <div class="card card-stats shadow">
@@ -98,6 +133,20 @@
                     }
                 });
             }
+        }
+        function setup_marketplace_logic() {
+            const function_name = $("#function-name").val();
+            $.post('', {
+                cmd: 'setup_marketplace_logic',
+                function_name: function_name,
+            }, function (data) {
+                if (data.error){
+                    alert(data.error.message);
+                }else{
+                    window.location.href = '{% url 'logic' app_id %}';
+                    alert('추가되었습니다.');
+                }
+            });
         }
     </script>
     <script type="text/javascript">

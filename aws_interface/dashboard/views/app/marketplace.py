@@ -16,7 +16,7 @@ import base64
 
 
 CATEGORIES = {
-    'hello_world': 'Hello world',
+    'example': 'Example',
     'api_bridge': 'API Bridge',
     'machine_learning': 'Machine Learning',
     'utilities': 'Utilities',
@@ -126,10 +126,21 @@ class MarketplaceDetail(LoginRequiredMixin, View):
                 })
         elif cmd == 'setup_marketplace_logic':
             adapter = DjangoAdapter(app_id, request)
-            return self.setup_marketplace_logic(adapter, marketplace_logic)
+            function_name = request.POST.get('function_name', None)
+            if not function_name:
+                function_name = marketplace_logic.function_name
+            return self.setup_marketplace_logic(adapter, marketplace_logic, function_name)
 
-    def setup_marketplace_logic(self, adapter, marketplace_logic):
-        return
+    def setup_marketplace_logic(self, adapter, marketplace_logic, function_name):
+        with adapter.open_api_logic() as logic_api:
+            description = marketplace_logic.description
+            runtime = marketplace_logic.runtime
+            handler = marketplace_logic.handler
+            zipfile = marketplace_logic.function_zip_file.read()
+            zipfile = base64.b64encode(zipfile)
+            zipfile = zipfile.decode('utf-8')
+            result = logic_api.create_function(function_name, description, runtime, handler, zipfile)
+            return JsonResponse(result)
 
 
 class MarketplaceEdit(LoginRequiredMixin, View):
