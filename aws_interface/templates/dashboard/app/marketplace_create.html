@@ -14,8 +14,8 @@
             <div class="container-fluid d-flex align-items-center">
                 <div class="row">
                     <div class="col-lg-12 col-md-12">
-                        <h2 class="display-2 text-white">Edit</h2>
-                        <p class="text-white">제출할 함수를 수정할시 다시 인증을 받아야합니다.</p>
+                        <h3 class="display-3 text-white"><a class="text-white" href="{% url 'marketplace' app_id %}">Marketplace</a> > Upload</h3>
+                        <p class="text-white">서버리스 생태계에 기여해주셔서 감사합니다</p>
                     </div>
                 </div>
             </div>
@@ -35,7 +35,7 @@
                                         <h2 class="text-black"><i class="fa fa-edit"></i> 기본 정보</h2>
                                     </div>
                                     <div class="col-4 text-right">
-                                        <button id="upload-btn" class="btn btn-sm btn-primary text-right">저장</button>
+                                        <button id="upload-btn" class="btn btn-sm btn-primary text-right">업로드</button>
                                     </div>
                                 </div>
                             </div>
@@ -45,13 +45,13 @@
                                     <div class="col-4">
                                         <div class="form-group">
                                             <label>제목</label>
-                                            <input id="title" class="form-control" type="text" placeholder="50자 이내의 표시될 제목" value="{{ marketplace_logic.title }}">
+                                            <input id="title" class="form-control" type="text" placeholder="50자 이내의 표시될 제목">
                                         </div>
                                     </div>
                                     <div class="col-8">
                                         <div class="form-group">
                                             <label>간단한 설명</label>
-                                            <input id="description" class="form-control" type="text" placeholder="100자 이내의 간단한 설명" value="{{ marketplace_logic.description }}">
+                                            <input id="description" class="form-control" type="text" placeholder="100자 이내의 간단한 설명">
                                         </div>
                                     </div>
                                 </div>
@@ -59,35 +59,25 @@
                                     <div class="col-4">
                                         <div class="form-group">
                                             <label>카테고리</label>
-                                            <select id="category" class="form-control" value="{{ marketplace_logic.category }}">
+                                            <select id="category" class="form-control">
                                                 {% for category_id, value in categories %}
-                                                    {% if category_id == marketplace_logic.category %}
-                                                        <option selected id="{{ category_id }}">{{ value }}</option>
-                                                    {% else %}
-                                                        <option value="{{ category_id }}">{{ value }}</option>
-                                                    {% endif %}
+                                                    <option value="{{ category_id }}">{{ value }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-4">
                                         <div class="form-group">
-                                            <label>로고 이미지 파일 변경 <input id="change-logo-image" type="checkbox" onchange="$('#logo-image').prop('disabled', !this.checked);"></label>
-                                            <input id="logo-image" class="form-control" type="file" disabled>
+                                            <label>로고 이미지 파일</label>
+                                            <input id="logo-image" class="form-control" type="file">
                                         </div>
                                     </div>
                                     <div class="col-4">
                                         <div class="form-group">
-                                            <label>업로드할 함수 <input id="change-function" type="checkbox" onchange="$('#function-name').prop('disabled', !this.checked);"></label>
-                                            <select id="function-name" class="form-control" disabled>
+                                            <label>업로드할 함수</label>
+                                            <select id="function-name" class="form-control">
                                                 {% for function in functions %}
-                                                    <option
-                                                            {% if marketplace_logic.function_name == function.function_name %}
-                                                                selected
-                                                            {% endif %}
-                                                                value="{{ function.function_name }}">
-                                                        {{ function.function_name }}
-                                                    </option>
+                                                    <option value="{{ function.function_name }}">{{ function.function_name }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -115,7 +105,7 @@
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div id="content-editor">
-                                    <textarea style="display:none;">{{ marketplace_logic.content }}</textarea>
+                                    <textarea style="display:none;"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -153,20 +143,15 @@
             });
         };
 
-        function uploadMarketplaceLogic(title, description, category, logo_image, function_name, content, change_logo_image, change_function){
+        function uploadMarketplaceLogic(title, description, category, logo_image, function_name, content){
             var formData = new FormData();
-            formData.append('cmd', 'edit_marketplace_logic');
-            formData.append('id', '{{ marketplace_logic.id }}');
+            formData.append('cmd', 'upload_marketplace_logic');
             formData.append('title', title);
             formData.append('description', description);
             formData.append('category', category);
             formData.append('logo_image', logo_image);
             formData.append('function_name', function_name);
             formData.append('content', content);
-
-            formData.append('change_logo_image', change_logo_image);
-            formData.append('change_function', change_function);
-
             $.ajax({
                 url : '',
                 type : 'POST',
@@ -174,7 +159,8 @@
                 processData: false,  // tell jQuery not to process the data
                 contentType: false,  // tell jQuery not to set contentType
                 success : function(data) {
-                    window.location.href = '{% url 'marketplace_detail' app_id marketplace_logic.id %}';
+                    const marketplace_logic_id = data.marketplace_logic_id;
+                    window.location.href = "detail/" + marketplace_logic_id;
                 }
             });
         }
@@ -186,10 +172,6 @@
             const logo_image = $("#logo-image")[0].files[0];
             const function_name = $("#function-name").val();
             const content = editor.getMarkdown();
-
-            const change_logo_image = $("#change-logo-image").is(':checked') == true;
-            const change_function = $("#change-function").is(':checked') == true;
-
             if (title.length < 1){
                 alert('Title must be at least 1 characters.');
                 return;
@@ -202,7 +184,7 @@
                 alert('Content must be at least 1 characters.');
                 return;
             }
-            uploadMarketplaceLogic(title, description, category, logo_image, function_name, content, change_logo_image, change_function);
+            uploadMarketplaceLogic(title, description, category, logo_image, function_name, content);
         });
     </script>
     <script src="{% static 'editormd/languages/en.js' %}"></script>

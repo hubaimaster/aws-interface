@@ -158,6 +158,7 @@ class MarketplaceLogic(models.Model):
     """
     id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)  # Plain text
     category = models.CharField(max_length=255)
@@ -165,8 +166,11 @@ class MarketplaceLogic(models.Model):
     content = models.TextField()  # Markdown content
     logo_image = models.ImageField()
     function_zip_file = models.FileField(null=True)
+    function_name = models.CharField(max_length=255, null=True)
+    handler = models.CharField(max_length=255)
+    runtime = models.CharField(max_length=255)
+
     verified = models.BooleanField(default=False)
     view_count = models.BigIntegerField(default=0)
     setup_count = models.BigIntegerField(default=0)
-    handler = models.CharField(max_length=255)
-    runtime = models.CharField(max_length=255)
+    price = models.BigIntegerField(default=0)

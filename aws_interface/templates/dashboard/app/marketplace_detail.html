@@ -1,0 +1,115 @@
+{% extends 'dashboard/app/base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+    <div class="main-content">
+        <!-- Top navbar -->
+        {% include 'dashboard/app/top-navbar.html' %}
+        <!-- Header -->
+        <input id="view-tag" value="guide" hidden>
+        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 600px; background-image: url({% static 'assets/img/theme/market.jpg' %}); background-size: cover; background-position: center top;">
+            <!-- Mask -->
+            <span class="mask bg-gradient-default opacity-8"></span>
+            <!-- Header container -->
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-9">
+                        <h1 class="display-2 text-white">{{ marketplace_logic.title }}</h1>
+                        {% if marketplace_logic.verified %}
+                            <h2 class="text-white"><span class="text-success">●</span> 인증 됨</h2>
+                        {% else %}
+                            <h2 class="text-white"><span class="text-danger">●</span> 인증 안됨</h2>
+                        {% endif %}
+                        <p class="text-white"><i class="ni ni-email-83 base"> {{ marketplace_logic.user.email }}</i></p>
+                        <p class="text-white mt-0 mb-5">{{ marketplace_logic.description }}</p>
+                        <a href="#!" onclick="" class="btn btn-success">
+                            가져오기
+                            <i class="ni ni-cloud-download-95 align-baseline"></i>
+                        </a>
+                        {% if request.user == marketplace_logic.user %}
+                            <a href="{% url 'marketplace_edit' app_id marketplace_logic.id %}" class="btn btn-outline-success">
+                                수정
+                                <i class="fa fa-edit align-baseline"></i>
+                            </a>
+                        {% endif %}
+                        {% if request.user == marketplace_logic.user %}
+                            <a href="#!" onclick="delete_marketplace_logic();" class="btn btn-outline-danger">
+                                삭제
+                                <i class="fa fa-trash align-baseline"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="col-3 text-center">
+                        {% if marketplace_logic.logo_image %}
+                            <img class="rounded-circle" src="{{ marketplace_logic.logo_image.url }}" style="height: 20vh; width: 20vh;">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page content -->
+        <div class="container-fluid mt--8">
+
+
+            <div class="row mt-3">
+                <div class="col-xl-12 mb-3 mb-xl-3">
+                    <div class="card card-stats shadow">
+                        <div class="card-header" style="height: 70px;">
+                            <h2 class="text-black"><i class="fa fa-book"></i> README.md</h2>
+                        </div>
+                        <div class="card-body" style="overflow-x: auto">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div id="markdown-content" hidden>{{ marketplace_logic.content }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="row align-items-center justify-content-xl-between">
+                    <div class="col-xl-6">
+                        <div class="copyright text-center text-xl-left text-muted">
+                            &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="{% static 'markdown/showdown.min.js' %}"></script>
+    <script>
+        function delete_marketplace_logic() {
+            if (confirm('정말 삭제하시겠습니까?')){
+                $.post('', {
+                    cmd: 'delete_marketplace_logic',
+                    id: '{{ marketplace_logic.id }}',
+                }, function (data) {
+                    if (data.error){
+                        alert(data.error);
+                    }else{
+                        alert('삭제되었습니다');
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        function loadContent() {
+            const contentView = document.getElementById("markdown-content");
+            const text = contentView.textContent;
+            const converter = new showdown.Converter();
+            const html = converter.makeHtml(text);
+            contentView.innerHTML = html;
+            contentView.hidden = false;
+        }
+        loadContent();
+    </script>
+
+{% endblock %}

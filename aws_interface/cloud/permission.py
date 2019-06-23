@@ -1,81 +1,6 @@
 from functools import wraps
 
 
-def database_has_read_permission(user, item):
-    if user is None or item is None:
-        return False
-    user_groups = user.get('groups', [])
-    user_id = user.get('id', None)
-    groups = item.get('read_groups', [])
-
-    for user_group in user_groups:
-        if user_group in groups or user_group == 'admin':
-            return True
-        elif 'owner' in groups and user_id == item.get('owner'):
-            return True
-        return False
-
-
-def database_has_write_permission(user, item):
-    if user is None or item is None:
-        return False
-    user_groups = user.get('groups', [])
-    user_id = user.get('id', None)
-    groups = item.get('write_groups', [])
-
-    for user_group in user_groups:
-        if user_group in groups or user_group == 'admin':
-            return True
-        elif 'owner' in groups and user_id == item.get('owner'):
-            return True
-        return False
-
-
-def storage_has_read_permission(user, item):
-    if user is None or item is None:
-        return False
-    user_groups = user.get('groups', [])
-    user_id = user.get('id', None)
-    groups = item.get('read_groups', [])
-
-    for user_group in user_groups:
-        if user_group in groups or user_group == 'admin':
-            return True
-        elif 'owner' in groups and user_id == item.get('owner'):
-            return True
-        return False
-
-
-def storage_has_write_permission(user, item):
-    if user is None or item is None:
-        return False
-    user_groups = user.get('groups', [])
-    user_id = user.get('id', None)
-    groups = item.get('write_groups', [])
-
-    for user_group in user_groups:
-        if user_group in groups or user_group == 'admin':
-            return True
-        elif 'owner' in groups and user_id == item.get('owner'):
-            return True
-        return False
-
-
-def logic_has_run_permission(user, item):
-    if user is None or item is None:
-        return False
-    user_groups = user.get('groups', [])
-    user_id = user.get('id', None)
-    groups = item.get('run_groups', [])
-
-    for user_group in user_groups:
-        if user_group in groups or user_group == 'admin':
-            return True
-        elif 'owner' in groups and user_id == item.get('owner'):
-            return True
-        return False
-
-
 system_partitions = ['user', 'log', 'logic-function', 'files', 'session']
 
 
@@ -176,6 +101,7 @@ class Permission:
             get_function_file_paths = 'run:cloud.logic.get_function_file_paths'
             get_function_file = 'run:cloud.logic.get_function_file'
             get_function_tests = 'run:cloud.logic.get_function_tests'
+            get_function_zip_b64 = 'run:cloud.logic.get_function_zip_b64'
             get_functions = 'run:cloud.logic.get_functions'
             get_trigger = 'run:cloud.logic.get_trigger'
             get_triggers = 'run:cloud.logic.get_triggers'

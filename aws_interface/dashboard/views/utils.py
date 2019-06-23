@@ -101,7 +101,7 @@ def page_manage(func):
 
             Util.log('error', request.user, event)
             print(event)
-
+            error_type = None
             code = ex.response.get('Error', {}).get('Code', None)
             if code == 'UnrecognizedClientException':
                 title = '등록된 IAM AccessKey 를 확인해주세요'
@@ -122,7 +122,8 @@ def page_manage(func):
                 desc = '경우에 따라 최대 10분 정도 소요될 수 있습니다'
                 error_type = 'allocating'
             else:
-                raise ex
+                # raise ex
+                pass
 
             context['error'] = ex
             context['error_type'] = error_type

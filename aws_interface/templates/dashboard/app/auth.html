@@ -325,40 +325,6 @@
                                         </label>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <th scope="row">
-                                        익명 로그인
-                                    </th>
-                                    <td>
-                                        <a href="#">cloud.auth.guest</a> API를 이용하여 로그인합니다
-                                    </td>
-
-                                    <td>
-                                        <select id="guest_default_group" class="form-control">
-                                            {% for group in user_groups %}
-                                                {% if group.name == guest_login.default_group_name %}
-                                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
-                                                {% else %}
-                                                    <option value="{{ group.name }}">{{ group.name }}</option>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                    </td>
-
-                                    <td>
-                                        <a class="btn btn-sm btn-info disabled" disabled>정책 없음</a>
-                                    </td>
-                                    <td>
-                                        <label class="custom-toggle">
-                                            {% if guest_login.enabled %}
-                                                <input id="guest_enabled" type="checkbox" checked>
-                                            {% else %}
-                                                <input id="guest_enabled" type="checkbox">
-                                            {% endif %}
-                                            <span class="custom-toggle-slider rounded-circle"></span>
-                                        </label>
-                                    </td>
-                                </tr>
 
                                 <tr>
                                     <th scope="row">
@@ -435,6 +401,42 @@
                                         </label>
                                     </td>
                                 </tr>
+
+                                <tr>
+                                    <th scope="row">
+                                        익명 로그인
+                                    </th>
+                                    <td>
+                                        <a href="#">cloud.auth.guest</a> API를 이용하여 로그인합니다
+                                    </td>
+
+                                    <td>
+                                        <select id="guest_default_group" class="form-control">
+                                            {% for group in user_groups %}
+                                                {% if group.name == guest_login.default_group_name %}
+                                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                                {% else %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+
+                                    <td>
+{#                                        <a class="btn btn-sm btn-info disabled" disabled>정책 없음</a>#}
+                                    </td>
+                                    <td>
+                                        <label class="custom-toggle">
+                                            {% if guest_login.enabled %}
+                                                <input id="guest_enabled" type="checkbox" checked>
+                                            {% else %}
+                                                <input id="guest_enabled" type="checkbox">
+                                            {% endif %}
+                                            <span class="custom-toggle-slider rounded-circle"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+
 
                                 </tbody>
                             </table>
