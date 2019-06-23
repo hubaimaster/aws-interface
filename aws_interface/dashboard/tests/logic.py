@@ -37,10 +37,10 @@ class LogicTestProcess:
 
     def _accept_and_has_function(self, function_name):
         """
-                Click accept button and check if [function_name] exists in function table
-                :param function_name: name of function to check
-                :return: bool
-                """
+        Click accept button and check if [function_name] exists in function table
+        :param function_name: name of function to check
+        :return: bool
+        """
         self.parent.browser.find_element_by_id('create-function').click()
         print("Accept button clicked")
         time.sleep(LONG_DELAY * 2)
@@ -60,6 +60,11 @@ class LogicTestProcess:
         return False
 
     def _remove_function(self, function_name):
+        """
+        Remove function [fucntion_name] from function table
+        :param function_name: name of function to remove
+        :return:
+        """
         function_modal = self.parent.browser.find_elements_by_tag_name('tbody')[1]
         th = None
         for th in function_modal.find_elements_by_tag_name('th'):
@@ -71,6 +76,10 @@ class LogicTestProcess:
         print("Removed [{}] from function table".format(function_name))
 
     def _click_create_testcase(self):
+        """
+        Click create-testcase button and check if create-function-test modal is open
+        :return: bool
+        """
         self.parent.browser.find_element_by_css_selector('a[data-target="#modal-create-function-test"]').click()
         time.sleep(DELAY)
         testcase_modal = self.parent.browser.find_element_by_id('modal-create-function-test')
@@ -82,6 +91,13 @@ class LogicTestProcess:
         return False
 
     def _set_testcase(self, testcase_name, testcase_function, testcase_pageload):
+        """
+        Fill modal with [testcase_name], [testcase_function], [testcase_pageload] and close the modal
+        :param testcase_name: name of testcase
+        :param testcase_function: name of function that would be run with testcase
+        :param testcase_pageload: pageload of testcase
+        :return:
+        """
         testcase_modal = self.parent.browser.find_element_by_id('modal-create-function-test')
         testcase_modal.find_element_by_name('test_name').send_keys(testcase_name)
         time.sleep(DELAY)
@@ -94,6 +110,11 @@ class LogicTestProcess:
         print("Set testcase with [{}], [{}], [{}]".format(testcase_name, testcase_function, testcase_pageload))
 
     def _remove_testcase(self, testcase_name):
+        """
+        Remove testcase [testcase_name] from testcase table.
+        :param testcase_name: name of testcase to remove
+        :return:
+        """
         testcase_modal = self.parent.browser.find_element_by_tag_name('tbody')
         th = None
         for th in testcase_modal.find_elements_by_tag_name('th'):
@@ -113,6 +134,11 @@ class LogicTestProcess:
         return False
 
     def _open_test_result(self, testcase_name):
+        """
+        Click run_function and open test result modal. Check if modal is open
+        :param testcase_name: name of testcase to run
+        :return: bool
+        """
         testcase_table = self.parent.browser.find_element_by_tag_name('tbody')
         tr = None
         for tr in testcase_table.find_elements_by_tag_name('tr'):
@@ -128,12 +154,22 @@ class LogicTestProcess:
                 return True
         return False
 
+    # Not implemented yet
     def _get_test_result(self):
+        """
+        Return the text of modal-test-result
+        :return: str type. text on test result modal
+        """
         #print(self.parent.browser.page_source)
         test_result_modal = self.parent.browser.find_element_by_id('modal-test-result')
         test_result_modal.find_element_by_tag_name('button').click()
 
     def _click_test_function(self, test_function):
+        """
+        Click name of function to move to function info page.
+        :param test_function: name of function to click
+        :return:
+        """
         function_table = self.parent.browser.find_elements_by_tag_name('tbody')[1]
         for th in function_table.find_elements_by_tag_name('th'):
             if th.text.strip() == test_function:
@@ -142,6 +178,11 @@ class LogicTestProcess:
                 break
 
     def _get_function_url(self, test_function):
+        """
+        Return url of function info page.
+        :param test_function:
+        :return:
+        """
         print("moved to url : {}".format(self.parent.browser.current_url))
         return self.parent.browser.current_url
 
@@ -176,7 +217,7 @@ class LogicTestProcess:
 
     def _edit_function_description(self, new_desc):
         """
-        Edit function_description to new_desc
+        Edit function_description to [new_desc]
         :return:
         """
         desc_field = self.parent.browser.find_element_by_id('function-description')
@@ -186,6 +227,10 @@ class LogicTestProcess:
         print("Edited function description to [{}]".format(new_desc))
 
     def _save_function_info(self):
+        """
+        click save button of function info, and accept button on alert
+        :return:
+        """
         self.parent.browser.find_element_by_css_selector('span[onclick="save_function_info();"]').click()
         time.sleep(LONG_DELAY)
         self.parent.browser.switch_to.alert.accept()
@@ -195,11 +240,19 @@ class LogicTestProcess:
         print("Clicked save function info")
 
     def _clear_function_file(self):
+        """
+        Clear function file(test.py)
+        :return:
+        """
         ace_script = "editor.setValue('',-1);"
         self.parent.browser.execute_script(ace_script)
         print("Cleared function file")
 
     def _save_function_file(self):
+        """
+        Click save button on fuction file, and accept button on alert
+        :return:
+        """
         self.parent.browser.find_element_by_css_selector('a[onclick="save_current_file();"]').click()
         time.sleep(LONG_DELAY)
         self.parent.browser.switch_to.alert.accept()
@@ -209,12 +262,20 @@ class LogicTestProcess:
         print("clicked save function file")
 
     def _get_function_file(self):
+        """
+        Get code on function file(test.py)/ace editor
+        :return: str type. text in function file.
+        """
         ace_script = "editor.getValue();"
         function_file = self.parent.browser.execute_script(ace_script)
         print(function_file)
         return function_file
 
     def _return_to_logic_module(self):
+        """
+        Click 'LOGIC' on navigation bar to move to logic module.
+        :return:
+        """
         self.parent.browser.find_element_by_id('link-logic').click()
         print("Returned to logic module")
         time.sleep(LONG_DELAY * 2)
@@ -265,6 +326,7 @@ class LogicTestProcess:
         time.sleep(DELAY)
         self._open_test_result(TESTCASE_NAME)
         time.sleep(LONG_DELAY)
+        # _get_test_result is not implemented yet!
         self._get_test_result()
         #self.parent.assertTrue(self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAGELOAD)['response'])
         time.sleep(LONG_DELAY)
@@ -296,6 +358,7 @@ class LogicTestProcess:
         time.sleep(LONG_DELAY * 2)
         self._open_test_result(TESTCASE_FUNCTION)
         time.sleep(DELAY)
+        # _get_test_result is not implemented yet!
         self._get_test_result()
         # self.parent.assertTrue(self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAGELOAD)['error'])
         time.sleep(LONG_DELAY)
