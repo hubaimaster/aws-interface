@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models.functions import Upper
-from .models import User, App, Log, Tracker, Event, MarketplaceLogic
+from .models import User, App, Log, MarketplaceLogic, MarketplaceLogicComment
 
 
 class CustomUserAdmin(UserAdmin):
@@ -45,6 +45,6 @@ class MarketplaceLogicAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(App, AppAdmin)
 admin.site.register(Log, LogAdmin)
-admin.site.register(Event, EventAdmin)
-admin.site.register(Tracker)
+
 admin.site.register(MarketplaceLogic, MarketplaceLogicAdmin)
+admin.site.register(MarketplaceLogicComment)

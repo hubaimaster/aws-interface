@@ -1,9 +1,8 @@
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from botocore.errorfactory import ClientError
 from numbers import Number
-from dashboard.models import App, Log
-from dashboard.management.tracking import Tracking
+from dashboard.models import Log
 import traceback
 
 
@@ -76,14 +75,6 @@ class Util:
 
 def page_manage(func):
     def wrap(*args, **kwargs):
-        try:  # Logging
-            request = args[1]
-            url = str(request.build_absolute_uri())
-            Tracking(request).view_url(url)
-            event = 'func:{}, args:{}, kwargs:{}'.format(func, args, kwargs)
-            Util.log('info', request.user, event)
-        except Exception as ex:
-            print(ex)
         try:
             result = func(*args, **kwargs)
         except ClientError as ex:
@@ -98,9 +89,8 @@ def page_manage(func):
 
             event = 'URL "{}"'.format(url)
             event = '{}\n{}'.format(event, traceback.format_exc())
-
             Util.log('error', request.user, event)
-            print(event)
+
             error_type = None
             code = ex.response.get('Error', {}).get('Code', None)
             if code == 'UnrecognizedClientException':
