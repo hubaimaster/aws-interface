@@ -569,6 +569,11 @@
                 set_fields(item);
             });
         }
+
+        function replaceAll(str, searchStr, replaceStr) {
+            return str.split(searchStr).join(replaceStr);
+        }
+
         function set_fields(_item) {
             $("#field-table>tbody").empty();
             var item = _item;
@@ -584,11 +589,13 @@
                     value_type = 'L';
                     value = JSON.stringify(value);
                 }
+                const value_escaped = replaceAll(value, '\n', '\\n');
+
                 var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\"><th name=\"field\" id=\"" +
                     key + "\" scope=\"row\">" +
                     "<div class=\"row\">" +
                     "<div class=\"col-10\">" +
-                    "<a style='color:cornflowerblue; cursor:pointer;' onclick=\"set_field('" + key + "', '" + value + "','" + value_type + "');\">" +
+                    "<a style='color:cornflowerblue; cursor:pointer;' onclick=\"set_field('" + key + "', '" + value_escaped + "','" + value_type + "');\">" +
                     "<label>" + key + "</label>&nbsp" +
                     "<button class=\"btn btn-sm\">수정</button>" +
                     "</a>" +
@@ -981,9 +988,11 @@
                 }
                 query_items(partition, query_json_instructions);
             });
-            render_read_groups();
-            render_write_groups();
-            set_policy_mode('create');
+            $(document).ready(function () {
+                render_read_groups();
+                render_write_groups();
+                set_policy_mode('create');
+            });
         }
     </script>
 

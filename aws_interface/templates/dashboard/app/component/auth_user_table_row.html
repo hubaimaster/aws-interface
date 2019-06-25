@@ -58,6 +58,9 @@
             </div>
         </td>
         <td>
+            {{ user.login_method }}
+        </td>
+        <td>
             {% for key, value in user.items %}
                 {% if key not in visible_user_fields and key not in none_extra_fields %}
                     <h5> {{ key }} : {{ value }} </h5>
@@ -65,9 +68,7 @@
             {% endfor %}
 
         </td>
-        <td>
-            {{ user.login_method }}
-        </td>
+
         <td>
             <div class="custom-control custom-radio mt--4">
                 <input class="custom-control-input" type="radio" name="checkbox-user" id="{{ user.id }}">

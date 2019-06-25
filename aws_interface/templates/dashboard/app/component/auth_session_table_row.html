@@ -1,0 +1,24 @@
+{% load timetags %}
+
+{% for session in sessions %}
+    <tr>
+        <th scope="row">
+            {{ session.user_id }}
+        </th>
+        <td>
+            {{ session.creation_date|to_date }}
+        </td>
+        <td>
+            {{ session.session_type }}
+        </td>
+        <td>
+            {{ session.id }}
+        </td>
+        <td>
+            <div class='custom-control custom-checkbox mt--4'>
+                <input class='custom-control-input' type='checkbox' name='checkbox-session' id='{{ session.id }}'>
+                <label class='custom-control-label' for='{{ session.id }}'></label>
+            </div>
+        </td>
+    </tr>
+{% endfor %}

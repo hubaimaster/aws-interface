@@ -95,19 +95,19 @@
             </footer>
         </div>
     </div>
-    
+
     <script>
-    var logs_end_key = null;
-    function load_more_logs(){
+        var logs_end_key = null;
+        function load_more_logs(){
             const user_id = '{{ user_id }}';
             const event_source = '{{ event_source }}';
             const event_name = '{{ event_name }}';
 
             var item = {
                 cmd: 'get_log_rows',
-                user_id,
-                event_source,
-                event_name,
+                user_id: user_id,
+                event_source: event_source,
+                event_name: event_name,
             };
 
             if (logs_end_key != null){
@@ -123,7 +123,9 @@
             });
         }
         window.onload = function () {
-            load_more_logs();
+            $(document).ready(function () {
+                load_more_logs();
+            });
         };
     </script>
 

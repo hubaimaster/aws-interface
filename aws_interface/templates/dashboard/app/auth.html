@@ -423,7 +423,7 @@
                                     </td>
 
                                     <td>
-{#                                        <a class="btn btn-sm btn-info disabled" disabled>정책 없음</a>#}
+                                        {#                                        <a class="btn btn-sm btn-info disabled" disabled>정책 없음</a>#}
                                     </td>
                                     <td>
                                         <label class="custom-toggle">
@@ -829,41 +829,19 @@
 
         function load_more_sessions(){
             var item = {
-                cmd: 'get_sessions',
+                cmd: 'get_session_rows',
             };
 
             if (sessions_end_key != null){
                 item['start_key'] = sessions_end_key;
             }
             $.post("", item, function (data) {
+                const session_rows = data['session_rows'];
                 sessions_end_key = data['end_key'];
                 if (sessions_end_key == null){
                     $("#load-more-sessions-btn").hide();
                 }
-                for (var i = 0; i < data['items'].length; i++){
-                    const session = data['items'][i];
-                    const raw = "<tr>" +
-                        "<th scope='row'>" +
-                        session['user_id'] +
-                        "</th>" +
-                        "<td>" +
-                        session['creation_date'] +
-                        "</td>" +
-                        "<td>" +
-                        session['session_type'] +
-                        "</td>" +
-                        "<td>" +
-                        session['id'] +
-                        "</td>" +
-                        "<td>" +
-                        "<div class='custom-control custom-checkbox mt--4'>" +
-                        "<input class='custom-control-input' type='checkbox' name='checkbox-session' id='" + session['id'] + "'>" +
-                        "<label class='custom-control-label' for='" + session['id'] + "'></label>" +
-                        "</div>" +
-                        "</td>" +
-                        "</tr>";
-                    $("#session-table>table").append(raw);
-                }
+                $("#session-table>table").append(session_rows);
             });
         }
 
@@ -911,8 +889,10 @@
             $("#check-all-users").click(function () {
                 $("input[name='checkbox-user']").prop('checked', this.checked);
             });
-            load_more_users();
-            load_more_sessions();
+            $(document).ready(function () {
+                load_more_users();
+                load_more_sessions();
+            });
         }
     </script>
 

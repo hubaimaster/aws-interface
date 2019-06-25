@@ -273,7 +273,7 @@
                                     <tr>
                                         <th scope="row">
                                             <a href="{% url 'logic_edit' app_id function.function_name %}">
-                                            {{ function.function_name }}
+                                                {{ function.function_name }}
                                             </a>
                                         </th>
                                         <td>
@@ -364,7 +364,6 @@
         }
 
         window.onload = function () {
-
             $("#create-function").click(function () {
                 const function_name = $("#function-name").val();
                 const description = $("#function-description").val();
@@ -372,11 +371,11 @@
                 const runtime = $("#function-runtime").val();
                 const zip_file = $('#function-zipfile')[0].files[0];
 
-                if (function_name == null || function_name.length == 0){
+                if (function_name == null || function_name.length == 0) {
                     alert("이름을 지정해주세요");
                     return;
                 }
-                if (zip_file == null || zip_file.length == 0){
+                if (zip_file == null || zip_file.length == 0) {
                     alert("파일을 지정해주세요");
                     return;
                 }
@@ -393,14 +392,14 @@
                     }
                     return true;
                 }
+
                 const test_input = $("#test_input").val();
-                if (is_json(test_input)){
+                if (is_json(test_input)) {
                     $("#create-function-test").prop("disabled", false);
-                }else{
+                } else {
                     $("#create-function-test").prop("disabled", true);
                 }
             });
-
         };
     </script>
 

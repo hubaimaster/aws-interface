@@ -353,25 +353,27 @@
         }
 
         window.onload = function () {
-            render_file_read_groups();
-            render_file_write_groups();
-            load_more_files();
-            set_policy_mode('create');
+            $(document).ready(function () {
+                render_file_read_groups();
+                render_file_write_groups();
+                load_more_files();
+                set_policy_mode('create');
 
-            $("#upload-file").click(function () {
-                var parent_path = $("#folder-parent-path").val();
-                var file_bin = $('#file-bin')[0].files[0];
-                var filename = $("#file-bin").val().replace(/.*(\/|\\)/, '');
-                if (file_bin == null || file_bin.length == 0){
-                    alert("파일을 지정해주세요");
-                    return;
-                }
-                if (file_read_groups.length == 0 || file_write_groups.length == 0){
-                    alert("권한 그룹은 1개 이상 지정해야 합니다");
-                    return;
-                }
-                upload_file('{{ folder_path }}', filename, file_bin, file_read_groups, file_write_groups);
-                $("#modal-upload-file").modal('hide');
+                $("#upload-file").click(function () {
+                    var parent_path = $("#folder-parent-path").val();
+                    var file_bin = $('#file-bin')[0].files[0];
+                    var filename = $("#file-bin").val().replace(/.*(\/|\\)/, '');
+                    if (file_bin == null || file_bin.length == 0) {
+                        alert("파일을 지정해주세요");
+                        return;
+                    }
+                    if (file_read_groups.length == 0 || file_write_groups.length == 0) {
+                        alert("권한 그룹은 1개 이상 지정해야 합니다");
+                        return;
+                    }
+                    upload_file('{{ folder_path }}', filename, file_bin, file_read_groups, file_write_groups);
+                    $("#modal-upload-file").modal('hide');
+                });
             });
         };
     </script>

@@ -119,6 +119,10 @@ class Auth(LoginRequiredMixin, View):
                 start_key = request.POST.get('start_key', None)
                 result = self._get_user_rows(request, app_id, start_key)
                 return JsonResponse(result)
+            elif cmd == 'get_session_rows':
+                start_key = request.POST.get('start_key', None)
+                result = self._get_session_rows(request, app_id, start_key)
+                return JsonResponse(result)
 
         return redirect(request.path_info)  # Redirect back
 
@@ -141,5 +145,21 @@ class Auth(LoginRequiredMixin, View):
             }
             return {
                 'user_rows': template.render(context, request),
+                'end_key': end_key
+            }
+
+    def _get_session_rows(self, request, app_id, start_key=None):
+        adapter = DjangoAdapter(app_id, request)
+        with adapter.open_api_auth() as api:
+            result = api.get_sessions(start_key, limit=30)
+            sessions = result['items']
+            end_key = result.get('end_key')
+
+            template = loader.get_template('dashboard/app/component/auth_session_table_row.html')
+            context = {
+                'sessions': sessions,
+            }
+            return {
+                'session_rows': template.render(context, request),
                 'end_key': end_key
             }

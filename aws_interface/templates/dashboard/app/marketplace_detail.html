@@ -21,7 +21,8 @@
                             <h2 class="text-white"><span class="text-danger">●</span> 인증 안됨</h2>
                         {% endif %}
                         <p class="text-white"><i class="ni ni-email-83 base"> {{ marketplace_logic.user.email }}</i></p>
-                        <p class="text-white mt-0 mb-5">{{ marketplace_logic.description }}</p>
+                        <p class="text-white mt-0 mb-2">{{ marketplace_logic.description }}</p>
+                        <p class="text-white mb-5"><b>{{ marketplace_logic.setup_count }} 명이 설치 했습니다</b></p>
                         <a href="#!" data-toggle="modal" data-target="#modal-setup-marketplace-logic" class="btn btn-success">
                             가져오기
                             <i class="ni ni-cloud-download-95 align-baseline"></i>

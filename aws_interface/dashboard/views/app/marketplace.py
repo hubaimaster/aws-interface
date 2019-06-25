@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ObjectDoesNotExist
 
-from dashboard.models import App, MarketplaceLogic
+from dashboard.models import App, MarketplaceLogic, MarketplaceLogicSetup
 from dashboard.views.utils import Util, page_manage
 from dashboard.message import error
 
@@ -132,9 +132,24 @@ class MarketplaceDetail(LoginRequiredMixin, View):
             function_name = request.POST.get('function_name', None)
             if not function_name:
                 function_name = marketplace_logic.function_name
-            return self.setup_marketplace_logic(adapter, marketplace_logic, function_name)
+            marketplace_logic_id = self.setup_marketplace_logic(adapter, marketplace_logic, function_name)
+            self.increase_setup_count(marketplace_logic, request.user)
+            return marketplace_logic_id
 
-    def setup_marketplace_logic(self, adapter, marketplace_logic, function_name):
+    @classmethod
+    def increase_setup_count(cls, marketplace_logic, setup_user):
+        try:
+            setup = MarketplaceLogicSetup.objects.get(marketplace_logic=marketplace_logic, user=setup_user)
+        except MarketplaceLogicSetup.DoesNotExist:
+            setup = None
+        if setup is None:
+            setup = MarketplaceLogicSetup(marketplace_logic=marketplace_logic, user=setup_user)
+            setup.save()
+            marketplace_logic.setup_count += 1
+            marketplace_logic.save()
+
+    @classmethod
+    def setup_marketplace_logic(cls, adapter, marketplace_logic, function_name):
         with adapter.open_api_logic() as logic_api:
             description = marketplace_logic.description
             runtime = marketplace_logic.runtime

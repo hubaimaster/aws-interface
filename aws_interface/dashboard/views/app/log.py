@@ -48,7 +48,12 @@ class Log(LoginRequiredMixin, View):
                 return JsonResponse(log_result)
             elif cmd == 'get_log_rows':
                 start_key = request.POST.get('start_key', None)
-                result = log.get_logs(start_key, reverse=True)
+                event_source = request.POST.get('event_source', None)
+                event_name = request.POST.get('event_name', None)
+                event_param = request.POST.get('event_param', None)
+                user_id = request.POST.get('user_id', None)
+
+                result = log.get_logs(event_source, event_name, event_param, user_id, start_key, reverse=True)
                 template = loader.get_template('dashboard/app/component/log_table_row.html')
                 items = result.get('items', [])
                 end_key = result.get('end_key', None)

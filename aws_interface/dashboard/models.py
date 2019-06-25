@@ -171,9 +171,28 @@ class MarketplaceLogic(models.Model):
     runtime = models.CharField(max_length=255)
 
     verified = models.BooleanField(default=False)
-    view_count = models.BigIntegerField(default=0)
-    setup_count = models.BigIntegerField(default=0)
     price = models.BigIntegerField(default=0)
+    setup_count = models.BigIntegerField(default=0)
+
+    setup_user_set = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                            blank=True,
+                                            related_name='setup_user_set',
+                                            through='MarketplaceLogicSetup')
+
+    comment_user_set = models.ManyToManyField(settings.AUTH_USER_MODEL,
+                                              blank=True,
+                                              related_name='comment_user_set',
+                                              through='MarketplaceLogicComment')
+
+
+class MarketplaceLogicSetup(models.Model):
+    """ Comment on marketplaceLogic
+    """
+    id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
+    creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
+
+    marketplace_logic = models.ForeignKey(MarketplaceLogic, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class MarketplaceLogicComment(models.Model):
@@ -182,7 +201,6 @@ class MarketplaceLogicComment(models.Model):
     id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
     creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
 
-    parent = models.ForeignKey(MarketplaceLogic, on_delete=models.CASCADE)
+    marketplace_logic = models.ForeignKey(MarketplaceLogic, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
-    like_count = models.BigIntegerField(default=0)
