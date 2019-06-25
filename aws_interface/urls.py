@@ -60,4 +60,8 @@ urlpatterns = [
     path('<app_id>/logic', Logic.as_view(), name='logic'),
     path('<app_id>/logic/<function_name>', LogicEdit.as_view(), name='logic_edit'),
     path('<app_id>/log', Log.as_view(), name='log'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# Allow MEDIA_URL to checkout media file in local when only DEBUG is True
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
