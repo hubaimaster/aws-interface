@@ -207,7 +207,7 @@ class MarketplaceEdit(LoginRequiredMixin, View):
             if change_logo_image:
                 marketplace_logic.logo_image = logo_image
 
-            if change_function or marketplace_logic.function_zip_file != function_zip_file:
+            if change_function:
                 # Needs security verification by AWS-I team
                 marketplace_logic.verified = False
                 marketplace_logic.function_zip_file = function_zip_file
