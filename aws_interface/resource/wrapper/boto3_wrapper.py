@@ -623,6 +623,8 @@ class DynamoDB:
         return response
 
     def _add_item_count(self, table_name, count_id, value_to_add=1):
+        if len(str(count_id)) > 1024:  # Index size max is 1024
+            return False
         response = self.client.update_item(
             ExpressionAttributeNames={
                 '#A': 'count',
@@ -657,12 +659,12 @@ class DynamoDB:
         creation_date = item.get('creation_date', self.time())
         with table.batch_writer() as batch:
             for field, value in item.items():
-                if len(str(value)) > 1024:  # Index size max is 1024
-                    continue
                 for operand in self._eq_operands(value):
                     self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date)
 
     def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date):
+        if len(str(operand)) > 1024:
+            return False
         _inverted_query = '{}-{}-{}-{}'.format(partition, field, operand, operation)
         query = {
             'id': 'query-{}'.format(shortuuid.uuid()),
