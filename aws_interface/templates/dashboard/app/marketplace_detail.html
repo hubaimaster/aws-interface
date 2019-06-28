@@ -23,26 +23,24 @@
                         <p class="text-white"><i class="ni ni-email-83 base"> {{ marketplace_logic.user.email }}</i></p>
                         <p class="text-white mt-0 mb-2">{{ marketplace_logic.description }}</p>
                         <p class="text-white mb-5"><b>{{ marketplace_logic.setup_count }} 명이 설치 했습니다</b></p>
-                        <a href="#!" data-toggle="modal" data-target="#modal-setup-marketplace-logic" class="btn btn-success">
-                            가져오기
+                        <a href="#!" data-toggle="modal" data-target="#modal-setup-marketplace-logic" class="btn btn-success mt-2">
+                            설치
                             <i class="ni ni-cloud-download-95 align-baseline"></i>
                         </a>
                         {% if request.user == marketplace_logic.user %}
-                            <a href="{% url 'marketplace_edit' app_id marketplace_logic.id %}" class="btn btn-outline-success">
+                            <a href="{% url 'marketplace_edit' app_id marketplace_logic.id %}" class="btn btn-outline-success mt-2">
                                 수정
-                                <i class="fa fa-edit align-baseline"></i>
+                                <i class="fa fa-archive align-baseline"></i>
                             </a>
-                        {% endif %}
-                        {% if request.user == marketplace_logic.user %}
-                            <a href="#!" onclick="delete_marketplace_logic();" class="btn btn-outline-danger">
+                            <a href="#!" onclick="delete_marketplace_logic();" class="btn btn-outline-danger mt-2">
                                 삭제
                                 <i class="fa fa-trash align-baseline"></i>
                             </a>
                         {% endif %}
                     </div>
-                    <div class="col-3 text-center">
+                    <div class="col-3">
                         {% if marketplace_logic.logo_image %}
-                            <img class="rounded-circle" src="{{ marketplace_logic.logo_image.url }}" style="height: 20vh; width: 20vh;">
+                            <img class="rounded-circle" src="{{ marketplace_logic.logo_image.url }}" style="height: auto; max-width: 256px; width: 80%;">
                         {% endif %}
                     </div>
                 </div>

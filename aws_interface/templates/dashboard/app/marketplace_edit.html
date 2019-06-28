@@ -15,7 +15,7 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12">
                         <h2 class="display-2 text-white">Edit</h2>
-                        <p class="text-white">제출할 함수를 수정할시 다시 인증을 받아야합니다.</p>
+                        <p class="text-white">함수를 다시 업로드하면 인증을 받아야합니다.</p>
                     </div>
                 </div>
             </div>
@@ -42,13 +42,13 @@
                             <!-- Card body -->
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-4">
+                                    <div class="col-lg-6 col-lg-12">
                                         <div class="form-group">
                                             <label>제목</label>
                                             <input id="title" class="form-control" type="text" placeholder="50자 이내의 표시될 제목" value="{{ marketplace_logic.title }}">
                                         </div>
                                     </div>
-                                    <div class="col-8">
+                                    <div class="col-lg-6 col-lg-12">
                                         <div class="form-group">
                                             <label>간단한 설명</label>
                                             <input id="description" class="form-control" type="text" placeholder="100자 이내의 간단한 설명" value="{{ marketplace_logic.description }}">
@@ -56,7 +56,7 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-4">
+                                    <div class="col-lg-4 col-lg-12">
                                         <div class="form-group">
                                             <label>카테고리</label>
                                             <select id="category" class="form-control" value="{{ marketplace_logic.category }}">
@@ -70,13 +70,13 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-lg-4 col-lg-12">
                                         <div class="form-group">
-                                            <label>로고 이미지 파일 변경 <input id="change-logo-image" type="checkbox" onchange="$('#logo-image').prop('disabled', !this.checked);"></label>
+                                            <label>로고 이미지 변경 <input id="change-logo-image" type="checkbox" onchange="$('#logo-image').prop('disabled', !this.checked);"></label>
                                             <input id="logo-image" class="form-control" type="file" accept="image/*" disabled>
                                         </div>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-lg-4 col-lg-12">
                                         <div class="form-group">
                                             <label>업로드할 함수 <input id="change-function" type="checkbox" onchange="$('#function-name').prop('disabled', !this.checked);"></label>
                                             <select id="function-name" class="form-control" disabled>

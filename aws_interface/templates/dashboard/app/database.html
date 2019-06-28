@@ -589,7 +589,7 @@
                     value_type = 'L';
                     value = JSON.stringify(value);
                 }
-                const value_escaped = replaceAll(value, '\n', '\\n');
+                const value_escaped = replaceAll(String(value), '\n', '\\n');
 
                 var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\"><th name=\"field\" id=\"" +
                     key + "\" scope=\"row\">" +
@@ -862,6 +862,7 @@
                 var items = data['items'];
                 item_ids = [];
                 $("#item-table>tbody").empty();
+                $("#field-table>tbody").empty();
                 append_items(items);
                 //append_more_query_button(); TODO
                 $("#modal-query-item").modal('hide');
