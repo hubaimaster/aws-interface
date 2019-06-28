@@ -90,12 +90,12 @@ class LogicTestProcess:
         print("Testcase modal is not opened")
         return False
 
-    def _set_testcase(self, testcase_name, testcase_function, testcase_pageload):
+    def _set_testcase(self, testcase_name, testcase_function, testcase_payload):
         """
-        Fill modal with [testcase_name], [testcase_function], [testcase_pageload] and close the modal
+        Fill modal with [testcase_name], [testcase_function], [testcase_payload] and close the modal
         :param testcase_name: name of testcase
         :param testcase_function: name of function that would be run with testcase
-        :param testcase_pageload: pageload of testcase
+        :param testcase_payload: payload of testcase
         :return:
         """
         testcase_modal = self.parent.browser.find_element_by_id('modal-create-function-test')
@@ -104,10 +104,10 @@ class LogicTestProcess:
         select_box = select.Select(testcase_modal.parent.find_element_by_name('function_name'))
         select_box.select_by_value(testcase_function)
         time.sleep(DELAY)
-        testcase_modal.find_element_by_id('test_input').send_keys(testcase_pageload)
+        testcase_modal.find_element_by_id('test_input').send_keys(testcase_payload)
         time.sleep(DELAY)
         testcase_modal.find_element_by_id('create-function-test').click()
-        print("Set testcase with [{}], [{}], [{}]".format(testcase_name, testcase_function, testcase_pageload))
+        print("Set testcase with [{}], [{}], [{}]".format(testcase_name, testcase_function, testcase_payload))
 
     def _remove_testcase(self, testcase_name):
         """
@@ -155,14 +155,24 @@ class LogicTestProcess:
         return False
 
     # Not implemented yet
-    def _get_test_result(self):
+    def _get_test_result(self,testcase_function, testcase_payload):
         """
         Return the text of modal-test-result
         :return: str type. text on test result modal
         """
-        #print(self.parent.browser.page_source)
+        DATA = {'cmd' : 'run_function', 'function_name' : "{}".format(testcase_function), 'payload' : "{}".format(testcase_payload)}
+        c = Client()
+        app_id = self.parent.browser.current_url.split('/')[-2]
+        print('{}/logic'.format(app_id))
+        print(self.parent.browser.current_url)
+        response = c.post(self.parent.browser.current_url, DATA)
+        print(response)
+        print(response.context)
+        #print(response.content)
+        """
         test_result_modal = self.parent.browser.find_element_by_id('modal-test-result')
         test_result_modal.find_element_by_tag_name('button').click()
+    """
 
     def _click_test_function(self, test_function):
         """
@@ -292,7 +302,7 @@ class LogicTestProcess:
         FUNCTION_URL = '/logic/{}'.format(FUNCTION_NAME)
         TESTCASE_NAME = 'test-case'
         TESTCASE_FUNCTION = 'test-function'
-        TESTCASE_PAGELOAD = '{"answer": 10}'
+        TESTCASE_PAYLOAD = '{"answer": 10}'
 
         time.sleep(DELAY)
         start_time = time.time()
@@ -320,16 +330,17 @@ class LogicTestProcess:
         time.sleep(DELAY)
         self._click_create_testcase()
         time.sleep(DELAY)
-        self._set_testcase(TESTCASE_NAME, TESTCASE_FUNCTION, TESTCASE_PAGELOAD)
+        self._set_testcase(TESTCASE_NAME, TESTCASE_FUNCTION, TESTCASE_PAYLOAD)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertTrue(self._has_testcase(TESTCASE_NAME))
         time.sleep(DELAY)
-        self._open_test_result(TESTCASE_NAME)
-        time.sleep(LONG_DELAY)
+        # self._open_test_result(TESTCASE_NAME)
+        # time.sleep(LONG_DELAY)
         # _get_test_result is not implemented yet!
-        self._get_test_result()
-        #self.parent.assertTrue(self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAGELOAD)['response'])
+        self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAYLOAD)
+        #self.parent.assertTrue(self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAYLOAD)['response'])
         time.sleep(LONG_DELAY)
+        """
         self._click_test_function(FUNCTION_NAME)
         time.sleep(LONG_DELAY)
         self.parent.assertTrue(self._get_function_url(FUNCTION_NAME).endswith(FUNCTION_URL))
@@ -360,7 +371,7 @@ class LogicTestProcess:
         time.sleep(DELAY)
         # _get_test_result is not implemented yet!
         self._get_test_result()
-        # self.parent.assertTrue(self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAGELOAD)['error'])
+        # self.parent.assertTrue(self._get_test_result(TESTCASE_FUNCTION, TESTCASE_PAYLOAD)['error'])
         time.sleep(LONG_DELAY)
         self._remove_testcase(TESTCASE_NAME)
         time.sleep(LONG_DELAY)
@@ -369,3 +380,4 @@ class LogicTestProcess:
         self._remove_function(FUNCTION_NAME)
         time.sleep(LONG_DELAY * 2)
         self.parent.assertFalse(self._has_function(FUNCTION_NAME))
+        """
