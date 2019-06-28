@@ -19,8 +19,8 @@ class TestDatabase(unittest.TestCase):
     user_password = 'ttestpassword'
     partition = 'test-partition'
     item = {'type': 'test'}
-    read_groups = ["user","admin"]
-    write_groups = ["user","admin"]
+    read_groups = ["user", "admin"]
+    write_groups = ["user", "admin"]
     field_name = 'test-field'
     field_value = 'test-field-value'
     read_groups_new = ["user"]
@@ -44,7 +44,7 @@ class TestDatabase(unittest.TestCase):
         :return: None
         """
         resp = self.client.database_create_item(self.partition, self.item, self.read_groups, self.write_groups)
-        self.item_id=resp['item_id']
+        self.item_id = resp['item_id']
 
     def tearDown(self):
         """
@@ -73,7 +73,6 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(resp['item']['read_groups'] == self.read_groups)
         self.assertTrue(resp['item']['write_groups'] == self.write_groups)
 
-    '''
     def test_database_get_item_count(self):
         """
         Get the number of items in the partition.
@@ -102,7 +101,9 @@ class TestDatabase(unittest.TestCase):
         resp = self.client.database_get_item(self.item_id)
         fields = resp['item']
         self.assertTrue(self.field_name in fields)
-        '''
+
+     '''
+     #Not implemented yet
     def test_database_update_item(self):
         """
         Update item
@@ -121,3 +122,4 @@ class TestDatabase(unittest.TestCase):
         query = self.query.format(self.partition)
         resp = self.client.database_query_items(self.partition, query)
         print("query", resp)
+    '''
