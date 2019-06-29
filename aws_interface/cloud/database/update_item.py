@@ -19,7 +19,7 @@ info = {
         'error?': {
             'code': 'int',
             'message': 'str',
-        }
+        },
     }
 }
 
