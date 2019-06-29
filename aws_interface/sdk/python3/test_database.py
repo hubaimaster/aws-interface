@@ -25,7 +25,7 @@ class TestDatabase(unittest.TestCase):
     field_value = 'test-field-value'
     read_groups_new = ["user"]
     write_groups_new = ["user"]
-    query = {}
+    query = [{"option": "or", "field": "read_groups", "condition": "in", "value": "user"}]
 
     @classmethod
     def setUpClass(cls):
@@ -49,7 +49,7 @@ class TestDatabase(unittest.TestCase):
     def tearDown(self):
         """
         This method is called when a function with prefix [test_] is ended.
-        SDK logout
+        Delete created item
         :return: None
         """
         self.client.database_delete_item(self.item_id)
@@ -70,8 +70,8 @@ class TestDatabase(unittest.TestCase):
         """
         resp = self.client.database_get_item(self.item_id)
         self.assertTrue(resp['item']['partition'] == self.partition)
-        self.assertTrue(resp['item']['read_groups'] == self.read_groups)
-        self.assertTrue(resp['item']['write_groups'] == self.write_groups)
+        self.assertTrue(set(resp['item']['read_groups']) == set(self.read_groups))
+        self.assertTrue(set(resp['item']['write_groups']) == set(self.write_groups))
 
     def test_database_get_item_count(self):
         """
@@ -95,31 +95,38 @@ class TestDatabase(unittest.TestCase):
         """
         Add new field with [field_name] and [field_value] on item with [item_id]
         Verify by checking if [field_name] : [field_value] pair is in the item
-        :return:
+        :return: None
         """
         self.client.database_put_item_field(self.item_id, self.field_name, self.field_value)
         resp = self.client.database_get_item(self.item_id)
         fields = resp['item']
         self.assertTrue(self.field_name in fields)
 
-     '''
-     #Not implemented yet
+    '''
+        #Not implemented yet
     def test_database_update_item(self):
         """
         Update item
         Verify by checking read_groups and write_groups
-        :return:
+        :return: None
         """
-        resp = self.client.database_update_item(self.item_id, self.item, self.read_groups_new, self.write_groups_new)
+        resp = self.client.database_get_items(self.partition)
         print(resp)
+        resp = self.client.database_get_item(self.item_id)
+        print(resp)
+        resp = self.client.database_update_item(self.item_id, self.item, self.read_groups_new, self.write_groups_new)
         time.sleep(8)
         resp = self.client.database_get_item(self.item_id)
         print(resp)
-        #self.assertTrue(resp['item']['read_groups'] == self.read_groups_new)
-        #self.assertTrue(resp['item']['write_groups'] == self.write_groups_new)
-
-    def test_database_query_items(self):
-        query = self.query.format(self.partition)
-        resp = self.client.database_query_items(self.partition, query)
-        print("query", resp)
+        resp = self.client.database_get_items(self.partition)
+        print(resp)
+        #self.assertTrue(set(resp['item']['read_groups']) == set(self.read_groups_new))
+        #self.assertTrue(set(resp['item']['write_groups']) == set(self.write_groups_new))
     '''
+    def test_database_query_items(self):
+        """
+        Query and check if the response is in list
+        :return: None
+        """
+        resp = self.client.database_query_items(self.partition, self.query)
+        self.assertIsInstance(resp['items'], list)
