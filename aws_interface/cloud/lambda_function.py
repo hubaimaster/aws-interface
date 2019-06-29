@@ -4,6 +4,7 @@ from resource import get_resource
 import cloud.message.error
 import sys
 import time
+import traceback
 
 
 CALLABLE_MODULE_WHITE_LIST = {
@@ -125,12 +126,15 @@ def abstracted_handler(params, resource):
         }
         return response
     except Exception as ex:
+        error_traceback = traceback.format_exc()
         print('Exception: [{}]'.format(ex))
+        print('error_traceback: [{}]'.format(error_traceback))
+
         response = {
             'statusCode': 400,
             'body': {
                 'error': cloud.message.error.INVALID_REQUEST,
-                'description': '{}'.format(ex)
+                'traceback': '{}'.format(error_traceback)
             },
             'error': cloud.message.error.INVALID_REQUEST
         }

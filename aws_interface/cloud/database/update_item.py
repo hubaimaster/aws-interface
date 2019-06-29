@@ -44,6 +44,14 @@ def do(data, resource):
         return Response(body)
 
     if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item):
+        # 새로운 필드에 없는 값은 이전 아이템에 있는값을 넣어줌
+        for key in item:
+            if key not in new_item:
+                new_item[key] = item[key]
+        # value 가 None 이면 필드에서 제거
+        for key, value in new_item.items():
+            if value is None:
+                new_item.pop(key)
         resource.db_update_item(item_id, new_item)
     else:
         body['error'] = error.NO_SUCH_PARTITION
