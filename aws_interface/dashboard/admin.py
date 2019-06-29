@@ -5,16 +5,15 @@ from .models import User, App, Log, MarketplaceLogic, MarketplaceLogicComment, M
 
 
 class CustomUserAdmin(UserAdmin):
-    fields = ['c_credentials']
-
-    def get_ordering(self, request):
-        return [Upper('creation_date')]
+    list_display = ('email', 'creation_date')
+    ordering = ['-creation_date']
 
 
 class AppAdmin(admin.ModelAdmin):
     readonly_fields = ['id', 'creation_date']
     fields = ['id', 'creation_date', 'name', 'user', 'vendor']
     list_display = ('id', 'creation_date', 'name', 'user', 'vendor')
+    ordering = ['-creation_date']
 
     def get_ordering(self, request):
         return [Upper('creation_date')]
@@ -42,7 +41,7 @@ class MarketplaceLogicAdmin(admin.ModelAdmin):
     ordering = ['creation_date']
 
 
-admin.site.register(User, UserAdmin)
+admin.site.register(User, CustomUserAdmin)
 admin.site.register(App, AppAdmin)
 admin.site.register(Log, LogAdmin)
 
