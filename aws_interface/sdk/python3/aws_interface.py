@@ -5,12 +5,19 @@ import os
 
 
 class Client:
-    def __init__(self, url=None):
-        self.url = '{{REST_API_URL}}'
-        if url:
-            self.url = url
-        self.session_id = None
-        self.guest_id = None
+    def __init__(self, config_path='config.json'):
+        config = self.get_config(config_path)
+        self.session_id = config.get('default_session_id', None)
+        self.url = config.get('url', None)
+
+    @classmethod
+    def get_config(cls, config_path):
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as fp:
+                config_json = json.load(fp)
+                return config_json
+        else:
+            return {}
 
     @classmethod
     def _post(cls, url, data):
@@ -25,18 +32,15 @@ class Client:
             data['session_id'] = self.session_id
         data = json.dumps(data)
         resp = self._post(self.url, data)
-        return resp.json().get('body', {'error': '404', 'message': 'NO RESPONSE'})
+        return resp.json().get('body', {'error': '404', 'message': 'No response'})
 
     def _auth(self, api_name, data):
-        self.log_create_log('auth', api_name, None)
         return self.call_api('auth', api_name, data)
 
     def _database(self, api_name, data):
-        self.log_create_log('database', api_name, None)
         return self.call_api('database', api_name, data)
 
     def _storage(self, api_name, data):
-        self.log_create_log('storage', api_name, None)
         return self.call_api('storage', api_name, data)
 
     def _logic(self, api_name, data):
@@ -261,6 +265,15 @@ def examples():
 
     response = client.database_create_item('test', {'type': 'test'}, read_groups=['owner'], write_groups=['owner'])
     print('database_create_item response: {}'.format(response))
+    item_id = response['item_id']
+
+    response = client.database_update_item(item_id, {
+        'man': 'ok',
+    }, ['owner'], ['owner'])
+    print(response)
+
+    response = client.database_get_item(item_id)
+    print(response)
 
     response = client.storage_upload_file('aws_interface.py', read_groups=['owner'], write_groups=['owner'])
     print(response)

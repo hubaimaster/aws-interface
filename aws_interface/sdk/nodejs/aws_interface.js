@@ -64,33 +64,15 @@ class Client{
     }
 
     _auth(api_name, data, callback) {
-        let self = this;
-        this.callAPI('auth', api_name, data, function (data) {
-            self.logCreateLog('auth', api_name, null, function (data) {
-
-            });
-            callback(data);
-        });
+        this.callAPI('auth', api_name, data, callback);
     }
 
     _database(api_name, data, callback) {
-        let self = this;
-        this.callAPI('database', api_name, data, function (data) {
-            self.logCreateLog('database', api_name, null, function (data) {
-
-            });
-            callback(data);
-        });
+        this.callAPI('database', api_name, data, callback);
     }
 
     _storage(api_name, data, callback) {
-        let self = this;
-        this.callAPI('storage', api_name, data, function (data) {
-            self.logCreateLog('storage', api_name, null, function (data) {
-
-            });
-            callback(data);
-        });
+        this.callAPI('storage', api_name, data, callback);
     }
 
     _logic(api_name, data, callback) {

@@ -44,11 +44,11 @@ def do(data, resource):
         return Response(body)
 
     if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item):
-        # 새로운 필드에 없는 값은 이전 아이템에 있는값을 넣어줌
+        # Put the value in the previous item that is not in the new field
         for key in item:
             if key not in new_item:
                 new_item[key] = item[key]
-        # value 가 None 이면 필드에서 제거
+        # Remove field if value is None
         for key, value in new_item.items():
             if value is None:
                 new_item.pop(key)

@@ -65,6 +65,7 @@ def _replace_template_key(sdk_dir, key, value):
         '.js',
         '.txt',
         '.java',
+        '.json',
     ]
     target_key = '{{' + key + '}}'
     files = [f for f in listdir(sdk_dir) if isfile(join(sdk_dir, f))]

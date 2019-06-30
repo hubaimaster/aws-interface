@@ -25,51 +25,51 @@
         <!-- Page content -->
         <div class="container-fluid mt--7">
 
-                <div class="row mt-4">
-                    <div class="col-xl-12 mb-5 mb-xl-0">
-                        <div class="card shadow">
-                            <div class="card-header border-1">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-                                        <h4 class="mb-0">
+            <div class="row mt-4">
+                <div class="col-xl-12 mb-5 mb-xl-0">
+                    <div class="card shadow">
+                        <div class="card-header border-1">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <h4 class="mb-0">
 
                                         정책함수 <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Delete 별 오퍼레이션이 허락됩니다"></i>
 
-                                             모드:
-                                            <select class="form-control-alternative" onchange="set_policy_mode(this.value);">
-                                                <option value="create"><span>Create</span></option>
-                                                <option value="read"><span>Read</span></option>
-                                                <option value="delete"><span>Delete</span></option>
-                                            </select>
+                                        모드:
+                                        <select class="form-control-alternative" onchange="set_policy_mode(this.value);">
+                                            <option value="create"><span>Create</span></option>
+                                            <option value="read"><span>Read</span></option>
+                                            <option value="delete"><span>Delete</span></option>
+                                        </select>
 
-                                        </h4>
-                                    </div>
-                                    <div class="text-right">
-                                        <button class="btn btn-sm btn-primary" onclick="save_policy();">Save</button>
-                                    </div>
+                                    </h4>
                                 </div>
-
+                                <div class="text-right">
+                                    <button class="btn btn-sm btn-primary" onclick="save_policy();">Save</button>
+                                </div>
                             </div>
-                            <div>
-                                <div id="code-editor" style="height: 250px;">
-                                    <!-- CODE EDITOR -->
-                                    <style type="text/css" media="screen">
-                                        #editor {
-                                            margin: 0;
-                                            margin-top: 69px;
-                                            position: absolute;
-                                            top: 0;
-                                            bottom: 0;
-                                            left: 0;
-                                            right: 0;
-                                        }
-                                    </style>
-                                    <pre id="editor"></pre>
-                                </div>
+
+                        </div>
+                        <div>
+                            <div id="code-editor" style="height: 250px;">
+                                <!-- CODE EDITOR -->
+                                <style type="text/css" media="screen">
+                                    #editor {
+                                        margin: 0;
+                                        margin-top: 69px;
+                                        position: absolute;
+                                        top: 0;
+                                        bottom: 0;
+                                        left: 0;
+                                        right: 0;
+                                    }
+                                </style>
+                                <pre id="editor"></pre>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
 
             <div class="row mt-3">
@@ -191,10 +191,10 @@
 
                                 </tbody>
                             </table>
+                        </div>
                         <button id="load-more-files-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_files();">
                             항목 더보기 +
                         </button>
-                        </div>
                     </div>
                 </div>
             </div>
