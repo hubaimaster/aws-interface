@@ -8,7 +8,6 @@ the execution base path will change,
 so you must use the import code that in the comments. [from aws_interface import Client]
 """
 import unittest
-import time
 # from ..aws_interface import Client
 from aws_interface import Client
 
@@ -102,27 +101,18 @@ class TestDatabase(unittest.TestCase):
         fields = resp['item']
         self.assertTrue(self.field_name in fields)
 
-    '''
-        #Not implemented yet
     def test_database_update_item(self):
         """
         Update item
         Verify by checking read_groups and write_groups
         :return: None
         """
-        resp = self.client.database_get_items(self.partition)
-        print(resp)
-        resp = self.client.database_get_item(self.item_id)
-        print(resp)
         resp = self.client.database_update_item(self.item_id, self.item, self.read_groups_new, self.write_groups_new)
-        time.sleep(8)
         resp = self.client.database_get_item(self.item_id)
-        print(resp)
-        resp = self.client.database_get_items(self.partition)
-        print(resp)
-        #self.assertTrue(set(resp['item']['read_groups']) == set(self.read_groups_new))
-        #self.assertTrue(set(resp['item']['write_groups']) == set(self.write_groups_new))
-    '''
+        self.assertTrue(set(resp['item']['read_groups']) == set(self.read_groups_new))
+        self.assertTrue(set(resp['item']['write_groups']) == set(self.write_groups_new))
+
+
     def test_database_query_items(self):
         """
         Query and check if the response is in list
