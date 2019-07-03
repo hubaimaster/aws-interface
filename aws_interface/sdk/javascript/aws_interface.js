@@ -1,4 +1,3 @@
-
 class Client{
 
     constructor() {
@@ -45,51 +44,33 @@ class Client{
         req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
         req.onreadystatechange = function (aEvt) {
-            if (req.readyState == 4) {
-                var json = JSON.parse(req.responseText);
-                var body = null;
-                var error = null;
-                if ("body" in json){
-                    body = json["body"];
-                }
-                if ("error" in json){
-                    error = json["error"];
-                    console.error(error);
-                }
-                callback(body);
+          if (req.readyState == 4) {
+            var json = JSON.parse(req.responseText);
+            var body = null;
+            var error = null;
+            if ("body" in json){
+              body = json["body"];
             }
+            if ("error" in json){
+              error = json["error"];
+              console.error(error);
+            }
+            callback(body);
+          }
         };
         req.send(JSON.stringify(data));
     }
 
     _auth(api_name, data, callback) {
-        let self = this;
-        this.callAPI('auth', api_name, data, function (data) {
-            self.logCreateLog('auth', api_name, null, function (data) {
-
-            });
-            callback(data);
-        });
+        this.callAPI('auth', api_name, data, callback);
     }
 
     _database(api_name, data, callback) {
-        let self = this;
-        this.callAPI('database', api_name, data, function (data) {
-            self.logCreateLog('database', api_name, null, function (data) {
-
-            });
-            callback(data);
-        });
+        this.callAPI('database', api_name, data, callback);
     }
 
     _storage(api_name, data, callback) {
-        let self = this;
-        this.callAPI('storage', api_name, data, function (data) {
-            self.logCreateLog('storage', api_name, null, function (data) {
-
-            });
-            callback(data);
-        });
+        this.callAPI('storage', api_name, data, callback);
     }
 
     _logic(api_name, data, callback) {
