@@ -116,11 +116,15 @@ def abstracted_handler(params, resource):
     try:
         module_response = module.do(data, resource)
     except PermissionError as ex:
-        print(ex)
+        error_traceback = traceback.format_exc()
+        print('Exception: [{}]'.format(ex))
+        print('error_traceback: [{}]'.format(error_traceback))
+
         response = {
             'statusCode': 401,
             'body': {
-                'error': cloud.message.error.PERMISSION_DENIED
+                'error': cloud.message.error.PERMISSION_DENIED,
+                'traceback': '{}'.format(error_traceback)
             },
             'error': cloud.message.error.PERMISSION_DENIED
         }

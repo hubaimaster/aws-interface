@@ -6,6 +6,8 @@ import sys
 import io
 import os
 import tempfile
+import shutil
+import json
 
 from importlib import import_module
 from zipfile import ZipFile
@@ -26,6 +28,13 @@ info = {
         },
     }
 }
+
+
+def copy_configfile(destination, sdk_config, config_name='aws_interface_config.json'):
+    config_filepath = os.path.join(destination, config_name)
+    if not os.path.exists(config_filepath):
+        with open(config_filepath, 'w+') as fp:
+            json.dump(sdk_config, fp)
 
 
 # TODO now it can only invoke python3.6 runtime. any other runtimes (java, node, ..) will be able to invoke.
@@ -49,6 +58,7 @@ def do(data, resource):
 
         zip_file_id = item['zip_file_id']
         function_handler = item['handler']
+        sdk_config = item.get('sdk_config', {})
         function_package = '.'.join(function_handler.split('.')[:-1])
         function_method = function_handler.split('.')[-1]
 
@@ -60,6 +70,7 @@ def do(data, resource):
             zip_temp.write(zip_file_bin)
         with ZipFile(zip_temp_dir) as zip_file:
             zip_file.extractall(extracted_dir)
+            copy_configfile(extracted_dir, sdk_config)
         try:
             #  Comment removing cache because of a performance issue
             #  invalidate_caches()

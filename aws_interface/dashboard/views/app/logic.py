@@ -1,14 +1,23 @@
 
+from core.adapter.django import DjangoAdapter
 from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from dashboard.views.utils import Util, page_manage
 from dashboard.views.app.overview import allocate_resource_in_background
-from core.adapter.django import DjangoAdapter
+
 import json
 import base64
 import time
+
+
+def get_sdk_config(adapter):
+    sdk_config = {
+        'rest_api_url': adapter.get_rest_api_url(),
+        'session_id': adapter.generate_session_id(['admin'])
+    }
+    return sdk_config
 
 
 class Logic(LoginRequiredMixin, View):
@@ -36,13 +45,15 @@ class Logic(LoginRequiredMixin, View):
                 description = request.POST['description']
                 runtime = request.POST['runtime']
                 handler = request.POST['handler']
+                sdk_config = get_sdk_config(adapter)
+
                 zip_file.seek(0)
                 zip_file_bin = zip_file.read()
                 zip_file_bin = base64.b64encode(zip_file_bin)
                 zip_file_bin = zip_file_bin.decode('utf-8')
                 if not description:
                     description = None
-                logic_api.create_function(function_name, description, runtime, handler, zip_file_bin, True)
+                logic_api.create_function(function_name, description, runtime, handler, sdk_config, zip_file_bin, True)
             elif cmd == 'create_function_test':
                 test_name = request.POST.get('test_name')
                 function_name = request.POST.get('function_name')
@@ -116,8 +127,9 @@ class LogicEdit(LoginRequiredMixin, View):
                 description = request.POST.get('description', None)
                 handler = request.POST.get('handler', None)
                 runtime = request.POST.get('runtime', None)
+                sdk_config = get_sdk_config(adapter)
                 result = logic_api.update_function(function_name=function_name, description=description,
-                                                   handler=handler, runtime=runtime)
+                                                   handler=handler, runtime=runtime, sdk_config=sdk_config)
                 return JsonResponse(result)
             elif cmd == 'get_function_file_paths':
                 function_name = request.POST.get('function_name')

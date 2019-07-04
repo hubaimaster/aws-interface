@@ -15,7 +15,7 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12">
                         <h2 class="display-2 text-white">Edit</h2>
-                        <p class="text-white">함수를 다시 업로드하면 인증을 받아야합니다.</p>
+                        <p class="text-white">{{ _("Uploading the function again will require verification") }} </p>
                     </div>
                 </div>
             </div>
@@ -32,10 +32,10 @@
                             <div class="card-header">
                                 <div class="row">
                                     <div class="col-8">
-                                        <h2 class="text-black"><i class="fa fa-edit"></i> 기본 정보</h2>
+                                        <h2 class="text-black"><i class="fa fa-edit"></i> {{ _("Information") }}</h2>
                                     </div>
                                     <div class="col-4 text-right">
-                                        <button id="upload-btn" class="btn btn-sm btn-primary text-right">저장</button>
+                                        <button id="upload-btn" class="btn btn-sm btn-primary text-right">{{ _("Save") }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -44,21 +44,21 @@
                                 <div class="row">
                                     <div class="col-lg-6 col-lg-12">
                                         <div class="form-group">
-                                            <label>제목</label>
-                                            <input id="title" class="form-control" type="text" placeholder="50자 이내의 표시될 제목" value="{{ marketplace_logic.title }}">
+                                            <label>{{ _("Title") }}</label>
+                                            <input id="title" class="form-control" type="text" placeholder="{{ _("Title") }}" value="{{ marketplace_logic.title }}">
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-lg-12">
                                         <div class="form-group">
-                                            <label>간단한 설명</label>
-                                            <input id="description" class="form-control" type="text" placeholder="100자 이내의 간단한 설명" value="{{ marketplace_logic.description }}">
+                                            <label>{{ _("Description") }}</label>
+                                            <input id="description" class="form-control" type="text" placeholder="{{ _("Short description") }}" value="{{ marketplace_logic.description }}">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-4 col-lg-12">
                                         <div class="form-group">
-                                            <label>카테고리</label>
+                                            <label>{{ _("Category") }}</label>
                                             <select id="category" class="form-control" value="{{ marketplace_logic.category }}">
                                                 {% for category_id, value in categories %}
                                                     {% if category_id == marketplace_logic.category %}
@@ -72,13 +72,13 @@
                                     </div>
                                     <div class="col-lg-4 col-lg-12">
                                         <div class="form-group">
-                                            <label>로고 이미지 변경 <input id="change-logo-image" type="checkbox" onchange="$('#logo-image').prop('disabled', !this.checked);"></label>
+                                            <label>{{ _("Logo image") }} <input id="change-logo-image" type="checkbox" onchange="$('#logo-image').prop('disabled', !this.checked);"></label>
                                             <input id="logo-image" class="form-control" type="file" accept="image/*" disabled>
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-lg-12">
                                         <div class="form-group">
-                                            <label>업로드할 함수 <input id="change-function" type="checkbox" onchange="$('#function-name').prop('disabled', !this.checked);"></label>
+                                            <label>{{ _("Function to upload") }} <input id="change-function" type="checkbox" onchange="$('#function-name').prop('disabled', !this.checked);"></label>
                                             <select id="function-name" class="form-control" disabled>
                                                 {% for function in functions %}
                                                     <option
@@ -104,7 +104,7 @@
 
             <div class="row">
                 <div class="col-lg-12 col-md-12 mt-4">
-                    <h2 class="text-black"><i class="fa fa-file-text"></i>  상세 내용 </h2>
+                    <h2 class="text-black"><i class="fa fa-file-text"></i>  {{ _("Content") }} </h2>
                 </div>
             </div>
 
@@ -191,15 +191,15 @@
             const change_function = $("#change-function").is(':checked') == true;
 
             if (title.length < 1){
-                alert('Title must be at least 1 characters.');
+                alert("{{ _('Title must be at least 1 characters') }}");
                 return;
             }
             if (description.length < 1){
-                alert('Description must be at least 1 characters.');
+                alert("{{ _('Description must be at least 1 characters') }}");
                 return;
             }
             if (content.length < 1){
-                alert('Content must be at least 1 characters.');
+                alert("{{ _('Content must be at least 1 characters') }}");
                 return;
             }
             uploadMarketplaceLogic(title, description, category, logo_image, function_name, content, change_logo_image, change_function);

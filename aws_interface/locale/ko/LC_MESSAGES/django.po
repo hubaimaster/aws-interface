@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-19 03:31+0900\n"
+"POT-Creation-Date: 2019-07-03 03:35+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,6 +18,50 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#: dashboard/message/error.py:6
+msgid "Permission denied"
+msgstr "권한이 없습니다"
+
+#: dashboard/views/utils.py:84
+msgid "An unknown error has occurred."
+msgstr "원인을 알수 없는 오류가 발생했습니다."
+
+#: dashboard/views/utils.py:99
+msgid "Please check the registered IAM AccessKey"
+msgstr "등록된 IAM AccessKey 를 확인해주세요"
+
+#: dashboard/views/utils.py:100
+msgid "Invalid AccessKey entered"
+msgstr "유효하지 않은 AccessKey 가 입력되어 있습니다"
+
+#: dashboard/views/utils.py:103
+msgid "The registered IAM AccessKey is insufficient"
+msgstr "등록된 IAM AccessKey 의 권한이 부족합니다"
+
+#: dashboard/views/utils.py:104
+msgid "Add the AdminUser privilege by referring to the guide link below"
+msgstr "아래 링크에서 AdminUser 권한을 추가하는 방법을 알아봅니다"
+
+#: dashboard/views/utils.py:105
+msgid "https://aws-interface.com/docs/start_awsi.pdf"
+msgstr "https://aws-interface.com/docs/start_awsi.pdf"
+
+#: dashboard/views/utils.py:106
+msgid "Adding AWS IAM AccessKey permissions"
+msgstr "IAM AccessKey 권한 추가"
+
+#: dashboard/views/utils.py:109
+msgid "Wait a minute, I'm creating a backend service."
+msgstr "잠시만 기다려주세요, 백엔드 서비스를 생성중입니다."
+
+#: dashboard/views/utils.py:110 dashboard/views/utils.py:114
+msgid "It may take up to 3 minutes"
+msgstr "3분정도 소요될 수 있습니다"
+
+#: dashboard/views/utils.py:113
+msgid "The system may be creating a backend service"
+msgstr "시스템이 백엔드 서비스를 생성중일수 있습니다"
+
 #: settings/base.py:129
 msgid "Korean"
 msgstr "한국어"
@@ -26,6 +70,813 @@ msgstr "한국어"
 msgid "English"
 msgstr "영어"
 
-#: templates/dashboard/apps.html:83
+#: templates/dashboard/accesskey.html:68 templates/dashboard/app/base.html:76
+#: templates/dashboard/app/top-navbar.html:28
+msgid "Logout"
+msgstr "로그아웃"
+
+#: templates/dashboard/accesskey.html:81
+msgid "Change certification information"
+msgstr "인증 정보 변경"
+
+#: templates/dashboard/accesskey.html:102 templates/dashboard/app/auth.html:484
+#: templates/dashboard/register.html:75
+msgid "Email"
+msgstr "이메일"
+
+#: templates/dashboard/accesskey.html:111
+msgid "Current password"
+msgstr "현재 비밀번호"
+
+#: templates/dashboard/accesskey.html:123 templates/dashboard/register.html:106
+msgid "Backend certification information"
+msgstr "백엔드 인증 정보"
+
+#: templates/dashboard/accesskey.html:125 templates/dashboard/register.html:108
+msgid "Click"
+msgstr "클릭"
+
+#: templates/dashboard/accesskey.html:138 templates/dashboard/register.html:121
+msgid "Access key"
+msgstr "Access key"
+
+#: templates/dashboard/accesskey.html:147 templates/dashboard/register.html:130
+msgid "Secret access key"
+msgstr "Secret access key"
+
+#: templates/dashboard/accesskey.html:156 templates/dashboard/register.html:139
+msgid "Region"
+msgstr "Region"
+
+#: templates/dashboard/accesskey.html:189 templates/dashboard/app/auth.html:305
+#: templates/dashboard/app/auth.html:378
+#: templates/dashboard/app/logic_edit.html:39
+#: templates/dashboard/app/marketplace_edit.html:38
+msgid "Save"
+msgstr "저장"
+
+#: templates/dashboard/app/auth.html:16
+#: templates/dashboard/app/database.html:15 templates/dashboard/app/log.html:15
+#: templates/dashboard/app/logic_edit.html:16
+#: templates/dashboard/app/storage.html:16
+msgid "are used"
+msgstr "를 사용중입니다"
+
+#: templates/dashboard/app/auth.html:26 templates/dashboard/app/auth.html:447
+msgid "Members"
+msgstr "회원"
+
+#: templates/dashboard/app/auth.html:43 templates/dashboard/app/auth.html:592
+msgid "Sessions"
+msgstr "세션"
+
+#: templates/dashboard/app/auth.html:64
+msgid "Groups"
+msgstr "그룹"
+
+#: templates/dashboard/app/auth.html:69 templates/dashboard/app/auth.html:76
+msgid "Create group"
+msgstr "그룹 생성"
+
+#: templates/dashboard/app/auth.html:88 templates/dashboard/app/auth.html:118
+#: templates/dashboard/app/database.html:128
+#: templates/dashboard/app/database.html:416
+#: templates/dashboard/app/logic.html:213
+#: templates/dashboard/app/logic_edit.html:48 templates/dashboard/apps.html:107
+msgid "Name"
+msgstr "이름"
+
+#: templates/dashboard/app/auth.html:89
+#: templates/dashboard/app/component/auth_user_table_row.html:37
+msgid "Group name"
+msgstr "그룹 이름"
+
+#: templates/dashboard/app/auth.html:92 templates/dashboard/app/auth.html:119
+#: templates/dashboard/app/auth.html:243 templates/dashboard/app/logic.html:225
+#: templates/dashboard/app/logic_edit.html:55
+#: templates/dashboard/app/marketplace_create.html:53
+#: templates/dashboard/app/marketplace_edit.html:53
+msgid "Description"
+msgstr "설명"
+
+#: templates/dashboard/app/auth.html:93
+msgid "Group description"
+msgstr "그룹 설명"
+
+#: templates/dashboard/app/auth.html:99
+msgid "Click the confirm button to create the group"
+msgstr "확인 버튼을 클릭하여 그룹을 생성합니다"
+
+#: templates/dashboard/app/auth.html:103 templates/dashboard/app/auth.html:304
+#: templates/dashboard/app/auth.html:377 templates/dashboard/app/auth.html:500
+#: templates/dashboard/app/auth.html:549
+#: templates/dashboard/app/component/auth_user_table_row.html:52
+#: templates/dashboard/app/database.html:140
+#: templates/dashboard/app/database.html:284
+#: templates/dashboard/app/database.html:367
+#: templates/dashboard/app/database.html:440
+#: templates/dashboard/app/logic.html:119
+#: templates/dashboard/app/logic.html:247
+#: templates/dashboard/app/marketplace_detail.html:79
+#: templates/dashboard/app/storage.html:166 templates/dashboard/apps.html:118
+msgid "Cancel"
+msgstr "취소"
+
+#: templates/dashboard/app/auth.html:104 templates/dashboard/app/auth.html:201
+#: templates/dashboard/app/auth.html:501 templates/dashboard/app/auth.html:550
+#: templates/dashboard/app/component/auth_user_table_row.html:53
+#: templates/dashboard/app/database.html:141
+#: templates/dashboard/app/database.html:368
+#: templates/dashboard/app/database.html:441
+#: templates/dashboard/app/logic.html:68 templates/dashboard/app/logic.html:120
+#: templates/dashboard/app/logic.html:248
+#: templates/dashboard/app/storage.html:167 templates/dashboard/apps.html:119
+msgid "Confirm"
+msgstr "확인"
+
+#: templates/dashboard/app/auth.html:120 templates/dashboard/app/auth.html:169
+msgid "Permissions"
+msgstr "권한"
+
+#: templates/dashboard/app/auth.html:134
+msgid "Manage"
+msgstr "관리"
+
+#: templates/dashboard/app/auth.html:140
+msgid "Manage group permissions"
+msgstr "그룹 권한 관리"
+
+#: templates/dashboard/app/auth.html:149
+msgid "Add permissions"
+msgstr "권한 추가"
+
+#: templates/dashboard/app/auth.html:178
+msgid "Permission name"
+msgstr "권한 이름"
+
+#: templates/dashboard/app/auth.html:212 templates/dashboard/app/logic.html:295
+#: templates/dashboard/app/marketplace_detail.html:36
+msgid "Remove"
+msgstr "제거"
+
+#: templates/dashboard/app/auth.html:232
+msgid "Sign-in methods"
+msgstr "로그인 방법"
+
+#: templates/dashboard/app/auth.html:242
+msgid "Method"
+msgstr "방법"
+
+#: templates/dashboard/app/auth.html:244
+msgid "Default group when joining"
+msgstr "가입시 기본 그룹"
+
+#: templates/dashboard/app/auth.html:245
+#: templates/dashboard/app/storage.html:36
+msgid "Policy"
+msgstr "정책"
+
+#: templates/dashboard/app/auth.html:246
+msgid "Enabled"
+msgstr "사용가능"
+
+#: templates/dashboard/app/auth.html:252
+msgid "Email/Password login"
+msgstr "이메일/비밀번호 로그인"
+
+#: templates/dashboard/app/auth.html:270 templates/dashboard/app/auth.html:275
+#: templates/dashboard/app/auth.html:343 templates/dashboard/app/auth.html:348
+msgid "Manage policy"
+msgstr "정책 관리"
+
+#: templates/dashboard/app/auth.html:326
+msgid "Facebook login"
+msgstr "페이스북 로그인"
+
+#: templates/dashboard/app/auth.html:399
+msgid "Guest login"
+msgstr "게스트 로그인"
+
+#: templates/dashboard/app/auth.html:453 templates/dashboard/app/auth.html:471
+msgid "Create member"
+msgstr "회원 생성"
+
+#: templates/dashboard/app/auth.html:460 templates/dashboard/app/auth.html:602
+#: templates/dashboard/app/database.html:102
+#: templates/dashboard/app/database.html:389
+msgid "Delete selected"
+msgstr "선택 삭제"
+
+#: templates/dashboard/app/auth.html:461
+msgid "Edit selected"
+msgstr "선택 수정"
+
+#: templates/dashboard/app/auth.html:488 templates/dashboard/register.html:84
+msgid "Password"
+msgstr "비밀번호"
+
+#: templates/dashboard/app/auth.html:496
+msgid "Click confirm button to create the member"
+msgstr "확인 버튼을 클릭하여 회원을 생성합니다"
+
+#: templates/dashboard/app/auth.html:513
+msgid "Edit member"
+msgstr "회원 수정"
+
+#: templates/dashboard/app/auth.html:524
+msgid "Field name to modify"
+msgstr "수정할 필드 이름"
+
+#: templates/dashboard/app/auth.html:529
+msgid "Field type to modify"
+msgstr "수정할 필드 타입"
+
+#: templates/dashboard/app/auth.html:531
+#: templates/dashboard/app/database.html:422
+msgid "String"
+msgstr "String"
+
+#: templates/dashboard/app/auth.html:532
+#: templates/dashboard/app/database.html:423
+msgid "Number"
+msgstr "Number"
+
+#: templates/dashboard/app/auth.html:537
+msgid "Field value to modify"
+msgstr "수정할 필드 값"
+
+#: templates/dashboard/app/auth.html:545
+msgid "Click confirm button to modify the member information"
+msgstr "확인 버튼을 클릭하여 회원 정보를 수정합니다"
+
+#: templates/dashboard/app/auth.html:578 templates/dashboard/app/auth.html:632
+#: templates/dashboard/app/log.html:78 templates/dashboard/app/storage.html:196
+msgid "More items"
+msgstr "항목 더 보기"
+
+#: templates/dashboard/app/auth.html:709
+msgid "Deleting sessions.."
+msgstr "세션 삭제중.."
+
+#: templates/dashboard/app/auth.html:721
+msgid "Deleting users.."
+msgstr "회원 삭제중.."
+
+#: templates/dashboard/app/auth.html:737
+msgid "Numeric types can only contain numeric variables"
+msgstr "Number 타입은 오직 숫자형 자료만 가질 수 있습니다"
+
+#: templates/dashboard/app/auth.html:741
+msgid "Modifying users.."
+msgstr "유저 수정중.."
+
+#: templates/dashboard/app/auth.html:799
+msgid "Are you sure you want to delete this group?"
+msgstr "이 그룹을 정말 삭제 하시겠습니까?"
+
+#: templates/dashboard/app/base.html:67
+msgid "Backends"
+msgstr "백엔드"
+
+#: templates/dashboard/app/base.html:71
+#: templates/dashboard/app/top-navbar.html:23
+msgid "Certification"
+msgstr "인증 정보"
+
+#: templates/dashboard/app/base.html:125
+msgid "Development"
+msgstr "개발"
+
+#: templates/dashboard/app/base.html:168
+msgid "Analysis"
+msgstr "분석"
+
+#: templates/dashboard/app/base.html:240
+msgid "It will be supported soon"
+msgstr "곧 지원될 예정입니다"
+
+#: templates/dashboard/app/component/auth_user_table_row.html:24
+msgid "Attach groups"
+msgstr "그룹 추가"
+
+#: templates/dashboard/app/component/auth_user_table_row.html:48
+msgid "Click the confirm button to attach this group."
+msgstr "확인 버튼을 클릭하여 그룹을 추가합니다."
+
+#: templates/dashboard/app/database.html:18
+#: templates/dashboard/app/logic.html:19
+#: templates/dashboard/app/logic_edit.html:19
+#: templates/dashboard/app/storage.html:19
+msgid "dependency"
+msgstr "에 의존합니다"
+
+#: templates/dashboard/app/database.html:37
+msgid ""
+"If the value of the has_permission function is True, each Create, Read, "
+"Update, and Delete operations are allowed"
+msgstr "has_permission 함수의 값이 True 면, Create, Read, Update, Delete 동작이 허용됩니다"
+
+#: templates/dashboard/app/database.html:44
+#: templates/dashboard/app/storage.html:38
+msgid "Mode"
+msgstr "모드"
+
+#: templates/dashboard/app/database.html:108
+#: templates/dashboard/app/database.html:190
+#: templates/dashboard/app/database.html:395
+msgid "Select all"
+msgstr "전체 선택"
+
+#: templates/dashboard/app/database.html:118
+msgid "Create partition"
+msgstr "파티션 생성"
+
+#: templates/dashboard/app/database.html:129
+msgid "Partition name"
+msgstr "파티션 이름"
+
+#: templates/dashboard/app/database.html:135
+msgid "Click confirm button to create partition"
+msgstr "확인 버튼을 눌러 파티션을 생성합니다"
+
+#: templates/dashboard/app/database.html:136
+msgid "A partition is a concept similar to a table in a RDB"
+msgstr "파티션은 RDB 의 테이블과 유사한 개념입니다"
+
+#: templates/dashboard/app/database.html:183
+#: templates/dashboard/app/database.html:201
+msgid "Search items"
+msgstr "아이템 검색"
+
+#: templates/dashboard/app/database.html:184
+msgid "Remove selected"
+msgstr "선택 삭제"
+
+#: templates/dashboard/app/database.html:211
+msgid "Add query"
+msgstr "쿼리 추가"
+
+#: templates/dashboard/app/database.html:215
+#: templates/dashboard/app/database.html:417
+msgid "Field name"
+msgstr "필드 이름"
+
+#: templates/dashboard/app/database.html:228
+#: templates/dashboard/app/database.html:428
+msgid "Field value"
+msgstr "필드 값"
+
+#: templates/dashboard/app/database.html:247
+msgid "Query"
+msgstr ""
+
+#: templates/dashboard/app/database.html:253
+msgid "option"
+msgstr ""
+
+#: templates/dashboard/app/database.html:256
+msgid "field"
+msgstr ""
+
+#: templates/dashboard/app/database.html:259
+msgid "condition"
+msgstr ""
+
+#: templates/dashboard/app/database.html:262
+msgid "value"
+msgstr ""
+
+#: templates/dashboard/app/database.html:276
+msgid "Generated Query"
+msgstr "쿼리 생성"
+
+#: templates/dashboard/app/database.html:285
+#: templates/dashboard/app/log.html:51
+msgid "Search"
+msgstr "검색"
+
+#: templates/dashboard/app/database.html:305
+msgid "Create item"
+msgstr "아이템 생성"
+
+#: templates/dashboard/app/database.html:315
+msgid "ID"
+msgstr "ID"
+
+#: templates/dashboard/app/database.html:316
+msgid "Auto generation"
+msgstr "자동 생성"
+
+#: templates/dashboard/app/database.html:320
+#: templates/dashboard/app/storage.html:119
+msgid "Read groups"
+msgstr "읽기 그룹"
+
+#: templates/dashboard/app/database.html:327
+#: templates/dashboard/app/database.html:347
+#: templates/dashboard/app/storage.html:126
+#: templates/dashboard/app/storage.html:146
+msgid "Add group"
+msgstr "그룹 추가"
+
+#: templates/dashboard/app/database.html:334
+#: templates/dashboard/app/database.html:354
+#: templates/dashboard/app/storage.html:133
+#: templates/dashboard/app/storage.html:153
+msgid "Manage groups"
+msgstr "그룹 관리"
+
+#: templates/dashboard/app/database.html:341
+#: templates/dashboard/app/storage.html:139
+msgid "Write groups"
+msgstr "쓰기 그룹"
+
+#: templates/dashboard/app/database.html:363
+msgid "Click confirm button to create item"
+msgstr "확인 버튼을 클릭하여 아이템을 생성합니다"
+
+#: templates/dashboard/app/database.html:405
+msgid "Put field"
+msgstr "필드 추가"
+
+#: templates/dashboard/app/database.html:420
+msgid "Type"
+msgstr "타입"
+
+#: templates/dashboard/app/database.html:427
+msgid "Value"
+msgstr "값"
+
+#: templates/dashboard/app/database.html:435
+msgid "Click confirm button to put field"
+msgstr "확인 버튼을 클릭하여 필드를 추가합니다"
+
+#: templates/dashboard/app/database.html:436
+msgid "A field is a concept like a column, and is dependent on an item"
+msgstr "필드는 컬럼과 유사한 개념이며, 아이템에 종속됩니다"
+
+#: templates/dashboard/app/database.html:629
+msgid "Please enter the partition name"
+msgstr "파티션 이름을 입력해주세요"
+
+#: templates/dashboard/app/database.html:643
+msgid "Please specify partition"
+msgstr "파티션을 선택해주세요"
+
+#: templates/dashboard/app/database.html:647
+#: templates/dashboard/app/storage.html:371
+msgid "You must specify at least one permission group"
+msgstr "권한 그룹을 하나 이상 지정해주세요"
+
+#: templates/dashboard/app/database.html:662
+msgid "Please specify partitions and items"
+msgstr "파티션과 아이템을 지정해주세요"
+
+#: templates/dashboard/app/database.html:802
+msgid "This group already exists"
+msgstr "이 그룹이 이미 존재합니다"
+
+#: templates/dashboard/app/database.html:969
+msgid "Please specify item"
+msgstr "아이템을 지정해주세요"
+
+#: templates/dashboard/app/log.html:32
+msgid "Events"
+msgstr "이벤트"
+
+#: templates/dashboard/app/logic.html:16
+msgid "is used"
+msgstr "가 사용됩니다."
+
+#: templates/dashboard/app/logic.html:34
+msgid "Tests"
+msgstr "테스트"
+
+#: templates/dashboard/app/logic.html:39
+msgid "Create test"
+msgstr "테스트 생성"
+
+#: templates/dashboard/app/logic.html:47
+msgid "Testing result"
+msgstr "테스트 결과"
+
+#: templates/dashboard/app/logic.html:59
+msgid "Execution result"
+msgstr "실행 결과"
+
+#: templates/dashboard/app/logic.html:81
+msgid "Create function test"
+msgstr "함수 테스트 생성"
+
+#: templates/dashboard/app/logic.html:93 templates/dashboard/app/logic.html:94
+msgid "Test name"
+msgstr "테스트 이름"
+
+#: templates/dashboard/app/logic.html:98 templates/dashboard/app/logic.html:214
+#: templates/dashboard/app/logic_edit.html:50
+#: templates/dashboard/app/marketplace_detail.html:64
+msgid "Function name"
+msgstr "함수 이름"
+
+#: templates/dashboard/app/logic.html:107
+msgid "Test payload"
+msgstr "테스트 Payload"
+
+#: templates/dashboard/app/logic.html:115
+msgid "Click the confirm button to create the test"
+msgstr "확인 버튼을 클릭하여 테스트를 생성합니다"
+
+#: templates/dashboard/app/logic.html:185
+msgid "Functions"
+msgstr "함수"
+
+#: templates/dashboard/app/logic.html:193
+#: templates/dashboard/app/logic.html:201
+msgid "Create function"
+msgstr "함수 생성"
+
+#: templates/dashboard/app/logic.html:218
+#: templates/dashboard/app/logic_edit.html:64
+msgid "Runtime"
+msgstr "런타임"
+
+#: templates/dashboard/app/logic.html:226
+#: templates/dashboard/app/marketplace_edit.html:54
+msgid "Short description"
+msgstr "짧은 설명"
+
+#: templates/dashboard/app/logic.html:230
+msgid "Source .zip file"
+msgstr "소스 .zip 파일"
+
+#: templates/dashboard/app/logic.html:235
+#: templates/dashboard/app/logic_edit.html:72
+msgid "Handler"
+msgstr "핸들러"
+
+#: templates/dashboard/app/logic.html:235
+msgid "Find the def method(payload, user) in the package and call it"
+msgstr "package 에서 def method(payload, user) 함수를 찾아 호출합니다"
+
+#: templates/dashboard/app/logic.html:243
+msgid ""
+"The SDK can call logic_run_function ('function name') to get the results of "
+"the execution."
+msgstr "SDK 에서 logic_run_function ('function name') 를 호출하여 함수 실행 결과를 얻을 수 있습니다"
+
+#: templates/dashboard/app/logic.html:373
+msgid "Please enter the function name"
+msgstr "함수 이름을 입력해주세요"
+
+#: templates/dashboard/app/logic.html:377
+msgid "Please specify the zipfile"
+msgstr "zipfile 를 선택해주세요"
+
+#: templates/dashboard/app/logic_edit.html:34
+msgid "Function information"
+msgstr "함수 정보"
+
+#: templates/dashboard/app/logic_edit.html:57
+msgid "Function description"
+msgstr "함수 설명"
+
+#: templates/dashboard/app/logic_edit.html:74
+msgid "Function handler"
+msgstr "함수 핸들러"
+
+#: templates/dashboard/app/logic_edit.html:153
+#: templates/dashboard/app/storage.html:82
+msgid "Files"
+msgstr "파일"
+
+#: templates/dashboard/app/marketplace.html:18
+msgid "Expand quickly"
+msgstr "순식간에 확장하세요"
+
+#: templates/dashboard/app/marketplace.html:19
+msgid "Quickly integrate prebuilt cloud functions into your service"
+msgstr "미리 만들어진 클라우드 함수를 빠르게 서비스에 통합하세요"
+
+#: templates/dashboard/app/marketplace.html:21
+#: templates/dashboard/app/marketplace_create.html:38
+msgid "Upload"
+msgstr "업로드하기"
+
+#: templates/dashboard/app/marketplace.html:25
+#: templates/dashboard/app/marketplace.html:37
+msgid "My functions"
+msgstr "내 함수"
+
+#: templates/dashboard/app/marketplace.html:67
+#: templates/dashboard/app/marketplace.html:124
+#: templates/dashboard/app/marketplace.html:171
+#: templates/dashboard/app/marketplace_detail.html:19
+msgid "Verified"
+msgstr "인증됨"
+
+#: templates/dashboard/app/marketplace.html:70
+#: templates/dashboard/app/marketplace.html:127
+#: templates/dashboard/app/marketplace.html:174
+#: templates/dashboard/app/marketplace_detail.html:21
+msgid "Not verified"
+msgstr "인증 안됨"
+
+#: templates/dashboard/app/marketplace.html:83
+msgid "Close"
+msgstr "닫기"
+
+#: templates/dashboard/app/marketplace.html:94
+msgid "Developer's choice"
+msgstr "개발자의 선택"
+
+#: templates/dashboard/app/marketplace.html:141
+msgid "Recently added"
+msgstr "최근 추가됨"
+
+#: templates/dashboard/app/marketplace_create.html:18
+msgid ""
+"Thank you for your contribution to the serverless ecosystem. After the "
+"upload, the function verification process will be done within one week."
+msgstr "서버리스 생태계에 기여해주셔서 감사합니다. 업로드 후 업무일 기준 1주일 이내로 함수 인증 절차를 거치게 됩니다."
+
+#: templates/dashboard/app/marketplace_create.html:35
+#: templates/dashboard/app/marketplace_edit.html:35
+msgid "Information"
+msgstr "정보"
+
+#: templates/dashboard/app/marketplace_create.html:47
+#: templates/dashboard/app/marketplace_edit.html:47
+#: templates/dashboard/app/marketplace_edit.html:48
+msgid "Title"
+msgstr "제목"
+
+#: templates/dashboard/app/marketplace_create.html:48
+msgid "Title 50 characters or less"
+msgstr "50자 이하의 제목"
+
+#: templates/dashboard/app/marketplace_create.html:54
+msgid "Description 100 characters or less"
+msgstr "100자 이하의 설명"
+
+#: templates/dashboard/app/marketplace_create.html:61
+#: templates/dashboard/app/marketplace_edit.html:61
+msgid "Category"
+msgstr "카테고리"
+
+#: templates/dashboard/app/marketplace_create.html:71
+#: templates/dashboard/app/marketplace_edit.html:75
+msgid "Logo image"
+msgstr "로고 이미지"
+
+#: templates/dashboard/app/marketplace_create.html:77
+#: templates/dashboard/app/marketplace_edit.html:81
+msgid "Function to upload"
+msgstr "업로드할 함수"
+
+#: templates/dashboard/app/marketplace_create.html:97
+#: templates/dashboard/app/marketplace_detail.html:93
+#: templates/dashboard/app/marketplace_edit.html:107
+msgid "Content"
+msgstr "내용"
+
+#: templates/dashboard/app/marketplace_create.html:180
+#: templates/dashboard/app/marketplace_edit.html:194
+msgid "Title must be at least 1 characters"
+msgstr "제목은 한글자 이상입니다"
+
+#: templates/dashboard/app/marketplace_create.html:184
+#: templates/dashboard/app/marketplace_edit.html:198
+msgid "Description must be at least 1 characters"
+msgstr "설명은 한글자 이상입니다"
+
+#: templates/dashboard/app/marketplace_create.html:188
+#: templates/dashboard/app/marketplace_edit.html:202
+msgid "Content must be at least 1 characters"
+msgstr "내용은 한글자 이상입니다"
+
+#: templates/dashboard/app/marketplace_detail.html:25
+msgid "people installed"
+msgstr "명이 설치했습니다"
+
+#: templates/dashboard/app/marketplace_detail.html:27
+#: templates/dashboard/app/marketplace_detail.html:80
+msgid "Import"
+msgstr "가져오기"
+
+#: templates/dashboard/app/marketplace_detail.html:32
+msgid "Edit"
+msgstr "수정"
+
+#: templates/dashboard/app/marketplace_detail.html:54
+msgid "Importing function"
+msgstr "함수 가져오기"
+
+#: templates/dashboard/app/marketplace_detail.html:72
+msgid "Click the import button to import the function into Logic"
+msgstr "가져오기 버튼을 클릭하여 함수를 Logic 으로 가져옵니다."
+
+#: templates/dashboard/app/marketplace_detail.html:74
+msgid ""
+"Importing not verified functions can cause serious problems with the backend"
+msgstr "인증되지 않은 함수를 가져오면 백엔드에 심각한 문제를 초래할 수 있습니다"
+
+#: templates/dashboard/app/marketplace_detail.html:122
+msgid "Are you sure you want to delete?"
+msgstr "정말 삭제 하시겠습니까?"
+
+#: templates/dashboard/app/marketplace_edit.html:18
+msgid "Uploading the function again will require verification"
+msgstr "함수를 업로드하면 다시 인증을 받아야합니다"
+
+#: templates/dashboard/app/overview.html:19 templates/dashboard/apps.html:83
 msgid "Welcome"
 msgstr "환영합니다"
+
+#: templates/dashboard/app/overview.html:20
+msgid "Create powerful backends and easily manage them"
+msgstr "강력한 백엔드를 생성하고 손쉽게 관리하세요"
+
+#: templates/dashboard/app/overview.html:25
+msgid "Download SDK"
+msgstr "SDK 다운로드"
+
+#: templates/dashboard/app/storage.html:36
+msgid ""
+"If the value of the has_permission function is True, each Create, Read, and "
+"Delete operation is allowed"
+msgstr "has_permission 함수의 값이 True 이면 Create, Read, Delete 동작이 허용됩니다"
+
+#: templates/dashboard/app/storage.html:89
+#: templates/dashboard/app/storage.html:98
+msgid "Upload file"
+msgstr "파일 업로드"
+
+#: templates/dashboard/app/storage.html:111
+msgid "Auto generated"
+msgstr "자동 생성"
+
+#: templates/dashboard/app/storage.html:114
+msgid "File"
+msgstr "파일"
+
+#: templates/dashboard/app/storage.html:162
+msgid "Click the confirm button to upload file"
+msgstr "확인 버튼을 클릭하여 파일을 업로드합니다"
+
+#: templates/dashboard/app/storage.html:367
+msgid "Please specify the file"
+msgstr "파일을 선택해주세요"
+
+#: templates/dashboard/app/top-navbar.html:19
+msgid "Backend list"
+msgstr "백엔드 목록"
+
+#: templates/dashboard/apps.html:69
+msgid "Profile"
+msgstr "프로필"
+
+#: templates/dashboard/apps.html:84 templates/dashboard/register.html:8
+msgid "Create and manage powerful backends with one click"
+msgstr "강력한 백엔드를 클릭 한번으로 생성하고 관리하세요"
+
+#: templates/dashboard/apps.html:89
+msgid "Create a new backend"
+msgstr "새로운 백엔드 만들기"
+
+#: templates/dashboard/apps.html:95
+msgid "Create backend"
+msgstr "백엔드 만들기"
+
+#: templates/dashboard/apps.html:108
+msgid "Backend name"
+msgstr "백엔드 이름"
+
+#: templates/dashboard/apps.html:114
+msgid ""
+"By clicking the Confirm button, you agree to share your analytics data with "
+"the AWS Interface to improve the AWS Interface service."
+msgstr "확인 버튼을 클릭하여 AWS Interface 서비스의 개선을 위해 분석 데이터를 AWS Interface 와 공유하는데 동의합니다."
+
+#: templates/dashboard/apps.html:151
+msgid "Remove backend"
+msgstr "백엔드 제거"
+
+#: templates/dashboard/register.html:43
+msgid "Sign-in"
+msgstr "로그인"
+
+#: templates/dashboard/register.html:53
+msgid "Create backend with a click"
+msgstr "클릭으로 백엔드 만들어 볼까요?"
+
+#: templates/dashboard/register.html:54
+msgid "Leading companies are already using it"
+msgstr "앞서가는 기업들은 이미 사용하고 있습니다"
+
+#: templates/dashboard/register.html:94
+msgid "Confirm Password"
+msgstr "비밀번호 확인"
+
+#: templates/dashboard/register.html:172
+msgid "Sign-up"
+msgstr "회원가입"

@@ -37,8 +37,8 @@ def do(data, resource):
     zip_file = params.get('zip_file', None)
     runtime = params.get('runtime', None)
     handler = params.get('handler', None)
-    run_groups = params.get('run_groups', None)
     runnable = params.get('runnable', None)
+    sdk_config = params.get('sdk_config', None)
 
     items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'condition': 'eq',
                                               'value': function_name}])
@@ -51,10 +51,10 @@ def do(data, resource):
             item['handler'] = handler
         if runtime:
             item['runtime'] = runtime
-        if run_groups is not None:
-            item['run_groups'] = run_groups
         if runnable is not None:
             item['runnable'] = runnable
+        if sdk_config is not None:
+            item['sdk_config'] = sdk_config
         if zip_file:
             zip_file_id = uuid()
             zip_file_b64 = zip_file.encode('utf-8')

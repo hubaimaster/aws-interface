@@ -4,6 +4,7 @@ from resource import get_resource_allocator
 from contextlib import contextmanager
 from sdk.python3.aws_interface import Client
 from shortuuid import uuid
+from secrets import token_urlsafe
 
 
 class Adapter(metaclass=ABCMeta):
@@ -96,16 +97,27 @@ class Adapter(metaclass=ABCMeta):
         :param groups: Groups the logged in user belongs to
         :return: Client
         """
-        allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
-        client = Client(allocator.get_rest_api_url())
+        client = Client()
+        client.session_id = self.generate_session_id(['admin'])
+        client.url = self.get_rest_api_url()
         with self.open_api_auth() as auth_api:
-            email = '{}@admin.com'.format(uuid())
-            password = '{}'.format(uuid())
-            auth_api.create_user(email, password, {})
-            client.auth_login(email, password)
+            yield client
             resp = client.auth_get_me()
             user_id = resp.get('item').get('id')
-            auth_api.attach_user_group(user_id, 'admin')
-            yield client
             client.auth_logout()
             auth_api.delete_user(user_id)
+
+    def generate_session_id(self, groups):
+        with self.open_api_auth() as auth_api:
+            email = '{}@system.com'.format(uuid())
+            password = '{}'.format(token_urlsafe(32))
+            auth_api.create_user(email, password, {})
+            session_id = auth_api.create_session(email, password)['session_id']
+            user_id = auth_api.get_user_by_email(email)['item']['id']
+            for group in groups:
+                auth_api.attach_user_group(user_id, group)
+            return session_id
+
+    def get_rest_api_url(self):
+        allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
+        return allocator.get_rest_api_url()

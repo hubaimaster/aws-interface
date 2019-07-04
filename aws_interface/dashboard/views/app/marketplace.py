@@ -11,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from dashboard.models import App, MarketplaceLogic, MarketplaceLogicSetup
 from dashboard.views.utils import Util, page_manage
 from dashboard.message import error
+from dashboard.views.app.logic import get_sdk_config
 
 import base64
 
@@ -154,10 +155,11 @@ class MarketplaceDetail(LoginRequiredMixin, View):
             description = marketplace_logic.description
             runtime = marketplace_logic.runtime
             handler = marketplace_logic.handler
+            sdk_config = get_sdk_config(adapter)
             zipfile = marketplace_logic.function_zip_file.read()
             zipfile = base64.b64encode(zipfile)
             zipfile = zipfile.decode('utf-8')
-            result = logic_api.create_function(function_name, description, runtime, handler, zipfile)
+            result = logic_api.create_function(function_name, description, runtime, handler, sdk_config, zipfile)
             return JsonResponse(result)
 
 

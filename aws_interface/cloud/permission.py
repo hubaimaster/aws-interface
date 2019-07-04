@@ -128,6 +128,7 @@ class Permission:
         Run.Auth.logout,
         Run.Auth.register,
         Run.Auth.set_me,
+        Run.Auth.get_login_method,
 
         Run.Database.create_item,
         Run.Database.delete_item,

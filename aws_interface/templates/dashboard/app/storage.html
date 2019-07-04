@@ -13,10 +13,10 @@
                 <div class="header-body">
                     <!-- Card stats -->
                     <div class="alert alert-primary" role="alert">
-                        <strong>AWS S3, AWS DynamoDB, AWS Lambda</strong>  를 사용합니다.
+                        <strong>AWS S3, AWS DynamoDB, AWS Lambda</strong>  {{ _("are used") }}
                     </div>
                     <div class="alert alert-default" role="alert">
-                        <strong>Auth </strong> 에 의존합니다.
+                        <strong>Auth </strong> {{ _("dependency") }}
                     </div>
 
                 </div>
@@ -33,9 +33,9 @@
                                 <div class="col-auto">
                                     <h4 class="mb-0">
 
-                                        정책함수 <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="has_permission 함수의 값이 True 면 각 Create, Read, Delete 별 오퍼레이션이 허락됩니다"></i>
+                                        {{ _("Policy") }} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ _("If the value of the has_permission function is True, each Create, Read, and Delete operation is allowed") }}"></i>
 
-                                        모드:
+                                        {{ _("Mode") }}:
                                         <select class="form-control-alternative" onchange="set_policy_mode(this.value);">
                                             <option value="create"><span>Create</span></option>
                                             <option value="read"><span>Read</span></option>
@@ -79,14 +79,14 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <h3 id="path-name" class="mb-0">
-                                        파일 목록
+                                        {{ _("Files") }}
                                     </h3>
                                 </div>
 
                                 <div class="col text-right">
 
                                     <a data-toggle="modal" data-target="#modal-upload-file" class="btn btn-sm btn-primary">
-                                        <span class="btn-inner--text" style="color: white;">파일 업로드</span>
+                                        <span class="btn-inner--text" style="color: white;">{{ _("Upload file") }}</span>
                                     </a>
 
                                 </div>
@@ -95,7 +95,7 @@
                                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title" id="modal-title-default">파일 업로드</h4>
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Upload file") }}</h4>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
@@ -107,50 +107,50 @@
                                                         <div class="col-lg-12">
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="file-parent-path">파일 ID</label>
-                                                                <input name="file-parent-path" type="text" id="file-parent-path" class="form-control form-control-alternative" placeholder="자동생성" disabled>
+                                                                <label class="form-control-label" for="file-parent-path">ID</label>
+                                                                <input name="file-parent-path" type="text" id="file-parent-path" class="form-control form-control-alternative" placeholder="{{ _("Auto generated") }}" disabled>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="file-bin">파일</label>
+                                                                <label class="form-control-label" for="file-bin">{{ _("File") }}</label>
                                                                 <input name="file-bin" type="file" id="file-bin" class="form-control form-control-alternative btn">
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">파일을 읽을 수 있는 그룹</label>
+                                                                <label class="form-control-label" for="input-username">{{ _("Read groups") }}</label>
                                                                 <div id="file-read-groups" class="mb-2">
 
                                                                 </div>
 
                                                                 <div class="dropdown">
                                                                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        그룹 추가
+                                                                        {{ _("Add group") }}
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         {% for group in user_groups %}
                                                                             <a class="dropdown-item" href="#!" onclick="put_file_read_group('{{ group.name }}');">{{ group.name }}</a>
                                                                         {% endfor %}
                                                                         <div class="dropdown-divider"></div>
-                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
+                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">{{ _("Manage groups") }}</a>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">파일을 쓰기 또는 삭제 할 수 있는 그룹</label>
+                                                                <label class="form-control-label" for="input-username">{{ _("Write groups") }}</label>
                                                                 <div id="file-write-groups" class="mb-2">
 
                                                                 </div>
 
                                                                 <div class="dropdown">
                                                                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        그룹 추가
+                                                                        {{ _("Add group") }}
                                                                     </button>
                                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         {% for group in user_groups %}
                                                                             <a class="dropdown-item" href="#!" onclick="put_file_write_group('{{ group.name }}');">{{ group.name }}</a>
                                                                         {% endfor %}
                                                                         <div class="dropdown-divider"></div>
-                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">회원 그룹 관리</a>
+                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">{{ _("Manage groups") }}</a>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -159,12 +159,12 @@
                                                     </div>
                                                 </div>
                                                 <p>
-                                                    확인 버튼을 클릭하여 파일을 업로드 합니다.
+                                                    {{ _("Click the confirm button to upload file") }}
                                                 </p>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                <button id="upload-file" class="btn btn-primary">확인</button>
+                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                <button id="upload-file" class="btn btn-primary">{{ _("Confirm") }}</button>
                                             </div>
 
                                         </div>
@@ -193,7 +193,7 @@
                             </table>
                         </div>
                         <button id="load-more-files-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_files();">
-                            항목 더보기 +
+                            {{ _("More items") }} +
                         </button>
                     </div>
                 </div>
@@ -300,7 +300,7 @@
         }
         function put_file_read_group(group_name) {
             if (file_read_groups.includes(group_name)){
-                alert("이미 해당 그룹이 존재합니다");
+                return;
             }else{
                 file_read_groups.push(group_name);
                 render_file_read_groups();
@@ -312,7 +312,7 @@
         }
         function put_file_write_group(group_name) {
             if (file_write_groups.includes(group_name)){
-                alert("이미 해당 그룹이 존재합니다");
+                return;
             }else{
                 file_write_groups.push(group_name);
                 render_file_write_groups();
@@ -364,11 +364,11 @@
                     var file_bin = $('#file-bin')[0].files[0];
                     var filename = $("#file-bin").val().replace(/.*(\/|\\)/, '');
                     if (file_bin == null || file_bin.length == 0) {
-                        alert("파일을 지정해주세요");
+                        alert("{{ _('Please specify the file') }}");
                         return;
                     }
                     if (file_read_groups.length == 0 || file_write_groups.length == 0) {
-                        alert("권한 그룹은 1개 이상 지정해야 합니다");
+                        alert("{{ _('You must specify at least one permission group') }}");
                         return;
                     }
                     upload_file('{{ folder_path }}', filename, file_bin, file_read_groups, file_write_groups);

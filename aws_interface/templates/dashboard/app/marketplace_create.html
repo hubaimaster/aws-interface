@@ -15,7 +15,7 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12">
                         <h3 class="display-3 text-white"><a class="text-white" href="{% url 'marketplace' app_id %}">Marketplace</a> > Upload</h3>
-                        <p class="text-white">서버리스 생태계에 기여해주셔서 감사합니다. 업로드 후 업무일 기준 1주일 이내로 함수 인증 절차를 거치게 됩니다.</p>
+                        <p class="text-white">{{ _("Thank you for your contribution to the serverless ecosystem. After the upload, the function verification process will be done within one week.") }}</p>
                     </div>
                 </div>
             </div>
@@ -32,10 +32,10 @@
                             <div class="card-header">
                                 <div class="row">
                                     <div class="col-8">
-                                        <h2 class="text-black"><i class="fa fa-edit"></i> 기본 정보</h2>
+                                        <h2 class="text-black"><i class="fa fa-edit"></i> {{ _('Information') }}</h2>
                                     </div>
                                     <div class="col-4 text-right">
-                                        <button id="upload-btn" class="btn btn-sm btn-primary text-right">업로드</button>
+                                        <button id="upload-btn" class="btn btn-sm btn-primary text-right">{{ _('Upload') }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -44,21 +44,21 @@
                                 <div class="row">
                                     <div class="col-lg-6 col-xs-12">
                                         <div class="form-group">
-                                            <label>제목</label>
-                                            <input id="title" class="form-control" type="text" placeholder="50자 이내의 표시될 제목">
+                                            <label>{{ _('Title') }}</label>
+                                            <input id="title" class="form-control" type="text" placeholder="{{ _('Title 50 characters or less') }}">
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-xs-12">
                                         <div class="form-group">
-                                            <label>간단한 설명</label>
-                                            <input id="description" class="form-control" type="text" placeholder="100자 이내의 간단한 설명">
+                                            <label>{{ _('Description') }}</label>
+                                            <input id="description" class="form-control" type="text" placeholder="{{ _('Description 100 characters or less') }}">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-4 col-xs-12">
                                         <div class="form-group">
-                                            <label>카테고리</label>
+                                            <label>{{ _('Category') }}</label>
                                             <select id="category" class="form-control">
                                                 {% for category_id, value in categories %}
                                                     <option value="{{ category_id }}">{{ value }}</option>
@@ -68,13 +68,13 @@
                                     </div>
                                     <div class="col-lg-4 col-xs-12">
                                         <div class="form-group">
-                                            <label>로고 이미지</label>
+                                            <label>{{ _('Logo image') }}</label>
                                             <input id="logo-image" class="form-control" type="file" accept="image/*">
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-xs-12">
                                         <div class="form-group">
-                                            <label>업로드할 함수</label>
+                                            <label>{{ _('Function to upload') }}</label>
                                             <select id="function-name" class="form-control">
                                                 {% for function in functions %}
                                                     <option value="{{ function.function_name }}">{{ function.function_name }}</option>
@@ -94,7 +94,7 @@
 
             <div class="row">
                 <div class="col-lg-12 col-md-12 mt-4">
-                    <h2 class="text-black"><i class="fa fa-file-text"></i>  상세 내용 </h2>
+                    <h2 class="text-black"><i class="fa fa-file-text"></i>  {{ _('Content') }} </h2>
                 </div>
             </div>
 
@@ -177,15 +177,15 @@
             const function_name = $("#function-name").val();
             const content = editor.getMarkdown();
             if (title.length < 1){
-                alert('Title must be at least 1 characters.');
+                alert("{{ _('Title must be at least 1 characters') }}");
                 return;
             }
             if (description.length < 1){
-                alert('Description must be at least 1 characters.');
+                alert("{{ _('Description must be at least 1 characters') }}");
                 return;
             }
             if (content.length < 1){
-                alert('Content must be at least 1 characters.');
+                alert("{{ _('Content must be at least 1 characters') }}");
                 return;
             }
             uploadMarketplaceLogic(title, description, category, logo_image, function_name, content);

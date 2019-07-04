@@ -1,8 +1,10 @@
 
 from django.shortcuts import render
+from django.utils.translation import ugettext_lazy as _
 from botocore.errorfactory import ClientError
 from numbers import Number
 from dashboard.models import Log
+
 import traceback
 
 
@@ -79,7 +81,7 @@ def page_manage(func):
             result = func(*args, **kwargs)
         except ClientError as ex:
             title = 'Unknown Error'
-            desc = '원인을 알 수 없는 에러입니다'
+            desc = _('An unknown error has occurred.')
             link = None
             link_desc = None
 
@@ -94,22 +96,22 @@ def page_manage(func):
             error_type = None
             code = ex.response.get('Error', {}).get('Code', None)
             if code == 'UnrecognizedClientException':
-                title = '등록된 IAM AccessKey 를 확인해주세요'
-                desc = '유효하지 않은 AccessKey 가 입력되어 있습니다'
+                title = _('Please check the registered IAM AccessKey')
+                desc = _('Invalid AccessKey entered')
                 error_type = 'invalid_access_key'
             elif code == 'AccessDeniedException':
-                title = '등록된 IAM AccessKey 의 권한이 부족합니다'
-                desc = '아래 가이드 링크를 참고하여 AdminUser 권한을 추가합니다'
-                link = 'https://aws-interface.com/docs/start_awsi.pdf'
-                link_desc = 'AWS IAM AccessKey 권한 추가하기'
+                title = _('The registered IAM AccessKey is insufficient')
+                desc = _('Add the AdminUser privilege by referring to the guide link below')
+                link = _('https://aws-interface.com/docs/start_awsi.pdf')
+                link_desc = _('Adding AWS IAM AccessKey permissions')
                 error_type = 'invalid_access_key'
             elif code == 'ResourceNotFoundException':
-                title = '잠시만 기다려주세요 백엔드 서비스를 생성중 입니다'
-                desc = '경우에 따라 최대 3분 정도 소요될 수 있습니다'
+                title = _("Wait a minute, I'm creating a backend service.")
+                desc = _('It may take up to 3 minutes')
                 error_type = 'allocating'
             elif code == 'ValidationException':
-                title = '백엔드 서비스를 생성중 일 수 있습니다'
-                desc = '경우에 따라 최대 10분 정도 소요될 수 있습니다'
+                title = _('The system may be creating a backend service')
+                desc = _('It may take up to 3 minutes')
                 error_type = 'allocating'
             else:
                 # raise ex

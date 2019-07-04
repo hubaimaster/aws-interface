@@ -16,13 +16,13 @@
                 <div class="row">
                     <div class="col-lg-9 col-md-9">
                         <h1 class="display-2 text-white">{{ app_name }}</h1>
-                        <h2 class="text-white">환영합니다 :)</h2>
-                        <p class="text-white mt-0 mb-5">강력한 백엔드를 생성하고 손쉽게 관리할 수 있습니다.</p>
+                        <h2 class="text-white">{{ _("Welcome") }} :)</h2>
+                        <p class="text-white mt-0 mb-5">{{ _("Create powerful backends and easily manage them") }}</p>
 
                         <div class="dropdown">
                             <button id="show-sdk-button" class="btn btn-info mt-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="ni ni-mobile-button"></i>
-                                SDK 내려받기
+                                {{ _("Download SDK") }}
                             </button>
                             <div class="dropdown-menu dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a id="download-sdk-python3" class="dropdown-item text-body" href="{% url 'overview' app_id %}?cmd=download_sdk&platform=python3">
@@ -54,7 +54,7 @@
                         </div>
 
                         <a href="https://github.com/hubaimaster/aws-interface" target="_blank" class="btn btn-dark btn-icon mt-2">
-                            <i class="fab fa-github mr-2"></i> <span class="nav-link-inner--text">Github에서 보기</span>
+                            <i class="fab fa-github mr-2"></i> <span class="nav-link-inner--text">Github repo</span>
                         </a>
                     </div>
                 </div>

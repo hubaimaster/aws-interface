@@ -6,14 +6,14 @@ class LogicAPI(API):
     SC_CLASS = LogicServiceController
 
     # Service
-    def create_function(self, function_name, description, runtime, handler, zip_file=None, runnable=True):
-        return self.service_controller.create_function(function_name, description, runtime, handler, zip_file, runnable)
+    def create_function(self, function_name, description, runtime, handler, sdk_config, zip_file=None, runnable=True):
+        return self.service_controller.create_function(function_name, description, runtime, handler, sdk_config, zip_file, runnable)
 
     def delete_function(self, function_name):
         return self.service_controller.delete_function(function_name)
 
-    def update_function(self, function_name, description, runtime=None, handler=None, zip_file=None, runnable=None):
-        return self.service_controller.update_function(function_name, description, runtime, handler, zip_file, runnable)
+    def update_function(self, function_name, description, runtime=None, handler=None, sdk_config=None, zip_file=None, runnable=None):
+        return self.service_controller.update_function(function_name, description, runtime, handler, sdk_config, zip_file, runnable)
 
     def get_functions(self):
         return self.service_controller.get_functions()

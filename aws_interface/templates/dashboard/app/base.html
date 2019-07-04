@@ -64,16 +64,16 @@
 
                     <a href="{% url 'apps'%}" class="dropdown-item">
                         <i class="ni ni-app"></i>
-                        <span>백엔드 목록</span>
+                        <span>{{ _("Backends") }}</span>
                     </a>
                     <a href="{%  url 'accesskey' %}" class="dropdown-item">
                         <i class="ni ni-settings"></i>
-                        <span class="nav-link-inner--text">인증 정보 변경</span>
+                        <span class="nav-link-inner--text">{{ _("Certification") }}</span>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a href="#!" class="dropdown-item">
                         <i class="ni ni-user-run"></i>
-                        <span>로그아웃</span>
+                        <span>{{ _("Logout") }}</span>
                     </a>
                 </div>
             </li>
@@ -122,7 +122,7 @@
             <!-- Divider -->
             <hr class="my-3">
             <!-- Heading -->
-            <h6 class="navbar-heading text-muted">개발</h6>
+            <h6 class="navbar-heading text-muted">{{ _("Development") }}</h6>
 
             <ul class="navbar-nav">
 {#                Billing will show bill in aws-i (Now is AWS)#}
@@ -165,22 +165,12 @@
             <!-- Divider -->
             <hr class="my-3">
             <!-- Heading -->
-            <h6 class="navbar-heading text-muted">분석</h6>
+            <h6 class="navbar-heading text-muted">{{ _("Analysis") }}</h6>
             <!-- Navigation -->
             <ul class="navbar-nav mb-md-3">
                 <li class="nav-item">
                     <a id="link-summary" class="nav-link">
                         <i class="ni ni-spaceship"></i> Summary
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a id="link-event" class="nav-link">
-                        <i class="ni ni-palette"></i> Event
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a id="link-retention" class="nav-link">
-                        <i class="ni ni-ui-04"></i> Retention
                     </a>
                 </li>
             </ul>
@@ -246,14 +236,8 @@
 </script>
 
 <script>
-    $("#link-event").click(function () {
-        alert("곧 지원될 예정입니다");
-    });
-    $("#link-retention").click(function () {
-        alert("곧 지원될 예정입니다");
-    });
     $("#link-summary").click(function () {
-        alert("곧 지원될 예정입니다");
+        alert("{{ _("It will be supported soon") }}");
     });
 </script>
 
