@@ -19,7 +19,8 @@ info = {
             'groups': 'list',
             '...': '...',
         }
-    }
+    },
+    'description': 'Return user by email'
 }
 
 

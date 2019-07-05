@@ -20,7 +20,9 @@ info = {
             'code': 'int',
             'message': 'str'
         }
-    }
+    },
+    'description': 'Guest login. If you save guest_id after login '
+                   'and send it as a parameter after logout, you can keep your guest status.'
 }
 
 

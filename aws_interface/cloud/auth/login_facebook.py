@@ -16,12 +16,9 @@ info = {
         'access_token': 'str',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
         'session_id': 'str',
-    }
+    },
+    'description': 'Sign-in by access_token from facebook sdk [scopes=id,email]'
 }
 
 

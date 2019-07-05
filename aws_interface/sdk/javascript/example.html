@@ -8,8 +8,8 @@
     <script src="aws_interface.js"></script>
 
     <script>
-      var awsi = new Client();
-      awsi.authLogin('test@email.com', 'password1234', function(data){
+      const client = new Client();
+      client.authLogin('test@email.com', 'password1234', function(data){
           alert(JSON.stringify(data));
       });
     </script>

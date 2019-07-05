@@ -14,11 +14,10 @@
             <div class="container-fluid d-flex align-items-center">
                 <div class="row">
                     <div class="col-lg-9 col-md-9">
-                        <h1 class="display-2 text-white">가이드 문서</h1>
-                        <h2 class="text-white">AWS-Interface 시작하기</h2>
-                        <p class="text-white mt-0 mb-5">가이드 문서의 도움을 받아 순식간에 강력한 백엔드 서비스를 구축하는 방법을 터득하세요.</p>
-                        <a href="https://github.com/hubaimaster/aws-interface/issues" target="_blank" class="btn btn-danger">버그 및 이슈 제보</a>
-                        <a href="https://aws-interface.com" target="_blank" class="btn btn-primary">서비스 소개</a>
+                        <h1 class="display-2 text-white">{{ _('Guide') }}</h1>
+                        <p class="text-white mt-0 mb-5">{{ _('Learn how to quickly build powerful backend services with the help of a guide document.') }}</p>
+                        <a href="https://github.com/hubaimaster/aws-interface/issues" target="_blank" class="btn btn-danger">{{ _('Report issues') }}</a>
+                        <a href="https://aws-interface.com" target="_blank" class="btn btn-primary">{{ _('Service Introduction') }}</a>
                     </div>
                 </div>
             </div>
@@ -29,130 +28,21 @@
             <div class="row mt-3">
                 <div class="col-xl-12 mb-5 mb-xl-0">
                     <div class="card card-stats shadow">
-                        <div class="card-body">
-                            <div class="row">
+                        <a href="https://aws-interface.com/docs/index.html#introduction" class="card-body btn text-left">
+                            <div class="row mb-4">
                                 <div class="col">
-                                    <h4>서비스 소개, AWS IAM AccessKey 권한 설정 및 SDK 구성</h4>
-                                    <h1 class="mb-0">AWS Interface 시작하기</h1>
+                                    <h4>{{ _('Learn how to use the SDK written in multiple languages') }}</h4>
+                                    <h1 class="mb-0">{{ _('Learn how to use the SDK') }}</h1>
                                 </div>
                                 <div class="col-auto">
-                                    <i class="ni ni-key-25 text-black-50"></i>
+
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-footer">
-                            <a target="_blank" href="https://s3.ap-northeast-2.amazonaws.com/aws-interface.com/docs/start_awsi.pdf" class="btn btn-sm btn-info text-white">가이드 PDF 다운로드</a>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="row mt-3">
 
-                <div class="col-xl-6 mb-5 mb-xl-0">
-                    <div class="card card-stats shadow">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <h4>회원 관리 및 인증</h4>
-                                    <h1 class="mb-0">Auth</h1>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="ni ni-single-02 text-blue"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <a onclick="alert('곧 지원될 예정입니다');" class="btn btn-sm btn-info text-white">가이드 PDF 다운로드</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-6 mb-5 mb-xl-0">
-                    <div class="card card-stats shadow">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <h4>자동 스케일 데이터베이스 관리</h4>
-                                    <h1 class="mb-0">Database</h1>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="ni ni-bullet-list-67 text-orange"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <a onclick="alert('곧 지원될 예정입니다');" class="btn btn-sm btn-info text-white">가이드 PDF 다운로드</a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="row mt-3">
-
-                <div class="col-xl-6 mb-5 mb-xl-0">
-                    <div class="card card-stats shadow">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <h4/>미디어 및 바이너리 파일 관리</h4>
-                                    <h1 class="mb-0">Storage</h1>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="ni ni-archive-2 text-red"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <a onclick="alert('곧 지원될 예정입니다');" class="btn btn-sm btn-info text-white">가이드 PDF 다운로드</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-6 mb-5 mb-xl-0">
-                    <div class="card card-stats shadow">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <h4>서버리스 코드 관리</h4>
-                                    <h1 class="mb-0">Logic</h1>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="ni ni-cloud-upload-96 text-green"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <a onclick="alert('곧 지원될 예정입니다');" class="btn btn-sm btn-info text-white">가이드 PDF 다운로드</a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="row mt-3">
-
-                <div class="col-xl-6 mb-5 mb-xl-0">
-                    <div class="card card-stats shadow">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <h4>로그 기록 및 관리</h4>
-                                    <h1 class="mb-0">Log</h1>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="ni ni-books text-dark"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <a onclick="alert('곧 지원될 예정입니다');" class="btn btn-sm btn-info text-white">가이드 PDF 다운로드</a>
-                        </div>
-                    </div>
-                </div>
-
-
-            </div>
             <!-- Footer -->
             <footer class="footer">
                 <div class="row align-items-center justify-content-xl-between">

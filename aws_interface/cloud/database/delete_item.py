@@ -13,11 +13,9 @@ info = {
         'item_id': 'str',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+        'success': 'bool'
+    },
+    'description': 'Delete item'
 }
 
 
@@ -39,7 +37,8 @@ def do(data, resource):
         return Response(body)
 
     if match_policy_after_get_policy_code(resource, 'delete', item['partition'], user, item):
-        resource.db_delete_item(item_id)
+        success = resource.db_delete_item(item_id)
+        body['success'] = success
     else:
         body['message'] = error.PERMISSION_DENIED
     return Response(body)

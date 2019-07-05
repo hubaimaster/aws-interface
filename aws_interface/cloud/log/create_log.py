@@ -14,11 +14,9 @@ info = {
         'event_param': 'str',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+        'success': 'bool'
+    },
+    'description': 'Create log'
 }
 
 
@@ -41,6 +39,7 @@ def do(data, resource):
         item['owner'] = user.get('id')
 
         success = resource.db_put_item(partition, item)
+        body['success'] = success
         if success:
             return Response(body)
         else:

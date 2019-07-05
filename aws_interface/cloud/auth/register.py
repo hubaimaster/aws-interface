@@ -16,11 +16,15 @@ info = {
         'extra?': 'map'
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str'
-        },
-    }
+        'item?': {
+            'id': 'str',
+            'creation_date': 'float',
+            'email': 'str',
+            'login_method': 'str',
+            '...': '...'
+        }
+    },
+    'description': 'Register by email and password'
 }
 
 
@@ -84,4 +88,5 @@ def do(data, resource):
             if key not in item:
                 item[key] = extra[key]
         resource.db_put_item(partition, item)
+        body['item'] = item
         return Response(body)

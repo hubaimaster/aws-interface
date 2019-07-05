@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-03 03:35+0900\n"
+"POT-Creation-Date: 2019-07-06 02:43+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -232,6 +232,7 @@ msgid "Default group when joining"
 msgstr "가입시 기본 그룹"
 
 #: templates/dashboard/app/auth.html:245
+#: templates/dashboard/app/database.html:37
 #: templates/dashboard/app/storage.html:36
 msgid "Policy"
 msgstr "정책"
@@ -374,7 +375,9 @@ msgstr "에 의존합니다"
 msgid ""
 "If the value of the has_permission function is True, each Create, Read, "
 "Update, and Delete operations are allowed"
-msgstr "has_permission 함수의 값이 True 면, Create, Read, Update, Delete 동작이 허용됩니다"
+msgstr ""
+"has_permission 함수의 값이 True 면, Create, Read, Update, Delete 동작이 허용"
+"됩니다"
 
 #: templates/dashboard/app/database.html:44
 #: templates/dashboard/app/storage.html:38
@@ -540,6 +543,32 @@ msgstr "이 그룹이 이미 존재합니다"
 msgid "Please specify item"
 msgstr "아이템을 지정해주세요"
 
+#: templates/dashboard/app/guide.html:17
+msgid "Guide"
+msgstr "가이드"
+
+#: templates/dashboard/app/guide.html:18
+msgid ""
+"Learn how to quickly build powerful backend services with the help of a "
+"guide document."
+msgstr "가이드 문서의 도움을 받아 강력한 백엔드를 순식간에 빌드하는 방법을 터득하세요"
+
+#: templates/dashboard/app/guide.html:19
+msgid "Report issues"
+msgstr "이슈 제보"
+
+#: templates/dashboard/app/guide.html:20
+msgid "Service Introduction"
+msgstr "서비스 소개"
+
+#: templates/dashboard/app/guide.html:34
+msgid "Learn how to use the SDK written in multiple languages"
+msgstr "여러 언어로 작성된 SDK 를 사용하는 방법을 배웁니다"
+
+#: templates/dashboard/app/guide.html:35
+msgid "Learn how to use the SDK"
+msgstr "SDK 사용 방법 배우기"
+
 #: templates/dashboard/app/log.html:32
 msgid "Events"
 msgstr "이벤트"
@@ -622,7 +651,9 @@ msgstr "package 에서 def method(payload, user) 함수를 찾아 호출합니�
 msgid ""
 "The SDK can call logic_run_function ('function name') to get the results of "
 "the execution."
-msgstr "SDK 에서 logic_run_function ('function name') 를 호출하여 함수 실행 결과를 얻을 수 있습니다"
+msgstr ""
+"SDK 에서 logic_run_function ('function name') 를 호출하여 함수 실행 결과를 얻"
+"을 수 있습니다"
 
 #: templates/dashboard/app/logic.html:373
 msgid "Please enter the function name"
@@ -697,7 +728,9 @@ msgstr "최근 추가됨"
 msgid ""
 "Thank you for your contribution to the serverless ecosystem. After the "
 "upload, the function verification process will be done within one week."
-msgstr "서버리스 생태계에 기여해주셔서 감사합니다. 업로드 후 업무일 기준 1주일 이내로 함수 인증 절차를 거치게 됩니다."
+msgstr ""
+"서버리스 생태계에 기여해주셔서 감사합니다. 업로드 후 업무일 기준 1주일 이내"
+"로 함수 인증 절차를 거치게 됩니다."
 
 #: templates/dashboard/app/marketplace_create.html:35
 #: templates/dashboard/app/marketplace_edit.html:35
@@ -778,7 +811,8 @@ msgstr "가져오기 버튼을 클릭하여 함수를 Logic 으로 가져옵니�
 #: templates/dashboard/app/marketplace_detail.html:74
 msgid ""
 "Importing not verified functions can cause serious problems with the backend"
-msgstr "인증되지 않은 함수를 가져오면 백엔드에 심각한 문제를 초래할 수 있습니다"
+msgstr ""
+"인증되지 않은 함수를 가져오면 백엔드에 심각한 문제를 초래할 수 있습니다"
 
 #: templates/dashboard/app/marketplace_detail.html:122
 msgid "Are you sure you want to delete?"
@@ -800,11 +834,40 @@ msgstr "강력한 백엔드를 생성하고 손쉽게 관리하세요"
 msgid "Download SDK"
 msgstr "SDK 다운로드"
 
+#: templates/dashboard/app/overview.html:73
+msgid "Membership Management and Certification"
+msgstr "회원 관리 및 인증"
+
+#: templates/dashboard/app/overview.html:82
+#: templates/dashboard/app/overview.html:101
+#: templates/dashboard/app/overview.html:124
+#: templates/dashboard/app/overview.html:143
+#: templates/dashboard/app/overview.html:166
+msgid "Shortcuts"
+msgstr "바로가기"
+
+#: templates/dashboard/app/overview.html:92
+msgid "Automatic Scale Database Management"
+msgstr "자동 스케일 데이터베이스 관리"
+
+#: templates/dashboard/app/overview.html:115
+msgid "Media and Binary File Management"
+msgstr "미디어 및 바이너리 파일 관리"
+
+#: templates/dashboard/app/overview.html:134
+msgid "Serverless Code Management"
+msgstr "서버리스 코드 관리"
+
+#: templates/dashboard/app/overview.html:157
+msgid "Logging and management"
+msgstr "로깅 및 관리"
+
 #: templates/dashboard/app/storage.html:36
 msgid ""
 "If the value of the has_permission function is True, each Create, Read, and "
 "Delete operation is allowed"
-msgstr "has_permission 함수의 값이 True 이면 Create, Read, Delete 동작이 허용됩니다"
+msgstr ""
+"has_permission 함수의 값이 True 이면 Create, Read, Delete 동작이 허용됩니다"
 
 #: templates/dashboard/app/storage.html:89
 #: templates/dashboard/app/storage.html:98
@@ -855,13 +918,20 @@ msgstr "백엔드 이름"
 msgid ""
 "By clicking the Confirm button, you agree to share your analytics data with "
 "the AWS Interface to improve the AWS Interface service."
-msgstr "확인 버튼을 클릭하여 AWS Interface 서비스의 개선을 위해 분석 데이터를 AWS Interface 와 공유하는데 동의합니다."
+msgstr ""
+"확인 버튼을 클릭하여 AWS Interface 서비스의 개선을 위해 분석 데이터를 AWS "
+"Interface 와 공유하는데 동의합니다."
 
 #: templates/dashboard/apps.html:151
 msgid "Remove backend"
 msgstr "백엔드 제거"
 
-#: templates/dashboard/register.html:43
+#: templates/dashboard/login.html:44 templates/dashboard/login.html:97
+#: templates/dashboard/register.html:172
+msgid "Sign-up"
+msgstr "회원가입"
+
+#: templates/dashboard/login.html:90 templates/dashboard/register.html:43
 msgid "Sign-in"
 msgstr "로그인"
 
@@ -876,7 +946,3 @@ msgstr "앞서가는 기업들은 이미 사용하고 있습니다"
 #: templates/dashboard/register.html:94
 msgid "Confirm Password"
 msgstr "비밀번호 확인"
-
-#: templates/dashboard/register.html:172
-msgid "Sign-up"
-msgstr "회원가입"

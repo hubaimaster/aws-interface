@@ -16,13 +16,14 @@ info = {
         'reverse': 'bool=False',
     },
     'output_format': {
-        'items?': [{'str': 'any'}],
+        'items?': [{
+            'id': 'str',
+            'creation_date': 'float',
+            '...': '...',
+        }],
         'end_key?': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+    },
+    'description': 'Get items and its end_key to iterate'
 }
 
 

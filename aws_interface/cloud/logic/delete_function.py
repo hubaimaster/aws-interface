@@ -9,7 +9,7 @@ info = {
         'function_name': 'str',
     },
     'output_format': {
-
+        'success': 'bool'
     }
 }
 
@@ -25,6 +25,7 @@ def do(data, resource):
     items, _ = resource.db_query(partition,
                                  [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}])
     for item in items:
-        resource.db_delete_item(item['id'])
+        success = resource.db_delete_item(item['id'])
+        body['success'] = success
 
     return Response(body)

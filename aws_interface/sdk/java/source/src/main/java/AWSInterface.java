@@ -49,8 +49,7 @@ public final class AWSInterface {
         });
     }
 
-    public void callAPI(String serviceName, String apiName, HashMap<String, Object> data, CallbackFunction callbackFunction){
-        String module_name = "cloud." + serviceName + "." + apiName;
+    public void callAPI(String module_name, HashMap<String, Object> data, CallbackFunction callbackFunction){
         data.put("session_id", sessionId);
         data.put("module_name", module_name);
         String json = new Gson().toJson(data);
@@ -64,23 +63,23 @@ public final class AWSInterface {
     }
 
     private void auth(String apiName, HashMap<String, Object> data, CallbackFunction callbackFunction){
-        callAPI("auth", apiName, data, callbackFunction);
+        callAPI("cloud.auth." + apiName, data, callbackFunction);
     }
 
     private void database(String apiName, HashMap<String, Object> data, CallbackFunction callbackFunction){
-        callAPI("database", apiName, data, callbackFunction);
+        callAPI("cloud.database." + apiName, data, callbackFunction);
     }
 
     private void storage(String apiName, HashMap<String, Object> data, CallbackFunction callbackFunction){
-        callAPI("storage", apiName, data, callbackFunction);
+        callAPI("cloud.storage." + apiName, data, callbackFunction);
     }
 
     private void logic(String apiName, HashMap<String, Object> data, CallbackFunction callbackFunction){
-        callAPI("logic", apiName, data, callbackFunction);
+        callAPI("cloud.logic." + apiName, data, callbackFunction);
     }
 
     private void log(String apiName, HashMap<String, Object> data, CallbackFunction callbackFunction){
-        callAPI("log", apiName, data, callbackFunction);
+        callAPI("cloud.log." + apiName, data, callbackFunction);
     }
 
     public void authRegister(String email, String password, HashMap<String, Object> extra, CallbackFunction callbackFunction){

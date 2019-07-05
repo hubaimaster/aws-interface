@@ -11,8 +11,9 @@ info = {
         'permission': 'str'
     },
     'output_format': {
-
-    }
+        'success': 'bool'
+    },
+    'description': 'Attach permission to group'
 }
 
 
@@ -21,12 +22,11 @@ def do(data, resource):
     body = {}
     params = data['params']
     group_name = params['group_name']
+    permission = params.get('permission', [])
 
     if group_name == 'admin':
         body['error'] = error.ADMIN_GROUP_CANNOT_BE_MODIFIED
         return Response(body)
-
-    permission = params.get('permission', [])
 
     item = resource.db_get_item('user-group-{}'.format(group_name))
     item_permissions = item.get('permissions', [])
@@ -34,5 +34,6 @@ def do(data, resource):
     item_permissions = list(set(item_permissions))
     item['permissions'] = sorted(item_permissions)
 
-    _ = resource.db_put_item('user_group', item, 'user-group-{}'.format(group_name))
+    success = resource.db_put_item('user_group', item, 'user-group-{}'.format(group_name))
+    body['success'] = success
     return Response(body)

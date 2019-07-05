@@ -12,12 +12,13 @@ info = {
         'item_id': 'str',
     },
     'output_format': {
-        'item': 'map',
-        'error': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+        'item': {
+            'id': 'str',
+            'creation_date': 'float',
+            '...': '...'
+        },
+    },
+    'description': 'Get item'
 }
 
 

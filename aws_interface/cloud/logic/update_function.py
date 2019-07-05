@@ -18,11 +18,8 @@ info = {
     },
     'output_format': {
         'function_name?': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+    },
+    'description': 'Update function item'
 }
 
 

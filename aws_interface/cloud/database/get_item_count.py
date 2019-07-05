@@ -15,11 +15,8 @@ info = {
         'item': {
             'count': 'int'
         },
-        'error': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+    },
+    'description': 'Return count of items on the condition'
 }
 
 

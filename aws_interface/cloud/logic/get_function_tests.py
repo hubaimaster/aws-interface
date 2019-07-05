@@ -11,7 +11,8 @@ info = {
     'output_format': {
         'items': 'list',
         'end_key': 'str',
-    }
+    },
+    'description': 'Return function test list'
 }
 
 

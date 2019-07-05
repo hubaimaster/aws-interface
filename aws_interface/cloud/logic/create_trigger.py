@@ -17,11 +17,8 @@ info = {
     },
     'output_format': {
         'trigger_name?': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+    },
+    'description': 'Create trigger (When the trigger is executed, the associated function is called)'
 }
 
 

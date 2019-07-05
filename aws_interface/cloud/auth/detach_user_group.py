@@ -11,8 +11,9 @@ info = {
         'group_name': 'str',
     },
     'output_format': {
-
-    }
+        'success': 'bool'
+    },
+    'description': 'Detach user group from user'
 }
 
 
@@ -30,5 +31,6 @@ def do(data, resource):
     groups = list(set(groups))
     user['groups'] = groups
 
-    _ = resource.db_update_item(user_id, user)
+    success = resource.db_update_item(user_id, user)
+    body['success'] = success
     return Response(body)

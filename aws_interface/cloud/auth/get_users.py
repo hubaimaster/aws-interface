@@ -19,7 +19,8 @@ info = {
             '...': '...',
         }, ],
         'end_key?': 'str'
-    }
+    },
+    'description': 'Return all users in system'
 }
 
 

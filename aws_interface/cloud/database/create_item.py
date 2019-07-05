@@ -17,11 +17,8 @@ info = {
     },
     'output_format': {
         'item_id?': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str'
-        }
-    }
+    },
+    'description': 'Create item and return id of item'
 }
 
 

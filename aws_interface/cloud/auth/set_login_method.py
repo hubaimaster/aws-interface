@@ -16,7 +16,8 @@ info = {
     },
     'output_format': {
 
-    }
+    },
+    'description': 'Set information of login method'
 }
 
 

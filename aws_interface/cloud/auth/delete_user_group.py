@@ -10,8 +10,9 @@ info = {
         'group_name': 'str'
     },
     'output_format': {
-
-    }
+        'success': 'bool'
+    },
+    'description': 'Delete user group'
 }
 
 
@@ -25,5 +26,6 @@ def do(data, resource):
         body['error'] = error.DEFAULT_USER_GROUP_CANNOT_BE_MODIFIED
         return Response(body)
 
-    _ = resource.db_delete_item('user-group-{}'.format(group_name))
+    success = resource.db_delete_item('user-group-{}'.format(group_name))
+    body['success'] = success
     return Response(body)

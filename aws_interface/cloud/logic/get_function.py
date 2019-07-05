@@ -7,8 +7,6 @@ from cloud.message import error
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'session_id': 'str',
-
         'function_name': 'str',
     },
     'output_format': {
@@ -19,12 +17,13 @@ info = {
             'description': 'str',
             'zip_file_id': 'str',
             'runnable': 'bool',
+            'sdk_config': {
+                'rest_api_url': 'str',
+                'session_id': 'str',
+            }
         },
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+    },
+    'description': 'Return function item'
 }
 
 

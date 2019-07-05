@@ -15,11 +15,9 @@ info = {
         'field_value?': 'any',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+        'success': 'bool'
+    },
+    'description': 'Put field:value to item'
 }
 
 
@@ -42,7 +40,8 @@ def do(data, resource):
         item[field_name] = field_value
         if field_value is None:
             item.pop(field_name)
-        resource.db_update_item(item_id, item)
+        success = resource.db_update_item(item_id, item)
+        body['success'] = success
     else:
         body['error'] = error.PERMISSION_DENIED
     return Response(body)

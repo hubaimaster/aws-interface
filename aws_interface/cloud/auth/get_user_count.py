@@ -12,7 +12,8 @@ info = {
         'item': {
             'count': 'int'
         }
-    }
+    },
+    'description': 'Return count of all users'
 }
 
 

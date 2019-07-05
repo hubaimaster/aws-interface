@@ -14,7 +14,8 @@ info = {
             'id': 'str',
             'creationDate': 'int',
         },
-    }
+    },
+    'description': 'Return session item'
 }
 
 

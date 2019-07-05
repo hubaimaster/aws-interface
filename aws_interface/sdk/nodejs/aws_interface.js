@@ -28,11 +28,11 @@ class Client{
         return (typeof result !== "undefined") ? result : defaultValue;
     }
 
-    callAPI(service_name, api_name, data, callback) {
+    callAPI(module_name, data, callback) {
         if (data == null){
             data = {};
         }
-        data['module_name'] = 'cloud.' + service_name + '.' + api_name;
+        data['module_name'] = module_name;
         if (this.get_session_id() != null){
             data['session_id'] = this.get_session_id();
         }
@@ -64,23 +64,23 @@ class Client{
     }
 
     _auth(api_name, data, callback) {
-        this.callAPI('auth', api_name, data, callback);
+        this.callAPI('cloud.auth.' + api_name, data, callback);
     }
 
     _database(api_name, data, callback) {
-        this.callAPI('database', api_name, data, callback);
+        this.callAPI('cloud.database.' + api_name, data, callback);
     }
 
     _storage(api_name, data, callback) {
-        this.callAPI('storage', api_name, data, callback);
+        this.callAPI('cloud.storage.' + api_name, data, callback);
     }
 
     _logic(api_name, data, callback) {
-        this.callAPI('logic', api_name, data, callback);
+        this.callAPI('cloud.logic.' + api_name, data, callback);
     }
 
     _log(api_name, data, callback) {
-        this.callAPI('log', api_name, data, callback);
+        this.callAPI('cloud.log.' + api_name, data, callback);
     }
 
     authRegister(email, password, extra={}, callback) {

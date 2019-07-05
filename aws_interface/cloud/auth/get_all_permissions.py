@@ -11,7 +11,8 @@ info = {
     },
     'output_format': {
         'permissions': ['str'],
-    }
+    },
+    'description': 'Return all permissions in AWSI'
 }
 
 

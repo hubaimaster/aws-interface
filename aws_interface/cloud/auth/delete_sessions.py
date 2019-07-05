@@ -9,8 +9,9 @@ info = {
         'session_ids': ['str'],
     },
     'output_format': {
-
-    }
+        'success': 'bool'
+    },
+    'description': 'Delete sessions'
 }
 
 
@@ -20,6 +21,6 @@ def do(data, resource):
     params = data['params']
 
     session_ids = params.get('session_ids')
-    _ = resource.db_delete_item_batch(session_ids)
-
+    success = resource.db_delete_item_batch(session_ids)
+    body['success'] = success
     return Response(body)

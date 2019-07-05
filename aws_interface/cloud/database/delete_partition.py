@@ -11,8 +11,9 @@ info = {
         'partition': 'str',
     },
     'output_format': {
-
-    }
+        'success': 'bool'
+    },
+    'description': 'Delete partition'
 }
 
 
@@ -22,6 +23,6 @@ def do(data, resource):
     params = data['params']
 
     partition = params.get('partition', None)
-    resource.db_delete_partition(partition)
-
+    success = resource.db_delete_partition(partition)
+    body['success'] = success
     return Response(body)

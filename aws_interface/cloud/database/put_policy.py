@@ -8,15 +8,13 @@ from cloud.message import error
 info = {
     'input_format': {
         'partition_to_apply': 'str',
-        'mode': 'str: "read" | "write"',
+        'mode': '"create" | "read" | "update" | "delete"',
         'policy_code': 'str',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+
+    },
+    'description': 'Put policy in the partition'
 }
 
 SERVICE = 'database'

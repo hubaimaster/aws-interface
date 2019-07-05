@@ -9,8 +9,6 @@ import base64
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'session_id': 'str',
-
         'function_name': 'str',
         'runtime': 'str',
         'description?': 'str',
@@ -20,11 +18,8 @@ info = {
     },
     'output_format': {
         'function_name?': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+    },
+    'description': 'Create function'
 }
 
 

@@ -11,7 +11,8 @@ info = {
     },
     'output_format': {
         'groups': [{'str': 'any'}],
-    }
+    },
+    'description': 'Return all groups enrolled in system'
 }
 
 

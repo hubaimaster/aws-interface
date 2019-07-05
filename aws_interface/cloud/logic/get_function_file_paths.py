@@ -17,11 +17,8 @@ info = {
             'type': '"text" | "bin" | "image" | "video"',
             'content': 'str',
         },
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+    },
+    'description': 'Return get function file list'
 }
 
 

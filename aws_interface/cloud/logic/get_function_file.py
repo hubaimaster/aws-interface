@@ -19,11 +19,8 @@ info = {
             'type': '"text" | "bin" | "image" | "video"',
             'content': 'str',
         },
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+    },
+    'description': 'Return function text or binary file'
 }
 
 

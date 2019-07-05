@@ -16,11 +16,9 @@ info = {
         'write_groups': 'list',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+        'success': 'bool'
+    },
+    'description': 'Update item'
 }
 
 
@@ -52,7 +50,8 @@ def do(data, resource):
         for key, value in new_item.items():
             if value is None:
                 new_item.pop(key)
-        resource.db_update_item(item_id, new_item)
+        success = resource.db_update_item(item_id, new_item)
+        body['success'] = success
     else:
         body['error'] = error.NO_SUCH_PARTITION
     return Response(body)

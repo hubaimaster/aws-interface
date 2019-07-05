@@ -9,15 +9,12 @@ import inspect
 info = {
     'input_format': {
         'partition_to_apply': 'str',
-        'mode': 'str: "create" | "read" | "update" | "delete"',
+        'mode': '"create" | "read" | "update" | "delete"',
     },
     'output_format': {
         'policy_code?': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+    },
+    'description': 'Get policy code about mode (CRUD)'
 }
 
 SERVICE = 'database'

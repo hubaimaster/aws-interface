@@ -16,11 +16,11 @@ info = {
         'file_b64': 'str',
         'parent_file_id?': 'str',
         'file_name?': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
+        'meta_info': {
+            '...': '...'
         }
-    }
+    },
+    'description': 'Download a file chunk as base64 encoding'
 }
 
 

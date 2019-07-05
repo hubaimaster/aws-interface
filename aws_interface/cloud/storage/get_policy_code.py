@@ -12,11 +12,8 @@ info = {
     },
     'output_format': {
         'policy_code?': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+    },
+    'description': 'Return policy code (Create, Read, Delete)'
 }
 
 SERVICE = 'storage'

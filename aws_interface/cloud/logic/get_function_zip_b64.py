@@ -14,11 +14,8 @@ info = {
         'item?': {
             'base64': 'str',
         },
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+    },
+    'description': 'Return file as base64 encoding'
 }
 
 

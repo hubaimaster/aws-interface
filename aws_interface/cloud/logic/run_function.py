@@ -21,12 +21,12 @@ info = {
         'payload': 'dict',
     },
     'output_format': {
-        'response': 'dict',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
+        'response': {
+            '...': '...'
         },
-    }
+        'stdout?': 'str',
+    },
+    'description': 'Run function and return response'
 }
 
 

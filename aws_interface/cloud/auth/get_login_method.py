@@ -18,7 +18,8 @@ info = {
             'default_group_name': 'str',
             'register_policy_code': 'str',
         },
-    }
+    },
+    'description': 'Return login method status'
 }
 
 

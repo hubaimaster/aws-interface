@@ -7,12 +7,12 @@ from cloud.permission import Permission, NeedPermission
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'session_id': 'str',
-        'partitions': 'list',
+        'partitions': '[str]',
     },
     'output_format': {
-
-    }
+        'success': 'bool',
+    },
+    'description': 'Delete partitions'
 }
 
 
@@ -24,5 +24,5 @@ def do(data, resource):
     partitions = params.get('partitions', [])
     for partition in partitions:
         resource.db_delete_partition(partition)
-
+    body['success'] = True
     return Response(body)

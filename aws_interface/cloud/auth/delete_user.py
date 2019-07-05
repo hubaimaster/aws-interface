@@ -10,8 +10,9 @@ info = {
         'user_id': 'str',
     },
     'output_format': {
-
-    }
+        'success': 'bool'
+    },
+    'description': 'Delete user'
 }
 
 
@@ -20,6 +21,6 @@ def do(data, resource):
     body = {}
     params = data['params']
     user_id = params.get('user_id', None)
-    _ = resource.db_delete_item(user_id)
-
+    success = resource.db_delete_item(user_id)
+    body['success'] = success
     return Response(body)

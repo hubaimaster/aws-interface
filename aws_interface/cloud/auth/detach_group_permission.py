@@ -11,8 +11,9 @@ info = {
         'permission': 'str'
     },
     'output_format': {
-
-    }
+        'success': 'bool',
+    },
+    'description': 'Detach group permission from group'
 }
 
 
@@ -33,5 +34,6 @@ def do(data, resource):
     item_permissions = list(set(item_permissions))
     item['permissions'] = item_permissions
 
-    _ = resource.db_put_item('user_group', item, 'user-group-{}'.format(group_name))
+    success = resource.db_put_item('user_group', item, 'user-group-{}'.format(group_name))
+    body['success'] = success
     return Response(body)

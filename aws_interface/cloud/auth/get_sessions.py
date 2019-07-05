@@ -11,7 +11,8 @@ info = {
     'output_format': {
         'items': [{'str': 'any'}],
         'end_key': 'str'
-    }
+    },
+    'description': 'Return sessions'
 }
 
 

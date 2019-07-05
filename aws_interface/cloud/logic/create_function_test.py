@@ -14,11 +14,8 @@ info = {
     },
     'output_format': {
         'test_name?': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+    },
+    'description': 'Creation test of function'
 }
 
 

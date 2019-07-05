@@ -59,9 +59,9 @@ class AWSI {
         }
     }
 
-    private func callAPI(service_type: String, function_name: String, data: [String: Any], callback: @escaping (_ response: [String: Any]?)->Void){
+    func callAPI(module_name: String, data: [String: Any], callback: @escaping (_ response: [String: Any]?)->Void){
         var data = data
-        data["module_name"] = "cloud.\(service_type).\(function_name)"
+        data["module_name"] = module_name
         if let session_id = self.session_id{
             data["session_id"] = session_id
         }
@@ -75,27 +75,23 @@ class AWSI {
     }
 
     private func auth(function_name: String, data: [String: Any], callback: @escaping (_ response: [String: Any]?)->Void){
-        callAPI(service_type: "auth", function_name: function_name, data: data, callback: callback)
-        self.log_create_log(event_source: "auth", event_name: function_name, event_param: nil) { (_) in }
+        callAPI(module_name: "cloud.auth.\(function_name)", data: data, callback: callback)
     }
 
     private func database(function_name: String, data: [String: Any], callback: @escaping (_ response: [String: Any]?)->Void){
-        callAPI(service_type: "database", function_name: function_name, data: data, callback: callback)
-        self.log_create_log(event_source: "auth", event_name: function_name, event_param: nil) { (_) in }
+        callAPI(module_name: "cloud.database.\(function_name)", data: data, callback: callback)
     }
 
     private func storage(function_name: String, data: [String: Any], callback: @escaping (_ response: [String: Any]?)->Void){
-        callAPI(service_type: "storage", function_name: function_name, data: data, callback: callback)
-        self.log_create_log(event_source: "auth", event_name: function_name, event_param: nil) { (_) in }
+        callAPI(module_name: "cloud.storage.\(function_name)", data: data, callback: callback)
     }
 
     private func logic(function_name: String, data: [String: Any], callback: @escaping (_ response: [String: Any]?)->Void){
-        callAPI(service_type: "logic", function_name: function_name, data: data, callback: callback)
-        self.log_create_log(event_source: "auth", event_name: function_name, event_param: nil) { (_) in }
+        callAPI(module_name: "cloud.logic.\(function_name)", data: data, callback: callback)
     }
 
     private func log(function_name: String, data: [String: Any], callback: @escaping (_ response: [String: Any]?)->Void){
-        callAPI(service_type: "log", function_name: function_name, data: data, callback: callback)
+        callAPI(module_name: "cloud.log.\(function_name)", data: data, callback: callback)
     }
 
     func auth_login(email: String, password: String, callback: @escaping (_ response: [String: Any]?)->Void){
@@ -173,11 +169,15 @@ class AWSI {
     }
 
     func database_get_item_count(partition: String, field: String?=nil, value: Any?=nil, callback: @escaping (_ response: [String: Any]?)->Void){
-        let data: [String: Any] = [
-            "item_id": item_id,
-            "field": field,
-            "value": value,
+        var data: [String: Any] = [
+            "partition": partition
         ]
+        if let field = field{
+            data["field"] = field
+        }
+        if let value = value{
+            data["value"] = value
+        }
         database(function_name: "get_item_count", data: data, callback: callback)
     }
 

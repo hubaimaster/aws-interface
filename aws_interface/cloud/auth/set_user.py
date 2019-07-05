@@ -12,11 +12,9 @@ info = {
         'value?': 'str',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
+        'user_id?': 'str'
     },
+    'description': 'Set user information'
 }
 
 

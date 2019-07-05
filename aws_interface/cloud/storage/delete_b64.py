@@ -11,11 +11,9 @@ info = {
         'file_id': 'str',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+        'success': 'bool'
+    },
+    'description': 'Delete file entities'
 }
 
 
@@ -32,8 +30,8 @@ def do(data, resource):
 
         if file_item and match_policy_after_get_policy_code(resource, 'delete', 'files', user, file_item):
             resource.file_delete_bin(file_id_to_delete)
-            resource.db_delete_item(file_id_to_delete)
-
+            success = resource.db_delete_item(file_id_to_delete)
+            body['success'] = success
             file_id_to_delete = file_item.get('parent_file_id', None)
         else:
             body['error'] = error.PERMISSION_DENIED

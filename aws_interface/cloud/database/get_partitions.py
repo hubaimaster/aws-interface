@@ -11,7 +11,8 @@ info = {
     },
     'output_format': {
         'items': ['str'],
-    }
+    },
+    'description': 'Get all partitions in system'
 }
 
 

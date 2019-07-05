@@ -12,8 +12,9 @@ info = {
         'permissions': ['str'],
     },
     'output_format': {
-
-    }
+        'success': 'bool'
+    },
+    'description': 'Put a group to system'
 }
 
 
@@ -38,6 +39,7 @@ def do(data, resource):
     }
 
     success = resource.db_put_item('user_group', group_item, group_id)
+    body['success'] = success
     if success:
         return Response(body)
     else:

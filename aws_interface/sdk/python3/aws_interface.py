@@ -46,10 +46,10 @@ class Client(object):
         response = requests.post(url, data)
         return response
 
-    def call_api(self, service_name, api_name, data=None):
+    def call_api(self, module_name, data=None):
         if not data:
             data = {}
-        data['module_name'] = 'cloud.{}.{}'.format(service_name, api_name)
+        data['module_name'] = module_name
         if self.session_id:
             data['session_id'] = self.session_id
         data = json.dumps(data)
@@ -57,19 +57,19 @@ class Client(object):
         return resp.json().get('body', {'error': '404', 'message': 'No response'})
 
     def _auth(self, api_name, data):
-        return self.call_api('auth', api_name, data)
+        return self.call_api('cloud.auth.{}'.format(api_name), data)
 
     def _database(self, api_name, data):
-        return self.call_api('database', api_name, data)
+        return self.call_api('cloud.database.{}'.format(api_name), data)
 
     def _storage(self, api_name, data):
-        return self.call_api('storage', api_name, data)
+        return self.call_api('cloud.storage.{}'.format(api_name), data)
 
     def _logic(self, api_name, data):
-        return self.call_api('logic', api_name, data)
+        return self.call_api('cloud.logic.{}'.format(api_name), data)
 
     def _log(self, api_name, data):
-        return self.call_api('log', api_name, data)
+        return self.call_api('cloud.log.{}'.format(api_name), data)
 
     def auth_register(self, email, password, extra={}):
         response = self._auth('register', {

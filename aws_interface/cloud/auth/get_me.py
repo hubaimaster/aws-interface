@@ -19,11 +19,8 @@ info = {
             'salt': 'str',
             'groups': ['str'],
         },
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+    },
+    'description': 'Get my information via session'
 }
 
 

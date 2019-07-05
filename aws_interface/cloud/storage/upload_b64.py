@@ -19,15 +19,12 @@ info = {
         'read_groups': 'list',
         'write_groups': 'list',
 
-        'meta_info?': 'map',
+        'meta_info?': 'dict',
     },
     'output_format': {
         'file_id': 'str',
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+    },
+    'description': 'Upload file as base64 encoding'
 }
 
 

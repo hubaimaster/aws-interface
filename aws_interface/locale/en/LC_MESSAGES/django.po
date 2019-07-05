@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-03 03:35+0900\n"
+"POT-Creation-Date: 2019-07-06 02:43+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -232,6 +232,7 @@ msgid "Default group when joining"
 msgstr ""
 
 #: templates/dashboard/app/auth.html:245
+#: templates/dashboard/app/database.html:37
 #: templates/dashboard/app/storage.html:36
 msgid "Policy"
 msgstr ""
@@ -540,6 +541,32 @@ msgstr ""
 msgid "Please specify item"
 msgstr ""
 
+#: templates/dashboard/app/guide.html:17
+msgid "Guide"
+msgstr ""
+
+#: templates/dashboard/app/guide.html:18
+msgid ""
+"Learn how to quickly build powerful backend services with the help of a "
+"guide document."
+msgstr ""
+
+#: templates/dashboard/app/guide.html:19
+msgid "Report issues"
+msgstr ""
+
+#: templates/dashboard/app/guide.html:20
+msgid "Service Introduction"
+msgstr ""
+
+#: templates/dashboard/app/guide.html:34
+msgid "Learn how to use the SDK written in multiple languages"
+msgstr ""
+
+#: templates/dashboard/app/guide.html:35
+msgid "Learn how to use the SDK"
+msgstr ""
+
 #: templates/dashboard/app/log.html:32
 msgid "Events"
 msgstr ""
@@ -800,6 +827,34 @@ msgstr ""
 msgid "Download SDK"
 msgstr ""
 
+#: templates/dashboard/app/overview.html:73
+msgid "Membership Management and Certification"
+msgstr ""
+
+#: templates/dashboard/app/overview.html:82
+#: templates/dashboard/app/overview.html:101
+#: templates/dashboard/app/overview.html:124
+#: templates/dashboard/app/overview.html:143
+#: templates/dashboard/app/overview.html:166
+msgid "Shortcuts"
+msgstr ""
+
+#: templates/dashboard/app/overview.html:92
+msgid "Automatic Scale Database Management"
+msgstr ""
+
+#: templates/dashboard/app/overview.html:115
+msgid "Media and Binary File Management"
+msgstr ""
+
+#: templates/dashboard/app/overview.html:134
+msgid "Serverless Code Management"
+msgstr ""
+
+#: templates/dashboard/app/overview.html:157
+msgid "Logging and management"
+msgstr ""
+
 #: templates/dashboard/app/storage.html:36
 msgid ""
 "If the value of the has_permission function is True, each Create, Read, and "
@@ -861,7 +916,12 @@ msgstr ""
 msgid "Remove backend"
 msgstr ""
 
-#: templates/dashboard/register.html:43
+#: templates/dashboard/login.html:44 templates/dashboard/login.html:97
+#: templates/dashboard/register.html:172
+msgid "Sign-up"
+msgstr ""
+
+#: templates/dashboard/login.html:90 templates/dashboard/register.html:43
 msgid "Sign-in"
 msgstr ""
 
@@ -875,8 +935,4 @@ msgstr ""
 
 #: templates/dashboard/register.html:94
 msgid "Confirm Password"
-msgstr ""
-
-#: templates/dashboard/register.html:172
-msgid "Sign-up"
 msgstr ""

@@ -14,11 +14,16 @@ info = {
         'extra': 'map'
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
+        'item?': {
+            'id': 'str',
+            'creation_date': 'float',
+            'email': 'str',
+            'groups': ['str'],
+            'login_method': 'str',
+            '...': '...',
         }
-    }
+    },
+    'description': 'Register admin user by email and password'
 }
 
 
@@ -50,7 +55,7 @@ def do(data, resource):
             'email': email,
             'password_hash': password_hash,
             'salt': salt,
-            'group': default_group_name,
+            'groups': [default_group_name],
             'extra': extra,
             'login_method': 'email_login',
         }

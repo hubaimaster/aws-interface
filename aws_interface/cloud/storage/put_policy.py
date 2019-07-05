@@ -11,11 +11,9 @@ info = {
         'policy_code': 'str',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+        'success': 'bool',
+    },
+    'description': 'Put policy code used for create, read, delete operation'
 }
 
 SERVICE = 'storage'
@@ -41,5 +39,6 @@ def do(data, resource):
         'mode': mode,
         'code': code,
     }
-    resource.db_put_item('{}-policy'.format(SERVICE), item, item_id)
+    success = resource.db_put_item('{}-policy'.format(SERVICE), item, item_id)
+    body['success'] = success
     return Response(body)

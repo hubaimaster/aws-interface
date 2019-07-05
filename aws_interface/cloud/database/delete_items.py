@@ -10,14 +10,12 @@ from cloud.database.get_policy_code import match_policy, get_policy_code
 info = {
     'input_format': {
         'session_id': 'str',
-        'item_ids': 'list',
+        'item_ids': '[str]',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        }
-    }
+        'success': 'bool'
+    },
+    'description': 'Delete items'
 }
 
 
@@ -46,5 +44,5 @@ def do(data, resource):
                 if item and match_policy(policy_code, user, item):
                     resource.db_delete_item(item_id)
             executor.submit(delete_item, _item_id)
-
+    body['success'] = True
     return Response(body)

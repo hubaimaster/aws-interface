@@ -19,7 +19,8 @@ info = {
             'message': 'str',
         },
         'session_id': 'str',
-    }
+    },
+    'description': 'Sign-in by email and password'
 }
 
 

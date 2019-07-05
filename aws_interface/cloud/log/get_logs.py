@@ -14,13 +14,10 @@ info = {
         'reverse?': 'bool',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str'
-        },
         'end_key': 'str',
         'items': 'list',
-    }
+    },
+    'description': 'Get logs in system'
 }
 
 

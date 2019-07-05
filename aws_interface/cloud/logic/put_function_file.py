@@ -18,11 +18,9 @@ info = {
         'file_type': '"text" | "bin" | "image" | "video"',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str',
-        },
-    }
+        'success': 'bool'
+    },
+    'description': 'Put file to function zip file'
 }
 
 SUPPORT_TYPES = ['text']
@@ -75,6 +73,7 @@ def do(data, resource):
             resource.file_upload_bin(zip_file_id, zip_file_bin)
             resource.file_delete_bin(item['zip_file_id'])  # Remove previous zip file
             item['zip_file_id'] = zip_file_id  # Set new file's id
-            resource.db_update_item(item['id'], item)
+            success = resource.db_update_item(item['id'], item)
+            body['success'] = success
 
         return Response(body)

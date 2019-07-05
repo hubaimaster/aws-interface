@@ -12,8 +12,9 @@ info = {
         'partition': 'str',
     },
     'output_format': {
-
-    }
+        'partition': 'str',
+    },
+    'description': 'Create partition and return partition name'
 }
 
 
@@ -24,5 +25,5 @@ def do(data, resource):
 
     partition = params.get('partition', None)
     resource.db_create_partition(partition)
-
+    body['partition'] = partition
     return Response(body)

@@ -11,11 +11,9 @@ info = {
         'session_id': 'str',
     },
     'output_format': {
-        'error?': {
-            'code': 'int',
-            'message': 'str'
-        },
-    }
+        'success': 'bool'
+    },
+    'description': 'Sign-out and remove session'
 }
 
 
@@ -26,7 +24,9 @@ def do(data, resource):
 
     session_id = params.get('session_id', None)
     if resource.db_delete_item(Hash.sha3_512(session_id)):
+        body['success'] = True
         return Response(body)
     else:
+        body['success'] = False
         body['error'] = error.LOGOUT_FAILED
         return Response(body)
