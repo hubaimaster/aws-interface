@@ -13,10 +13,10 @@
             <div class="container-fluid">
                 <div class="header-body">
                     <div class="alert alert-primary" role="alert">
-                        <strong>AWS Lambda</strong>  를 사용합니다.
+                        <strong>AWS Lambda</strong> {{ _("is used") }}
                     </div>
                     <div class="alert alert-default" role="alert">
-                        <strong>Auth </strong> 에 의존합니다.
+                        <strong>Auth </strong> {{ _("dependency") }}
                     </div>
                     <!-- Card stats -->
 
@@ -31,12 +31,12 @@
                         <div class="card-header border-0">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <h3 class="mb-0">함수 테스트 목록</h3>
+                                    <h3 class="mb-0">{{ _("Tests") }}</h3>
                                 </div>
 
                                 <div class="col text-right">
                                     <a data-toggle="modal" data-target="#modal-create-function-test" class="btn btn-sm btn-primary">
-                                        <span class="btn-inner--text" style="color: white;">테스트 생성</span>
+                                        <span class="btn-inner--text" style="color: white;">{{ _("Create test") }}</span>
                                     </a>
                                 </div>
 
@@ -44,7 +44,7 @@
                                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title" id="modal-title-default">테스트 결과</h4>
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Testing result") }}</h4>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
@@ -56,7 +56,7 @@
                                                         <div class="col-lg-12">
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="file-bin">실행 결과</label>
+                                                                <label class="form-control-label" for="file-bin">{{ _("Execution result") }}</label>
                                                                 <textarea id="result-test-input" name="test_input" rows="10" name="handler" type="text" class="form-control form-control-alternative" disabled></textarea>
                                                             </div>
 
@@ -65,7 +65,7 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
-                                                <button class="btn btn-primary" data-dismiss="modal">확인</button>
+                                                <button class="btn btn-primary" data-dismiss="modal">{{ _("Confirm") }}</button>
                                             </div>
 
                                         </div>
@@ -78,7 +78,7 @@
                                             <form method="POST">{% csrf_token %}
                                                 <input name="cmd" value="create_function_test" hidden>
                                                 <div class="modal-header">
-                                                    <h4 class="modal-title" id="modal-title-default">함수 테스트 생성</h4>
+                                                    <h4 class="modal-title" id="modal-title-default">{{ _("Create function test") }}</h4>
                                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                         <span aria-hidden="true">×</span>
                                                     </button>
@@ -90,12 +90,12 @@
                                                             <div class="col-lg-12">
 
                                                                 <div class="form-group">
-                                                                    <label class="form-control-label" for="folder-name">테스트 이름</label>
-                                                                    <input name="test_name" type="text" class="form-control form-control-alternative" placeholder="테스트 케이스 이름">
+                                                                    <label class="form-control-label" for="folder-name">{{ _("Test name") }}</label>
+                                                                    <input name="test_name" type="text" class="form-control form-control-alternative" placeholder="{{ _("Test name") }}">
                                                                 </div>
 
                                                                 <div class="form-group">
-                                                                    <label class="form-control-label" for="function-description">테스트할 함수 이름</label>
+                                                                    <label class="form-control-label" for="function-description">{{ _("Function name") }}</label>
                                                                     <select name="function_name" class="form-control">
                                                                         {% for function in functions %}
                                                                             <option value="{{ function.function_name }}">{{ function.function_name }}</option>
@@ -104,7 +104,7 @@
                                                                 </div>
 
                                                                 <div class="form-group">
-                                                                    <label class="form-control-label" for="file-bin">테스트 페이로드 (JSON)</label>
+                                                                    <label class="form-control-label" for="file-bin">{{ _("Test payload") }} (JSON)</label>
                                                                     <textarea id="test_input" name="test_input" rows="5" name="handler" type="text" id="test-input" class="form-control form-control-alternative" placeholder='{"field": "value"}'></textarea>
                                                                 </div>
 
@@ -112,12 +112,12 @@
                                                         </div>
                                                     </div>
                                                     <p>
-                                                        확인 버튼을 클릭하여 테스트를 생성합니다.
+                                                        {{ _("Click the confirm button to create the test") }}
                                                     </p>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                    <button type="submit" id="create-function-test" class="btn btn-primary" disabled>확인</button>
+                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                    <button type="submit" id="create-function-test" class="btn btn-primary" disabled>{{ _("Confirm") }}</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -182,7 +182,7 @@
                         <div class="card-header border-0">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <h3 class="mb-0">함수 목록</h3>
+                                    <h3 class="mb-0">{{ _("Functions") }}</h3>
                                 </div>
 
                                 <div class="col text-right">
@@ -190,7 +190,7 @@
                                         <span class="btn-inner--text">Marketplace</span>
                                     </a>
                                     <a data-toggle="modal" data-target="#modal-create-function" class="btn btn-sm btn-primary">
-                                        <span class="btn-inner--text" style="color: white;">함수 생성</span>
+                                        <span class="btn-inner--text" style="color: white;">{{ _("Create function") }}</span>
                                     </a>
                                 </div>
 
@@ -198,7 +198,7 @@
                                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title" id="modal-title-default">함수 생성</h4>
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Create function") }}</h4>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
@@ -210,43 +210,42 @@
                                                         <div class="col-lg-12">
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="folder-name">*이름</label>
-                                                                <input name="function_name" type="text" id="function-name" class="form-control form-control-alternative" placeholder="함수 이름">
+                                                                <label class="form-control-label" for="function_name">* {{ _("Name") }}</label>
+                                                                <input name="function_name" type="text" id="function-name" class="form-control form-control-alternative" placeholder="{{ _("Function name") }}">
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="folder-name">*런타임</label>
+                                                                <label class="form-control-label" for="runtime">* {{ _("Runtime") }}</label>
                                                                 <select name="runtime" id="function-runtime" class="form-control form-control-alternative">
                                                                     <option value="python3.6">python3.6</option>
                                                                 </select>
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="function-description">설명</label>
-                                                                <input name="function-description" type="text" id="function-description" class="form-control form-control-alternative" placeholder="함수 설명">
+                                                                <label class="form-control-label" for="function-description">{{ _("Description") }}</label>
+                                                                <input name="function-description" type="text" id="function-description" class="form-control form-control-alternative" placeholder="{{ _("Short description") }}">
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="file-bin">소스 코드 .zip 파일</label>
+                                                                <label class="form-control-label" for="function-zipfile">{{ _("Source .zip file") }}</label>
                                                                 <input name="zip_file" type="file" id="function-zipfile" class="form-control form-control-alternative btn">
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="folder-name">실행될 함수경로.메소드이름 <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="def handler(payload, user) 함수를 찾아 호출합니다"></i></label>
-                                                                <input name="handler" type="text" id="function-handler" class="form-control form-control-alternative" placeholder="path.to.function.handler">
+                                                                <label class="form-control-label" for="function-handler">{{ _("Handler") }} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ _("Find the def method(payload, user) in the package and call it") }}"></i></label>
+                                                                <input name="handler" type="text" id="function-handler" class="form-control form-control-alternative" placeholder="package.method">
                                                             </div>
-
 
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <p>
-                                                    함수를 생성하면 SDK 에서 logic_run_function("function_name") 을 호출하여 실행 결과를 반환 받을 수 있습니다.
+                                                    {{ _("The SDK can call logic_run_function ('function name') to get the results of the execution.") }}
                                                 </p>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                <button id="create-function" class="btn btn-primary">확인</button>
+                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                <button id="create-function" class="btn btn-primary">{{ _("Confirm") }}</button>
                                             </div>
 
                                         </div>
@@ -293,7 +292,7 @@
                                             <form method="post">{% csrf_token %}
                                                 <input name="cmd" value="delete_function" hidden>
                                                 <input name="function_name" value="{{ function.function_name }}" hidden>
-                                                <button type="submit" class="btn btn-danger btn-sm">제거</button>
+                                                <button type="submit" class="btn btn-danger btn-sm">{{ _("Remove") }}</button>
                                             </form>
                                         </td>
 
@@ -370,13 +369,12 @@
                 const handler = $("#function-handler").val();
                 const runtime = $("#function-runtime").val();
                 const zip_file = $('#function-zipfile')[0].files[0];
-
                 if (function_name == null || function_name.length == 0) {
-                    alert("이름을 지정해주세요");
+                    alert("{{ _("Please enter the function name") }}");
                     return;
                 }
                 if (zip_file == null || zip_file.length == 0) {
-                    alert("파일을 지정해주세요");
+                    alert("{{ _("Please specify the zipfile") }}");
                     return;
                 }
                 create_function(function_name, description, handler, runtime, zip_file);

@@ -13,10 +13,10 @@
             <div class="container-fluid">
                 <div class="header-body">
                     <div class="alert alert-primary" role="alert">
-                        <strong>AWS Lambda</strong>  를 사용합니다.
+                        <strong>AWS Lambda, DynamoDB, S3</strong> {{ _('are used') }}
                     </div>
                     <div class="alert alert-default" role="alert">
-                        <strong>Auth </strong> 에 의존합니다.
+                        <strong>Auth </strong> {{ _('dependency') }}
                     </div>
                     <!-- Card stats -->
 
@@ -31,12 +31,12 @@
                         <div class="card-header border-1">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <h4 class="mb-0">함수 정보</h4>
+                                    <h4 class="mb-0">{{ _('Function information') }}</h4>
                                 </div>
 
                                 <div class="col text-right">
                                     <a data-toggle="modal" data-target="#modal-create-function-test" class="btn btn-sm btn-primary">
-                                        <span class="btn-inner--text" style="color: white;" onclick="save_function_info();">Save</span>
+                                        <span class="btn-inner--text" style="color: white;" onclick="save_function_info();">{{ _('Save') }}</span>
                                     </a>
                                 </div>
                             </div>
@@ -45,23 +45,23 @@
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label class="form-control-label" for="function-name">이름</label>
+                                        <label class="form-control-label" for="function-name">{{ _('Name') }}</label>
                                         <input id="function-name" name="function_name" type="text" class="form-control form-control-alternative"
-                                               placeholder="함수 이름" value="{{ function.function_name }}" disabled>
+                                               placeholder="{{ _('Function name') }}" value="{{ function.function_name }}" disabled>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label class="form-control-label" for="function-description">설명</label>
+                                        <label class="form-control-label" for="function-description">{{ _('Description') }}</label>
                                         <input id="function-description" name="function_description" type="text" id="input-function-description" class="form-control form-control-alternative"
-                                               placeholder="함수 설명" value="{{ function.description }}">
+                                               placeholder="{{ _('Function description') }}" value="{{ function.description }}">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label class="form-control-label" for="input-username">런타임</label>
+                                        <label class="form-control-label" for="input-username">{{ _('Runtime') }}</label>
                                         <select name="function-runtime" id="function-runtime" class="form-control form-control-alternative">
                                             <option value="python3.6">python3.6</option>
                                         </select>
@@ -69,9 +69,9 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label class="form-control-label" for="function-handler">핸들러</label>
+                                        <label class="form-control-label" for="function-handler">{{ _('Handler') }}</label>
                                         <input id="function-handler" name="function_handler" type="text" class="form-control form-control-alternative"
-                                               placeholder="함수 핸들러" value="{{ function.handler }}">
+                                               placeholder="{{ _('Function handler') }}" value="{{ function.handler }}">
                                     </div>
                                 </div>
                             </div>
@@ -150,7 +150,7 @@
                 <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="modal-title-default">파일 목록</h4>
+                            <h4 class="modal-title" id="modal-title-default">{{ _('Files') }}</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">×</span>
                             </button>

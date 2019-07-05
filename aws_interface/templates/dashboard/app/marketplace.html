@@ -15,14 +15,14 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12">
                         <h1 class="display-2 text-white">Marketplace</h1>
-                        <h2 class="text-white">순식간에 확장하세요</h2>
-                        <p class="text-white mt-0 mb-5">미리 만들어진 클라우드 함수를 빠르게 서비스에 통합하세요</p>
+                        <h2 class="text-white">{{ _('Expand quickly') }}</h2>
+                        <p class="text-white mt-0 mb-5">{{ _('Quickly integrate prebuilt cloud functions into your service') }}</p>
                         <a href="{% url 'marketplace_create' app_id %}" class="btn btn-primary">
-                            함수 업로드하기
+                            {{ _('Upload') }}
                             <i class="ni ni-cloud-upload-96 align-baseline"></i>
                         </a>
                         <a href="#" target="_blank" class="btn btn-outline-success" data-toggle="modal" data-target="#modal-uploaded-function-list">
-                            업로드한 함수 목록
+                            {{ _('My functions') }}
                             <i class="fa fa-list align-baseline"></i>
                         </a>
                     </div>
@@ -34,7 +34,7 @@
             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="modal-title-default">업로드한 함수 목록</h4>
+                        <h4 class="modal-title" id="modal-title-default">{{ _('My functions') }}</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -64,10 +64,10 @@
                                                         <p class="text-sm text-muted mb-0">{{ marketplace_logic.description }}</p>
                                                         {% if marketplace_logic.verified %}
                                                             <span class="text-success">●</span>
-                                                            <small>인증 됨</small>
+                                                            <small>{{ _('Verified') }}</small>
                                                         {% else %}
                                                             <span class="text-danger">●</span>
-                                                            <small>인증 안됨</small>
+                                                            <small>{{ _('Not verified') }}</small>
                                                         {% endif %}
                                                     </div>
                                                 </div>
@@ -80,7 +80,7 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">닫기</button>
+                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _('Close') }}</button>
                     </div>
                 </div>
             </div>
@@ -91,7 +91,7 @@
 
             <div class="row">
                 <div class="col-lg-12 col-md-12">
-                    <h2 class="text-white"><i class="fa fa-star"></i> Developer's choice</h2>
+                    <h2 class="text-white"><i class="fa fa-star"></i>{{ _("Developer's choice") }}</h2>
                 </div>
             </div>
 
@@ -121,10 +121,10 @@
                                 </a>
                                 {% if marketplace_logic.verified %}
                                     <span class="text-success">●</span>
-                                    <small>인증 됨</small>
+                                    <small>{{ _('Verified') }}</small>
                                 {% else %}
                                     <span class="text-danger">●</span>
-                                    <small>인증 안됨</small>
+                                    <small>{{ _('Not verified') }}</small>
                                 {% endif %}
                             </div>
                         </div>
@@ -138,7 +138,7 @@
 
                 <div class="row">
                     <div class="col-lg-12 col-md-12 mt-4">
-                        <h2 class="text-black"><i class="fa fa-history"></i> Recently added </h2>
+                        <h2 class="text-black"><i class="fa fa-history"></i> {{ _('Recently added') }} </h2>
                     </div>
                 </div>
 
@@ -168,10 +168,10 @@
 
                                             {% if marketplace_logic.verified %}
                                                 <span class="text-success">●</span>
-                                                <small>인증 됨</small>
+                                                <small>{{ _("Verified") }}</small>
                                             {% else %}
                                                 <span class="text-danger">●</span>
-                                                <small>인증 안됨</small>
+                                                <small>{{ _("Not verified") }}</small>
                                             {% endif %}
                                         </div>
                                     </div>

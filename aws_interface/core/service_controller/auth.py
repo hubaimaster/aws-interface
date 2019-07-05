@@ -49,6 +49,15 @@ class AuthServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
+    def get_user_by_email(self, email):
+        import cloud.auth.get_user_by_email as method
+        params = {
+            'email': email,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
     def get_user_count(self):
         import cloud.auth.get_user_count as method
         params = {

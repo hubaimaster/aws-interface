@@ -4,11 +4,16 @@ import base64
 import os
 
 
-class Client:
-    def __init__(self, config_path='config.json'):
+CONFIG_PATH = 'aws_interface_config.json'
+SESSION_FILE = 'aws_interface_session.json'
+
+
+class Client(object):
+    def __init__(self, config_path=CONFIG_PATH):
         config = self.get_config(config_path)
-        self.session_id = config.get('default_session_id', None)
-        self.url = config.get('url', None)
+        self.session_id = config.get('session_id', None)
+        self.url = config.get('rest_api_url', None)
+        self.load_session()
 
     @classmethod
     def get_config(cls, config_path):
@@ -18,6 +23,23 @@ class Client:
                 return config_json
         else:
             return {}
+
+    def save_session(self, filename=SESSION_FILE):
+        try:
+            if self.session_id:
+                with open(filename, 'w+') as fp:
+                    fp.write(self.session_id)
+        except Exception as ex:
+            print(ex)
+
+    def load_session(self, filename=SESSION_FILE):
+        try:
+            with open(filename, 'r') as fp:
+                session_id = fp.read()
+                if session_id:
+                    self.session_id = session_id
+        except Exception as ex:
+            print(ex)
 
     @classmethod
     def _post(cls, url, data):
@@ -57,19 +79,23 @@ class Client:
         })
         return response
 
-    def auth_login(self, email, password):
+    def auth_login(self, email, password, save_session=True):
         response = self._auth('login', {
             'email': email,
             'password': password
         })
         self.session_id = response.get('session_id', None)
+        if save_session:
+            self.save_session()
         return response
 
-    def auth_login_facebook(self, access_token):
+    def auth_login_facebook(self, access_token, save_session=True):
         response = self._auth('login_facebook', {
             'access_token': access_token,
         })
         self.session_id = response.get('session_id', None)
+        if save_session:
+            self.save_session()
         return response
 
     def auth_get_user(self, user_id):
@@ -96,12 +122,14 @@ class Client:
         self.session_id = None
         return response
 
-    def auth_guest(self, guest_id=None):
+    def auth_guest(self, guest_id=None, save_session=True):
         data = {}
         if guest_id:
             data['guest_id'] = guest_id
         response = self._auth('guest', data)
         self.session_id = response.get('session_id', None)
+        if save_session:
+            self.save_session()
         return response
 
     def database_create_item(self, partition, item, read_groups, write_groups):
@@ -252,6 +280,47 @@ class Client:
         return response
 
 
+class Condition(object):
+    equal = 'eq'
+    include = 'in'
+    greater_than = 'gt'
+    greater_than_or_equal = 'ge'
+    less_than = 'ls'
+    less_than_or_equal = 'le'
+
+
+class Query(list):
+    """Generate query list
+    """
+    def __init__(self, condition, field, value):
+        super(Query, self).__init__()
+        self._add(None, condition, field, value)
+
+    def _add(self, logical_operator, condition, field, value):
+        if len(self) == 0:
+            logical_operator = None
+        self.append({'option': logical_operator,  'condition': condition, 'field': field, 'value': value})
+        return self
+
+    def add_or(self, condition, field, value):
+        """
+        :param field: Field name to operate
+        :param value: Field value to operate
+        :param condition:
+        :return:
+        """
+        return self._add('or', condition, field, value)
+
+    def add_and(self, condition, field, value):
+        """
+        :param field: Field name to operate
+        :param value: Field value to operate
+        :param condition:
+        :return:
+        """
+        return self._add('and', condition, field, value)
+
+
 def examples():
     email = 'email@example.com'
     password = 'password'
@@ -279,6 +348,14 @@ def examples():
     print(response)
 
     client.storage_download_file(response['file_id'], 'download')
+
+    query = Query(Condition.equal, 'man', 'ok')\
+        .add_or(Condition.include, 'man', 'o')\
+        .add_and(Condition.include, 'type', 'test')
+
+    response = client.database_query_items('test', query)
+    for item in response['items']:
+        print(item)
 
 
 if __name__ == '__main__':

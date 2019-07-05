@@ -40,6 +40,7 @@ def do(data, resource):
     runtime = params.get('runtime')
     handler = params.get('handler')
     runnable = params.get('runnable', True)
+    sdk_config = params.get('sdk_config', {})
 
     zip_file_id = uuid()
 
@@ -50,12 +51,13 @@ def do(data, resource):
     item['runtime'] = runtime
     item['runnable'] = runnable
     item['zip_file_id'] = zip_file_id
+    item['sdk_config'] = sdk_config
 
     item_ids, _ = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
     if len(item_ids) == 0:
         zip_file_b64 = zip_file.encode('utf-8')
-        zip_file_b64 = base64.b64decode(zip_file_b64)
-        resource.file_upload_bin(zip_file_id, zip_file_b64)
+        zip_file_bin = base64.b64decode(zip_file_b64)
+        resource.file_upload_bin(zip_file_id, zip_file_bin)
         resource.db_put_item(partition, item)
         body['function_name'] = function_name
         return Response(body)

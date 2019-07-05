@@ -38,6 +38,9 @@ class IDDict(dict):
     def __hash__(self):
         return hash(self['id'])
 
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
 
 class Resource(metaclass=ABCMeta):
     def __init__(self, credential, app_id):
@@ -209,7 +212,6 @@ class Resource(metaclass=ABCMeta):
             all_items.extend(items)
             if len(all_items) >= start_index + limit:
                 end_index = len(items) - (len(all_items) - (start_index + limit))
-                print('end_index:', end_index)
                 if end_index % sub_limit == 0:
                     end_index = 0
                     start_key_list = end_key_list

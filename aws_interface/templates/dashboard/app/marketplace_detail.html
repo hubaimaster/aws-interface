@@ -16,24 +16,24 @@
                     <div class="col-9">
                         <h1 class="display-2 text-white">{{ marketplace_logic.title }}</h1>
                         {% if marketplace_logic.verified %}
-                            <h2 class="text-white"><span class="text-success">●</span> 인증 됨</h2>
+                            <h2 class="text-white"><span class="text-success">●</span> {{ _('Verified') }}</h2>
                         {% else %}
-                            <h2 class="text-white"><span class="text-danger">●</span> 인증 안됨</h2>
+                            <h2 class="text-white"><span class="text-danger">●</span> {{ _('Not verified') }}</h2>
                         {% endif %}
                         <p class="text-white"><i class="ni ni-email-83 base"> {{ marketplace_logic.user.email }}</i></p>
                         <p class="text-white mt-0 mb-2">{{ marketplace_logic.description }}</p>
-                        <p class="text-white mb-5"><b>{{ marketplace_logic.setup_count }} 명이 설치 했습니다</b></p>
+                        <p class="text-white mb-5"><b>{{ marketplace_logic.setup_count }} {{ _('people installed') }}</b></p>
                         <a href="#!" data-toggle="modal" data-target="#modal-setup-marketplace-logic" class="btn btn-success mt-2">
-                            설치
+                            {{ _('Import') }}
                             <i class="ni ni-cloud-download-95 align-baseline"></i>
                         </a>
                         {% if request.user == marketplace_logic.user %}
                             <a href="{% url 'marketplace_edit' app_id marketplace_logic.id %}" class="btn btn-outline-success mt-2">
-                                수정
+                                {{ _('Edit') }}
                                 <i class="fa fa-archive align-baseline"></i>
                             </a>
                             <a href="#!" onclick="delete_marketplace_logic();" class="btn btn-outline-danger mt-2">
-                                삭제
+                                {{ _('Remove') }}
                                 <i class="fa fa-trash align-baseline"></i>
                             </a>
                         {% endif %}
@@ -51,7 +51,7 @@
             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="modal-title-default">함수 가져오기</h4>
+                        <h4 class="modal-title" id="modal-title-default">{{ _('Importing function') }}</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
@@ -61,7 +61,7 @@
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="form-group">
-                                        <label class="form-control-label" for="input-username">함수 이름</label>
+                                        <label class="form-control-label" for="input-username">{{ _('Function name') }}</label>
                                         <input id="function-name" type="text" class="form-control form-control-alternative" placeholder="{{ marketplace_logic.function_name }}">
                                     </div>
                                 </div>
@@ -69,15 +69,15 @@
                         </div>
                         <p>
                             {% if marketplace_logic.verified %}
-                                확인 버튼을 클릭하여 함수를 Logic 으로 가져옵니다.
+                                {{ _('Click the import button to import the function into Logic') }}
                             {% else %}
-                                <b>미인증 함수</b>를 가져오면 백엔드에 <b>심각한 문제</b>가 발생할수도 있습니다.
+                                {{ _('Importing not verified functions can cause serious problems with the backend') }}
                             {% endif %}
                         </p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                        <button id="setup-marketplace-logic" onclick="setup_marketplace_logic()" type="submit" class="btn btn-primary">가져오기</button>
+                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _('Cancel') }}</button>
+                        <button id="setup-marketplace-logic" onclick="setup_marketplace_logic()" type="submit" class="btn btn-primary">{{ _('Import') }}</button>
                     </div>
                 </div>
             </div>
@@ -90,7 +90,7 @@
                 <div class="col-xl-12 mb-3 mb-xl-3">
                     <div class="card card-stats shadow">
                         <div class="card-header" style="height: 70px;">
-                            <h2 class="text-black"><i class="fa fa-book"></i> README.md</h2>
+                            <h2 class="text-black"><i class="fa fa-book"></i> {{ _('Content') }}</h2>
                         </div>
                         <div class="card-body" style="overflow-x: auto">
                             <div class="row">
@@ -119,7 +119,7 @@
     <script src="{% static 'markdown/showdown.min.js' %}"></script>
     <script>
         function delete_marketplace_logic() {
-            if (confirm('정말 삭제하시겠습니까?')){
+            if (confirm('{{ _("Are you sure you want to delete?") }}')){
                 $.post('', {
                     cmd: 'delete_marketplace_logic',
                     id: '{{ marketplace_logic.id }}',
@@ -127,7 +127,6 @@
                     if (data.error){
                         alert(data.error);
                     }else{
-                        alert('삭제되었습니다');
                         window.location.reload();
                     }
                 });
@@ -143,7 +142,6 @@
                     alert(data.error.message);
                 }else{
                     window.location.href = '{% url 'logic' app_id %}';
-                    alert('추가되었습니다.');
                 }
             });
         }

@@ -21,7 +21,7 @@
                 <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="modal-title-default">그룹 추가</h4>
+                            <h4 class="modal-title" id="modal-title-default">{{ _('Attach groups') }}</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">×</span>
                             </button>
@@ -34,7 +34,7 @@
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="form-group">
-                                                <label class="form-control-label" for="input-username">그룹 이름</label>
+                                                <label class="form-control-label" for="input-username">{{ _('Group name') }}</label>
                                                 <select id="group-name" name="group_name" class="form-control form-control-alternative">
                                                     {% for group in user_groups %}
                                                         <option value="{{ group.name }}">{{ group.name }}</option>
@@ -45,12 +45,12 @@
                                     </div>
                                 </div>
                                 <p>
-                                    확인 버튼을 클릭하여 회원에게 그룹을 부여합니다.
+                                    {{ _('Click the confirm button to attach this group.') }}
                                 </p>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                <button id="attach-user-group-{{ user.id }}" type="submit" class="btn btn-primary">확인</button>
+                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _('Cancel') }}</button>
+                                <button id="attach-user-group-{{ user.id }}" type="submit" class="btn btn-primary">{{ _('Confirm') }}</button>
                             </div>
                         </form>
                     </div>

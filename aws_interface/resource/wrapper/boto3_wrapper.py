@@ -152,8 +152,6 @@ class APIGateway:
             stageName=stage_name,
         )
 
-
-
     def put_method(self, rest_api_id, resource_id, method_type, auth_type='NONE'):
         try:
             response = self.client.put_method(

@@ -13,7 +13,7 @@
                 <div class="header-body">
 
                     <div class="alert alert-primary" role="alert">
-                        <strong>AWS DynamoDB, AWS Lambda, AWS APIGateway</strong>  를 사용합니다.
+                        <strong>AWS DynamoDB, AWS Lambda, AWS APIGateway</strong> {{ _("are used") }}
                     </div>
 
                     <!-- Card stats -->
@@ -23,8 +23,8 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">총 회원 수</h5>
-                                            <span class="h2 font-weight-bold mb-0">{{ user_count.item.count }} 명</span>
+                                            <h5 class="card-title text-uppercase text-muted mb-0">{{ _("Members") }}</h5>
+                                            <span class="h2 font-weight-bold mb-0">{{ user_count.item.count }} </span>
                                         </div>
                                         <div class="col-auto">
                                             <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
@@ -40,8 +40,8 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">접속 중인 세션 수</h5>
-                                            <span class="h2 font-weight-bold mb-0">{{ session_count.item.count }} 개</span>
+                                            <h5 class="card-title text-uppercase text-muted mb-0">{{ _("Sessions") }}</h5>
+                                            <span class="h2 font-weight-bold mb-0">{{ session_count.item.count }} </span>
                                         </div>
                                     </div>
                                 </div>
@@ -61,20 +61,19 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <h3 class="mb-0">
-                                        <span class="badge badge-primary">설정</span>
-                                        회원 그룹
+                                        {{ _("Groups") }}
                                     </h3>
                                 </div>
                                 <div class="col text-right">
                                     <a id="create-group-modal" data-toggle="modal" data-target="#modal-put-group" class="btn btn-sm btn-primary">
-                                        <span class="btn-inner--text" style="color: white;">그룹 생성</span>
+                                        <span class="btn-inner--text" style="color: white;">{{ _("Create group") }}</span>
                                     </a>
                                 </div>
                                 <div class="modal fade" id="modal-put-group" tabindex="-1" role="dialog" aria-labelledby="modal-put-group" aria-hidden="true">
                                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title" id="modal-title-default">그룹 생성</h4>
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Create group") }}</h4>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
@@ -86,23 +85,23 @@
                                                         <div class="row">
                                                             <div class="col-lg-12">
                                                                 <div class="form-group">
-                                                                    <label class="form-control-label" for="input-username">이름</label>
-                                                                    <input id="group-name" name="group_name" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 이름">
+                                                                    <label class="form-control-label" for="input-username">{{ _("Name") }}</label>
+                                                                    <input id="group-name" name="group_name" type="text" id="input-username" class="form-control form-control-alternative" placeholder="{{ _("Group name") }}">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label class="form-control-label" for="input-username">설명</label>
-                                                                    <input id="group-description" name="group_description" type="text" id="input-username" class="form-control form-control-alternative" placeholder="그룹 설명">
+                                                                    <label class="form-control-label" for="input-username">{{ _("Description") }}</label>
+                                                                    <input id="group-description" name="group_description" type="text" id="input-username" class="form-control form-control-alternative" placeholder="{{ _("Group description") }}">
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <p>
-                                                        확인 버튼을 클릭하여 회원 그룹을 생성합니다.
+                                                        {{ _("Click the confirm button to create the group") }}
                                                     </p>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                    <button id="create-group" type="submit" class="btn btn-primary">확인</button>
+                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                    <button id="create-group" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -116,9 +115,9 @@
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                 <tr>
-                                    <th scope="col">이름</th>
-                                    <th scope="col">설명</th>
-                                    <th scope="col">권한</th>
+                                    <th scope="col">{{ _("Name") }}</th>
+                                    <th scope="col">{{ _("Description") }}</th>
+                                    <th scope="col">{{ _("Permissions") }}</th>
                                     <th scope="col"></th>
                                 </tr>
                                 </thead>
@@ -132,13 +131,13 @@
                                             {{ group.description }}
                                         </td>
                                         <td name="group-description">
-                                            <button id="modify-permissions-{{ group.name }}" data-toggle="modal"  data-target="#modal-permissions-{{ group.name }}" class="btn btn-sm btn-info"> 관리 ({{ group.permissions|length }}) </button>
+                                            <button id="modify-permissions-{{ group.name }}" data-toggle="modal"  data-target="#modal-permissions-{{ group.name }}" class="btn btn-sm btn-info"> {{ _("Manage") }} ({{ group.permissions|length }}) </button>
 
                                             <div class="modal fade" id="modal-permissions-{{ group.name }}" tabindex="-1" role="dialog" aria-labelledby="modal-permissions-{{ group.name }}" aria-hidden="true">
                                                 <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h4 class="modal-title" id="modal-title-default">그룹 권한 관리</h4>
+                                                            <h4 class="modal-title" id="modal-title-default">{{ _("Manage group permissions") }}</h4>
                                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                 <span aria-hidden="true">×</span>
                                                             </button>
@@ -147,7 +146,7 @@
                                                             <div class="pl-lg-12">
 
                                                                 <div class="form-group">
-                                                                    <label class="form-control-label">권한 추가</label>
+                                                                    <label class="form-control-label">{{ _("Add permissions") }}</label>
                                                                     <div class="row">
                                                                         <div class="col-9">
                                                                             <select id="select-permissions-{{ group.name }}" class="form-control">
@@ -167,7 +166,7 @@
                                                                 </div>
 
                                                                 <div class="form-group">
-                                                                    <label class="form-control-label">보유 권한 목록</label>
+                                                                    <label class="form-control-label">{{ _("Permissions") }}</label>
                                                                     <div class="row">
                                                                         <div class="col-12">
 
@@ -176,7 +175,7 @@
                                                                                     <table class="table align-items-center table-hover table-flush">
                                                                                         <thead class="thead-light">
                                                                                         <tr>
-                                                                                            <th scope="col">권한 이름</th>
+                                                                                            <th scope="col">{{ _("Permission name") }}</th>
                                                                                             <th scope="col"></th>
                                                                                         </tr>
                                                                                         </thead>
@@ -199,7 +198,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button data-dismiss="modal" type="submit" class="btn btn-primary">확인</button>
+                                                            <button data-dismiss="modal" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -210,7 +209,7 @@
                                                 <form role="form" method="post">{% csrf_token %}
                                                     <input name="cmd" value="delete_group" hidden>
                                                     <input name="group_name" value="{{ group.name }}" hidden>
-                                                    <button id="remove-group-{{ group.name }}" type="submit" class="btn btn-sm btn-danger">제거</button>
+                                                    <button id="remove-group-{{ group.name }}" type="submit" class="btn btn-sm btn-danger">{{ _("Remove") }}</button>
                                                 </form>
                                             </div>
                                         </td>
@@ -230,8 +229,7 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <h3 class="mb-0">
-                                        <span class="badge badge-primary">설정</span>
-                                        로그인 방법
+                                        {{ _("Sign-in methods") }}
                                     </h3>
                                 </div>
                             </div>
@@ -241,20 +239,20 @@
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                 <tr>
-                                    <th scope="col">방법</th>
-                                    <th scope="col">설명</th>
-                                    <th scope="col">가입시 기본 그룹</th>
-                                    <th scope="col">가입 정책 <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Python3 함수의 return 값이 True 면 가입이 허락됩니다"></i></th>
-                                    <th scope="col">사용</th>
+                                    <th scope="col">{{ _("Method") }}</th>
+                                    <th scope="col">{{ _("Description") }}</th>
+                                    <th scope="col">{{ _("Default group when joining") }}</th>
+                                    <th scope="col">{{ _("Policy") }} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="If the return value of the Python3 function is True, membership is allowed"></i></th>
+                                    <th scope="col">{{ _("Enabled") }}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr>
                                     <th scope="row">
-                                        이메일/비밀번호 로그인
+                                        {{ _("Email/Password login") }}
                                     </th>
                                     <td>
-                                        <a href="#">cloud.auth.login</a> API를 이용하여 로그인합니다
+                                        <a href="#">cloud.auth.login</a>
                                     </td>
 
                                     <td>
@@ -269,12 +267,12 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <a class="btn btn-sm btn-info text-white" data-toggle="modal" data-target="#modal-email-register-policy">정책 관리</a>
+                                        <a class="btn btn-sm btn-info text-white" data-toggle="modal" data-target="#modal-email-register-policy">{{ _("Manage policy") }}</a>
                                         <div class="modal fade" id="modal-email-register-policy" tabindex="-1" role="dialog" aria-labelledby="modal-email-register-policy" aria-hidden="true">
                                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h4 class="modal-title" id="modal-title-default">이메일/비밀번호 가입 정책 관리</h4>
+                                                        <h4 class="modal-title" id="modal-title-default">{{ _("Manage policy") }}</h4>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                             <span aria-hidden="true">×</span>
                                                         </button>
@@ -301,13 +299,10 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <p>
-                                                            저장 버튼을 클릭하여 정책을 수정합니다.
-                                                        </p>
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                        <button id="save-email-register-policy-btn" class="btn btn-primary" onclick="set_email_login();">저장</button>
+                                                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                        <button id="save-email-register-policy-btn" class="btn btn-primary" onclick="set_email_login();">{{ _("Save") }}</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -328,10 +323,10 @@
 
                                 <tr>
                                     <th scope="row">
-                                        Facebook 로그인
+                                        {{ _("Facebook login") }}
                                     </th>
                                     <td>
-                                        <a href="#">cloud.auth.login_facebook</a> API를 이용하여 로그인합니다
+                                        <a href="#">cloud.auth.login_facebook</a>
                                     </td>
                                     <td>
                                         <select id="facebook_default_group" class="form-control">
@@ -345,12 +340,12 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <a class="btn btn-sm btn-info text-white" data-toggle="modal" data-target="#modal-facebook-register-policy">정책 관리</a>
+                                        <a class="btn btn-sm btn-info text-white" data-toggle="modal" data-target="#modal-facebook-register-policy">{{ _("Manage policy") }}</a>
                                         <div class="modal fade" id="modal-facebook-register-policy" tabindex="-1" role="dialog" aria-labelledby="modal-facebook-register-policy" aria-hidden="true">
                                             <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h4 class="modal-title" id="modal-title-default">Facebook 로그인 가입 정책 관리</h4>
+                                                        <h4 class="modal-title" id="modal-title-default">{{ _("Manage policy") }}</h4>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                             <span aria-hidden="true">×</span>
                                                         </button>
@@ -377,13 +372,10 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <p>
-                                                            저장 버튼을 클릭하여 정책을 수정합니다.
-                                                        </p>
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                        <button id="save-facebook-register-policy-btn" class="btn btn-primary" onclick="set_facebook_login();">저장</button>
+                                                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                        <button id="save-facebook-register-policy-btn" class="btn btn-primary" onclick="set_facebook_login();">{{ _("Save") }}</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -404,10 +396,10 @@
 
                                 <tr>
                                     <th scope="row">
-                                        익명 로그인
+                                        {{ _("Guest login") }}
                                     </th>
                                     <td>
-                                        <a href="#">cloud.auth.guest</a> API를 이용하여 로그인합니다
+                                        <a href="#">cloud.auth.guest</a>
                                     </td>
 
                                     <td>
@@ -423,7 +415,7 @@
                                     </td>
 
                                     <td>
-                                        {#                                        <a class="btn btn-sm btn-info disabled" disabled>정책 없음</a>#}
+
                                     </td>
                                     <td>
                                         <label class="custom-toggle">
@@ -452,21 +444,21 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <h3 class="mb-0">
-                                        가입된 회원
+                                        {{ _("Members") }}
                                     </h3>
                                 </div>
 
                                 <div class="col text-right">
                                     <a id="create-user-button" data-toggle="modal" data-target="#modal-put-user" class="btn btn-sm btn-primary">
-                                        <span class="btn-inner--text" style="color: white;">회원 생성</span>
+                                        <span class="btn-inner--text" style="color: white;">{{ _("Create member") }}</span>
                                     </a>
                                     <div class="dropdown">
                                         <button class="btn btn-sm btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="fas fa-ellipsis-v"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" onclick="delete_checked_users();"><i class="fas fa-trash"></i> 선택 삭제</a>
-                                            <a class="dropdown-item" data-toggle="modal" data-target="#modal-mod-user"><i class="fas fa-user-edit"></i>선택 수정</a>
+                                            <a class="dropdown-item" onclick="delete_checked_users();"><i class="fas fa-trash"></i> {{ _("Delete selected") }}</a>
+                                            <a class="dropdown-item" data-toggle="modal" data-target="#modal-mod-user"><i class="fas fa-user-edit"></i>{{ _("Edit selected") }}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -476,7 +468,7 @@
                                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title" id="modal-title-default">회원 생성</h4>
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Create member") }}</h4>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
@@ -489,11 +481,11 @@
                                                             <div class="col-lg-12">
 
                                                                 <div class="form-group">
-                                                                    <label class="form-control-label" for="input-username">이메일</label>
+                                                                    <label class="form-control-label" for="input-username">{{ _("Email") }}</label>
                                                                     <input name="user_email" type="email" id="input-username" class="form-control form-control-alternative" placeholder="example@email.com">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label class="form-control-label" for="input-password">비밀번호</label>
+                                                                    <label class="form-control-label" for="input-password">{{ _("Password") }}</label>
                                                                     <input name="user_password" type="password" id="input-password" class="form-control form-control-alternative" placeholder="******">
                                                                 </div>
 
@@ -501,12 +493,12 @@
                                                         </div>
                                                     </div>
                                                     <p>
-                                                        확인 버튼을 클릭하여 회원을 생성합니다.
+                                                        {{ _("Click confirm button to create the member") }}
                                                     </p>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                    <button id="create-user-commit" type="submit" class="btn btn-primary">확인</button>
+                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                    <button id="create-user-commit" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -518,7 +510,7 @@
                                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title" id="modal-title-default">회원 수정</h4>
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Edit member") }}</h4>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
@@ -529,20 +521,20 @@
                                                         <div class="col-lg-12">
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="user-field-name">수정할 필드 이름</label>
+                                                                <label class="form-control-label" for="user-field-name">{{ _("Field name to modify") }}</label>
                                                                 <input name="user-field-name" type="text" id="user-field-name" class="form-control form-control-alternative" placeholder="Field name">
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="field-type">수정할 필드 타입</label>
+                                                                <label class="form-control-label" for="field-type">{{ _("Field type to modify") }}</label>
                                                                 <select id="user-field-type" class="form-control">
-                                                                    <option value="S">문자열</option>
-                                                                    <option value="N">숫자</option>
+                                                                    <option value="S">{{ _("String") }}</option>
+                                                                    <option value="N">{{ _("Number") }}</option>
                                                                 </select>
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="user-field-value">수정할 필드 내용</label>
+                                                                <label class="form-control-label" for="user-field-value">{{ _("Field value to modify") }}</label>
                                                                 <input name="user-field-value" type="text" id="user-field-value" class="form-control form-control-alternative" placeholder="Field value">
                                                             </div>
 
@@ -550,12 +542,12 @@
                                                     </div>
                                                 </div>
                                                 <p>
-                                                    확인 버튼을 클릭하여 회원을 정보를 수정합니다.
+                                                    {{ _("Click confirm button to modify the member information") }}
                                                 </p>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">취소</button>
-                                                <button id="mod-user-commit" class="btn btn-primary" onclick="set_checked_users();">수정</button>
+                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                <button id="mod-user-commit" class="btn btn-primary" onclick="set_checked_users();">{{ _("Confirm") }}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -583,7 +575,7 @@
                             </table>
                         </div>
                         <button id="load-more-users-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_users();">
-                            항목 더보기 +
+                            {{ _("More items") }} +
                         </button>
                     </div>
                 </div>
@@ -597,7 +589,7 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <h3 class="mb-0">
-                                        접속 중인 세션
+                                        {{ _("Sessions") }}
                                     </h3>
                                 </div>
 
@@ -607,7 +599,7 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" onclick="delete_checked_sessions();"><i class="fas fa-trash"></i>선택 삭제</a>
+                                            <a class="dropdown-item" onclick="delete_checked_sessions();"><i class="fas fa-trash"></i>{{ _("Delete selected") }}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -637,7 +629,7 @@
 
                         </div>
                         <button id="load-more-sessions-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_sessions();">
-                            항목 더보기 +
+                            {{ _("More items") }} +
                         </button>
                     </div>
                 </div>
@@ -714,7 +706,7 @@
         }
         function delete_sessions(session_ids){
             $.LoadingOverlay('show', {
-                text:'Deleting sessions...'
+                text:'{{ _("Deleting sessions..") }}'
             });
             $.post("", {
                 cmd: "delete_sessions",
@@ -726,7 +718,7 @@
         }
         function delete_users(user_ids){
             $.LoadingOverlay('show', {
-                text:'Deleting users...'
+                text:'{{ _("Deleting users..") }}'
             });
             $.post("", {
                 cmd: "delete_users",
@@ -742,11 +734,11 @@
             const field_type = $("#user-field-type").val();
             const field_value = $("#user-field-value").val();
             if (field_type == 'N' && !$.isNumeric(field_value)){
-                alert("Numeric types can only contain numeric variables");
+                alert("{{ _("Numeric types can only contain numeric variables") }}");
                 return;
             }
             $.LoadingOverlay('show', {
-                text:'Modifying users...'
+                text:'{{ _("Modifying users..") }}'
             });
             $.post("", {
                 cmd: "set_users",
@@ -804,7 +796,7 @@
         }
 
         function detach_user_group(user_id, group_name) {
-            if (confirm('그룹을 삭제하시겠습니까?')){
+            if (confirm('{{ _("Are you sure you want to delete this group?") }}')){
                 $.post("", {
                     cmd: "detach_user_group",
                     group_name: group_name,

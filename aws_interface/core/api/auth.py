@@ -35,6 +35,9 @@ class AuthAPI(API):
     def get_user(self, user_id):
         return self.service_controller.get_user(user_id)
 
+    def get_user_by_email(self, email):
+        return self.service_controller.get_user_by_email(email)
+
     def get_users(self, start_key=None, limit=100):
         return self.service_controller.get_users(start_key, limit)
 

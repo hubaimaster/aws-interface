@@ -39,12 +39,10 @@
             <a class="navbar-brand" href="{%  url 'index' %}">
                 <img src="{% static 'assets/img/brand/white.png' %}" />
             </a>
-
             <a class="btn btn-outline-white" href="{%  url 'register' %}">
                 <i class="ni ni-circle-08 align-items-center"></i>
-                <span class="nav-link-inner--text">회원 가입</span>
+                <span class="nav-link-inner--text">{{ _('Sign-up') }}</span>
             </a>
-
         </div>
     </nav>
     <!-- Header -->
@@ -89,14 +87,14 @@
                                 </div>
                             </div>
                             <div class="text-center">
-                                <button id="login" type="submitm" class="btn btn-block btn-primary my-4">로그인</button>
+                                <button id="login" type="submitm" class="btn btn-block btn-primary my-4">{{ _('Sign-in') }}</button>
                             </div>
                         </form>
                     </div>
                 </div>
                 <div class="row mt-3">
                     <div class="col-12 text-right">
-                        <a id="register" href="{% url 'register' %}" class="text-light"><small>회원 가입</small></a>
+                        <a id="register" href="{% url 'register' %}" class="text-light"><small>{{ _('Sign-up') }}</small></a>
                     </div>
                 </div>
             </div>

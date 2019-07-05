@@ -12,7 +12,7 @@
             <div class="container-fluid">
                 <div class="header-body">
                     <div class="alert alert-primary" role="alert">
-                        <strong>AWS Lambda</strong>  를 사용합니다.
+                        <strong>AWS Lambda, DynamoDB</strong>  {{ _('are used') }}
                     </div>
 
                     <!-- Card stats -->
@@ -29,7 +29,7 @@
                             <div class="row align-items-center">
                                 <div class="col-3">
                                     <h3 class="mb-0">
-                                        이벤트 목록
+                                        {{ _('Events') }}
                                     </h3>
                                 </div>
 
@@ -48,7 +48,7 @@
 
                                             <div class="col-2">
                                                 <button type="submit" id="search-event-btn" class="btn btn-sm btn-primary">
-                                                    <span class="btn-inner--text" style="color: white;">검색</span>
+                                                    <span class="btn-inner--text" style="color: white;">{{ _('Search') }}</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -75,7 +75,7 @@
                             </table>
                         </div>
                         <button id="load-more-logs-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_logs();">
-                            항목 더보기 +
+                            {{ _('More items') }} +
                         </button>
                     </div>
                 </div>
