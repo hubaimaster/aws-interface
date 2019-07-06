@@ -554,6 +554,10 @@
     var link = 'mailto:kchdully@gmail.com?subject=' + subject + '&body=' + body;
     window.location.href = link;
   });
+  var userLang = navigator.language || navigator.userLanguage;
+  if (userLang.includes("en")){
+    window.location.href = "index_en.html";
+  }
   </script>
 </body>
 

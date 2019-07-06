@@ -548,6 +548,10 @@
     var link = 'mailto:kchdully@gmail.com?subject=' + subject + '&body=' + body;
     window.location.href = link;
   });
+  var userLang = navigator.language || navigator.userLanguage;
+  if (userLang.includes("ko")){
+    window.location.href = "index.html";
+  }
   </script>
 </body>
 

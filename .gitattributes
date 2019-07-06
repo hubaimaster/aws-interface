@@ -2,4 +2,5 @@
 * text=auto
 aws_interface/static/* linguist-vendored
 aws_interface/templates/* linguist-vendored
+aws_interface/documentation/* linguist-vendored
 html_landing/* linguist-vendored
