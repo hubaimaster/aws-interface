@@ -359,6 +359,14 @@ public final class AWSInterface {
         logic("run_function", data, callbackFunction);
     }
 
+    public void logCreateLog(String event_source, String event_name, String event_param, CallbackFunction callbackFunction){
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("event_source", event_source);
+        data.put("event_name", event_name);
+        data.put("event_param", event_param);
+        log("create_log", data, callbackFunction);
+    }
+
     public static void main(String... args) throws Exception {
         String url = "https://ri0rhdq9ab.execute-api.ap-northeast-2.amazonaws.com/prod_aws_interface/N4RVz5GjMRmfao2qBSbWwE";
         AWSInterface awsinterface = new AWSInterface(url);

@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.awsinterface'
-version '0.0.4'
+version '0.0.5'
 
 sourceCompatibility = 1.8
 
