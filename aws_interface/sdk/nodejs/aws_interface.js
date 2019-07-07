@@ -1,10 +1,11 @@
 const request = require('request');
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 class Client{
 
     constructor() {
         this.set_session_id(null);
-        this.setBaseUrl('{{REST_API_URL}}');
+        this.setBaseUrl('https://e3t7xfb981.execute-api.ap-northeast-2.amazonaws.com/prod_aws_interface/ipxsNKvdpXUgzAMqg2JgdM');
     }
 
     getBaseUrl(){
@@ -167,7 +168,7 @@ class Client{
 
     databaseGetItemCount(partition, field=null, value=null, callback) {
         this._database('get_item_count', {
-            'item_id': item_id,
+            'partition': partition,
             'field': field,
             'value': value,
         }, callback);
