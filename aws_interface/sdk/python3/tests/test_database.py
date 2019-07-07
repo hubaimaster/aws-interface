@@ -8,6 +8,7 @@ the execution base path will change,
 so you must use the import code that in the comments. [from aws_interface import Client]
 """
 import unittest
+import time
 # from ..aws_interface import Client
 from aws_interface import Client
 
@@ -72,6 +73,7 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(set(resp['item']['read_groups']) == set(self.read_groups))
         self.assertTrue(set(resp['item']['write_groups']) == set(self.write_groups))
 
+    '''
     def test_database_get_item_count(self):
         """
         Get the number of items in the partition.
@@ -101,6 +103,7 @@ class TestDatabase(unittest.TestCase):
         fields = resp['item']
         self.assertTrue(self.field_name in fields)
 
+    '''
     def test_database_update_item(self):
         """
         Update item
@@ -112,7 +115,7 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(set(resp['item']['read_groups']) == set(self.read_groups_new))
         self.assertTrue(set(resp['item']['write_groups']) == set(self.write_groups_new))
 
-
+    '''
     def test_database_query_items(self):
         """
         Query and check if the response is in list
@@ -120,3 +123,4 @@ class TestDatabase(unittest.TestCase):
         """
         resp = self.client.database_query_items(self.partition, self.query)
         self.assertIsInstance(resp['items'], list)
+'''
