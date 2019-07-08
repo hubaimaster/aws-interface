@@ -136,7 +136,6 @@
                                     <tr>
                                         <th scope="col">test_name</th>
                                         <th scope="col">function_name</th>
-                                        <th scope="col">test_input</th>
                                         <th scope="col"></th>
                                         <th scope="col"></th>
                                     </tr>
@@ -151,16 +150,13 @@
                                                 {{ function_test.function_name }}
                                             </td>
                                             <td>
-                                                {{ function_test.test_input }}
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-success" onclick="run_function('{{ function_test.function_name }}', '{{ function_test.test_input }}')">테스트</button>
+                                                <button class="btn btn-sm btn-success" onclick="run_function('{{ function_test.function_name }}', '{{ function_test.test_input }}')">{{ _('Test') }}</button>
                                             </td>
                                             <td>
                                                 <form method="post">{% csrf_token %}
                                                     <input name="cmd" value="delete_function_test" hidden>
                                                     <input name="test_name" value="{{ function_test.test_name }}" hidden>
-                                                    <button class="btn btn-sm btn-danger" type="submit">제거</button>
+                                                    <button class="btn btn-sm btn-danger" type="submit">{{ _('Remove') }}</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -259,11 +255,9 @@
                                 <thead class="thead-light">
                                 <tr>
                                     <th scope="col">function_name</th>
-                                    <th scope="col">description</th>
                                     <th scope="col">runtime</th>
                                     <th scope="col">handler</th>
                                     <th scope="col">creation_date</th>
-                                    <th scope="col"></th>
                                     <th scope="col"></th>
                                 </tr>
                                 </thead>
@@ -275,9 +269,6 @@
                                                 {{ function.function_name }}
                                             </a>
                                         </th>
-                                        <td>
-                                            {{ function.description }}
-                                        </td>
                                         <td>
                                             {{ function.runtime }}
                                         </td>
@@ -334,7 +325,9 @@
             formData.append('handler', handler);
             formData.append('runtime', runtime);
             formData.append('zip_file', zip_file);
-
+            $.LoadingOverlay('show', {
+                text:'Creating function...',
+            });
             $.ajax({
                 url : '',
                 type : 'POST',

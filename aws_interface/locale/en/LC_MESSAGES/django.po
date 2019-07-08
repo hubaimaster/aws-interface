@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-06 02:43+0900\n"
+"POT-Creation-Date: 2019-07-08 20:05+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -139,8 +139,8 @@ msgid "Create group"
 msgstr ""
 
 #: templates/dashboard/app/auth.html:88 templates/dashboard/app/auth.html:118
-#: templates/dashboard/app/database.html:128
-#: templates/dashboard/app/database.html:416
+#: templates/dashboard/app/database.html:149
+#: templates/dashboard/app/database.html:417
 #: templates/dashboard/app/logic.html:213
 #: templates/dashboard/app/logic_edit.html:48 templates/dashboard/apps.html:107
 msgid "Name"
@@ -171,10 +171,10 @@ msgstr ""
 #: templates/dashboard/app/auth.html:377 templates/dashboard/app/auth.html:500
 #: templates/dashboard/app/auth.html:549
 #: templates/dashboard/app/component/auth_user_table_row.html:52
-#: templates/dashboard/app/database.html:140
-#: templates/dashboard/app/database.html:284
-#: templates/dashboard/app/database.html:367
-#: templates/dashboard/app/database.html:440
+#: templates/dashboard/app/database.html:161
+#: templates/dashboard/app/database.html:285
+#: templates/dashboard/app/database.html:368
+#: templates/dashboard/app/database.html:441
 #: templates/dashboard/app/logic.html:119
 #: templates/dashboard/app/logic.html:247
 #: templates/dashboard/app/marketplace_detail.html:79
@@ -185,9 +185,9 @@ msgstr ""
 #: templates/dashboard/app/auth.html:104 templates/dashboard/app/auth.html:201
 #: templates/dashboard/app/auth.html:501 templates/dashboard/app/auth.html:550
 #: templates/dashboard/app/component/auth_user_table_row.html:53
-#: templates/dashboard/app/database.html:141
-#: templates/dashboard/app/database.html:368
-#: templates/dashboard/app/database.html:441
+#: templates/dashboard/app/database.html:162
+#: templates/dashboard/app/database.html:369
+#: templates/dashboard/app/database.html:442
 #: templates/dashboard/app/logic.html:68 templates/dashboard/app/logic.html:120
 #: templates/dashboard/app/logic.html:248
 #: templates/dashboard/app/storage.html:167 templates/dashboard/apps.html:119
@@ -214,7 +214,8 @@ msgstr ""
 msgid "Permission name"
 msgstr ""
 
-#: templates/dashboard/app/auth.html:212 templates/dashboard/app/logic.html:295
+#: templates/dashboard/app/auth.html:212 templates/dashboard/app/logic.html:163
+#: templates/dashboard/app/logic.html:290
 #: templates/dashboard/app/marketplace_detail.html:36
 msgid "Remove"
 msgstr ""
@@ -264,7 +265,7 @@ msgstr ""
 
 #: templates/dashboard/app/auth.html:460 templates/dashboard/app/auth.html:602
 #: templates/dashboard/app/database.html:102
-#: templates/dashboard/app/database.html:389
+#: templates/dashboard/app/database.html:390
 msgid "Delete selected"
 msgstr ""
 
@@ -293,12 +294,12 @@ msgid "Field type to modify"
 msgstr ""
 
 #: templates/dashboard/app/auth.html:531
-#: templates/dashboard/app/database.html:422
+#: templates/dashboard/app/database.html:423
 msgid "String"
 msgstr ""
 
 #: templates/dashboard/app/auth.html:532
-#: templates/dashboard/app/database.html:423
+#: templates/dashboard/app/database.html:424
 msgid "Number"
 msgstr ""
 
@@ -311,6 +312,7 @@ msgid "Click confirm button to modify the member information"
 msgstr ""
 
 #: templates/dashboard/app/auth.html:578 templates/dashboard/app/auth.html:632
+#: templates/dashboard/app/database.html:537
 #: templates/dashboard/app/log.html:78 templates/dashboard/app/storage.html:196
 msgid "More items"
 msgstr ""
@@ -383,161 +385,165 @@ msgid "Mode"
 msgstr ""
 
 #: templates/dashboard/app/database.html:108
-#: templates/dashboard/app/database.html:190
-#: templates/dashboard/app/database.html:395
+#: templates/dashboard/app/database.html:191
+#: templates/dashboard/app/database.html:396
 msgid "Select all"
 msgstr ""
 
-#: templates/dashboard/app/database.html:118
+#: templates/dashboard/app/database.html:139
 msgid "Create partition"
 msgstr ""
 
-#: templates/dashboard/app/database.html:129
+#: templates/dashboard/app/database.html:150
 msgid "Partition name"
 msgstr ""
 
-#: templates/dashboard/app/database.html:135
+#: templates/dashboard/app/database.html:156
 msgid "Click confirm button to create partition"
 msgstr ""
 
-#: templates/dashboard/app/database.html:136
+#: templates/dashboard/app/database.html:157
 msgid "A partition is a concept similar to a table in a RDB"
 msgstr ""
 
-#: templates/dashboard/app/database.html:183
-#: templates/dashboard/app/database.html:201
+#: templates/dashboard/app/database.html:184
+#: templates/dashboard/app/database.html:202
 msgid "Search items"
 msgstr ""
 
-#: templates/dashboard/app/database.html:184
+#: templates/dashboard/app/database.html:185
 msgid "Remove selected"
 msgstr ""
 
-#: templates/dashboard/app/database.html:211
+#: templates/dashboard/app/database.html:212
 msgid "Add query"
 msgstr ""
 
-#: templates/dashboard/app/database.html:215
-#: templates/dashboard/app/database.html:417
+#: templates/dashboard/app/database.html:216
+#: templates/dashboard/app/database.html:418
 msgid "Field name"
 msgstr ""
 
-#: templates/dashboard/app/database.html:228
-#: templates/dashboard/app/database.html:428
+#: templates/dashboard/app/database.html:229
+#: templates/dashboard/app/database.html:429
 msgid "Field value"
 msgstr ""
 
-#: templates/dashboard/app/database.html:247
+#: templates/dashboard/app/database.html:248
 msgid "Query"
 msgstr ""
 
-#: templates/dashboard/app/database.html:253
+#: templates/dashboard/app/database.html:254
 msgid "option"
 msgstr ""
 
-#: templates/dashboard/app/database.html:256
+#: templates/dashboard/app/database.html:257
 msgid "field"
 msgstr ""
 
-#: templates/dashboard/app/database.html:259
+#: templates/dashboard/app/database.html:260
 msgid "condition"
 msgstr ""
 
-#: templates/dashboard/app/database.html:262
+#: templates/dashboard/app/database.html:263
 msgid "value"
 msgstr ""
 
-#: templates/dashboard/app/database.html:276
+#: templates/dashboard/app/database.html:277
 msgid "Generated Query"
 msgstr ""
 
-#: templates/dashboard/app/database.html:285
+#: templates/dashboard/app/database.html:286
 #: templates/dashboard/app/log.html:51
 msgid "Search"
 msgstr ""
 
-#: templates/dashboard/app/database.html:305
+#: templates/dashboard/app/database.html:306
 msgid "Create item"
 msgstr ""
 
-#: templates/dashboard/app/database.html:315
+#: templates/dashboard/app/database.html:316
 msgid "ID"
 msgstr ""
 
-#: templates/dashboard/app/database.html:316
+#: templates/dashboard/app/database.html:317
 msgid "Auto generation"
 msgstr ""
 
-#: templates/dashboard/app/database.html:320
+#: templates/dashboard/app/database.html:321
 #: templates/dashboard/app/storage.html:119
 msgid "Read groups"
 msgstr ""
 
-#: templates/dashboard/app/database.html:327
-#: templates/dashboard/app/database.html:347
+#: templates/dashboard/app/database.html:328
+#: templates/dashboard/app/database.html:348
 #: templates/dashboard/app/storage.html:126
 #: templates/dashboard/app/storage.html:146
 msgid "Add group"
 msgstr ""
 
-#: templates/dashboard/app/database.html:334
-#: templates/dashboard/app/database.html:354
+#: templates/dashboard/app/database.html:335
+#: templates/dashboard/app/database.html:355
 #: templates/dashboard/app/storage.html:133
 #: templates/dashboard/app/storage.html:153
 msgid "Manage groups"
 msgstr ""
 
-#: templates/dashboard/app/database.html:341
+#: templates/dashboard/app/database.html:342
 #: templates/dashboard/app/storage.html:139
 msgid "Write groups"
 msgstr ""
 
-#: templates/dashboard/app/database.html:363
+#: templates/dashboard/app/database.html:364
 msgid "Click confirm button to create item"
 msgstr ""
 
-#: templates/dashboard/app/database.html:405
+#: templates/dashboard/app/database.html:406
 msgid "Put field"
 msgstr ""
 
-#: templates/dashboard/app/database.html:420
+#: templates/dashboard/app/database.html:421
 msgid "Type"
 msgstr ""
 
-#: templates/dashboard/app/database.html:427
+#: templates/dashboard/app/database.html:428
 msgid "Value"
 msgstr ""
 
-#: templates/dashboard/app/database.html:435
+#: templates/dashboard/app/database.html:436
 msgid "Click confirm button to put field"
 msgstr ""
 
-#: templates/dashboard/app/database.html:436
+#: templates/dashboard/app/database.html:437
 msgid "A field is a concept like a column, and is dependent on an item"
 msgstr ""
 
-#: templates/dashboard/app/database.html:629
+#: templates/dashboard/app/database.html:601
+msgid "Modify"
+msgstr ""
+
+#: templates/dashboard/app/database.html:630
 msgid "Please enter the partition name"
 msgstr ""
 
-#: templates/dashboard/app/database.html:643
+#: templates/dashboard/app/database.html:644
 msgid "Please specify partition"
 msgstr ""
 
-#: templates/dashboard/app/database.html:647
+#: templates/dashboard/app/database.html:648
 #: templates/dashboard/app/storage.html:371
 msgid "You must specify at least one permission group"
 msgstr ""
 
-#: templates/dashboard/app/database.html:662
+#: templates/dashboard/app/database.html:663
 msgid "Please specify partitions and items"
 msgstr ""
 
-#: templates/dashboard/app/database.html:802
+#: templates/dashboard/app/database.html:803
 msgid "This group already exists"
 msgstr ""
 
-#: templates/dashboard/app/database.html:969
+#: templates/dashboard/app/database.html:970
 msgid "Please specify item"
 msgstr ""
 
@@ -613,6 +619,10 @@ msgstr ""
 msgid "Click the confirm button to create the test"
 msgstr ""
 
+#: templates/dashboard/app/logic.html:157
+msgid "Test"
+msgstr ""
+
 #: templates/dashboard/app/logic.html:185
 msgid "Functions"
 msgstr ""
@@ -651,11 +661,11 @@ msgid ""
 "the execution."
 msgstr ""
 
-#: templates/dashboard/app/logic.html:373
+#: templates/dashboard/app/logic.html:370
 msgid "Please enter the function name"
 msgstr ""
 
-#: templates/dashboard/app/logic.html:377
+#: templates/dashboard/app/logic.html:374
 msgid "Please specify the zipfile"
 msgstr ""
 
