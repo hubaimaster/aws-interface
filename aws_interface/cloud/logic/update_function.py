@@ -3,6 +3,7 @@ from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.shortuuid import uuid
+from cloud.logic.util import generate_requirements_zipfile
 import base64
 
 # Define the input output format of the function.
@@ -12,7 +13,7 @@ info = {
         'function_name': 'str',
         'runtime?': 'str',
         'description?': 'str',
-        'zip_file?': 'bytes',
+        'zip_file?': 'base64',
         'run_groups?': 'list',
         'runnable?': 'bool',
     },
@@ -54,10 +55,14 @@ def do(data, resource):
             item['sdk_config'] = sdk_config
         if zip_file:
             zip_file_id = uuid()
+            requirements_zip_file_id = uuid()
             zip_file_b64 = zip_file.encode('utf-8')
-            zip_file_b64 = base64.b64decode(zip_file_b64)
-            resource.file_upload_bin(zip_file_id, zip_file_b64)
+            zip_file_bin = base64.b64decode(zip_file_b64)
+            requirements_zip_file_bin = generate_requirements_zipfile(zip_file_bin)
+            resource.file_upload_bin(zip_file_id, zip_file_bin)
+            resource.file_upload_bin(requirements_zip_file_id, requirements_zip_file_bin)
             item['zip_file_id'] = zip_file_id
+            item['requirements_zip_file_id'] = requirements_zip_file_id
 
         resource.db_update_item(item['id'], item)
         body['function_name'] = function_name

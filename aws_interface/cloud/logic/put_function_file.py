@@ -2,6 +2,7 @@
 from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
+from cloud.logic.util import generate_requirements_zipfile
 from zipfile import ZipFile
 from shortuuid import uuid
 import tempfile
@@ -68,12 +69,22 @@ def do(data, resource):
             zip_file.write(file_name, file_path)
 
         zip_file_id = uuid()
+
         with open(zip_temp_dir, 'rb') as zip_file:
             zip_file_bin = zip_file.read()
             resource.file_upload_bin(zip_file_id, zip_file_bin)
-            resource.file_delete_bin(item['zip_file_id'])  # Remove previous zip file
+            if 'zip_file_id' in item:
+                resource.file_delete_bin(item['zip_file_id'])  # Remove previous zip file
             item['zip_file_id'] = zip_file_id  # Set new file's id
             success = resource.db_update_item(item['id'], item)
             body['success'] = success
+
+        if 'requirements.txt' in file_path:
+            requirements_zipfile_id = uuid()
+            requirements_zipfile_bin = generate_requirements_zipfile(zip_file_bin)
+            resource.file_upload_bin(requirements_zipfile_id, requirements_zipfile_bin)
+            if 'requirements_zipfile_id' in item:
+                resource.file_delete_bin(item['requirements_zipfile_id'])
+            item['requirements_zipfile_id'] = requirements_zipfile_id
 
         return Response(body)

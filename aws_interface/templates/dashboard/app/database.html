@@ -534,7 +534,7 @@
         }
         function append_more_button() {
             var more = "<tr name='more-item' style=\"display:table; width:100%; table-layout:fixed;\">" +
-                "<th style='vertical-align:middle;' onclick=\"append_more_items();\" scope=\"row\"><a href=\"#!\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">항목 더 보기 + </a>" +
+                "<th style='vertical-align:middle;' onclick=\"append_more_items();\" scope=\"row\"><a href=\"#!\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">{{ _('More items') }} + </a>" +
                 "</th></tr>";
             $("#item-table").append(more);
         }
@@ -598,7 +598,7 @@
                     "<div class=\"col-10\">" +
                     "<a style='color:cornflowerblue; cursor:pointer;' onclick=\"set_field('" + key + "', '" + value_escaped + "','" + value_type + "');\">" +
                     "<label>" + key + "</label>&nbsp" +
-                    "<button class=\"btn btn-sm\">수정</button>" +
+                    "<button class=\"btn btn-sm\">{{ _("Modify") }}</button>" +
                     "</a>" +
                     "<textarea readonly class=\"form-control form-control-alternative\" style='width:100%;'>" + value + "</textarea>" +
                     "</div>" +

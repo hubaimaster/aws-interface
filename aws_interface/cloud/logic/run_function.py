@@ -37,6 +37,7 @@ def copy_configfile(destination, sdk_config, config_name='aws_interface_config.j
             json.dump(sdk_config, fp)
 
 
+
 # TODO now it can only invoke python3.6 runtime. any other runtimes (java, node, ..) will be able to invoke.
 @NeedPermission(Permission.Run.Logic.run_function)
 def do(data, resource):
@@ -57,20 +58,30 @@ def do(data, resource):
         item = items[0]
 
         zip_file_id = item['zip_file_id']
+        requirements_zip_file_id = item.get('requirements_zip_file_id', None)
         function_handler = item['handler']
         sdk_config = item.get('sdk_config', {})
         function_package = '.'.join(function_handler.split('.')[:-1])
         function_method = function_handler.split('.')[-1]
 
         zip_file_bin = resource.file_download_bin(zip_file_id)
+        requirements_zip_file_bin = resource.file_download_bin(requirements_zip_file_id)
         zip_temp_dir = tempfile.mktemp()
+        requirements_zip_temp_dir = tempfile.mktemp()
         extracted_dir = tempfile.mkdtemp()
 
         with open(zip_temp_dir, 'wb') as zip_temp:
             zip_temp.write(zip_file_bin)
+        with open(requirements_zip_temp_dir, 'wb') as zip_temp:
+            zip_temp.write(requirements_zip_file_bin)
+        # Extract function files and copy configs
         with ZipFile(zip_temp_dir) as zip_file:
             zip_file.extractall(extracted_dir)
             copy_configfile(extracted_dir, sdk_config)
+        # Extract requirements folders and files
+        with ZipFile(requirements_zip_temp_dir) as zip_temp:
+            zip_temp.extractall(extracted_dir)
+
         try:
             #  Comment removing cache because of a performance issue
             #  invalidate_caches()
