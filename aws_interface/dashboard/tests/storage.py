@@ -33,7 +33,7 @@ class StorageTestProcess:
         :param textfile: name of textfile to attach
         :return:
         """
-        with open(textfile, 'w') as file:
+        with open(textfile, 'w+') as file:
             file.write("This is a test sample file")
         file_select = self.parent.browser.find_element_by_id('file-bin')
         self.file_dir = os.path.join(BASE_DIR, textfile)
