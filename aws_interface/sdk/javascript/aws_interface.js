@@ -1,3 +1,4 @@
+const request = require('request');
 
 class Client{
 
@@ -27,7 +28,8 @@ class Client{
         return (typeof result !== "undefined") ? result : defaultValue;
     }
 
-    callAPI(module_name, data, callback) {
+    callAPI(module_name, data) {
+        self = this;
         if (data == null){
             data = {};
         }
@@ -35,7 +37,15 @@ class Client{
         if (this.get_session_id() != null){
             data['session_id'] = this.get_session_id();
         }
-        this._post(this.getBaseUrl(), data, callback);
+        return new Promise(function (resolve, reject) {
+            self._post(self.getBaseUrl(), data, function (body) {
+                if ("error" in body){
+                    reject(new Error(body["error"]));
+                }else{
+                    resolve(body);
+                }
+            });
+        });
     }
 
     _post(url, data, callback){
@@ -62,177 +72,179 @@ class Client{
         req.send(JSON.stringify(data));
     }
 
-    _auth(api_name, data, callback) {
-        this.callAPI('cloud.auth.' + api_name, data, callback);
+    _auth(api_name, data) {
+        return this.callAPI('cloud.auth.' + api_name, data);
     }
 
-    _database(api_name, data, callback) {
-        this.callAPI('cloud.database.' + api_name, data, callback);
+    _database(api_name, data) {
+        return this.callAPI('cloud.database.' + api_name, data);
     }
 
-    _storage(api_name, data, callback) {
-        this.callAPI('cloud.storage.' + api_name, data, callback);
+    _storage(api_name, data) {
+        return this.callAPI('cloud.storage.' + api_name, data);
     }
 
-    _logic(api_name, data, callback) {
-        this.callAPI('cloud.logic.' + api_name, data, callback);
+    _logic(api_name, data) {
+        return this.callAPI('cloud.logic.' + api_name, data);
     }
 
-    _log(api_name, data, callback) {
-        this.callAPI('cloud.log.' + api_name, data, callback);
+    _log(api_name, data) {
+        return this.callAPI('cloud.log.' + api_name, data);
     }
 
-    authRegister(email, password, extra={}, callback) {
-        this._auth('register', {
+    authRegister(email, password, extra) {
+        return this._auth('register', {
             'email': email,
             'password': password,
             'extra': extra,
-        }, callback);
-    }
-
-    authLogin(email, password, callback) {
-        let self = this;
-        this._auth('login', {
-            'email': email,
-            'password': password,
-        }, function (data) {
-            if ('session_id' in data){
-                self.set_session_id(Client._get(data,'session_id'));
-            }
-            callback(data);
         });
     }
 
-    authLoginFacebook(access_token, callback) {
+    authLogin(email, password) {
         let self = this;
-        this._auth('login_facebook', {
-            'access_token': access_token,
-        }, function (data) {
-            if ('session_id' in data){
-                self.set_session_id(Client._get(data,'session_id'));
-            }
-            callback(data);
+        return new Promise((resolve, reject) => {
+            this._auth('login', {
+                'email': email,
+                'password': password,
+            }).then(function (body) {
+                self.set_session_id(Client._get(body,'session_id'));
+                resolve(body);
+            }).catch(reject);
         });
     }
 
-    authGetUser(user_id, callback) {
-        this._auth('get_user', {
+    authLoginFacebook(access_token) {
+        let self = this;
+        return new Promise((resolve, reject) => {
+            this._auth('login_facebook', {
+                'access_token': access_token,
+            }).then(function (body) {
+                self.set_session_id(Client._get(body,'session_id'));
+                resolve(body);
+            }).catch(reject);
+        });
+    }
+
+    authGetUser(user_id) {
+        return this._auth('get_user', {
             'user_id': user_id,
-        }, callback);
-    }
-
-    authGetUsers(start_key=null, callback) {
-        this._auth('get_users', {
-            'start_key': start_key,
-        }, callback);
-    }
-
-    authLogout(callback) {
-        this._auth('logout', {
-            'session_id': this.get_session_id(),
-        }, callback);
-    }
-
-    authGuest(guest_id=null, callback) {
-        let self = this;
-        this._auth('guest', {
-            'guest_id': guest_id,
-        }, function (data) {
-            self.set_session_id(Client._get(data,'session_id'));
-            callback(data);
         });
     }
 
-    databaseCreateItem(partition, item, callback) {
-        this._database('create_item', {
+    authGetUsers(start_key=null) {
+        return this._auth('get_users', {
+            'start_key': start_key,
+        });
+    }
+
+    authLogout() {
+        return this._auth('logout', {
+            'session_id': this.get_session_id(),
+        });
+    }
+
+    authGuest(guest_id=null) {
+        let self = this;
+        return new Promise((resolve, reject) => {
+            this._auth('guest', {
+                'guest_id': guest_id,
+            }).then(function (body) {
+                self.set_session_id(Client._get(body,'session_id'));
+                resolve(body);
+            }).catch(reject);
+        });
+    }
+
+    databaseCreateItem(partition, item) {
+        return this._database('create_item', {
             'item': item,
             'partition': partition,
-        }, callback);
+        });
     }
 
-    databaseDeleteItem(item_id, callback) {
-        this._database('delete_item', {
+    databaseDeleteItem(item_id) {
+        return this._database('delete_item', {
             'item_id': item_id,
-        }, callback);
+        });
     }
 
-    databaseGetItem(item_id, callback) {
-        this._database('get_item', {
+    databaseGetItem(item_id) {
+        return this._database('get_item', {
             'item_id': item_id,
-        }, callback);
+        });
     }
 
-    databaseGetItemCount(partition, field=null, value=null, callback) {
-        this._database('get_item_count', {
-            'item_id': item_id,
+    databaseGetItemCount(partition, field=null, value=null) {
+        return this._database('get_item_count', {
+            'partition': partition,
             'field': field,
             'value': value,
-        }, callback);
+        });
     }
 
-    databaseGetItems(partition, start_key=null, limit=100, callback) {
-        this._database('get_items', {
+    databaseGetItems(partition, start_key=null, limit=100) {
+        return this._database('get_items', {
             'partition': partition,
             'start_key': start_key,
             'limit': limit,
-        }, callback);
+        });
     }
 
-    databasePutItemField(item_id, field_name, field_value, callback) {
-        this._database('put_item_field', {
+    databasePutItemField(item_id, field_name, field_value) {
+        return this._database('put_item_field', {
             'item_id': item_id,
             'field_name': field_name,
             'field_value': field_value,
-        }, callback);
+        });
     }
 
-    databaseUpdateItem(item_id, item, callback) {
-        this._database('update_item', {
+    databaseUpdateItem(item_id, item) {
+        return this._database('update_item', {
             'item_id': item_id,
             'item': item,
-        }, callback);
+        });
     }
 
-    databaseQueryItems(partition, query, start_key=null, limit=100, reverse=false, callback) {
-        this._database('query_items', {
+    databaseQueryItems(partition, query, start_key=null, limit=100, reverse=false) {
+        return this._database('query_items', {
             'partition': partition,
             'query': query,
             'start_key': start_key,
             'limit': limit,
             'reverse': reverse,
-        }, callback);
+        });
     }
 
-    storageDeleteB64(file_id, callback) {
-        this._storage('delete_b64', {
+    storageDeleteB64(file_id) {
+        return this._storage('delete_b64', {
             'file_id': file_id,
-        }, callback);
+        });
     }
 
-    storageDownloadB64Chunk(file_id, callback) {
-        this._storage('download_b64', {
+    storageDownloadB64Chunk(file_id) {
+        return this._storage('download_b64', {
             'file_id': file_id,
-        }, callback);
+        });
     }
 
-    storageUploadB64Chunk(parent_file_id, file_name, file_b64, callback) {
-        this._storage('upload_b64', {
+    storageUploadB64Chunk(parent_file_id, file_name, file_b64) {
+        return this._storage('upload_b64', {
             'parent_file_id': parent_file_id,
             'file_name': file_name,
             'file_b64': file_b64,
-        }, callback);
+        });
     }
 
-    storageDeleteFile(file_id, callback) {
-        this.storageDeleteB64(file_id, callback);
+    storageDeleteFile(file_id) {
+        return this.storageDeleteB64(file_id);
     }
 
-    storageDownloadFile(file_id, callback_file) {
+    storageDownloadFile(file_id) {
         let self = this;
         var string_file_b64 = null;
         var file_name = 'file';
         function download(file_id, callback){
-            self.storageDownloadB64Chunk(file_id, function (result) {
+            self.storageDownloadB64Chunk(file_id).then(function (result) {
                 file_id = Client._get(result, 'parent_file_id', null);
                 file_name = Client._get(result,'file_name', file_name);
                 if (string_file_b64 != null){
@@ -247,18 +259,21 @@ class Client{
                 }
             });
         }
-        download(file_id, function (string_file_b64, result) {
-            if (string_file_b64 == null){
-                callback_file(null);
-                console.error(result);
-            }else{
-                let file_bin = Buffer.from(string_file_b64, 'base64');
-                callback_file(file_bin);
-            }
+        return new Promise((resolve, reject) => {
+            download(file_id, function (string_file_b64, result) {
+                if (string_file_b64 == null){
+                    callback_file(null);
+                    console.error(result);
+                    reject(new Error(result))
+                }else{
+                    let file_bin = Buffer.from(string_file_b64, 'base64');
+                    resolve(file_bin);
+                }
+            });
         });
     }
 
-    storageUploadFile(bin, callback) {
+    storageUploadFile(bin) {
         let self = this;
         function *div_chunks(text, n){
             for (var i = 0; i < text.length; i+= n){
@@ -273,7 +288,7 @@ class Client{
         let file_name = "file";
         function upload(parent_file_id, base64_chunk, callback){
             base64_chunk = base64_chunk.toString();
-            self.storageUploadB64Chunk(parent_file_id, file_name, base64_chunk, function (data) {
+            self.storageUploadB64Chunk(parent_file_id, file_name, base64_chunk).then(function (data) {
                 var parent_file_id = data['file_id'];
                 var next_base64_chunk = base64_chunks.next();
                 if (next_base64_chunk.done){
@@ -283,22 +298,38 @@ class Client{
                 }
             });
         }
-        upload(parent_file_id, base64_chunks.next().value, callback);
+        return new Promise((resolve) => {
+            upload(parent_file_id, base64_chunks.next().value, function (data) {
+                resolve(data);
+            });
+        });
     }
 
-    logCreateLog(event_source, event_name, event_param, callback) {
-        this._log('create_log', {
+    logCreateLog(event_source, event_name, event_param) {
+        return this._log('create_log', {
             'event_source': event_source,
             'event_name': event_name,
             'event_param': event_param,
-        }, callback);
+        });
     }
 
-    logicRunFunction(function_name, payload, callback){
-        this._logic('logic', {
+    logGetLogs(event_source, event_name, log_owner, start_key, reverse){
+        return this._log('get_logs', {
+            "event_name": event_name,
+            "event_source": event_source,
+            "reverse": reverse,
+            "start_key": start_key,
+            "user_id": log_owner
+        });
+    }
+
+    logicRunFunction(function_name, payload){
+        return this._logic('run_function', {
             'function_name': function_name,
             'payload': payload,
-        }, callback);
+        });
     }
 
 }
+
+module.exports.Client = Client;
