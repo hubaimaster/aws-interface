@@ -164,15 +164,6 @@ public final class AWSInterface {
         }));
     }
 
-    public void databaseCreateItem(String partition, HashMap<String, Object> item, ArrayList<String> readGroups, ArrayList<String> writeGroups, CallbackFunction callbackFunction){
-        HashMap<String, Object> data = new HashMap<>();
-        data.put("item", item);
-        data.put("partition", partition);
-        data.put("read_groups", readGroups);
-        data.put("write_groups", writeGroups);
-        database("create_item", data, callbackFunction);
-    }
-
     public void databaseCreateItem(String partition, HashMap<String, Object> item, CallbackFunction callbackFunction){
         HashMap<String, Object> data = new HashMap<>();
         data.put("item", item);
@@ -229,15 +220,6 @@ public final class AWSInterface {
         database("put_item_field", data, callbackFunction);
     }
 
-    public void databaseUpdateItem(String itemId, HashMap<String, Object> item, ArrayList<String> readGroups, ArrayList<String> writeGroups, CallbackFunction callbackFunction){
-        HashMap<String, Object> data = new HashMap<>();
-        data.put("item_id", itemId);
-        data.put("item", item);
-        data.put("read_groups", readGroups);
-        data.put("write_groups", writeGroups);
-        database("update_item", data, callbackFunction);
-    }
-
     public void databaseUpdateItem(String itemId, HashMap<String, Object> item, CallbackFunction callbackFunction){
         HashMap<String, Object> data = new HashMap<>();
         data.put("item_id", itemId);
@@ -276,20 +258,6 @@ public final class AWSInterface {
         storage("download_b64", data, callbackFunction);
     }
 
-    private void storageUploadB64(String parentFileId, String fileName, String fileB64, ArrayList<String> readGroups, ArrayList<String> writeGroups, CallbackFunction callbackFunction){
-        HashMap<String, Object> data = new HashMap<>();
-        if (parentFileId != null){
-            data.put("parent_file_id", parentFileId);
-        }
-        if (fileName != null){
-            data.put("file_name", fileName);
-        }
-        data.put("file_b64", fileB64);
-        data.put("read_groups", readGroups);
-        data.put("write_groups", writeGroups);
-        storage("upload_b64", data, callbackFunction);
-    }
-
     private void storageUploadB64(String parentFileId, String fileName, String fileB64, CallbackFunction callbackFunction){
         HashMap<String, Object> data = new HashMap<>();
         if (parentFileId != null){
@@ -298,7 +266,6 @@ public final class AWSInterface {
         if (fileName != null){
             data.put("file_name", fileName);
         }
-        data.put("file_name", fileName);
         data.put("file_b64", fileB64);
         storage("upload_b64", data, callbackFunction);
     }
@@ -335,21 +302,21 @@ public final class AWSInterface {
         downloadFileChunks(fileId, chunks, callbackFunction, callbackFileByteFunction);
     }
 
-    private void uploadFileChunks(String parentFileId, String fileName, Iterator<String> chunks, ArrayList<String> readGroups, ArrayList<String> writeGroups, CallbackFunction callbackFunction){
-        storageUploadB64(parentFileId, fileName, chunks.next(), readGroups, writeGroups, ((response, hasError) -> {
+    private void uploadFileChunks(String parentFileId, String fileName, Iterator<String> chunks, CallbackFunction callbackFunction){
+        storageUploadB64(parentFileId, fileName, chunks.next(), ((response, hasError) -> {
             if (chunks.hasNext() && !response.has("error")){
                 String fileId = response.get("file_id").getAsString();
-                this.uploadFileChunks(fileId, fileName, chunks, readGroups, writeGroups, callbackFunction);
+                this.uploadFileChunks(fileId, fileName, chunks, callbackFunction);
             }else{
                 callbackFunction.callback(response, hasError);
             }
         }));
     }
 
-    public void storageUploadFile(File file, ArrayList<String> readGroups, ArrayList<String> writeGroups, CallbackFunction callbackFunction) throws IOException{
+    public void storageUploadFile(File file, CallbackFunction callbackFunction) throws IOException{
         int chunkSize = 3 * 1024 * 1024; // 3 mb
         Iterator<String> chunks = new FileBase64Reader(file, chunkSize);
-        uploadFileChunks(null, file.getName(), chunks, readGroups, writeGroups, callbackFunction);
+        uploadFileChunks(null, file.getName(), chunks, callbackFunction);
     }
 
     public void logicRunFunction(String functionName, HashMap<String, Object> payload, CallbackFunction callbackFunction){
@@ -376,14 +343,8 @@ public final class AWSInterface {
             long time = System.currentTimeMillis();
             File file = new File("/Users/changhwankim/Documents/awsi-demo.mp4");
 
-            ArrayList<String> readGroups = new ArrayList<>();
-            readGroups.add("owner");
-
-            ArrayList<String> writeGroups = new ArrayList<>();
-            writeGroups.add("owner");
-
             try {
-                awsinterface.storageUploadFile(file, readGroups, writeGroups, (response2, hasError2)->{
+                awsinterface.storageUploadFile(file, (response2, hasError2)->{
                     System.out.println(response2);
                     System.out.println("Time:" + (System.currentTimeMillis() - time) / 1000 + "s");
                     long time2 = System.currentTimeMillis();

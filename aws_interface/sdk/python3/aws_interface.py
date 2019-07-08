@@ -132,12 +132,10 @@ class Client(object):
             self.save_session()
         return response
 
-    def database_create_item(self, partition, item, read_groups, write_groups):
+    def database_create_item(self, partition, item):
         response = self._database('create_item', {
             'item': item,
             'partition': partition,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
         })
         return response
 
@@ -177,12 +175,10 @@ class Client(object):
         })
         return response
 
-    def database_update_item(self, item_id, item, read_groups, write_groups):
+    def database_update_item(self, item_id, item):
         response = self._database('update_item', {
             'item_id': item_id,
             'item': item,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
         })
         return response
 
@@ -208,13 +204,11 @@ class Client(object):
         })
         return response
 
-    def _storage_upload_b64_chunk(self, parent_file_id, file_name, file_b64, read_groups, write_groups):
+    def _storage_upload_b64_chunk(self, parent_file_id, file_name, file_b64):
         response = self._storage('upload_b64', {
             'parent_file_id': parent_file_id,
             'file_name': file_name,
             'file_b64': file_b64,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
         })
         return response
 
@@ -245,7 +239,7 @@ class Client(object):
             file_obj.seek(0)
             file_obj.write(file_bin)
 
-    def storage_upload_file(self, file_path, read_groups, write_groups):
+    def storage_upload_file(self, file_path):
         def div_chunks(file_path_to_chunk, n):
             with open(file_path_to_chunk, 'rb') as file_obj:
                 while True:
@@ -260,7 +254,7 @@ class Client(object):
         base64_chunks = div_chunks(file_path, 1024 * 1024 * 3)
         parent_file_id = None
         for base64_chunk in base64_chunks:
-            result = self._storage_upload_b64_chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups)
+            result = self._storage_upload_b64_chunk(parent_file_id, file_name, base64_chunk)
             parent_file_id = result.get('file_id')
         return result
 
@@ -332,19 +326,19 @@ def examples():
     response = client.auth_login(email, password)
     print('auth_login response: {}'.format(response))
 
-    response = client.database_create_item('test', {'type': 'test'}, read_groups=['owner'], write_groups=['owner'])
+    response = client.database_create_item('test', {'type': 'test'})
     print('database_create_item response: {}'.format(response))
     item_id = response['item_id']
 
     response = client.database_update_item(item_id, {
         'man': 'ok',
-    }, ['owner'], ['owner'])
+    })
     print(response)
 
     response = client.database_get_item(item_id)
     print(response)
 
-    response = client.storage_upload_file('aws_interface.py', read_groups=['owner'], write_groups=['owner'])
+    response = client.storage_upload_file('aws_interface.py')
     print(response)
 
     client.storage_download_file(response['file_id'], 'download')

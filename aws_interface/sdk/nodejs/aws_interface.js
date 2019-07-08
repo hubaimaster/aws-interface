@@ -144,12 +144,10 @@ class Client{
         });
     }
 
-    databaseCreateItem(partition, item, read_groups, write_groups, callback) {
+    databaseCreateItem(partition, item, callback) {
         this._database('create_item', {
             'item': item,
             'partition': partition,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
         }, callback);
     }
 
@@ -189,12 +187,10 @@ class Client{
         }, callback);
     }
 
-    databaseUpdateItem(item_id, item, read_groups, write_groups, callback) {
+    databaseUpdateItem(item_id, item, callback) {
         this._database('update_item', {
             'item_id': item_id,
             'item': item,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
         }, callback);
     }
 
@@ -220,13 +216,11 @@ class Client{
         }, callback);
     }
 
-    storageUploadB64Chunk(parent_file_id, file_name, file_b64, read_groups, write_groups, callback) {
+    storageUploadB64Chunk(parent_file_id, file_name, file_b64, callback) {
         this._storage('upload_b64', {
             'parent_file_id': parent_file_id,
             'file_name': file_name,
             'file_b64': file_b64,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
         }, callback);
     }
 
@@ -265,7 +259,7 @@ class Client{
         });
     }
 
-    storageUploadFile(bin, read_groups, write_groups, callback) {
+    storageUploadFile(bin, callback) {
         let self = this;
         function *div_chunks(text, n){
             for (var i = 0; i < text.length; i+= n){
@@ -280,7 +274,7 @@ class Client{
         let file_name = "file";
         function upload(parent_file_id, base64_chunk, callback){
             base64_chunk = base64_chunk.toString();
-            self.storageUploadB64Chunk(parent_file_id, file_name, base64_chunk, read_groups, write_groups, function (data) {
+            self.storageUploadB64Chunk(parent_file_id, file_name, base64_chunk, function (data) {
                 var parent_file_id = data['file_id'];
                 var next_base64_chunk = base64_chunks.next();
                 if (next_base64_chunk.done){
@@ -302,7 +296,7 @@ class Client{
     }
 
     logicRunFunction(function_name, payload, callback){
-        this._logic('logic', {
+        this._logic('run_function', {
             'function_name': function_name,
             'payload': payload,
         }, callback);

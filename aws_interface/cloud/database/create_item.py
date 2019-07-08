@@ -12,8 +12,6 @@ info = {
         'session_id': 'str',
         'item': 'dict',
         'partition': 'str',
-        'read_groups': 'list',
-        'write_groups': 'list',
     },
     'output_format': {
         'item_id?': 'str',
@@ -32,16 +30,7 @@ def do(data, resource):
 
     partition = params.get('partition', None)
     item = params.get('item', {})
-    read_groups = params.get('read_groups', [])
-    write_groups = params.get('write_groups', [])
 
-    read_groups = list(set(read_groups))
-    write_groups = list(set(write_groups))
-
-    if 'read_groups' not in read_groups:
-        item['read_groups'] = read_groups
-    if 'write_groups' not in item:
-        item['write_groups'] = write_groups
     if 'owner' not in item:
         item['owner'] = user_id
     # Check partition has been existed

@@ -144,12 +144,10 @@ class AWSI {
         }
     }
 
-    func database_create_item(partition: String, item: [String: Any], read_groups:[String], write_groups:[String], callback: @escaping (_ response: [String: Any]?)->Void){
+    func database_create_item(partition: String, item: [String: Any], callback: @escaping (_ response: [String: Any]?)->Void){
         let data: [String: Any] = [
             "item": item,
             "partition": partition,
-            "read_groups": read_groups,
-            "write_groups": write_groups,
         ]
         database(function_name: "create_item", data: data, callback: callback)
     }
@@ -203,12 +201,10 @@ class AWSI {
         database(function_name: "put_item_field", data: data, callback: callback)
     }
 
-    func database_update_item(item_id: String, item: [String: Any], read_groups:[String], write_groups:[String], callback: @escaping (_ response: [String: Any]?)->Void){
+    func database_update_item(item_id: String, item: [String: Any], callback: @escaping (_ response: [String: Any]?)->Void){
         let data: [String: Any] = [
             "item_id": item_id,
             "item": item,
-            "read_groups": read_groups,
-            "write_groups": write_groups,
         ]
         database(function_name: "update_item", data: data, callback: callback)
     }
@@ -245,12 +241,10 @@ class AWSI {
         storage(function_name: "download_b64", data: data, callback: callback)
     }
 
-    private func storage_upload_b64(parent_file_id: String?, file_name: String, file_b64: String, read_groups:[String], write_groups:[String], callback: @escaping (_ response: [String: Any]?)->Void){
+    private func storage_upload_b64(parent_file_id: String?, file_name: String, file_b64: String, callback: @escaping (_ response: [String: Any]?)->Void){
         var data: [String: Any] = [
             "file_name": file_name,
             "file_b64": file_b64,
-            "read_groups": read_groups,
-            "write_groups": write_groups,
         ]
         if let parent_file_id = parent_file_id{
             data["parent_file_id"] = parent_file_id
@@ -282,13 +276,13 @@ class AWSI {
         download(file_id: _file_id, stringFileBase64: "")
     }
 
-    func storage_upload_file(file_data: Data, file_name: String, read_groups: [String], write_groups: [String], callback: @escaping (_ response: [String: Any]?)->Void){
+    func storage_upload_file(file_data: Data, file_name: String, callback: @escaping (_ response: [String: Any]?)->Void){
         let rawBase64String = file_data.base64EncodedString()
         let stringChunks = rawBase64String.split(by: 1024 * 1024 * 6)
 
         func upload(count: Int, parent_file_id: String?){
             let b64String = stringChunks[count]
-            storage_upload_b64(parent_file_id: parent_file_id, file_name: file_name, file_b64: b64String, read_groups: read_groups, write_groups: write_groups) { (response) in
+            storage_upload_b64(parent_file_id: parent_file_id, file_name: file_name, file_b64: b64String) { (response) in
                 if let response = response, response.keys.contains("file_id"), let file_id = response["file_id"] as? String{
                     if count + 1 < stringChunks.count{
                         upload(count: count + 1, parent_file_id: file_id)

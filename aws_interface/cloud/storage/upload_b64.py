@@ -16,9 +16,6 @@ info = {
         'file_name?': 'str',
         'file_b64': 'str',
 
-        'read_groups': 'list',
-        'write_groups': 'list',
-
         'meta_info?': 'dict',
     },
     'output_format': {

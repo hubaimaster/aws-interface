@@ -12,8 +12,6 @@ info = {
         'session_id': 'str',
         'item_id': 'str',
         'item': 'map',
-        'read_groups': 'list',
-        'write_groups': 'list',
     },
     'output_format': {
         'success': 'bool'
@@ -30,11 +28,6 @@ def do(data, resource):
 
     item_id = params.get('item_id', None)
     new_item = params.get('item', {})
-    read_groups = params.get('read_groups', [])
-    write_groups = params.get('write_groups', [])
-
-    new_item['read_groups'] = read_groups
-    new_item['write_groups'] = write_groups
 
     item = resource.db_get_item(item_id)
     if database_can_not_access_to_item(item):

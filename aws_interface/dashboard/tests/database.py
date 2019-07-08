@@ -257,7 +257,7 @@ class DatabaseTestProcess:
         MODE = 'update'
         CODE = "def has_permission(user, item):\\n\\treturn False"
         USER_NAME = "user"
-        FIELD_LIST = ['read_groups', 'write_groups', 'owner', 'id', 'partition', 'creation_date']
+        FIELD_LIST = ['owner', 'id', 'partition', 'creation_date']
         FIELD_NAME = "test-field"
         FIELD_TYPE = "S"
         FIELD_VALUE = "test-value"
