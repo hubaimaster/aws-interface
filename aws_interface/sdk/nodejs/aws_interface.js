@@ -1,4 +1,5 @@
 const request = require('request');
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 class Client{
 

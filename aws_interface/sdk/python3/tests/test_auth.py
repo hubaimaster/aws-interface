@@ -90,3 +90,4 @@ class TestAuth(unittest.TestCase):
         self.client.auth_logout()
         resp = self.client.auth_guest()
         self.assertIsNotNone(resp['session_id'])
+
