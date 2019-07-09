@@ -18,7 +18,9 @@ from contextlib import redirect_stdout
 info = {
     'input_format': {
         'function_name': 'str',
-        'payload': 'dict',
+        'payload': {
+            '...': '...',
+        },
     },
     'output_format': {
         'response': {

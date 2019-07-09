@@ -704,7 +704,7 @@ class Lambda:
             },
             Description=description,
             Timeout=128,
-            MemorySize=1024,
+            MemorySize=1536,
             Publish=True,
             TracingConfig={
                 'Mode': 'Active'
