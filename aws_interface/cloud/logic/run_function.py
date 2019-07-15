@@ -67,22 +67,27 @@ def do(data, resource):
         function_method = function_handler.split('.')[-1]
 
         zip_file_bin = resource.file_download_bin(zip_file_id)
-        requirements_zip_file_bin = resource.file_download_bin(requirements_zip_file_id)
+
         zip_temp_dir = tempfile.mktemp()
-        requirements_zip_temp_dir = tempfile.mktemp()
+
         extracted_dir = tempfile.mkdtemp()
 
         with open(zip_temp_dir, 'wb') as zip_temp:
             zip_temp.write(zip_file_bin)
-        with open(requirements_zip_temp_dir, 'wb') as zip_temp:
-            zip_temp.write(requirements_zip_file_bin)
+
         # Extract function files and copy configs
         with ZipFile(zip_temp_dir) as zip_file:
             zip_file.extractall(extracted_dir)
             copy_configfile(extracted_dir, sdk_config)
+
         # Extract requirements folders and files
-        with ZipFile(requirements_zip_temp_dir) as zip_temp:
-            zip_temp.extractall(extracted_dir)
+        if requirements_zip_file_id:
+            requirements_zip_temp_dir = tempfile.mktemp()
+            requirements_zip_file_bin = resource.file_download_bin(requirements_zip_file_id)
+            with open(requirements_zip_temp_dir, 'wb') as zip_temp:
+                zip_temp.write(requirements_zip_file_bin)
+            with ZipFile(requirements_zip_temp_dir) as zip_temp:
+                zip_temp.extractall(extracted_dir)
 
         try:
             #  Comment removing cache because of a performance issue

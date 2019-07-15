@@ -11,10 +11,9 @@ from secrets import token_urlsafe
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'guest_id?': 'str',
+        'session_id?': 'str',
     },
     'output_format': {
-        'guest_id': 'str',
         'session_id': 'str',
         'error?': {
             'code': 'int',
@@ -40,8 +39,8 @@ def put_guest_session(resource, guest_id):
 def do(data, resource):
     body = {}
     params = data['params']
-
-    guest_id = params.get('guest_id', None)
+    user = data.get('user', None)
+    session_id = params.get('session_id', None)
 
     data['params']['login_method'] = 'guest_login'
     login_conf = get_login_method(data, resource)['body']['item']
@@ -57,16 +56,10 @@ def do(data, resource):
         body['error'] = error.GUEST_LOGIN_INVALID
         return Response(body)
 
-    if guest_id:
-        item = resource.db_get_item(guest_id)
-        if item:
-            session_id = put_guest_session(resource, guest_id)
-            body['session_id'] = session_id
-            body['guest_id'] = guest_id
-            return Response(body)
-        else:
-            body['error'] = error.NO_SUCH_GUEST
-            return Response(body)
+    if user:
+        body['session_id'] = session_id
+        body['guest_id'] = user['id']
+        return Response(body)
     else:
         guest_id = shortuuid.uuid()
         email = '{}@guest.com'.format(shortuuid.uuid())

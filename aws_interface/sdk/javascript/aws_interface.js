@@ -1,4 +1,3 @@
-const request = require('request');
 
 class Client{
 
@@ -16,11 +15,11 @@ class Client{
     }
 
     get_session_id(){
-        return this.session_id;
+        return window.localStorage.getItem('session_id');
     }
 
     set_session_id(session_id){
-        this.session_id = session_id;
+        window.localStorage.setItem('session_id', session_id);
     }
 
     static _get(object, key, defaultValue=null) {
@@ -331,5 +330,3 @@ class Client{
     }
 
 }
-
-module.exports.Client = Client;
