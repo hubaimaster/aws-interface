@@ -1,6 +1,6 @@
 branch-defaults:
   default:
-    environment: aws-interface-dev
+    environment: aws-interface
 environment-defaults:
   aws-interface-dev:
     branch: null

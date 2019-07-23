@@ -5,6 +5,6 @@ def can_register(extra, password_meta):
                            'count_special': int}, Meta information for passwords
     :return: bool, Determines if user can register.
     """
-    if password_meta['count'] > 6:
-        return True
-    return False
+    if password_meta['count'] <= 6:
+        return False
+    return True

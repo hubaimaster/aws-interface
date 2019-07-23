@@ -1,5 +1,4 @@
 from .base import *
-import pymysql
 
 DEBUG = False
 ALLOWED_HOSTS = ['console.aws-interface.com', '*']
@@ -11,7 +10,6 @@ DB_PASSWORD = secrets_base['DB_PASSWORD']
 DB_HOST = secrets_base['DB_HOST']
 DB_PORT = secrets_base['DB_PORT']
 
-pymysql.install_as_MySQLdb()
 
 DATABASES['default'] = {
     'ENGINE': DB_ENGINE,

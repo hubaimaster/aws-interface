@@ -25,6 +25,11 @@ def do(data, resource):
             'description': 'Default user group',
             'permissions': Permission.default_user_permissions,
         },
+        'unknown': {
+            'name': 'unknown',
+            'description': 'For not signed in user',
+            'permissions': Permission.unknown_user_permissions,
+        }
     }
     admin_groups = {
         'admin': {

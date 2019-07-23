@@ -24,9 +24,12 @@ info = {
 def do(data, resource):
     body = {}
     params = data['params']
-    user = data['user']
+    user = data.get('user', None)
 
-    user_id = user.get('id', None)
+    if user:
+        user_id = user.get('id', None)
+    else:
+        user_id = None
 
     partition = params.get('partition', None)
     item = params.get('item', {})

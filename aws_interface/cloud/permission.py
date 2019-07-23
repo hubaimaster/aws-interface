@@ -178,7 +178,14 @@ class Permission:
                 if group_name == 'admin':
                     has_permission = True
         else:  # No session
-            if permission in Permission.unknown_user_permissions:
+            group_name = 'unknown'
+            group = self.resource.db_get_item('user-group-{}'.format(group_name))
+            permissions = self.unknown_user_permissions
+            if group:
+                permissions = group.get('permissions', [])
+            if permission in permissions:
+                has_permission = True
+            if group_name == 'admin':
                 has_permission = True
         return has_permission
 

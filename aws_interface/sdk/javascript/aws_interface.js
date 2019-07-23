@@ -14,12 +14,20 @@ class Client{
         this.baseUrl = baseUrl;
     }
 
+    isLogin(){
+        return this.get_session_id() != null;
+    }
+
     get_session_id(){
         return window.localStorage.getItem('session_id');
     }
 
     set_session_id(session_id){
         window.localStorage.setItem('session_id', session_id);
+    }
+
+    remove_session(){
+        window.localStorage.removeItem('session_id');
     }
 
     static _get(object, key, defaultValue=null) {
@@ -54,19 +62,19 @@ class Client{
         req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
         req.onreadystatechange = function (aEvt) {
-          if (req.readyState == 4) {
-            var json = JSON.parse(req.responseText);
-            var body = null;
-            var error = null;
-            if ("body" in json){
-              body = json["body"];
+            if (req.readyState == 4) {
+                var json = JSON.parse(req.responseText);
+                var body = null;
+                var error = null;
+                if ("body" in json){
+                    body = json["body"];
+                }
+                if ("error" in json){
+                    error = json["error"];
+                    console.error(error);
+                }
+                callback(body);
             }
-            if ("error" in json){
-              error = json["error"];
-              console.error(error);
-            }
-            callback(body);
-          }
         };
         req.send(JSON.stringify(data));
     }
@@ -130,6 +138,12 @@ class Client{
         });
     }
 
+    authGetMe() {
+        return this._auth('get_me', {
+
+        });
+    }
+
     authGetUsers(start_key=null) {
         return this._auth('get_users', {
             'start_key': start_key,
@@ -137,8 +151,17 @@ class Client{
     }
 
     authLogout() {
-        return this._auth('logout', {
-            'session_id': this.get_session_id(),
+        const self = this;
+        return new Promise((resolve, reject) => {
+            self._auth('logout', {
+                'session_id': self.get_session_id(),
+            }).then(function (data) {
+                self.remove_session();
+                resolve(data);
+            }).catch(function (data) {
+                self.remove_session();
+                reject(data);
+            });
         });
     }
 
