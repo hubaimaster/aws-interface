@@ -4,8 +4,9 @@ import base64
 import os
 
 
-CONFIG_PATH = 'aws_interface_config.json'
-SESSION_FILE = 'aws_interface_session.json'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH = os.path.join(BASE_DIR, 'aws_interface_config.json')
+SESSION_FILE = os.path.join(BASE_DIR, 'aws_interface_session.json')
 
 
 class Client(object):
