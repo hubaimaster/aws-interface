@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -31,7 +30,7 @@ def do(data, resource):
 
     if mode not in POLICY_MODES:
         body['error'] = error.NO_SUCH_POLICY_MODE
-        return Response(body)
+        return body
 
     item_id = '{}-policy-{}-{}'.format(SERVICE, partition_to_apply, mode)
     item = {
@@ -41,4 +40,4 @@ def do(data, resource):
     }
     success = resource.db_put_item('{}-policy'.format(SERVICE), item, item_id)
     body['success'] = success
-    return Response(body)
+    return body

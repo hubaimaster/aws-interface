@@ -39,7 +39,6 @@ def copy_configfile(destination, sdk_config, config_name='aws_interface_config.j
             json.dump(sdk_config, fp)
 
 
-
 # TODO now it can only invoke python3.6 runtime. any other runtimes (java, node, ..) will be able to invoke.
 @NeedPermission(Permission.Run.Logic.run_function)
 def do(data, resource):

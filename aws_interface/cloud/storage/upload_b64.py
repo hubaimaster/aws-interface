@@ -1,5 +1,4 @@
 import sys
-from cloud.response import Response
 from cloud.storage.get_policy_code import match_policy_after_get_policy_code
 from cloud.permission import Permission, NeedPermission
 from cloud.shortuuid import uuid
@@ -56,7 +55,7 @@ def do(data, resource):
                 file_size += parent_file_info['file_size']
             else:
                 body['error'] = error.PERMISSION_DENIED
-                return Response(body)
+                return body
 
     file_info = {
         'file_id': file_id,
@@ -79,8 +78,8 @@ def do(data, resource):
         resource.file_upload_bin(file_id, file_b64)
 
         body['file_id'] = file_id
-        return Response(body)
+        return body
     else:
         body['error'] = error.PERMISSION_DENIED
-        return Response(body)
+        return body
 

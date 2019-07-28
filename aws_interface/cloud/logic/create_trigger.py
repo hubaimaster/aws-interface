@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.shortuuid import uuid
@@ -32,7 +31,6 @@ def do(data, resource):
     trigger_type = params.get('trigger_type')
     function_name = params.get('function_name')
     description = params.get('description', None)
-    option = params.get('option')
     runnable = params.get('runnable', True)
 
     item = dict()
@@ -40,14 +38,21 @@ def do(data, resource):
     item['trigger_type'] = trigger_type
     item['function_name'] = function_name
     item['description'] = description
-    item['option'] = option
     item['runnable'] = runnable
+
+    if trigger_type == 'webhook':
+        webhook_name = 'webhook-{}'.format(trigger_name)
+        redirection_uri = params.get('redirection_uri')
+        redirection = resource.ag_create_redirection(webhook_name, redirection_uri)
+        item['config'] = {
+            'redirection': redirection
+        }
 
     item_ids, _ = resource.db_get_item_id_and_orders(partition, 'trigger_name', trigger_name)
     if item_ids:
         body['error'] = error.EXISTING_TRIGGER
-        return Response(body)
+        return body
     else:
         resource.db_put_item(partition, item)
         body['trigger_name'] = trigger_name
-        return Response(body)
+        return body

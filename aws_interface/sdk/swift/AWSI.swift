@@ -67,8 +67,8 @@ class AWSI {
         }
         post(params: data) { (response, error) in
             var body: [String: Any] = [:]
-            if let json = response, json.keys.contains("body"), let _body = json["body"] as? [String: Any]{
-                body = _body
+            if let json = response{
+                body = json
             }
             callback(body)
         }

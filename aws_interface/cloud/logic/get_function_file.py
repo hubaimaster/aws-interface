@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from zipfile import ZipFile
@@ -39,7 +38,7 @@ def do(data, resource):
 
     if not file_path:
         body['error'] = error.NO_SUCH_FILE
-        return Response(body)
+        return body
 
     if items:
         item = items[0]
@@ -57,7 +56,7 @@ def do(data, resource):
             'type': 'text',
             'content': content
         }
-        return Response(body)
+        return body
 
     body['error'] = 'function_name: {} did not exist'.format(function_name)
-    return Response(body)
+    return body

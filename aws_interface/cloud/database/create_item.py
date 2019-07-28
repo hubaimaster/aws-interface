@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
@@ -41,10 +40,10 @@ def do(data, resource):
         if match_policy_after_get_policy_code(resource, 'create', partition, user, item):
             resource.db_put_item(partition, item)
             body['item_id'] = item.get('id', None)
-            return Response(body)
+            return body
         else:
             body['error'] = error.PERMISSION_DENIED
-            return Response(body)
+            return body
 
     body['error'] = error.NO_SUCH_PARTITION
-    return Response(body)
+    return body

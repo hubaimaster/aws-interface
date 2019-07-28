@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 
@@ -22,4 +21,4 @@ def do(data, resource):
     params = data['params']
     partitions = resource.db_get_partitions()
     body['items'] = partitions
-    return Response(body)
+    return body

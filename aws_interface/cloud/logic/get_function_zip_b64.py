@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 import base64
 
@@ -33,7 +32,7 @@ def do(data, resource):
 
     if len(items) == 0:
         body['message'] = 'function_name: {} did not exist'.format(function_name)
-        return Response(body)
+        return body
     else:
         item = items[0]
         zip_file_id = item['zip_file_id']
@@ -43,4 +42,4 @@ def do(data, resource):
         body['item'] = {
             'base64': file_b64,
         }
-        return Response(body)
+        return body

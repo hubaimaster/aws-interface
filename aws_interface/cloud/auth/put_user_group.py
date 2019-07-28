@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -30,7 +29,7 @@ def do(data, resource):
 
     if group_name in Permission.DEFAULT_USER_GROUPS:
         body['error'] = error.DEFAULT_USER_GROUP_CANNOT_BE_MODIFIED
-        return Response(body)
+        return body
     group_id = 'user-group-{}'.format(group_name)
     group_item = {
         'name': group_name,
@@ -41,7 +40,7 @@ def do(data, resource):
     success = resource.db_put_item('user_group', group_item, group_id)
     body['success'] = success
     if success:
-        return Response(body)
+        return body
     else:
         body['error'] = error.PUT_USER_GROUP_FAILED
-        return Response(body)
+        return body

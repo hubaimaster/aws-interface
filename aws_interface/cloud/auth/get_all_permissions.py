@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 
@@ -21,4 +20,4 @@ def do(data, resource):
     params = data['params']
     permissions = sorted(Permission.all())
     body['permissions'] = permissions
-    return Response(body)
+    return body

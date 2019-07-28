@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.crypto import Hash
 from cloud.permission import Permission, NeedPermission
 
@@ -26,4 +25,4 @@ def do(data, resource):
     session_id = params.get('session_id', None)
     item = resource.db_get_item(Hash.sha3_512(session_id))
     body['item'] = item
-    return Response(body)
+    return body

@@ -1,6 +1,5 @@
 
 from cloud.crypto import *
-from cloud.response import Response
 import cloud.shortuuid as shortuuid
 from cloud.auth.get_login_method import do as get_login_method
 from cloud.permission import Permission, NeedPermission
@@ -43,7 +42,7 @@ def do(data, resource):
     session_id = params.get('session_id', None)
 
     data['params']['login_method'] = 'guest_login'
-    login_conf = get_login_method(data, resource)['body']['item']
+    login_conf = get_login_method(data, resource)['item']
 
     default_group_name = login_conf['default_group_name']
     enabled = login_conf['enabled']
@@ -54,12 +53,12 @@ def do(data, resource):
 
     if not enabled:
         body['error'] = error.GUEST_LOGIN_INVALID
-        return Response(body)
+        return body
 
     if user:
         body['session_id'] = session_id
         body['guest_id'] = user['id']
-        return Response(body)
+        return body
     else:
         guest_id = shortuuid.uuid()
         email = '{}@guest.com'.format(shortuuid.uuid())
@@ -72,4 +71,4 @@ def do(data, resource):
         session_id = put_guest_session(resource, guest_id)
         body['session_id'] = session_id
         body['guest_id'] = guest_id
-        return Response(body)
+        return body

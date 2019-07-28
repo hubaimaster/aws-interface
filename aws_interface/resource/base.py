@@ -54,6 +54,23 @@ class Resource(metaclass=ABCMeta):
     def cost_and_usage_for(self, start, end):
         raise NotImplementedError
 
+    # API Gateway
+    def ag_create_redirection(self, name, redirection_url):
+        """
+        Create webhook connected to redirection_url
+        :param name: Unique [name] of webhook
+        :param redirection_url: Webhook request via path will redirect to [redirection_url]
+        :return: {name: str, redirection_url: str, url: str}
+        """
+        raise NotImplementedError
+
+    def ag_delete_redirection(self, name):
+        """
+        :param name: Name of webhook to delete
+        :return: bool
+        """
+        raise NotImplementedError
+
     # DB ops
     def db_create_partition(self, partition):
         raise NotImplementedError
@@ -324,7 +341,6 @@ class Resource(metaclass=ABCMeta):
                 else:
                     raise BaseException('No such condition : [{}]'.format(condition))
 
-    #TODO
     def _db_scan_items(self, statement, partition, order_by, order_min, order_max, start_key, limit, reverse):
         items, end_key = self.db_get_items_in_partition(partition, order_by, order_min, order_max, start_key, limit, reverse)
         items = [IDDict(item) for item in self._db_filter_items(statement, items)]

@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 
@@ -24,4 +23,4 @@ def do(data, resource):
     user_ids = params.get('user_ids', [])
     success = resource.db_delete_item_batch(user_ids)
     body['success'] = success
-    return Response(body)
+    return body

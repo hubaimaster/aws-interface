@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from concurrent.futures import ThreadPoolExecutor
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -28,7 +27,7 @@ def do(data, resource):
     item_ids = params.get('item_ids', [])
     if len(item_ids) > 128:
         body['error'] = error.NUM_OF_BATCH_ITEMS_MUST_BE_LESS_THAN_128
-        return Response(body)
+        return body
 
     policy_codes_by_partition = {}
     with ThreadPoolExecutor(max_workers=32) as executor:
@@ -45,4 +44,4 @@ def do(data, resource):
                     resource.db_delete_item(item_id)
             executor.submit(delete_item, _item_id)
     body['success'] = True
-    return Response(body)
+    return body

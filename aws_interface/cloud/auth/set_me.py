@@ -1,4 +1,4 @@
-from cloud.response import Response
+
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -32,9 +32,9 @@ def do(data, resource):
     # For security
     if field in ['id', 'email', 'password_hash', 'salt', 'groups', 'login_method']:
         body['error'] = error.FORBIDDEN_MODIFICATION
-        return Response(body)
+        return body
     else:
         user[field] = value
         resource.db_update_item(user_id, user)
         body['user_id'] = user_id
-        return Response(body)
+        return body

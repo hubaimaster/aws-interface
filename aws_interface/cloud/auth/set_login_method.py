@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.auth._constant import LOGIN_METHODS
 from cloud.message import error
@@ -32,7 +31,7 @@ def do(data, resource):
 
     if login_method not in LOGIN_METHODS:
         body['error'] = error.NO_SUCH_LOGIN_METHOD
-        return Response(body)
+        return body
 
     if enabled == 'true':
         enabled = True
@@ -48,4 +47,4 @@ def do(data, resource):
     if not resource.db_put_item('meta-info', item, item_id):
         resource.db_update_item(item_id, item)
 
-    return Response(body)
+    return body

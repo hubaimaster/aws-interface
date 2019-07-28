@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.crypto import Hash
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -34,7 +33,7 @@ def do(data, resource):
     except BaseException as ex:
         print(ex)
         body['error'] = error.PERMISSION_DENIED
-        return Response(body)
+        return body
     print('session_item:', item)
     if item:
         user_id = item.get('user_id', None)
@@ -46,4 +45,4 @@ def do(data, resource):
         body['item'] = user
     else:
         body['item'] = None
-    return Response(body)
+    return body

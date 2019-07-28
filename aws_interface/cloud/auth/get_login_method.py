@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.auth._constant import LOGIN_METHODS
@@ -55,7 +54,7 @@ def do(data, resource):
     login_method = params.get('login_method')  # email_login, guest_login, facebook_login
     if login_method not in LOGIN_METHODS:
         body['error'] = error.NO_SUCH_LOGIN_METHOD
-        return Response(body)
+        return body
 
     item = resource.db_get_item('auth-login-method-{}'.format(login_method))
     default_policy_code = get_default_policy_code(login_method)
@@ -71,4 +70,4 @@ def do(data, resource):
         item['register_policy_code'] = default_policy_code
 
     body['item'] = item
-    return Response(body)
+    return body

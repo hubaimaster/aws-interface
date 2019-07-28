@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -33,4 +32,4 @@ def do(data, resource):
 
     success = resource.db_update_item(user_id, user)
     body['success'] = success
-    return Response(body)
+    return body

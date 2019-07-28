@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.
@@ -25,4 +24,4 @@ def do(data, resource):
     for item in items:
         success = resource.db_delete_item(item['id'])
         body['success'] = success
-    return Response(body)
+    return body

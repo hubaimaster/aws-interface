@@ -54,11 +54,7 @@ public final class AWSInterface {
         data.put("module_name", module_name);
         String json = new Gson().toJson(data);
         post(endpointUrl, json, ((response, hasError) -> {
-            if (response.has("body")){
-                callbackFunction.callback(response.get("body").getAsJsonObject(), hasError);
-            }else{
-                callbackFunction.callback(null, true);
-            }
+            callbackFunction.callback(response, hasError);
         }));
     }
 
@@ -335,35 +331,36 @@ public final class AWSInterface {
     }
 
     public static void main(String... args) throws Exception {
-        String url = "https://ri0rhdq9ab.execute-api.ap-northeast-2.amazonaws.com/prod_aws_interface/N4RVz5GjMRmfao2qBSbWwE";
+        String url = "https://t8ddet8cl8.execute-api.ap-northeast-2.amazonaws.com/prod_aws_interface/Gfd8xNbvQz4vYJCRYKNXxA";
         AWSInterface awsinterface = new AWSInterface(url);
+        awsinterface.authRegister("kchdully1@naver.com", "pass1234", ((response0, hasError0) -> {
+            System.out.println(response0);
+            awsinterface.authLogin("kchdully1@naver.com", "pass1234", ((response, hasError) -> {
+                System.out.println(response);
+                long time = System.currentTimeMillis();
+                File file = new File("/Users/kchdully/Desktop/gits/aws-interface/aws_interface/sdk/java/aws-interface-0.0.6.jar");
 
-        awsinterface.authLogin("kchdully1@naver.com", "pass1234", ((response, hasError) -> {
-            System.out.println(response);
-            long time = System.currentTimeMillis();
-            File file = new File("/Users/changhwankim/Documents/awsi-demo.mp4");
+                try {
+                    awsinterface.storageUploadFile(file, (response2, hasError2)->{
+                        System.out.println(response2);
+                        System.out.println("Time:" + (System.currentTimeMillis() - time) / 1000 + "s");
+                        long time2 = System.currentTimeMillis();
+                        awsinterface.storageDownloadFileByte(response2.get("file_id").getAsString(), (response1, hasError1) -> {
+                        }, (fileBytes -> {
+                            try (FileOutputStream fos = new FileOutputStream("/Users/kchdully/Desktop/gits/aws-interface/aws_interface/sdk/java/down-aws-interface-0.0.6.jar")) {
+                                fos.write(fileBytes);
+                            }catch (Exception ex){
 
-            try {
-                awsinterface.storageUploadFile(file, (response2, hasError2)->{
-                    System.out.println(response2);
-                    System.out.println("Time:" + (System.currentTimeMillis() - time) / 1000 + "s");
-                    long time2 = System.currentTimeMillis();
-                    awsinterface.storageDownloadFileByte(response2.get("file_id").getAsString(), (response1, hasError1) -> {
-                    }, (fileBytes -> {
-                        try (FileOutputStream fos = new FileOutputStream("/Users/changhwankim/Documents/awsi-demo-down.mp4")) {
-                            fos.write(fileBytes);
-                        }catch (Exception ex){
+                            }
+                            System.out.println("Time:" + (System.currentTimeMillis() - time2) / 1000 + "s");
+                        }));
+                    });
 
-                        }
-                        System.out.println("Time:" + (System.currentTimeMillis() - time2) / 1000 + "s");
-                    }));
-                });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            }));
         }));
-
     }
 }

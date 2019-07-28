@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy, get_policy_code
@@ -55,9 +54,9 @@ def do(data, resource):
 
         body['items'] = filtered
         body['end_key'] = end_key
-        return Response(body)
+        return body
     else:
         body['items'] = None
         body['end_key'] = None
         body['error'] = error.NO_SUCH_PARTITION
-        return Response(body)
+        return body

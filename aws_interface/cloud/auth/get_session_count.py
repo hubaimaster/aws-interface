@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 
@@ -26,4 +25,4 @@ def do(data, resource):
     body['item'] = {
         'count': count
     }
-    return Response(body)
+    return body

@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 
@@ -34,7 +33,7 @@ def do(data, resource):
     if 'admin' in user.get('groups', []):
         items, end_key = resource.db_query('user', [{'option': None, 'field': 'email', 'value': email, 'condition': 'eq'}])
         body['item'] = items[0]
-        return Response(body)
+        return body
     elif user.get('id', None):
         body['item'] = user
-        return Response(body)
+        return body

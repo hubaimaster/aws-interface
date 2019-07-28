@@ -1,6 +1,5 @@
 
 from cloud.crypto import *
-from cloud.response import Response
 import cloud.auth.get_login_method as get_login_method
 from secrets import token_urlsafe
 from cloud.permission import Permission, NeedPermission
@@ -47,7 +46,7 @@ def do(data, resource):
     user = data['user']
     access_token = params.get('access_token')
     data['params']['login_method'] = 'facebook_login'
-    login_conf = get_login_method.do(data, resource)['body']['item']
+    login_conf = get_login_method.do(data, resource)['item']
     default_group_name = login_conf['default_group_name']
     register_policy_code = login_conf.get('register_policy_code', None)
 
@@ -59,7 +58,7 @@ def do(data, resource):
 
     if not enabled:
         body['error'] = error.EMAIL_LOGIN_INVALID
-        return Response(body)
+        return body
 
     extra_fb_response = get_facebook_response(access_token, ['id', 'email'])
     fb_user_id = extra_fb_response['id']
@@ -68,7 +67,7 @@ def do(data, resource):
     if not data.get('admin', False):
         if not match_policy(register_policy_code, extra_fb_response, None):
             body['error'] = error.REGISTER_POLICY_VIOLATION
-            return Response(body)
+            return body
 
     instructions = [
         (None, ('fb_user_id', 'eq', fb_user_id)),
@@ -78,7 +77,7 @@ def do(data, resource):
     if items:
         session_id = create_session(resource, items[0])
         body['session_id'] = session_id
-        return Response(body)
+        return body
     else:  # Create new user and create session also.
         item = {
             'email': fb_user_email,
@@ -93,5 +92,5 @@ def do(data, resource):
         resource.db_put_item('user', item)
         session_id = create_session(resource, item)
         body['session_id'] = session_id
-        return Response(body)
+        return body
 

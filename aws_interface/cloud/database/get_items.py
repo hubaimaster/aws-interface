@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.database.get_policy_code import match_policy, get_policy_code
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -52,9 +51,9 @@ def do(data, resource):
                 filtered.append(item)
         body['items'] = filtered
         body['end_key'] = end_key
-        return Response(body)
+        return body
     else:
         body['items'] = None
         body['end_key'] = None
         body['error'] = error.PERMISSION_DENIED
-        return Response(body)
+        return body

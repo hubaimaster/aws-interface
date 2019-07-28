@@ -1,6 +1,5 @@
 
 from cloud.crypto import *
-from cloud.response import Response
 from cloud.auth.get_login_method import do as get_login_method
 from secrets import token_urlsafe
 from cloud.permission import Permission, NeedPermission
@@ -33,7 +32,7 @@ def do(data, resource):
     password = params.get('password', None)
 
     data['params']['login_method'] = 'email_login'
-    login_conf = get_login_method(data, resource)['body']['item']
+    login_conf = get_login_method(data, resource)['item']
     enabled = login_conf['enabled']
     if enabled == 'true':
         enabled = True
@@ -42,7 +41,7 @@ def do(data, resource):
 
     if not enabled:
         body['error'] = error.EMAIL_LOGIN_INVALID
-        return Response(body)
+        return body
 
     instructions = [
         (None, ('email', 'eq', email)),
@@ -66,4 +65,4 @@ def do(data, resource):
             body['error'] = error.WRONG_PASSWORD
     else:
         body['error'] = error.NO_SUCH_ACCOUNT
-    return Response(body)
+    return body

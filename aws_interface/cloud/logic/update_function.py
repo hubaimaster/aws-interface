@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.shortuuid import uuid
@@ -66,7 +65,7 @@ def do(data, resource):
 
         resource.db_update_item(item['id'], item)
         body['function_name'] = function_name
-        return Response(body)
+        return body
     else:
         body['error'] = error.NO_SUCH_FUNCTION
-        return Response(body)
+        return body

@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.storage.get_policy_code import match_policy_after_get_policy_code
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -45,10 +44,10 @@ def do(data, resource):
             body['parent_file_id'] = parent_file_id
             body['file_name'] = item.get('file_name', None)
             body['meta_info'] = item.get('meta_info', {})
-            return Response(body)
+            return body
         else:
             body['error'] = error.PERMISSION_DENIED
-            return Response(body)
+            return body
     else:
         body['error'] = error.INVALID_FILE_KEY
-        return Response(body)
+        return body

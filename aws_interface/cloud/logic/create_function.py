@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.shortuuid import uuid
@@ -61,7 +60,7 @@ def do(data, resource):
         resource.file_upload_bin(requirements_zip_file_id, requirements_zip_file_bin)
         resource.db_put_item(partition, item)
         body['function_name'] = function_name
-        return Response(body)
+        return body
     else:
         body['error'] = error.EXISTING_FUNCTION
-        return Response(body)
+        return body

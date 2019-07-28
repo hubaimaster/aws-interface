@@ -5,6 +5,8 @@ import cloud.message.error
 import sys
 import time
 import traceback
+from cloud.response import AWSResponse
+import cloud.libs.simplejson as json
 
 
 CALLABLE_MODULE_WHITE_LIST = {
@@ -82,31 +84,50 @@ CALLABLE_MODULE_WHITE_LIST = {
 
 # AWS Lambda handler
 def aws_handler(event, context):
+    print('event:', event)
     import boto3
+    query_string_parameters = event.get('queryStringParameters', {})
+    params = json.loads(event.get('body', '{}'))
     vendor = 'aws'
-    params = event
+
     with open('./cloud/app_id.txt', 'r') as file:
         app_id = file.read()
     resource = get_resource(vendor, None, app_id, boto3.Session())
-    return abstracted_handler(params, resource)
+    body = gateway(params, resource, query_string_parameters)
+    response = AWSResponse(body)
+    print('response:', response)
+    return response
+
+
+def gateway(params, resource, query_string_parameters):
+    if query_string_parameters is None:
+        gate = 'handler'
+    else:
+        gate = query_string_parameters.get('gate', 'handler')
+
+    if gate == 'webhook':
+        return abstracted_webhook(params, resource)
+    elif gate == 'handler':
+        return abstracted_handler(params, resource)
+
+
+def abstracted_webhook(params, resource):
+    body = {}
+    return body
 
 
 def abstracted_handler(params, resource):
     current_time = time.time()
     module_name = params.get('module_name', None)
     if module_name not in CALLABLE_MODULE_WHITE_LIST:
-        response = {
-            'statusCode': 403,
-            'body': {
-                'error': cloud.message.error.FORBIDDEN_REQUEST
-            },
+        body = {
             'error': cloud.message.error.FORBIDDEN_REQUEST
         }
-        return response
+        return body
     data = {
         'params': params,
     }
-    user = get_me.do(data, resource).get('body', {}).get('item', None)
+    user = get_me.do(data, resource).get('item', None)
     data['user'] = user
 
     module = importlib.import_module(module_name)
@@ -114,43 +135,25 @@ def abstracted_handler(params, resource):
 
     # Invoke module
     try:
-        module_response = module.do(data, resource)
+        body = module.do(data, resource)
     except PermissionError as ex:
         error_traceback = traceback.format_exc()
         print('Exception: [{}]'.format(ex))
         print('error_traceback: [{}]'.format(error_traceback))
-
-        response = {
-            'statusCode': 401,
-            'body': {
-                'error': cloud.message.error.PERMISSION_DENIED,
-                'traceback': '{}'.format(error_traceback)
-            },
-            'error': cloud.message.error.PERMISSION_DENIED
+        body = {
+            'error': cloud.message.error.PERMISSION_DENIED,
+            'traceback': '{}'.format(error_traceback)
         }
-        return response
+        return body
     except Exception as ex:
         error_traceback = traceback.format_exc()
         print('Exception: [{}]'.format(ex))
         print('error_traceback: [{}]'.format(error_traceback))
-
-        response = {
-            'statusCode': 400,
-            'body': {
-                'error': cloud.message.error.INVALID_REQUEST,
-                'traceback': '{}'.format(error_traceback)
-            },
-            'error': cloud.message.error.INVALID_REQUEST
+        body = {
+            'error': cloud.message.error.INVALID_REQUEST,
+            'traceback': '{}'.format(error_traceback)
         }
-        return response
+        return body
 
-    response = {
-        'statusCode': module_response.get('statusCode', 200),
-        'headers': module_response.get('header', {}),
-        'body': module_response.get('body', {}),
-    }
-    error = module_response.get('error', None)
-    if error:
-        response['error'] = error
-    response['duration'] = time.time() - current_time
-    return response
+    body['duration'] = time.time() - current_time
+    return body

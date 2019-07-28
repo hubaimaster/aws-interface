@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from zipfile import ZipFile
 import tempfile
@@ -46,7 +45,7 @@ def do(data, resource):
 
     if len(items) == 0:
         body['message'] = 'function_name: {} did not exist'.format(function_name)
-        return Response(body)
+        return body
     else:
         item = items[0]
         zip_file_id = item['zip_file_id']
@@ -59,4 +58,4 @@ def do(data, resource):
             file_paths = zip_file.namelist()
             file_paths = [file_path for file_path in file_paths if not os.path.isdir(file_path)]
             body['file_paths'] = list(set(file_paths))
-        return Response(body)
+        return body

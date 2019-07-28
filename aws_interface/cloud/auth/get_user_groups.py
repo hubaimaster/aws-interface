@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 
@@ -53,4 +52,4 @@ def do(data, resource):
         group_items, _ = resource.db_get_items_in_partition('user_group', limit=10000)
 
     body['groups'] = group_items
-    return Response(body)
+    return body

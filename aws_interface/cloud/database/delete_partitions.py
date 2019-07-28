@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 
@@ -25,4 +24,4 @@ def do(data, resource):
     for partition in partitions:
         resource.db_delete_partition(partition)
     body['success'] = True
-    return Response(body)
+    return body

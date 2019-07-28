@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.
@@ -35,4 +34,4 @@ def do(data, resource):
 
     body['items'] = items
     body['end_key'] = end_key
-    return Response(body)
+    return body

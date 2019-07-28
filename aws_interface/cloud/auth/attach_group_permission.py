@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -26,7 +25,7 @@ def do(data, resource):
 
     if group_name == 'admin':
         body['error'] = error.ADMIN_GROUP_CANNOT_BE_MODIFIED
-        return Response(body)
+        return body
 
     item = resource.db_get_item('user-group-{}'.format(group_name))
     item_permissions = item.get('permissions', [])
@@ -36,4 +35,4 @@ def do(data, resource):
 
     success = resource.db_put_item('user_group', item, 'user-group-{}'.format(group_name))
     body['success'] = success
-    return Response(body)
+    return body

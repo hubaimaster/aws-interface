@@ -9,9 +9,11 @@
 
     <script>
       const client = new Client();
-      client.authLogin('test@email.com', 'password1234', function(data){
-          alert(JSON.stringify(data));
-      });
+      client.authLogin('test@email.com', 'password1234').then(function(data) {
+        alert(JSON.stringify(data));
+      }).catch(function (data) {
+        alert(JSON.stringify(data));
+      })
     </script>
 </body>
 </html>

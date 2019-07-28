@@ -1,6 +1,5 @@
 
 from cloud.crypto import *
-from cloud.response import Response
 from cloud.auth.get_login_method import do as get_login_method
 from cloud.permission import Permission, NeedPermission
 from cloud.auth.get_login_method import match_policy
@@ -48,13 +47,13 @@ def do(data, resource):
 
     partition = 'user'
     data['params']['login_method'] = 'email_login'
-    login_conf = get_login_method(data, resource)['body']['item']
+    login_conf = get_login_method(data, resource)['item']
     register_policy_code = login_conf.get('register_policy_code', None)
 
     if not data.get('admin', False):
         if not match_policy(register_policy_code, extra, password_meta):
             body['error'] = error.REGISTER_POLICY_VIOLATION
-            return Response(body)
+            return body
 
     default_group_name = login_conf['default_group_name']
     enabled = login_conf['enabled']
@@ -65,7 +64,7 @@ def do(data, resource):
 
     if not enabled:
         body['error'] = error.EMAIL_LOGIN_INVALID
-        return Response(body)
+        return body
 
     instructions = [
         (None, ('email', 'eq', email))
@@ -74,7 +73,7 @@ def do(data, resource):
     users = list(items)
     if len(users) > 0:
         body['error'] = error.EXISTING_ACCOUNT
-        return Response(body)
+        return body
     else:
         item = {
             'email': email,
@@ -89,4 +88,4 @@ def do(data, resource):
                 item[key] = extra[key]
         resource.db_put_item(partition, item)
         body['item'] = item
-        return Response(body)
+        return body

@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.
@@ -23,4 +22,4 @@ def do(data, resource):
     session_ids = params.get('session_ids')
     success = resource.db_delete_item_batch(session_ids)
     body['success'] = success
-    return Response(body)
+    return body

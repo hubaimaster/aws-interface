@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.crypto import Hash
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -25,8 +24,8 @@ def do(data, resource):
     session_id = params.get('session_id', None)
     if resource.db_delete_item(Hash.sha3_512(session_id)):
         body['success'] = True
-        return Response(body)
+        return body
     else:
         body['success'] = False
         body['error'] = error.LOGOUT_FAILED
-        return Response(body)
+        return body

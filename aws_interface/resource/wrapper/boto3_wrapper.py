@@ -80,6 +80,37 @@ class APIGateway:
         url = base_url.format(api_id, region, stage, cloud_api_name)
         return url
 
+    def create_redirection(self, cloud_api_name, name, redirection_uri, method='POST'):
+        stage_name = self.stage_name
+        api_client = self.client
+        path_part = name
+        # Find existing rest api
+        rest_api_id = self.get_rest_api_id(cloud_api_name)
+        root_resource_id = self.get_root_resource_id(rest_api_id)
+        resource_id = self.create_resource(rest_api_id, root_resource_id, path_part)['id']
+        self.put_method(rest_api_id, resource_id, method)
+        self.put_integration(rest_api_id, resource_id, method, redirection_uri, {}, 'AWS_PROXY')
+        api_client.create_deployment(
+            restApiId=rest_api_id,
+            stageName=stage_name,
+        )
+        url = '{}/{}'.format(self.get_rest_api_url(cloud_api_name), path_part)
+        return {
+            'rest_api_id': rest_api_id,
+            'resource_id': resource_id,
+            'name': name,
+            'url': url,
+            'path': path_part,
+            'redirection_uri': redirection_uri,
+            }
+
+    def delete_resource(self, rest_api_id, resource_id):
+        response = self.client.delete_resource(
+            restApiId=rest_api_id,
+            resourceId=resource_id
+        )
+        return response
+
     def connect_with_lambda(self, cloud_api_name, lambda_func_name):
         aws_region = self.region
         api_client = self.client
@@ -185,7 +216,7 @@ class APIGateway:
                "{aws-acct-id}:function:{lambda-function-name}/invocations".format(**uri_data)
         return uri
 
-    def put_integration(self, rest_api_id, resource_id, method_type, uri, requestTemplates={}, type="AWS"):
+    def put_integration(self, rest_api_id, resource_id, method_type, uri, requestTemplates={}, type="AWS_PROXY"):
         integration_resp = self.client.put_integration(
             restApiId=rest_api_id,
             resourceId=resource_id,

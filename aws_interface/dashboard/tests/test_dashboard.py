@@ -196,7 +196,6 @@ class DashboardTestCase(StaticLiveServerTestCase):
 
     def do_test_process(self):
         from dashboard.tests.auth import AuthTestProcess
-        from dashboard.tests.bill import BillTestProcess
         from dashboard.tests.database import DatabaseTestProcess
         from dashboard.tests.storage import StorageTestProcess
         from dashboard.tests.logic import LogicTestProcess
@@ -204,7 +203,6 @@ class DashboardTestCase(StaticLiveServerTestCase):
         AuthTestProcess(self).do_test()
         DatabaseTestProcess(self).do_test()
         StorageTestProcess(self).do_test()
-        #LogTestProcess(self).do_test
         LogicTestProcess(self).do_test()
         SDKTestProcess(self).do_test()
 

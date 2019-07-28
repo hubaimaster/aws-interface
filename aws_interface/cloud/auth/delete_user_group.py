@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -24,8 +23,8 @@ def do(data, resource):
 
     if group_name in Permission.DEFAULT_USER_GROUPS:
         body['error'] = error.DEFAULT_USER_GROUP_CANNOT_BE_MODIFIED
-        return Response(body)
+        return body
 
     success = resource.db_delete_item('user-group-{}'.format(group_name))
     body['success'] = success
-    return Response(body)
+    return body

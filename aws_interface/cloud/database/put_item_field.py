@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import database_can_not_access_to_item
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -34,7 +33,7 @@ def do(data, resource):
     item = resource.db_get_item(item_id)
     if database_can_not_access_to_item(item):
         body['error'] = error.PERMISSION_DENIED
-        return Response(body)
+        return body
 
     if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item):
         item[field_name] = field_value
@@ -44,4 +43,4 @@ def do(data, resource):
         body['success'] = success
     else:
         body['error'] = error.PERMISSION_DENIED
-    return Response(body)
+    return body

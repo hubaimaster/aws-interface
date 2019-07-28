@@ -1,4 +1,4 @@
-from cloud.response import Response
+
 from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.
@@ -45,4 +45,4 @@ def do(data, resource):
         items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, reverse=reverse)
     body['end_key'] = end_key
     body['items'] = items
-    return Response(body)
+    return body

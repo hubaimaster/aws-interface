@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import inspect
@@ -69,5 +68,5 @@ def do(data, resource):
         body['code'] = policy_code
     else:
         body['error'] = error.NO_SUCH_POLICY_MODE
-    return Response(body)
+    return body
 

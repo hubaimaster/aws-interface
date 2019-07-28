@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import database_can_not_access_to_item
 from cloud.permission import Permission, NeedPermission
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
@@ -32,7 +31,7 @@ def do(data, resource):
     item = resource.db_get_item(item_id)
     if database_can_not_access_to_item(item):
         body['error'] = error.NO_SUCH_PARTITION
-        return Response(body)
+        return body
 
     if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item):
         # Put the value in the previous item that is not in the new field
@@ -47,4 +46,4 @@ def do(data, resource):
         body['success'] = success
     else:
         body['error'] = error.NO_SUCH_PARTITION
-    return Response(body)
+    return body

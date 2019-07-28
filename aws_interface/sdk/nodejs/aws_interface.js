@@ -4,7 +4,6 @@ var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 class Client{
 
     constructor() {
-        this.set_session_id(null);
         this.setBaseUrl('{{REST_API_URL}}');
     }
 
@@ -45,7 +44,7 @@ class Client{
         return new Promise(function (resolve, reject) {
             self._post(self.getBaseUrl(), data, function (body) {
                 if ("error" in body){
-                    reject(new Error(body["error"]));
+                    reject(body["error"]);
                 }else{
                     resolve(body);
                 }
@@ -61,14 +60,9 @@ class Client{
 
         req.onreadystatechange = function (aEvt) {
             if (req.readyState == 4) {
-                var json = JSON.parse(req.responseText);
-                var body = null;
-                var error = null;
-                if ("body" in json){
-                    body = json["body"];
-                }
-                if ("error" in json){
-                    error = json["error"];
+                const body = JSON.parse(req.responseText);
+                if ("error" in body){
+                    const error = body["error"];
                     console.error(error);
                 }
                 callback(body);

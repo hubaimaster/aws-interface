@@ -157,6 +157,19 @@ class AWSResource(Resource):
         cost_exp = CostExplorer(self.boto3_session)
         return cost_exp.get_cost_and_usage(start, end)
 
+    # API Gateway
+    def ag_create_redirection(self, name, redirection_url):
+        ag = APIGateway(self.boto3_session)
+        webhook = ag.create_redirection(self.app_id, name, redirection_url)
+        return webhook
+
+    def ag_delete_redirection(self, name):
+        """
+        :param name: Name of webhook to delete
+        :return: bool
+        """
+        raise NotImplementedError
+
     # DB ops
     def db_create_partition(self, partition):
         dynamo = DynamoDB(self.boto3_session)

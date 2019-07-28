@@ -1,4 +1,4 @@
-from cloud.response import Response
+
 from cloud.permission import Permission, NeedPermission
 from cloud.storage.get_policy_code import match_policy_after_get_policy_code
 from cloud.message import error
@@ -35,6 +35,6 @@ def do(data, resource):
             file_id_to_delete = file_item.get('parent_file_id', None)
         else:
             body['error'] = error.PERMISSION_DENIED
-            return Response(body)
+            return body
 
-    return Response(body)
+    return body

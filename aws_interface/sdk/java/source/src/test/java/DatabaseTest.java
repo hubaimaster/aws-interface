@@ -100,8 +100,8 @@ public class DatabaseTest {
 	//Test create item with [readGroups], [writeGroups], [test_item] on [test_partition]
 	@Test
 	public void databaseCreateItem2Test() {
-		client.authLogin(test_email, test_password, (rr, hE)->{
-			client.databaseCreateItem(test_partition, test_item, readGroups, writeGroups, (response, hasError)->{
+		client.authLogin(test_email, test_password, (rr, hE)-> {
+			client.databaseCreateItem(test_partition, test_item, (response, hasError)->{
 				assertNotNull(response.get("item_id"));
 	         	received = true;
          	});
@@ -191,7 +191,7 @@ public class DatabaseTest {
 		client.authLogin(test_email, test_password, (rr, hE)->{
 			client.databaseCreateItem(test_partition, test_item, (response1, hasError1)->{
 				item_id = response1.get("item_id").getAsString();
-				client.databaseUpdateItem(item_id, test_item_new, readGroups, writeGroups, (response, hasError)->{
+				client.databaseUpdateItem(item_id, test_item_new, (response, hasError)->{
 					assertNotNull(response.get("success"));
 			        received2 = true;
 				});

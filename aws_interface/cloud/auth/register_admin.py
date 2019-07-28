@@ -1,6 +1,5 @@
 
 from cloud.crypto import *
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -49,7 +48,7 @@ def do(data, resource):
     users = items
     if len(users) > 0:
         body['error'] = error.EXISTING_ACCOUNT
-        return Response(body)
+        return body
     else:
         item = {
             'email': email,
@@ -60,4 +59,4 @@ def do(data, resource):
             'login_method': 'email_login',
         }
         resource.db_put_item(partition, item)
-        return Response(body)
+        return body

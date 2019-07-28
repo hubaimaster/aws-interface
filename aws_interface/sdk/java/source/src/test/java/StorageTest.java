@@ -77,7 +77,7 @@ public class StorageTest {
     	client.authLogin(test_email, test_password,(rr, hE)->{
 		try {
 			//UploadFile with [readGroups], [writeGroups] and save file_id to [file_id]
-	        	client.storageUploadFile(file, readGroups, writeGroups, (response, hasError)->{
+	        	client.storageUploadFile(file, (response, hasError)->{
 	        		file_id = response.get("file_id").getAsString();
 	        		assertNotNull(response.get("file_id").getAsString());
 	        		System.out.println("upload "+ response);

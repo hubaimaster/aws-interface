@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 # Define the input output format of the function.
@@ -33,5 +32,5 @@ def do(data, resource):  # This is for admins
 
     body['items'] = list(filter(lambda x: x.get('next_file_id', None) is None, items))
     body['end_key'] = end_key
-    return Response(body)
+    return body
 

@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.logic.util import generate_requirements_zipfile
@@ -42,7 +41,7 @@ def do(data, resource):
 
     if file_type not in SUPPORT_TYPES:
         body['error'] = error.UNSUPPORTED_FILE_TYPE
-        return Response(body)
+        return body
 
     items, _ = resource.db_query(partition,
                                  [{'option': None, 'field': 'function_name', 'value': function_name,
@@ -50,7 +49,7 @@ def do(data, resource):
 
     if len(items) == 0:
         body['message'] = 'function_name: {} did not exist'.format(function_name)
-        return Response(body)
+        return body
     else:
         item = items[0]
         zip_file_id = item['zip_file_id']
@@ -87,4 +86,4 @@ def do(data, resource):
                 resource.file_delete_bin(item['requirements_zipfile_id'])
             item['requirements_zipfile_id'] = requirements_zipfile_id
 
-        return Response(body)
+        return body

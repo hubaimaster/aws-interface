@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
@@ -36,4 +35,4 @@ def do(data, resource):
     else:
         body['error'] = error.PERMISSION_DENIED
 
-    return Response(body)
+    return body

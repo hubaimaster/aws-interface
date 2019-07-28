@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -41,10 +40,10 @@ def do(data, resource):
         success = resource.db_put_item(partition, item)
         body['success'] = success
         if success:
-            return Response(body)
+            return body
         else:
             body['error'] = error.LOG_CREATION_FAILED
-            return Response(body)
+            return body
     else:
         body['error'] = error.INVALID_SESSION
-        return Response(body)
+        return body

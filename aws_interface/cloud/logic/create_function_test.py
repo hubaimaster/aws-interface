@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import json
@@ -40,7 +39,7 @@ def do(data, resource):
     if len(item_ids) == 0:
         resource.db_put_item(partition, item)
         body['test_name'] = test_name
-        return Response(body)
+        return body
     else:
         body['error'] = error.EXISTING_FUNCTION
-        return Response(body)
+        return body

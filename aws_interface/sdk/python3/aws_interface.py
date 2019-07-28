@@ -55,7 +55,7 @@ class Client(object):
             data['session_id'] = self.session_id
         data = json.dumps(data)
         resp = self._post(self.url, data)
-        return resp.json().get('body', {'error': '404', 'message': 'No response'})
+        return resp.json()
 
     def _auth(self, api_name, data):
         return self.call_api('cloud.auth.{}'.format(api_name), data)

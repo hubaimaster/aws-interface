@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -25,4 +24,4 @@ def do(data, resource):
     partition = params.get('partition', None)
     success = resource.db_delete_partition(partition)
     body['success'] = success
-    return Response(body)
+    return body

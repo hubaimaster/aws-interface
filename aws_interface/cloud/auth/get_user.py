@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 
 
@@ -32,4 +31,4 @@ def do(data, resource):
 
     item = resource.db_get_item(user_id)
     body['item'] = item
-    return Response(body)
+    return body

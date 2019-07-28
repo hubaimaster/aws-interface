@@ -1,5 +1,4 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
@@ -41,7 +40,7 @@ def do(data, resource):
 
     if len(items) == 0:
         body['error'] = error.NO_SUCH_FUNCTION
-        return Response(body)
+        return body
     else:
         body['item'] = items[0]
-        return Response(body)
+        return body
