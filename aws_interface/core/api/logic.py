@@ -44,3 +44,18 @@ class LogicAPI(API):
 
     def put_function_file(self, function_name, file_path, file_content, file_type):
         return self.service_controller.put_function_file(function_name, file_path, file_content, file_type)
+
+    def create_webhook(self, name, description, function_name):
+        return self.service_controller.create_webhook(name, description, function_name)
+
+    def delete_webhook(self, name):
+        return self.service_controller.delete_webhook(name)
+
+    def get_webhook(self, name):
+        return self.service_controller.get_webhook(name)
+
+    def get_webhook_url(self, name):
+        return self.service_controller.get_webhook_url(name)
+
+    def get_webhooks(self, start_key=None):
+        return self.service_controller.get_webhooks(start_key)

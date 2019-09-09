@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import json
+from decimal import Decimal
 from numbers import Number
 from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3
 from resource.base import ResourceAllocator, Resource
@@ -18,6 +19,21 @@ def encode_dict(dict_obj):
             return int(v)
         else:
             return float(v)
+
+    if isinstance(dict_obj, dict):
+        return {k: cast_number(v) for k, v in dict_obj.items()}
+    else:
+        return dict_obj
+
+
+def decode_dict(dict_obj):
+    def cast_number(v):
+        if isinstance(v, dict):
+            return decode_dict(v)
+        if isinstance(v, float):
+            return Decimal(str(v))
+        else:
+            return v
 
     if isinstance(dict_obj, dict):
         return {k: cast_number(v) for k, v in dict_obj.items()}
@@ -148,6 +164,14 @@ class AWSResource(Resource):
         elif credential:
             self.boto3_session = get_boto3_session(credential)
 
+    def get_rest_api_url(self):
+        api_gateway = APIGateway(self.boto3_session)
+        return api_gateway.get_rest_api_url(self.app_id)
+
+    def create_webhook_url(self, name):
+        url = '{}?webhook={}'.format(self.get_rest_api_url(), name)
+        return url
+
     # backend resource cost
     def cost_for(self, start, end):
         cost_exp = CostExplorer(self.boto3_session)
@@ -156,19 +180,6 @@ class AWSResource(Resource):
     def cost_and_usage_for(self, start, end):
         cost_exp = CostExplorer(self.boto3_session)
         return cost_exp.get_cost_and_usage(start, end)
-
-    # API Gateway
-    def ag_create_redirection(self, name, redirection_url):
-        ag = APIGateway(self.boto3_session)
-        webhook = ag.create_redirection(self.app_id, name, redirection_url)
-        return webhook
-
-    def ag_delete_redirection(self, name):
-        """
-        :param name: Name of webhook to delete
-        :return: bool
-        """
-        raise NotImplementedError
 
     # DB ops
     def db_create_partition(self, partition):
@@ -227,11 +238,13 @@ class AWSResource(Resource):
 
     def db_put_item(self, partition, item, item_id=None, creation_date=None):
         dynamo = DynamoDB(self.boto3_session)
+        item = decode_dict(item)
         result = dynamo.put_item(self.app_id, partition, item, item_id, creation_date)
         return bool(result)
 
     def db_update_item(self, item_id, item):
         dynamo = DynamoDB(self.boto3_session)
+        item = decode_dict(item)
         result = dynamo.update_item(self.app_id, item_id, item)
         return bool(result)
 

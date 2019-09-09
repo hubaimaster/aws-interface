@@ -121,3 +121,11 @@ EXISTING_TRIGGER = {
     'code': 30,
     'message': 'Existing trigger'
 }
+EXISTING_WEBHOOK = {
+    'code': 31,
+    'message': 'Existing webhook'
+}
+NO_SUCH_WEBHOOK = {
+    'code': 32,
+    'message': 'No such webhook'
+}

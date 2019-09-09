@@ -1,7 +1,7 @@
 from functools import wraps
 
 
-system_partitions = ['user', 'log', 'logic-function', 'files', 'session']
+system_partitions = ['user', 'log', 'logic-function', 'files', 'session', 'webhook']
 
 
 def database_can_not_access_to_item(item):
@@ -69,6 +69,8 @@ class Permission:
             set_user = 'run:cloud.auth.set_user'
             set_me = 'run:cloud.auth.set_me'
             get_login_method = 'run:cloud.auth.get_login_method'
+            change_password = 'run:cloud.auth.change_password'
+            find_password = 'run:cloud.auth.find_password'
 
         class Database:
             create_item = 'run:cloud.database.create_item'
@@ -111,6 +113,12 @@ class Permission:
             update_trigger = 'run:cloud.logic.update_trigger'
             delete_function_test = 'run:cloud.logic.delete_function_test'
 
+            create_webhook = 'run:cloud.logic.create_webhook'
+            delete_webhook = 'run:cloud.logic.delete_webhook'
+            get_webhook = 'run:cloud.logic.get_webhook'
+            get_webhook_url = 'run:cloud.logic.get_webhook_url'
+            get_webhooks = 'run:cloud.logic.get_webhooks'
+
         class Storage:
             delete_b64 = 'run:cloud.storage.delete_b64'
             download_b64 = 'run:cloud.storage.download_b64'
@@ -151,12 +159,32 @@ class Permission:
 
     unknown_user_permissions = [
         Run.Auth.get_me,
-        Run.Auth.register,
+        Run.Auth.get_session,
         Run.Auth.guest,
         Run.Auth.login,
         Run.Auth.login_facebook,
+        Run.Auth.logout,
+        Run.Auth.register,
+        Run.Auth.set_me,
         Run.Auth.get_login_method,
+
+        Run.Database.create_item,
+        Run.Database.delete_item,
+        Run.Database.delete_items,
+        Run.Database.get_item,
+        Run.Database.get_item_count,
+        Run.Database.get_items,
+        Run.Database.put_item_field,
+        Run.Database.query_items,
+        Run.Database.update_item,
+
         Run.Log.create_log,
+
+        Run.Logic.run_function,
+
+        Run.Storage.delete_b64,
+        Run.Storage.download_b64,
+        Run.Storage.upload_b64,
     ]
 
     def __init__(self, data, resource):

@@ -139,3 +139,50 @@ class LogicServiceController(ServiceController):
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
+
+    @lambda_method
+    def create_webhook(self, name, description, function_name):
+        import cloud.logic.create_webhook as method
+        params = {
+            'name': name,
+            'description': description,
+            'function_name': function_name,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def delete_webhook(self, name):
+        import cloud.logic.delete_webhook as method
+        params = {
+            'name': name,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_webhook(self, name):
+        import cloud.logic.get_webhook as method
+        params = {
+            'name': name,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_webhook_url(self, name):
+        import cloud.logic.get_webhook_url as method
+        params = {
+            'name': name,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_webhooks(self, start_key):
+        import cloud.logic.get_webhooks as method
+        params = {
+            'start_key': start_key,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)

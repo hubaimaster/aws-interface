@@ -47,28 +47,25 @@ class Resource(metaclass=ABCMeta):
         self.credential = credential
         self.app_id = app_id
 
+    def get_rest_api_url(self):
+        raise NotImplementedError
+
+    def create_webhook_url(self, name):
+        """
+        Create url string (Literally just string) like https://...?gateway=name
+        or https://.../gateway/name (Because of to match available url format type of the various vendors
+        Ex: AWS using query parameters to make integrated request)
+        used to make webhooks ...
+        :param name: An identifier seed to make url
+        :return: Url string to be created
+        """
+        raise NotImplementedError
+
     # backend resource cost
     def cost_for(self, start, end):
         raise NotImplementedError
 
     def cost_and_usage_for(self, start, end):
-        raise NotImplementedError
-
-    # API Gateway
-    def ag_create_redirection(self, name, redirection_url):
-        """
-        Create webhook connected to redirection_url
-        :param name: Unique [name] of webhook
-        :param redirection_url: Webhook request via path will redirect to [redirection_url]
-        :return: {name: str, redirection_url: str, url: str}
-        """
-        raise NotImplementedError
-
-    def ag_delete_redirection(self, name):
-        """
-        :param name: Name of webhook to delete
-        :return: bool
-        """
         raise NotImplementedError
 
     # DB ops
@@ -146,6 +143,8 @@ class Resource(metaclass=ABCMeta):
     def db_query(self, partition, instructions, start_key=None, limit=100, reverse=False, order_by='creation_date'):
         """:return:items:list,end_key:str"""
         # TODO 상위레이어에서 쿼리를 순차적으로 실행가능한 instructions 으로 만들어 전달 -> ORM 클래스 만들기
+        if not instructions:
+            instructions = [{'field': 'partition', 'value': partition, 'condition': 'eq', 'option': None}]
 
         def get_items(_start_key_list, _sub_limit):
             if not _start_key_list:
@@ -301,45 +300,45 @@ class Resource(metaclass=ABCMeta):
         items = self._db_batch_fake_items_to_real(items)
         for item in items:
             item_value = item.get(field, None)
-            if not item_value:
-                continue
-            else:
-                if condition == 'eq':
-                    if value == item_value:
+            if condition == 'eq':
+                if value == item_value:
+                    yield item
+            elif condition == 'neq':
+                if value != item_value:
+                    yield item
+            elif condition == 'in':
+                if value in item_value:
+                    yield item
+            elif condition == 'gt':
+                if isinstance(item_value, str):
+                    if str(value) < str(item_value):
                         yield item
-                elif condition == 'in':
-                    if value in item_value:
-                        yield item
-                elif condition == 'gt':
-                    if isinstance(item_value, str):
-                        if str(value) < str(item_value):
-                            yield item
-                    else:
-                        if float(value) < float(item_value):
-                            yield item
-                elif condition == 'ls':
-                    if isinstance(item_value, str):
-                        if str(value) > str(item_value):
-                            yield item
-                    else:
-                        if float(value) > float(item_value):
-                            yield item
-                elif condition == 'ge':
-                    if isinstance(item_value, str):
-                        if str(value) <= str(item_value):
-                            yield item
-                    else:
-                        if float(value) <= float(item_value):
-                            yield item
-                elif condition == 'le':
-                    if isinstance(item_value, str):
-                        if str(value) >= str(item_value):
-                            yield item
-                    else:
-                        if float(value) >= float(item_value):
-                            yield item
                 else:
-                    raise BaseException('No such condition : [{}]'.format(condition))
+                    if float(value) < float(item_value):
+                        yield item
+            elif condition == 'ls':
+                if isinstance(item_value, str):
+                    if str(value) > str(item_value):
+                        yield item
+                else:
+                    if float(value) > float(item_value):
+                        yield item
+            elif condition == 'ge':
+                if isinstance(item_value, str):
+                    if str(value) <= str(item_value):
+                        yield item
+                else:
+                    if float(value) <= float(item_value):
+                        yield item
+            elif condition == 'le':
+                if isinstance(item_value, str):
+                    if str(value) >= str(item_value):
+                        yield item
+                else:
+                    if float(value) >= float(item_value):
+                        yield item
+            else:
+                raise BaseException('No such condition : [{}]'.format(condition))
 
     def _db_scan_items(self, statement, partition, order_by, order_min, order_max, start_key, limit, reverse):
         items, end_key = self.db_get_items_in_partition(partition, order_by, order_min, order_max, start_key, limit, reverse)

@@ -1,21 +1,24 @@
 import importlib
 import cloud.auth.get_me as get_me
 from resource import get_resource
-import cloud.message.error
+import cloud.message.error as error
 import sys
 import time
 import traceback
 from cloud.response import AWSResponse
 import cloud.libs.simplejson as json
+import cloud.logic.run_function as run_function
 
 
 CALLABLE_MODULE_WHITE_LIST = {
     # auth
     'cloud.auth.attach_group_permission',
     'cloud.auth.attach_user_group',
+    'cloud.auth.change_password',
     'cloud.auth.delete_sessions',
     'cloud.auth.delete_user',
     'cloud.auth.delete_user_group',
+    'cloud.auth.find_password',
     # 'cloud.auth.get_email_login',
     # 'cloud.auth.get_group_permissions',
     'cloud.auth.get_all_permissions',
@@ -84,64 +87,41 @@ CALLABLE_MODULE_WHITE_LIST = {
 
 # AWS Lambda handler
 def aws_handler(event, context):
-    print('event:', event)
     import boto3
-    query_string_parameters = event.get('queryStringParameters', {})
-    params = json.loads(event.get('body', '{}'))
-    vendor = 'aws'
+    query_params = event.get('queryStringParameters', {})
+    if query_params is None:
+        query_params = {}
 
+    try:
+        params = json.loads('{}'.format(event.get('body', '{}')))
+    except Exception as ex:
+        print(ex)
+        params = event.get('body', {})
+
+    vendor = 'aws'
     with open('./cloud/app_id.txt', 'r') as file:
         app_id = file.read()
     resource = get_resource(vendor, None, app_id, boto3.Session())
-    body = gateway(params, resource, query_string_parameters)
+
+    body = abstracted_gateway(params, query_params, resource)
     response = AWSResponse(body)
-    print('response:', response)
     return response
 
 
-def gateway(params, resource, query_string_parameters):
-    if query_string_parameters is None:
-        gate = 'handler'
-    else:
-        gate = query_string_parameters.get('gate', 'handler')
-
-    if gate == 'webhook':
-        return abstracted_webhook(params, resource)
-    elif gate == 'handler':
-        return abstracted_handler(params, resource)
-
-
-def abstracted_webhook(params, resource):
-    body = {}
-    return body
-
-
-def abstracted_handler(params, resource):
-    current_time = time.time()
-    module_name = params.get('module_name', None)
-    if module_name not in CALLABLE_MODULE_WHITE_LIST:
-        body = {
-            'error': cloud.message.error.FORBIDDEN_REQUEST
-        }
-        return body
-    data = {
-        'params': params,
-    }
-    user = get_me.do(data, resource).get('item', None)
-    data['user'] = user
-
-    module = importlib.import_module(module_name)
-    sys.modules[module_name] = module
-
-    # Invoke module
+def abstracted_gateway(params, query_params, resource):
     try:
-        body = module.do(data, resource)
+        if 'webhook' in query_params:
+            webhook_name = query_params['webhook']
+            return abstracted_webhook(params, query_params, resource, webhook_name)
+        else:
+            return abstracted_handler(params, query_params, resource)
+
     except PermissionError as ex:
         error_traceback = traceback.format_exc()
         print('Exception: [{}]'.format(ex))
         print('error_traceback: [{}]'.format(error_traceback))
         body = {
-            'error': cloud.message.error.PERMISSION_DENIED,
+            'error': error.PERMISSION_DENIED,
             'traceback': '{}'.format(error_traceback)
         }
         return body
@@ -150,10 +130,57 @@ def abstracted_handler(params, resource):
         print('Exception: [{}]'.format(ex))
         print('error_traceback: [{}]'.format(error_traceback))
         body = {
-            'error': cloud.message.error.INVALID_REQUEST,
+            'error': error.INVALID_REQUEST,
             'traceback': '{}'.format(error_traceback)
         }
         return body
 
+
+def abstracted_webhook(params, query_params, resource, webhook_name):
+    item_id = 'webhook-{}'.format(webhook_name)
+    webhook = resource.db_get_item(item_id)
+    body = {}
+    if webhook:
+        function_name = webhook['function_name']
+        webhook_groups = webhook.get('groups', ['user'])  # TODO
+        data = {
+            'params': {
+                'payload': {
+                    'params': params,
+                    'query_params': query_params,
+                },
+                'function_name': function_name,
+            },
+            'user': {
+                'groups': webhook_groups
+            },
+        }
+        body = run_function.do(data, resource)
+        return body
+    else:
+        body['error'] = error.NO_SUCH_WEBHOOK
+        return body
+
+
+def abstracted_handler(params, query_params, resource):
+    current_time = time.time()
+    module_name = params.get('module_name', None)
+    if module_name not in CALLABLE_MODULE_WHITE_LIST:
+        body = {
+            'error': error.FORBIDDEN_REQUEST
+        }
+        return body
+    data = {
+        'params': params,
+        'query_params': query_params,
+    }
+    user = get_me.do(data, resource).get('item', None)
+    data['user'] = user
+
+    module = importlib.import_module(module_name)
+    sys.modules[module_name] = module
+
+    # Invoke module
+    body = module.do(data, resource)
     body['duration'] = time.time() - current_time
     return body

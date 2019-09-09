@@ -111,8 +111,11 @@ class Adapter(metaclass=ABCMeta):
         with self.open_api_auth() as auth_api:
             email = '{}@system.com'.format(uuid())
             password = '{}'.format(token_urlsafe(32))
-            auth_api.create_user(email, password, {})
+            auth_api.create_user(email, password, {
+                'role': 'Admin session for running function'
+            })
             session_id = auth_api.create_session(email, password)['session_id']
+            print('session_id:', session_id)
             user_id = auth_api.get_user_by_email(email)['item']['id']
             for group in groups:
                 auth_api.attach_user_group(user_id, group)

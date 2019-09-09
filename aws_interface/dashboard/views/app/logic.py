@@ -17,6 +17,7 @@ def get_sdk_config(adapter):
         'rest_api_url': adapter.get_rest_api_url(),
         'session_id': adapter.generate_session_id(['admin'])
     }
+    print('sdk_config', sdk_config)
     return sdk_config
 
 
@@ -31,6 +32,10 @@ class Logic(LoginRequiredMixin, View):
             context['user_groups'] = auth_api.get_user_groups()['groups']
             context['functions'] = logic_api.get_functions()['items']
             context['function_tests'] = logic_api.get_function_tests()['items']
+            webhooks = logic_api.get_webhooks()['items']
+            for webhook in webhooks:
+                webhook['url'] = logic_api.get_webhook_url(webhook['name'])['url']
+            context['webhooks'] = webhooks
         return render(request, 'dashboard/app/logic.html', context=context)
 
     def post(self, request, app_id):
@@ -77,6 +82,14 @@ class Logic(LoginRequiredMixin, View):
             elif cmd == 'delete_function':
                 function_name = request.POST.get('function_name')
                 logic_api.delete_function(function_name)
+            elif cmd == 'create_webhook':
+                name = request.POST.get('name')
+                description = request.POST.get('description')
+                function_name = request.POST.get('function_name')
+                logic_api.create_webhook(name, description, function_name)
+            elif cmd == 'delete_webhook':
+                name = request.POST.get('name')
+                logic_api.delete_webhook(name)
 
         return redirect(request.path_info)  # Redirect back
 

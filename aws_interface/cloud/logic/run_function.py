@@ -1,17 +1,16 @@
 
-from cloud.response import Response
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import sys
 import io
 import os
 import tempfile
-import shutil
-import json
+import cloud.libs.simplejson as json
 
 from importlib import import_module
 from zipfile import ZipFile
 from contextlib import redirect_stdout
+from cloud.log.create_log import create_event
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -54,7 +53,7 @@ def do(data, resource):
 
     if len(items) == 0:
         body['error'] = error.NO_SUCH_FUNCTION
-        return Response(body)
+        return body
     else:
         item = items[0]
 
@@ -103,4 +102,10 @@ def do(data, resource):
             body['error']['message'] = body['error']['message'].format(ex)
         os.remove(zip_temp_dir)
 
-        return Response(body)
+        # Logging
+        create_event(resource, user, 'run_function:{}'.format(function_name), json.dumps({
+            'params': params,
+            'body': body,
+        }), 'logic')
+
+        return body

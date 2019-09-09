@@ -61,7 +61,7 @@ def do(data, resource):
             zip_temp.write(zip_file_bin)
         with ZipFile(zip_temp_dir) as zip_file:
             zip_file.extractall(extracted_dir)
-        with open(os.path.join(extracted_dir, file_path), 'w+') as fp:
+        with open(os.path.join(extracted_dir, file_path), 'w+', encoding='utf-8') as fp:
             fp.write(file_content)
         with ZipFile(zip_temp_dir, 'a') as zip_file:
             file_name = os.path.join(extracted_dir, file_path)

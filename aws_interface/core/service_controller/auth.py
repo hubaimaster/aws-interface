@@ -20,6 +20,17 @@ class AuthServiceController(ServiceController):
         return method.do(data, self.resource)
 
     @lambda_method
+    def create_system_user(self, email, password, extra):
+        import cloud.auth.register_admin as method
+        params = {
+            'email': email,
+            'password': password,
+            'extra': extra,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
     def set_user(self, user_id, field, value):
         import cloud.auth.set_user as method
         params = {

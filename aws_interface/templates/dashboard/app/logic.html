@@ -171,6 +171,120 @@
 
             </div>
 
+            <div class="row mt-5">
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h3 class="mb-0">{{ _("Webhooks") }}</h3>
+                                </div>
+
+                                <div class="col text-right">
+                                    <a data-toggle="modal" data-target="#modal-create-webhook" class="btn btn-sm btn-primary">
+                                        <span class="btn-inner--text" style="color: white;">{{ _("Create webhook") }}</span>
+                                    </a>
+                                </div>
+
+                                <div class="modal fade" id="modal-create-webhook" tabindex="-1" role="dialog" aria-labelledby="modal-create-webhook" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <form method="POST">{% csrf_token %}
+                                                <input name="cmd" value="create_webhook" hidden>
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title" id="modal-title-default">{{ _("Create function webhook") }}</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+
+                                                <div class="modal-body modal-lg">
+                                                    <div class="pl-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="folder-name">{{ _("Webhook name") }}</label>
+                                                                    <input name="name" type="text" class="form-control form-control-alternative" placeholder="{{ _("Webhook name") }}">
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="function-description">{{ _("Function name") }}</label>
+                                                                    <select name="function_name" class="form-control">
+                                                                        {% for function in functions %}
+                                                                            <option value="{{ function.function_name }}">{{ function.function_name }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="file-bin">{{ _("Webhook description") }}</label>
+                                                                    <input name="description" type="text" class="form-control form-control-alternative" placeholder="{{ _("Webhook description") }}">
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p>
+                                                        {{ _("Click the confirm button to create the webhook") }}
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                    <button type="submit" id="create-webhook" class="btn btn-primary">{{ _("Confirm") }}</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div>
+
+                            <div class="table-responsive">
+                                <!-- Projects table -->
+                                <table class="table align-items-center table-flush">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">name</th>
+                                        <th scope="col">function_name</th>
+                                        <th scope="col">url</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for webhook in webhooks %}
+                                        <tr>
+                                            <th scope="row">
+                                                {{ webhook.name }}
+                                            </th>
+                                            <td>
+                                                {{ webhook.function_name }}
+                                            </td>
+                                            <td>
+                                                {{ webhook.url }}
+                                            </td>
+                                            <td>
+                                                <form method="post">{% csrf_token %}
+                                                    <input name="cmd" value="delete_webhook" hidden>
+                                                    <input name="name" value="{{ webhook.name }}" hidden>
+                                                    <button class="btn btn-sm btn-danger" type="submit">{{ _('Remove') }}</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
 
             <div class="row mt-5">
                 <div class="col-xl-12">

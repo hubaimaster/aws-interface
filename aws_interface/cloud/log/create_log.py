@@ -19,9 +19,20 @@ info = {
 }
 
 
+def create_event(resource, user, name, param, source):
+    item = dict()
+    item['event_name'] = name
+    item['event_param'] = param
+    item['event_source'] = source
+    if user and user.get('id', None):
+        item['owner'] = user.get('id')
+    success = resource.db_put_item('log', item)
+    return success
+
+
 @NeedPermission(Permission.Run.Log.create_log)
 def do(data, resource):
-    partition = 'log'
+
     body = {}
     params = data['params']
     user = data.get('user', None)
@@ -31,13 +42,7 @@ def do(data, resource):
     event_param = params.get('event_param')
 
     if user:
-        item = dict()
-        item['event_name'] = event_name
-        item['event_param'] = event_param
-        item['event_source'] = event_source
-        item['owner'] = user.get('id')
-
-        success = resource.db_put_item(partition, item)
+        success = create_event(resource, user, event_name, event_param, event_source)
         body['success'] = success
         if success:
             return body

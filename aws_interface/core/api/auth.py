@@ -23,6 +23,9 @@ class AuthAPI(API):
     def create_user(self, email, password, extra):
         return self.service_controller.create_user(email, password, extra)
 
+    def create_system_user(self, email, password, extra):
+        return self.service_controller.create_system_user(email, password, extra)
+
     def set_user(self, user_id, field, value):
         return self.service_controller.set_user(user_id, field, value)
 

@@ -143,14 +143,10 @@
                                     <span class="nav-link-inner--text d-lg-none">Settings</span>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="setting-{{ app.name }}">
-                                    <form method="post" action="">{% csrf_token %}
-                                        <input hidden name="cmd" value="remove_app">
-                                        <input hidden name="app_id" value="{{ app.id }}">
-                                        <button id="delete-{{ app.name }}" type="submit" class="dropdown-item">
+                                        <button onclick="deleteApp('{{ app.id }}', '{{ app.name }}');" class="dropdown-item">
                                             <i class="fas fa-trash align-baseline"></i>
                                             {{ _('Remove backend') }}
                                         </button>
-                                    </form>
                                 </div>
                             </div>
                             <a id="app-{{ app.name }}" href="{% url 'overview' app.id %}">
@@ -200,6 +196,25 @@
             alert('{{alert}}');
         {% endif %}
     });
+
+    function deleteApp(app_id, app_name) {
+        if (prompt('삭제하시려면 어플리케이션 이름을 입력해주세요') == app_name){
+            $.ajax({
+                url : '',
+                type : 'POST',
+                data : {
+                    'cmd': 'remove_app',
+                    'app_id': app_id
+                },
+                success : function(data) {
+                    alert("삭제 되었습니다");
+                    window.location.reload();
+                }
+            });
+        }else{
+            alert("삭제 실패, 어플리케이션 이름이 일치하지 않습니다");
+        }
+    }
 </script>
 
 
