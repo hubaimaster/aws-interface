@@ -70,6 +70,7 @@ class Permission:
             set_me = 'run:cloud.auth.set_me'
             get_login_method = 'run:cloud.auth.get_login_method'
             change_password = 'run:cloud.auth.change_password'
+            change_password_admin = 'run:cloud.auth.change_password_admin'
             find_password = 'run:cloud.auth.find_password'
 
         class Database:

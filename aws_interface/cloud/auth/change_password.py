@@ -45,7 +45,7 @@ def do(data, resource):
     }
 
     if not data.get('admin', False):
-        if not match_policy(register_policy_code, {}, password_meta):
+        if not match_policy(register_policy_code, user, password_meta):
             body['error'] = error.REGISTER_POLICY_VIOLATION
             return body
 

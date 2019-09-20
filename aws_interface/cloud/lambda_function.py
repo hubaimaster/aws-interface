@@ -15,6 +15,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.auth.attach_group_permission',
     'cloud.auth.attach_user_group',
     'cloud.auth.change_password',
+    'cloud.auth.change_password_admin',
     'cloud.auth.delete_sessions',
     'cloud.auth.delete_user',
     'cloud.auth.delete_user_group',
