@@ -1,6 +1,7 @@
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 
+import ast
 import uuid
 import os
 import tempfile
@@ -98,30 +99,24 @@ def do(data, resource):
         vh_code = "from {} import {}".format(function_package, function_method) + '\n' +\
                   "import io\n" + \
                   "import json\n" + \
-                  "import traceback\n" + \
                   "from contextlib import redirect_stdout\n" +\
                   "if __name__ == '__main__':\n" +\
                   "    std_str = io.StringIO()\n" +\
-                  "    with redirect_stdout(std_str):\n" + \
-                  "        resp, error = None, None\n" + \
-                  "        try:\n" +\
-                  "            resp = {}({}, {})\n".format(function_method, payload, json.loads(json.dumps(user))) +\
-                  "        except Exception as e:\n" +\
-                  "            error = traceback.format_exc()\n" +\
-                  '    print(json.dumps({\"response\": resp, \"stdout\": std_str.getvalue(), \"error\": error}))\n'
+                  "    with redirect_stdout(std_str):" +\
+                  "        resp = {}({}, {})".format(function_method, payload, {}) + "\n" +\
+                  '    print(json.dumps({\"response\": resp, \"stdout\": str(std_str.getvalue())}))\n'
 
         with open(virtual_handler_path, 'w+') as vh:
             vh.write(vh_code)
 
         try:
             return_value = run_subprocess(virtual_handler_path)
-            return_value = json.loads(return_value)
+            return_value = ast.literal_eval(return_value)
+            response = return_value.get('response')
+            stdout = return_value.get('stdout')
 
-            body['response'] = return_value.get('response')
-            body['stdout'] = return_value.get('stdout')
-            err = return_value.get('error', None)
-            if err:
-                body['error'] = err
+            body['response'] = response
+            body['stdout'] = stdout
 
         except Exception as ex:
             error_traceback = traceback.format_exc()

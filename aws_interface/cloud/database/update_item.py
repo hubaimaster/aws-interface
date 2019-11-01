@@ -43,7 +43,7 @@ def do(data, resource):
             if value is None:
                 new_item.pop(key)
 
-        new_item = {key: value for key, value in new_item.items() if value or value is False}
+        new_item = {key: value for key, value in new_item.items() if value != '' and value != {} and value != []}
         success = resource.db_update_item(item_id, new_item)
         body['success'] = success
     else:

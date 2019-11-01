@@ -24,7 +24,7 @@ def do(data, resource):
     limit = 1000
     items = []
     while True:
-        _items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit)
+        _items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit, reverse=True)
         items.extend(_items)
         start_key = end_key
         if not start_key:

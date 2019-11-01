@@ -35,7 +35,7 @@ def do(data, resource):
 
     if 'owner' not in item:
         item['owner'] = user_id
-    item = {key: value for key, value in item.items() if value or value is False}
+    item = {key: value for key, value in item.items() if value != '' and value != {} and value != []}
     # Check partition has been existed
     if resource.db_get_item(partition):
         if match_policy_after_get_policy_code(resource, 'create', partition, user, item):

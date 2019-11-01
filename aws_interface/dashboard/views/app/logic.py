@@ -75,6 +75,7 @@ class Logic(LoginRequiredMixin, View):
                     data = sdk_client.logic_run_function(function_name, payload)
                     end = time.time()
                     data['duration'] = end - start
+                    print('data:', data)
                     return JsonResponse(data)
             elif cmd == 'delete_function_test':
                 test_name = request.POST.get('test_name')

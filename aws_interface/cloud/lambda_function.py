@@ -157,7 +157,7 @@ def abstracted_webhook(params, query_params, resource, webhook_name):
             },
         }
         body = run_function.do(data, resource)
-        return body
+        return body.get('response', None)
     else:
         body['error'] = error.NO_SUCH_WEBHOOK
         return body

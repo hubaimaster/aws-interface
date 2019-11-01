@@ -17,5 +17,8 @@ class AWSResponse(dict):
         headers = _get_headers(content_type)
         self['statusCode'] = status_code
         self['headers'] = headers
-        self['body'] = json.dumps(body)
+        if isinstance(body, dict):
+            self['body'] = json.dumps(body)
+        else:
+            self['body'] = body
         self['isBase64Encoded'] = False
