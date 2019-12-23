@@ -1,5 +1,4 @@
 from datetime import date
-from core.service_controller import BillServiceController
 from .base import API
 
 
@@ -21,14 +20,33 @@ def get_prev_month_date():
 
 
 class BillAPI(API):
-    SC_CLASS = BillServiceController
-
-    def get_current_cost(self):
+    def get_cost(self):
         start = get_prev_month_date().isoformat()
         end = get_current_date().isoformat()
-        return self.service_controller.get_cost(start, end)
 
-    def get_current_usage_costs(self):
+        response = self.resource.cost_for(start, end)
+        response = response.get('ResultsByTime', {})
+        response = response[-1]
+
+        total = response.get('Total', {})
+        blended_cost = total.get('BlendedCost', {})
+        amount = blended_cost.get('Amount', -1)
+        unit = blended_cost.get('Unit', None)
+        result = {'Amount': amount, 'Unit': unit}
+        return result
+
+    def get_usage_costs(self):
         start = get_prev_month_date().isoformat()
         end = get_current_date().isoformat()
-        return self.service_controller.get_usage_costs(start, end)
+
+        response = self.resource.cost_and_usage_for(start, end)
+        response = response.get('ResultsByTime', {})
+        response = response[-1]
+
+        groups = response.get('Groups', [])
+        groups = [{
+            'Service': x.get('Keys', [None])[0],
+            'Cost': x.get('Metrics', {}).get('AmortizedCost', {})
+        } for x in groups]
+        groups.sort(key=lambda x: x['Cost']['Amount'], reverse=True)
+        return groups

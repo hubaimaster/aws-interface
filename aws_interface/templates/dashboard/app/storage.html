@@ -115,46 +115,6 @@
                                                                 <input name="file-bin" type="file" id="file-bin" class="form-control form-control-alternative btn">
                                                             </div>
 
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">{{ _("Read groups") }}</label>
-                                                                <div id="file-read-groups" class="mb-2">
-
-                                                                </div>
-
-                                                                <div class="dropdown">
-                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        {{ _("Add group") }}
-                                                                    </button>
-                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                        {% for group in user_groups %}
-                                                                            <a class="dropdown-item" href="#!" onclick="put_file_read_group('{{ group.name }}');">{{ group.name }}</a>
-                                                                        {% endfor %}
-                                                                        <div class="dropdown-divider"></div>
-                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">{{ _("Manage groups") }}</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">{{ _("Write groups") }}</label>
-                                                                <div id="file-write-groups" class="mb-2">
-
-                                                                </div>
-
-                                                                <div class="dropdown">
-                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        {{ _("Add group") }}
-                                                                    </button>
-                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                        {% for group in user_groups %}
-                                                                            <a class="dropdown-item" href="#!" onclick="put_file_write_group('{{ group.name }}');">{{ group.name }}</a>
-                                                                        {% endfor %}
-                                                                        <div class="dropdown-divider"></div>
-                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">{{ _("Manage groups") }}</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -250,26 +210,11 @@
 
         var files_end_key = null;
 
-        var folder_read_groups = [];
-        var folder_write_groups = [];
-
-        var file_read_groups = [];
-        var file_write_groups = [];
-
-        {% for group in user_groups %}
-            folder_read_groups.push('{{ group.name }}');
-            folder_write_groups.push('{{ group.name }}');
-            file_read_groups.push('{{ group.name }}');
-            file_write_groups.push('{{ group.name }}');
-        {% endfor %}
-
-        function upload_file(parent_path, file_name, file_bin, read_groups, write_groups) {
+        function upload_file(parent_path, file_name, file_bin) {
             var formData = new FormData();
             formData.append('cmd', 'upload_b64');
             formData.append('file_bin', file_bin);
             formData.append('file_name', file_name);
-            formData.append('read_groups', JSON.stringify(read_groups));
-            formData.append('write_groups', JSON.stringify(write_groups));
             $.ajax({
                 url : '',
                 type : 'POST',
@@ -280,47 +225,6 @@
                     window.location.reload();
                 }
             });
-        }
-
-        function render_file_read_groups() {
-            $("#file-read-groups").empty();
-            for (var i = 0; i < file_read_groups.length; i++){
-                var group = file_read_groups[i];
-                var tag = "<a onclick=\"remove_file_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
-                $("#file-read-groups").append(tag);
-            }
-        }
-        function render_file_write_groups() {
-            $("#file-write-groups").empty();
-            for (var i = 0; i < file_write_groups.length; i++){
-                var group = file_write_groups[i];
-                var tag = "<a onclick=\"remove_file_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
-                $("#file-write-groups").append(tag);
-            }
-        }
-        function put_file_read_group(group_name) {
-            if (file_read_groups.includes(group_name)){
-                return;
-            }else{
-                file_read_groups.push(group_name);
-                render_file_read_groups();
-            }
-        }
-        function remove_file_read_group(group_name) {
-            file_read_groups.remove(group_name);
-            render_file_read_groups();
-        }
-        function put_file_write_group(group_name) {
-            if (file_write_groups.includes(group_name)){
-                return;
-            }else{
-                file_write_groups.push(group_name);
-                render_file_write_groups();
-            }
-        }
-        function remove_file_write_group(group_name) {
-            file_write_groups.remove(group_name);
-            render_file_write_groups();
         }
 
         function delete_b64(file_id){
@@ -354,8 +258,6 @@
 
         window.onload = function () {
             $(document).ready(function () {
-                render_file_read_groups();
-                render_file_write_groups();
                 load_more_files();
                 set_policy_mode('create');
 
@@ -367,11 +269,7 @@
                         alert("{{ _('Please specify the file') }}");
                         return;
                     }
-                    if (file_read_groups.length == 0 || file_write_groups.length == 0) {
-                        alert("{{ _('You must specify at least one permission group') }}");
-                        return;
-                    }
-                    upload_file('{{ folder_path }}', filename, file_bin, file_read_groups, file_write_groups);
+                    upload_file('{{ folder_path }}', filename, file_bin);
                     $("#modal-upload-file").modal('hide');
                 });
             });

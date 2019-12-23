@@ -317,45 +317,6 @@
                                                                 <input type="text" class="form-control form-control-alternative" placeholder="{{ _("Auto generation") }}" disabled>
                                                             </div>
 
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">{{ _("Read groups") }}</label>
-                                                                <div id="read-groups" class="mb-2">
-
-                                                                </div>
-
-                                                                <div class="dropdown">
-                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        {{ _("Add group") }}
-                                                                    </button>
-                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                        {% for group in user_groups %}
-                                                                            <a class="dropdown-item" href="#!" onclick="put_read_group('{{ group.name }}');">{{ group.name }}</a>
-                                                                        {% endfor %}
-                                                                        <div class="dropdown-divider"></div>
-                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">{{ _("Manage groups") }}</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="input-username">{{ _("Write groups") }}</label>
-                                                                <div id="write-groups" class="mb-2">
-
-                                                                </div>
-                                                                <div class="dropdown">
-                                                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        {{ _("Add group") }}
-                                                                    </button>
-                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                        {% for group in user_groups %}
-                                                                            <a class="dropdown-item" href="#!" onclick="put_write_group('{{ group.name }}');">{{ group.name }}</a>
-                                                                        {% endfor %}
-                                                                        <div class="dropdown-divider"></div>
-                                                                        <a class="dropdown-item" href="{% url 'auth' app_id %}">{{ _("Manage groups") }}</a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
 
                                                         </div>
                                                     </div>
@@ -478,14 +439,8 @@
         var item_id = null;
         var start_key = null;
 
-        var read_groups = [];
-        var write_groups = [];
-
         var query_instructions = [];
-        {% for user_group in user_groups %}
-            read_groups.push('{{ user_group.name }}');
-            write_groups.push('{{ user_group.name }}');
-        {% endfor %}
+
 
         var item_ids = [];
         var item_fields = [];
@@ -644,15 +599,10 @@
                 alert("{{ _('Please specify partition') }}");
                 return;
             }
-            if (read_groups.length == 0 || write_groups.length == 0){
-                alert("{{ _('You must specify at least one permission group') }}");
-                return;
-            }
+
             $.post("", {
                 cmd: "add_item",
                 partition: partition,
-                'read_groups[]': read_groups,
-                'write_groups[]': write_groups,
             }, function (data) {
                 set_partition(partition);
             });
@@ -715,22 +665,7 @@
 
     <script>
         var policy_mode = 'read';
-        function render_read_groups() {
-            $("#read-groups").empty();
-            for (var i = 0; i < read_groups.length; i++){
-                var group = read_groups[i];
-                var tag = "<a onclick=\"remove_read_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
-                $("#read-groups").append(tag);
-            }
-        }
-        function render_write_groups() {
-            $("#write-groups").empty();
-            for (var i = 0; i < write_groups.length; i++){
-                var group = write_groups[i];
-                var tag = "<a onclick=\"remove_write_group('" + group + "')\" class=\"btn badge badge-primary\">" + group + " <i class=\"fas fa-trash\"></i></a>\n";
-                $("#write-groups").append(tag);
-            }
-        }
+
         function render_query_list() {
             $("#query-list>tbody").empty();
             if (query_instructions.length > 0){
@@ -767,14 +702,7 @@
                 $("#query-list").append(tag);
             }
         }
-        function put_read_group(group_name) {
-            if (read_groups.includes(group_name)){
-                //alert("이미 해당 그룹이 존재합니다");
-            }else{
-                read_groups.push(group_name);
-                render_read_groups();
-            }
-        }
+
         function make_query(logic_operation, field_name, query_operation, field_value) {
             _query = {
                 'option': logic_operation,
@@ -794,22 +722,7 @@
             query_instructions.push(query);
             render_query_list();
         }
-        function remove_read_group(group_name) {
-            read_groups.remove(group_name);
-            render_read_groups();
-        }
-        function put_write_group(group_name) {
-            if (write_groups.includes(group_name)){
-                alert("{{ _('This group already exists') }}");
-            }else{
-                write_groups.push(group_name);
-                render_write_groups();
-            }
-        }
-        function remove_write_group(group_name) {
-            write_groups.remove(group_name);
-            render_write_groups();
-        }
+
         function remove_query(_query_idx) {
             query_instructions.splice(_query_idx, 1);
             render_query_list();
@@ -992,8 +905,6 @@
                 query_items(partition, query_json_instructions);
             });
             $(document).ready(function () {
-                render_read_groups();
-                render_write_groups();
                 set_policy_mode('create');
             });
         }

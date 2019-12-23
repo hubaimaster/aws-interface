@@ -5,6 +5,8 @@ from .database import DatabaseAPI
 from .storage import StorageAPI
 from .logic import LogicAPI
 from .log import LogAPI
+from .schedule import ScheduleAPI
+from .notification import NotificationAPI
 
 api_list = [
     BillAPI,
@@ -13,4 +15,6 @@ api_list = [
     StorageAPI,
     LogicAPI,
     LogAPI,
+    ScheduleAPI,
+    NotificationAPI,
 ]

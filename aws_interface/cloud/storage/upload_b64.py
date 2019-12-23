@@ -36,9 +36,6 @@ def do(data, resource):
     file_name = params.get('file_name', uuid())
     file_b64 = params.get('file_b64')
 
-    read_groups = params.get('read_groups', [])
-    write_groups = params.get('write_groups', [])
-
     meta_info = params.get('meta_info', {})
 
     file_id = '{}'.format(uuid())
@@ -63,8 +60,6 @@ def do(data, resource):
         'file_name': file_name,
         'owner': user_id,
         'file_size': file_size,
-        'read_groups': read_groups,
-        'write_groups': write_groups,
         'meta_info': meta_info,
     }
 

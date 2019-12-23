@@ -83,6 +83,18 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.storage.download_b64',
     'cloud.storage.get_b64_info_items',
     'cloud.storage.upload_b64',
+    # schedule
+    'cloud.schedule.create_schedule',
+    'cloud.schedule.delete_schedule',
+    'cloud.schedule.get_schedule',
+    'cloud.schedule.get_schedules',
+    # notification
+    'cloud.notification.create_email_provider',
+    'cloud.notification.delete_email_provider',
+    'cloud.notification.get_email_provider',
+    'cloud.notification.get_email_providers',
+    'cloud.notification.send_email',
+    'cloud.notification.update_email_provider',
 }
 
 

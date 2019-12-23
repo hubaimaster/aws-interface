@@ -25,7 +25,7 @@ def match_policy_after_get_policy_code(resource, mode, partition, user, item):
 
 
 def match_policy(policy_code, user, item):
-    if 'admin' in user.get('groups', []):
+    if user and 'admin' in user.get('groups', []):
         return True
     else:
         exec(policy_code)

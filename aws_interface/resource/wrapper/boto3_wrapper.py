@@ -769,6 +769,22 @@ class Lambda:
         )
         return response
 
+    def get_function(self, name):
+        response = self.client.get_function(
+            FunctionName=name,
+        )
+        return response
+
+    def add_permission(self, function_name, statement_id, action, principal, source_arn):
+        response = self.client.add_permission(
+            FunctionName=function_name,
+            StatementId=statement_id,
+            Action=action,
+            Principal=principal,
+            SourceArn=source_arn,
+        )
+        return response
+
 
 class S3:
     def __init__(self, boto3_session):
@@ -848,6 +864,7 @@ class S3:
 class IAM:
     policy_arns = [
         'arn:aws:iam::aws:policy/AWSLambdaExecute',
+        'arn:aws:iam::aws:policy/AWSLambdaFullAccess',
         'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
         'arn:aws:iam::aws:policy/AmazonS3FullAccess',
         'arn:aws:iam::aws:policy/AWSXrayFullAccess',
@@ -966,5 +983,74 @@ class CostExplorer:
             },
             Granularity='MONTHLY',
             Metrics=['BLENDED_COST']
+        )
+        return response
+
+
+class Events:
+    def __init__(self, boto3_session):
+        self.client = boto3_session.client('events')
+
+    def put_rule(self, name, schedule_expression):
+        response = self.client.put_rule(
+            Name=name,
+            ScheduleExpression=schedule_expression,
+            State='ENABLED',
+        )
+        return response
+
+    def put_target(self, target_id, rule_name, target_arn, target_input):
+        response = self.client.put_targets(
+            Rule=rule_name,
+            Targets=[
+                {
+                    'Id': target_id,
+                    'Arn': target_arn,
+                    'Input': target_input,
+                },
+            ]
+        )
+        return response
+
+    def get_rules(self, name, next_token=None):
+        if next_token:
+            response = self.client.list_rules(
+                NamePrefix=name,
+                NextToken=next_token,
+                Limit=1000
+            )
+        else:
+            response = self.client.list_rules(
+                NamePrefix=name,
+                Limit=1000
+            )
+        return response
+
+    def get_targets(self, rule_name, next_token=None):
+        if next_token:
+            response = self.client.list_targets_by_rule(
+                Rule=rule_name,
+                NextToken=next_token,
+                Limit=1000
+            )
+        else:
+            response = self.client.list_targets_by_rule(
+                Rule=rule_name,
+                Limit=1000
+            )
+        return response
+
+    def delete_rule(self, name):
+        response = self.client.delete_rule(
+            Name=name,
+            Force=True
+        )
+        return response
+
+    def delete_targets(self, rule_name, target_ids):
+        response = self.client.remove_targets(
+            Rule=rule_name,
+            Ids=target_ids,
+            Force=True
         )
         return response

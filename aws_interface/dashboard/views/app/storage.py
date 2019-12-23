@@ -72,8 +72,6 @@ class Storage(LoginRequiredMixin, View):
             if cmd == 'upload_b64':  # 분할 업로드
                 file_bin = request.FILES['file_bin']
                 file_name = request.POST['file_name']
-                read_groups = json.loads(request.POST.get('read_groups'))
-                write_groups = json.loads(request.POST.get('write_groups'))
                 parent_file_id = None
 
                 def divide_chunks(text, n):
@@ -85,7 +83,7 @@ class Storage(LoginRequiredMixin, View):
                 raw_base64 = raw_base64.decode('utf-8')
                 base64_chunks = divide_chunks(raw_base64, 1024 * 1024 * 4)  # 4mb
                 for base64_chunk in base64_chunks:
-                    result = storage_api.upload_b64(parent_file_id, file_name, base64_chunk, read_groups, write_groups)
+                    result = storage_api.upload_b64(parent_file_id, file_name, base64_chunk)
                     parent_file_id = result.get('file_id')
                 return JsonResponse(result)
             elif cmd == 'get_b64_info_items':  # For admins

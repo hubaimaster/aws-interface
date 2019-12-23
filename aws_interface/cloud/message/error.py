@@ -129,3 +129,19 @@ NO_SUCH_WEBHOOK = {
     'code': 32,
     'message': 'No such webhook'
 }
+EXISTING_SCHEDULE = {
+    'code': 33,
+    'message': 'Existing schedule'
+}
+NO_SUCH_SCHEDULE = {
+    'code': 34,
+    'message': 'No such schedule'
+}
+EXISTING_EMAIL_PROVIDER = {
+    'code': 35,
+    'message': 'Existing email provider'
+}
+NO_SUCH_EMAIL_PROVIDER = {
+    'code': 36,
+    'message': 'No such email provider'
+}

@@ -1,26 +1,62 @@
-from core.service_controller import StorageServiceController
 from .base import API
+from .utils import lambda_method, make_data
 
 
 class StorageAPI(API):
-    SC_CLASS = StorageServiceController
+    @lambda_method
+    def upload_b64(self, parent_file_id, file_name, file_b64):
+        import cloud.storage.upload_b64 as method
+        params = {
+            'parent_file_id': parent_file_id,
+            'file_name': file_name,
+            'file_b64': file_b64,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
 
-    # Service
+    @lambda_method
+    def delete_b64(self, file_id):
+        import cloud.storage.delete_b64 as method
+        params = {
+            'file_id': file_id,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
 
-    def upload_b64(self, parent_file_id, file_name, file_b64, read_groups, write_groups):
-        return self.service_controller.upload_b64(parent_file_id, file_name, file_b64, read_groups, write_groups)
-
-    def delete_b64(self, file_key):
-        return self.service_controller.delete_b64(file_key)
-
+    @lambda_method
     def download_b64(self, file_id):
-        return self.service_controller.download_b64(file_id)
+        import cloud.storage.download_b64 as method
+        params = {
+            'file_id': file_id,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
 
-    def get_b64_info_items(self, start_key, reverse=False):
-        return self.service_controller.get_b64_info_items(start_key, reverse)
+    @lambda_method
+    def get_b64_info_items(self, start_key, reverse):
+        import cloud.storage.get_b64_info_items as method
+        params = {
+            'start_key': start_key,
+            'reverse': reverse,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
 
+    @lambda_method
     def get_policy_code(self, mode):
-        return self.service_controller.get_policy_code(mode)
+        import cloud.storage.get_policy_code as method
+        params = {
+            'mode': mode,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
 
+    @lambda_method
     def put_policy(self, mode, code):
-        return self.service_controller.put_policy(mode, code)
+        import cloud.storage.put_policy as method
+        params = {
+            'mode': mode,
+            'code': code,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)

@@ -17,4 +17,5 @@ class API(metaclass=ABCMeta):
         self.app_id = app_id
 
         resource = get_resource(vendor, credentials, app_id)
-        self.service_controller = type(self).SC_CLASS(resource, app_id)
+        # self.service_controller = type(self).SC_CLASS(resource, app_id)
+        self.resource = resource

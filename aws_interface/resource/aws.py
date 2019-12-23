@@ -3,9 +3,10 @@ import os
 import shutil
 import tempfile
 import json
+import uuid
 from decimal import Decimal
 from numbers import Number
-from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3
+from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3, Events
 from resource.base import ResourceAllocator, Resource
 
 
@@ -294,3 +295,33 @@ class AWSResource(Resource):
         s3 = S3(self.boto3_session)
         result = s3.delete_bin(self.app_id, file_id)
         return bool(result)
+
+    # Event scheduling
+    def ev_put_schedule(self, schedule_name, cron_exp, params):
+        input_json = {
+            'body': params
+        }
+        target_id = str(uuid.uuid4()).replace('-', '')
+        input_json = json.dumps(input_json)
+        lambda_client = Lambda(self.boto3_session)
+        lambda_function = lambda_client.get_function(self.app_id)
+        lambda_function_config = lambda_function.get('Configuration')
+        lambda_function_arn = lambda_function_config.get('FunctionArn')
+        lambda_function_name = lambda_function_config.get("FunctionName")
+        statement_id = target_id
+        action = 'lambda:InvokeFunction'
+        principal = 'events.amazonaws.com'
+        events = Events(self.boto3_session)
+        rule_response = events.put_rule(schedule_name, cron_exp)
+        rule_arn = rule_response.get('RuleArn')
+        _ = lambda_client.add_permission(lambda_function_name, statement_id, action, principal, rule_arn)
+        put_target_resp = events.put_target(target_id, schedule_name, lambda_function_arn, input_json)
+        return put_target_resp
+
+    def ev_delete_schedule(self, schedule_name):
+        events = Events(self.boto3_session)
+        targets = events.get_targets(schedule_name).get('Targets', [])
+        target_ids = [target.get('Id') for target in targets]
+        events.delete_rule(schedule_name)
+        resp = events.delete_targets(schedule_name, target_ids)
+        return resp

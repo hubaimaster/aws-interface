@@ -23,6 +23,16 @@ class Adapter(metaclass=ABCMeta):
         raise NotImplementedError
 
     @contextmanager
+    def open_api(self, api_class):
+        """
+            You can do this:
+            with adapter.open_api(api_class) as api:
+                api.method_in_api_class(...)
+        """
+        api = api_class(self._get_vendor(), self._get_credential(), self._get_app_id())
+        yield api
+
+    @contextmanager
     def open_api_auth(self):
         """
             You can do this:
@@ -55,6 +65,16 @@ class Adapter(metaclass=ABCMeta):
     @contextmanager
     def open_api_log(self):
         api = LogAPI(self._get_vendor(), self._get_credential(), self._get_app_id())
+        yield api
+
+    @contextmanager
+    def open_api_schedule(self):
+        api = ScheduleAPI(self._get_vendor(), self._get_credential(), self._get_app_id())
+        yield api
+
+    @contextmanager
+    def open_api_notification(self):
+        api = NotificationAPI(self._get_vendor(), self._get_credential(), self._get_app_id())
         yield api
 
     def generate_sdk(self, platform):

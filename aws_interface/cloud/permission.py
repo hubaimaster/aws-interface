@@ -1,7 +1,7 @@
 from functools import wraps
 
 
-system_partitions = ['user', 'log', 'logic-function', 'files', 'session', 'webhook']
+system_partitions = ['user', 'log', 'logic-function', 'files', 'session', 'webhook', 'schedule']
 
 
 def database_can_not_access_to_item(item):
@@ -29,7 +29,9 @@ class Permission:
             cls.Run.Database,
             cls.Run.Storage,
             cls.Run.Logic,
-            cls.Run.Log
+            cls.Run.Log,
+            cls.Run.Schedule,
+            cls.Run.Notification,
         ]
         for permission_cls in permission_cls_list:
             obj = permission_cls()
@@ -127,6 +129,20 @@ class Permission:
             upload_b64 = 'run:cloud.storage.upload_b64'
             get_policy_code = 'run:cloud.storage.get_policy_code'
             put_policy = 'run:cloud.storage.put_policy'
+
+        class Schedule:
+            create_schedule = 'run:cloud.schedule.create_schedule'
+            delete_schedule = 'run:cloud.schedule.delete_schedule'
+            get_schedule = 'run:cloud.schedule.get_schedule'
+            get_schedules = 'run:cloud.schedule.get_schedules'
+
+        class Notification:
+            create_email_provider = 'run:cloud.notification.create_email_provider'
+            delete_email_provider = 'run:cloud.notification.delete_email_provider'
+            get_email_provider = 'run:cloud.notification.get_email_provider'
+            get_email_providers = 'run:cloud.notification.get_email_providers'
+            update_email_provider = 'run:cloud.notification.update_email_provider'
+            send_email = 'run:cloud.notification.send_email'
 
     default_user_permissions = [
         Run.Auth.get_me,

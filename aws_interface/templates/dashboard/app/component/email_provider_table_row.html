@@ -1,0 +1,24 @@
+{% load timetags %}
+
+{% for item in items %}
+    <tr>
+        <th scope="row">
+            {{ item.name }}
+        </th>
+        <th>
+            {{ item.description }}
+        </th>
+        <td>
+            {{ item.url }}
+        </td>
+        <td>
+            {{ item.port }}
+        </td>
+        <td>
+            {{ item.email }}
+        </td>
+        <td>
+            {{ item.creation_date|to_date }}
+        </td>
+    </tr>
+{% endfor %}

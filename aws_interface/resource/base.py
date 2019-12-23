@@ -1,6 +1,7 @@
 from abc import ABCMeta
 from concurrent.futures import ThreadPoolExecutor
 import time
+import json
 
 
 class ResourceAllocator(metaclass=ABCMeta):
@@ -344,3 +345,10 @@ class Resource(metaclass=ABCMeta):
         items, end_key = self.db_get_items_in_partition(partition, order_by, order_min, order_max, start_key, limit, reverse)
         items = [IDDict(item) for item in self._db_filter_items(statement, items)]
         return items, end_key
+
+    # Event scheduling
+    def ev_put_schedule(self, schedule_name, cron_exp, params):
+        raise NotImplementedError
+
+    def ev_delete_schedule(self, schedule_name):
+        raise NotImplementedError
