@@ -109,11 +109,11 @@ class Auth(LoginRequiredMixin, View):
                 api.detach_user_group(user_id, group_name)
             elif cmd == 'get_sessions':
                 start_key = request.POST.get('start_key', None)
-                result = api.get_sessions(start_key=start_key, limit=30)
+                result = api.get_sessions(start_key=start_key, limit=1000)
                 return JsonResponse(result)
             elif cmd == 'get_users':
-                start_key = request.POST.get('start_key', None, limit=30)
-                result = api.get_users(start_key=start_key)
+                start_key = request.POST.get('start_key', None)
+                result = api.get_users(start_key=start_key, limit=1000)
                 return JsonResponse(result)
             elif cmd == 'get_user_rows':
                 start_key = request.POST.get('start_key', None)
@@ -129,7 +129,7 @@ class Auth(LoginRequiredMixin, View):
     def _get_user_rows(self, request, app_id, start_key=None):
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_auth() as api:
-            result = api.get_users(start_key, limit=30)
+            result = api.get_users(start_key, limit=1000)
             users = result['items']
             end_key = result.get('end_key')
             user_groups = api.get_user_groups()['groups']
@@ -151,7 +151,7 @@ class Auth(LoginRequiredMixin, View):
     def _get_session_rows(self, request, app_id, start_key=None):
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_auth() as api:
-            result = api.get_sessions(start_key, limit=30)
+            result = api.get_sessions(start_key, limit=1000)
             sessions = result['items']
             end_key = result.get('end_key')
 

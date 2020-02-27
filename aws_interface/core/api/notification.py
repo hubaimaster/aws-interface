@@ -69,3 +69,13 @@ class NotificationAPI(API):
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
+
+    @lambda_method
+    def send_sms(self, message, phone_number):
+        import cloud.notification.send_sms as method
+        params = {
+            'message': message,
+            'phone_number': phone_number
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)

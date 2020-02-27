@@ -143,6 +143,7 @@ class Permission:
             get_email_providers = 'run:cloud.notification.get_email_providers'
             update_email_provider = 'run:cloud.notification.update_email_provider'
             send_email = 'run:cloud.notification.send_email'
+            send_sms = 'run:cloud.notification.send_sms'
 
     default_user_permissions = [
         Run.Auth.get_me,

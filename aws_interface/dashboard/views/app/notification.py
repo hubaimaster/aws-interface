@@ -54,5 +54,10 @@ class Notification(LoginRequiredMixin, View):
                 password = request.POST.get('email-provider-password')
                 result = notification.create_email_provider(name, description, url, port, email, password)
                 return JsonResponse(result)
+            elif cmd == 'send_sms':
+                phone_number = request.POST.get('sms-phone-number')
+                message = request.POST.get('sms-message')
+                result = notification.send_sms(message, phone_number)
+                return JsonResponse(result)
 
         return redirect(request.path_info)  # Redirect back

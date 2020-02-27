@@ -6,13 +6,15 @@ import json
 import uuid
 from decimal import Decimal
 from numbers import Number
-from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3, Events
+from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3, Events, SNS
 from resource.base import ResourceAllocator, Resource
 
 
 def encode_dict(dict_obj):
     def cast_number(v):
         if isinstance(v, dict):
+            return encode_dict(v)
+        if isinstance(v, list):
             return encode_dict(v)
         if not isinstance(v, Number):
             return v
@@ -23,6 +25,8 @@ def encode_dict(dict_obj):
 
     if isinstance(dict_obj, dict):
         return {k: cast_number(v) for k, v in dict_obj.items()}
+    elif isinstance(dict_obj, list):
+        return [cast_number(v) for v in dict_obj]
     else:
         return dict_obj
 
@@ -31,6 +35,8 @@ def decode_dict(dict_obj):
     def cast_number(v):
         if isinstance(v, dict):
             return decode_dict(v)
+        if isinstance(v, list):
+            return decode_dict(v)
         if isinstance(v, float):
             return Decimal(str(v))
         else:
@@ -38,6 +44,8 @@ def decode_dict(dict_obj):
 
     if isinstance(dict_obj, dict):
         return {k: cast_number(v) for k, v in dict_obj.items()}
+    elif isinstance(dict_obj, list):
+        return [cast_number(v) for v in dict_obj]
     else:
         return dict_obj
 
@@ -324,4 +332,9 @@ class AWSResource(Resource):
         target_ids = [target.get('Id') for target in targets]
         events.delete_rule(schedule_name)
         resp = events.delete_targets(schedule_name, target_ids)
+        return resp
+
+    def sms_send_message(self, phone_number, message):
+        sns = SNS(self.boto3_session)
+        resp = sns.send_message(phone_number, message)
         return resp

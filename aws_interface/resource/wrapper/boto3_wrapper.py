@@ -1054,3 +1054,11 @@ class Events:
             Force=True
         )
         return response
+
+
+class SNS:
+    def __init__(self, boto3_session):
+        self.client = boto3_session.client('sns', 'us-east-1')
+
+    def send_message(self, phone_number, message):
+        return self.client.publish(PhoneNumber=phone_number, Message=message)

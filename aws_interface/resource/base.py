@@ -352,3 +352,6 @@ class Resource(metaclass=ABCMeta):
 
     def ev_delete_schedule(self, schedule_name):
         raise NotImplementedError
+
+    def sms_send_message(self, phone_number, message):
+        raise NotImplementedError

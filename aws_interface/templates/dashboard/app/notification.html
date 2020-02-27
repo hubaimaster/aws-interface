@@ -126,7 +126,63 @@
                     </div>
                 </div>
             </div>
+
+
             <div class="row mt-7">
+
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col-3">
+                                    <h3 class="mb-0">
+                                        {{ _('SMS Message') }}
+                                    </h3>
+                                </div>
+
+                                <div class="col-9">
+                                    <div class="row" style="text-align: right;">
+
+                                            <div class="col-12">
+                                                <button onclick="send_sms();" class="btn btn-sm btn-primary">
+                                                    <span class="btn-inner--text" style="color: white;">{{ _('Send sms message') }}</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">{{ _('Content') }}</th>
+                                    <th scope="col">{{ _('Phone number list') }}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <textarea id="sms-message" class="form-control" rows="13" placeholder="Text message content"></textarea>
+                                    </td>
+                                    <td>
+                                        <label>Default nation code:
+                                            <input id="sms-nation-code" class="form-control" type="text" value="+82">
+                                        </label>
+                                            <textarea id="sms-phone-number-list" class="form-control" rows="10" placeholder="01012345678&#13;&#10;01098765432"></textarea>
+
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
 
             </div>
             <!-- Footer -->
@@ -160,6 +216,34 @@
                 $("#email-provider-table>table").append(rows);
             });
         }
+
+        function send_sms(){
+            const message = $("#sms-message").val();
+            const phone_number_list = $("#sms-phone-number-list").val();
+            const nation_code = $("#sms-nation-code").val();
+            $.LoadingOverlay('show');
+            const numbers = phone_number_list.split('\n');
+            var new_numbers = [];
+            for (const number of numbers){
+                if (number.startsWith('+')){
+                    new_numbers.push(number);
+                }else{
+                    new_numbers.push(nation_code + number);
+                }
+            }
+            for (const number of new_numbers){
+
+            }
+            $.post('', {
+                cmd: 'send_sms',
+                'sms-phone-number': phone_number_list,
+                'sms-message': message,
+            }, function (response) {
+                $.LoadingOverlay('hide');
+                alert(JSON.stringify(response));
+            });
+        }
+
         window.onload = function () {
             $(document).ready(function () {
                 load_more_email_providers();
