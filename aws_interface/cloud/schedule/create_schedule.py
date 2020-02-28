@@ -1,6 +1,7 @@
 
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
+from uuid import uuid4
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -47,10 +48,12 @@ def do(data, resource):
         body['error'] = error.EXISTING_SCHEDULE
         return body
 
-    message = resource.ev_put_schedule(schedule_name, schedule_expression, schedule_params)
+    schedule_relation_name = uuid4()
+    message = resource.ev_put_schedule(schedule_relation_name, schedule_expression, schedule_params)
     success = resource.db_put_item('schedule', {
         'session_id': session_id,
         'schedule_name': schedule_name,
+        'schedule_relation_name': schedule_relation_name,
         'schedule_expression': schedule_expression,
         'function_name': function_name,
         'payload': payload

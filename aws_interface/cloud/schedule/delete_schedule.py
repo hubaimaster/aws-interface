@@ -1,6 +1,6 @@
 
 from cloud.permission import Permission, NeedPermission
-
+from cloud.message.error import NO_SUCH_SCHEDULE
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -20,7 +20,15 @@ def do(data, resource):
     body = {}
     params = data['params']
     schedule_name = params.get('schedule_name')
-
-    message = resource.ev_delete_schedule(schedule_name)
-    body['message'] = message
-    return body
+    inst = [
+        {'field': 'schedule_name', 'value': schedule_name, 'option': None, 'condition': 'eq'}
+    ]
+    items, _ = resource.db_query('schedule', inst)
+    if items:
+        schedule_relation_name = items[0].get('schedule_relation_name')
+        message = resource.ev_delete_schedule(schedule_relation_name)
+        body['message'] = message
+        return body
+    else:
+        body['error'] = NO_SUCH_SCHEDULE
+        return body
