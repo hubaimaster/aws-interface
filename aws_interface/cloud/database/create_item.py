@@ -2,7 +2,7 @@
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
-
+from shortuuid import uuid
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -33,8 +33,11 @@ def do(data, resource):
     partition = params.get('partition', None)
     item = params.get('item', {})
 
+    if 'id' not in item:
+        item['id'] = uuid()
     if 'owner' not in item:
         item['owner'] = user_id
+
     item = {key: value for key, value in item.items() if value != '' and value != {} and value != []}
     # Check partition has been existed
     if resource.db_get_item(partition):
