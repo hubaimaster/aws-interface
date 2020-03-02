@@ -222,26 +222,29 @@
             const phone_number_list = $("#sms-phone-number-list").val();
             const nation_code = $("#sms-nation-code").val();
             $.LoadingOverlay('show');
-            const numbers = phone_number_list.split('\n');
+            const numbers = phone_number_list.split("\n");
             var new_numbers = [];
-            for (const number of numbers){
+            for (var number of numbers){
+                number = number.replace('\n', '');
                 if (number.startsWith('+')){
                     new_numbers.push(number);
                 }else{
                     new_numbers.push(nation_code + number);
                 }
             }
-            for (const number of new_numbers){
-
-            }
-            $.post('', {
+            new_numbers.forEach(function (number, idx) {
+                $.post('', {
                 cmd: 'send_sms',
-                'sms-phone-number': phone_number_list,
+                'sms-phone-number': number,
                 'sms-message': message,
-            }, function (response) {
-                $.LoadingOverlay('hide');
-                alert(JSON.stringify(response));
+                }, function (response) {
+                    if (idx == new_numbers.length - 1){
+                        $.LoadingOverlay('hide');
+                        alert("Complete!");
+                    }
+                });
             });
+            
         }
 
         window.onload = function () {
