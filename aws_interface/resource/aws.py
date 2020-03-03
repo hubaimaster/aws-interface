@@ -320,10 +320,10 @@ class AWSResource(Resource):
         action = 'lambda:InvokeFunction'
         principal = 'events.amazonaws.com'
         events = Events(self.boto3_session)
-        rule_response = events.put_rule(schedule_name, cron_exp)
+        rule_response = events.put_rule(str(schedule_name), cron_exp)
         rule_arn = rule_response.get('RuleArn')
         _ = lambda_client.add_permission(lambda_function_name, statement_id, action, principal, rule_arn)
-        put_target_resp = events.put_target(target_id, schedule_name, lambda_function_arn, input_json)
+        put_target_resp = events.put_target(target_id, str(schedule_name), lambda_function_arn, input_json)
         return put_target_resp
 
     def ev_delete_schedule(self, schedule_name):

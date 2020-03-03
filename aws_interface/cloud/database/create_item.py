@@ -2,7 +2,7 @@
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
-from shortuuid import uuid
+from cloud.shortuuid import uuid
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.

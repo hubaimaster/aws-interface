@@ -48,7 +48,7 @@ def do(data, resource):
         body['error'] = error.EXISTING_SCHEDULE
         return body
 
-    schedule_relation_name = uuid4()
+    schedule_relation_name = str(uuid4())
     message = resource.ev_put_schedule(schedule_relation_name, schedule_expression, schedule_params)
     success = resource.db_put_item('schedule', {
         'session_id': session_id,
