@@ -396,6 +396,227 @@
 
                                 <tr>
                                     <th scope="row">
+                                        {{ _("Google login") }}
+                                    </th>
+                                    <td>
+                                        <a href="#">cloud.auth.login_google</a>
+                                    </td>
+                                    <td>
+                                        <select id="google_default_group" class="form-control">
+                                            {% for group in user_groups %}
+                                                {% if group.name == google_login.default_group_name %}
+                                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                                {% else %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-info text-white" data-toggle="modal" data-target="#modal-google-register-policy">{{ _("Manage policy") }}</a>
+                                        <div class="modal fade" id="modal-google-register-policy" tabindex="-1" role="dialog" aria-labelledby="modal-google-register-policy" aria-hidden="true">
+                                            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title" id="modal-title-default">{{ _("Manage policy") }}</h4>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">×</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="pl-lg-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div style="height: 250px;">
+                                                                        <!-- CODE EDITOR -->
+                                                                        <style type="text/css" media="screen">
+                                                                            #google-register-policy-code {
+                                                                                margin: 0;
+                                                                                margin-top: 0px;
+                                                                                position: absolute;
+                                                                                top: 0;
+                                                                                bottom: 10px;
+                                                                                left: 0;
+                                                                                right: 0;
+                                                                            }
+                                                                        </style>
+                                                                        <pre id="google-register-policy-code">{{ google_login.register_policy_code }}</pre>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                        <button id="save-google-register-policy-btn" class="btn btn-primary" onclick="set_google_login();">{{ _("Save") }}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <label class="custom-toggle">
+                                            {% if google_login.enabled %}
+                                                <input id="google_enabled" type="checkbox" checked>
+                                            {% else %}
+                                                <input id="google_enabled" type="checkbox">
+                                            {% endif %}
+                                            <span class="custom-toggle-slider rounded-circle"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <th scope="row">
+                                        {{ _("Naver login") }}
+                                    </th>
+                                    <td>
+                                        <a href="#">cloud.auth.login_naver</a>
+                                    </td>
+                                    <td>
+                                        <select id="naver_default_group" class="form-control">
+                                            {% for group in user_groups %}
+                                                {% if group.name == naver_login.default_group_name %}
+                                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                                {% else %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-info text-white" data-toggle="modal" data-target="#modal-naver-register-policy">{{ _("Manage policy") }}</a>
+                                        <div class="modal fade" id="modal-naver-register-policy" tabindex="-1" role="dialog" aria-labelledby="modal-naver-register-policy" aria-hidden="true">
+                                            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title" id="modal-title-default">{{ _("Manage policy") }}</h4>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">×</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="pl-lg-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div style="height: 250px;">
+                                                                        <!-- CODE EDITOR -->
+                                                                        <style type="text/css" media="screen">
+                                                                            #naver-register-policy-code {
+                                                                                margin: 0;
+                                                                                margin-top: 0px;
+                                                                                position: absolute;
+                                                                                top: 0;
+                                                                                bottom: 10px;
+                                                                                left: 0;
+                                                                                right: 0;
+                                                                            }
+                                                                        </style>
+                                                                        <pre id="naver-register-policy-code">{{ naver_login.register_policy_code }}</pre>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                        <button id="save-naver-register-policy-btn" class="btn btn-primary" onclick="set_naver_login();">{{ _("Save") }}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <label class="custom-toggle">
+                                            {% if naver_login.enabled %}
+                                                <input id="naver_enabled" type="checkbox" checked>
+                                            {% else %}
+                                                <input id="naver_enabled" type="checkbox">
+                                            {% endif %}
+                                            <span class="custom-toggle-slider rounded-circle"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <th scope="row">
+                                        {{ _("Kakao login") }}
+                                    </th>
+                                    <td>
+                                        <a href="#">cloud.auth.login_kakao</a>
+                                    </td>
+                                    <td>
+                                        <select id="kakao_default_group" class="form-control">
+                                            {% for group in user_groups %}
+                                                {% if group.name == kakao_login.default_group_name %}
+                                                    <option value="{{ group.name }}" selected>{{ group.name }}</option>
+                                                {% else %}
+                                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-info text-white" data-toggle="modal" data-target="#modal-kakao-register-policy">{{ _("Manage policy") }}</a>
+                                        <div class="modal fade" id="modal-kakao-register-policy" tabindex="-1" role="dialog" aria-labelledby="modal-kakao-register-policy" aria-hidden="true">
+                                            <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h4 class="modal-title" id="modal-title-default">{{ _("Manage policy") }}</h4>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">×</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="pl-lg-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div style="height: 250px;">
+                                                                        <!-- CODE EDITOR -->
+                                                                        <style type="text/css" media="screen">
+                                                                            #kakao-register-policy-code {
+                                                                                margin: 0;
+                                                                                margin-top: 0px;
+                                                                                position: absolute;
+                                                                                top: 0;
+                                                                                bottom: 10px;
+                                                                                left: 0;
+                                                                                right: 0;
+                                                                            }
+                                                                        </style>
+                                                                        <pre id="kakao-register-policy-code">{{ kakao_login.register_policy_code }}</pre>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                        <button id="save-kakao-register-policy-btn" class="btn btn-primary" onclick="set_kakao_login();">{{ _("Save") }}</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <label class="custom-toggle">
+                                            {% if kakao_login.enabled %}
+                                                <input id="kakao_enabled" type="checkbox" checked>
+                                            {% else %}
+                                                <input id="kakao_enabled" type="checkbox">
+                                            {% endif %}
+                                            <span class="custom-toggle-slider rounded-circle"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <th scope="row">
                                         {{ _("Guest login") }}
                                     </th>
                                     <td>
@@ -656,6 +877,15 @@
         const facebook_policy_code_editor = ace.edit("facebook-register-policy-code");
         facebook_policy_code_editor.session.setMode("ace/mode/python");
 
+         const google_policy_code_editor = ace.edit("google-register-policy-code");
+         google_policy_code_editor.session.setMode("ace/mode/python");
+
+         const naver_policy_code_editor = ace.edit("naver-register-policy-code");
+         naver_policy_code_editor.session.setMode("ace/mode/python");
+
+         const kakao_policy_code_editor = ace.edit("kakao-register-policy-code");
+         kakao_policy_code_editor.session.setMode("ace/mode/python");
+
     </script>
     <script>
         var sessions_end_key = null;
@@ -690,6 +920,54 @@
 
             });
             $("#modal-facebook-register-policy").modal('hide');
+        }
+        
+        function set_google_login(){
+            var google_default_group = $("#google_default_group").val();
+            var google_enabled = $("#google_enabled").is(':checked');
+            var register_policy_code = google_policy_code_editor.getValue();
+            $.post("", {
+                cmd: "set_login_method",
+                login_method: 'google_login',
+                default_group_name: google_default_group,
+                enabled: google_enabled,
+                register_policy_code: register_policy_code,
+            }, function (data) {
+
+            });
+            $("#modal-google-register-policy").modal('hide');
+        }
+        
+        function set_naver_login(){
+            var naver_default_group = $("#naver_default_group").val();
+            var naver_enabled = $("#naver_enabled").is(':checked');
+            var register_policy_code = naver_policy_code_editor.getValue();
+            $.post("", {
+                cmd: "set_login_method",
+                login_method: 'naver_login',
+                default_group_name: naver_default_group,
+                enabled: naver_enabled,
+                register_policy_code: register_policy_code,
+            }, function (data) {
+
+            });
+            $("#modal-naver-register-policy").modal('hide');
+        }
+        
+        function set_kakao_login(){
+            var kakao_default_group = $("#kakao_default_group").val();
+            var kakao_enabled = $("#kakao_enabled").is(':checked');
+            var register_policy_code = kakao_policy_code_editor.getValue();
+            $.post("", {
+                cmd: "set_login_method",
+                login_method: 'kakao_login',
+                default_group_name: kakao_default_group,
+                enabled: kakao_enabled,
+                register_policy_code: register_policy_code,
+            }, function (data) {
+
+            });
+            $("#modal-kakao-register-policy").modal('hide');
         }
         function set_guest_login(){
             var guest_default_group = $("#guest_default_group").val();

@@ -145,3 +145,23 @@ NO_SUCH_EMAIL_PROVIDER = {
     'code': 36,
     'message': 'No such email provider'
 }
+FACEBOOK_LOGIN_INVALID = {
+    'code': 37,
+    'message': 'Facebook login invalid'
+}
+NAVER_LOGIN_INVALID = {
+    'code': 38,
+    'message': 'Naver login invalid'
+}
+KAKAO_LOGIN_INVALID = {
+    'code': 39,
+    'message': 'Kakao login invalid'
+}
+GOOGLE_LOGIN_INVALID = {
+    'code': 40,
+    'message': 'Google login invalid'
+}
+EXISTING_ACCOUNT_VIA_OTHER_LOGIN_METHOD = {
+    'code': 41,
+    'message': 'Existing account via other login method'
+}

@@ -33,6 +33,9 @@ class Auth(LoginRequiredMixin, View):
             context['email_login'] = api.get_login_method('email_login')['item']
             context['guest_login'] = api.get_login_method('guest_login')['item']
             context['facebook_login'] = api.get_login_method('facebook_login')['item']
+            context['google_login'] = api.get_login_method('google_login')['item']
+            context['naver_login'] = api.get_login_method('naver_login')['item']
+            context['kakao_login'] = api.get_login_method('kakao_login')['item']
 
             context['all_permissions'] = api.get_all_permissions()['permissions']
 

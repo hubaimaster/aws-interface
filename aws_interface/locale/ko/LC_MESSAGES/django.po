@@ -959,3 +959,13 @@ msgstr "앞서가는 기업들은 이미 사용하고 있습니다"
 #: templates/dashboard/register.html:94
 msgid "Confirm Password"
 msgstr "비밀번호 확인"
+
+msgid "Google login"
+msgstr "구글 로그인"
+
+msgid "Kakao login"
+msgstr "카카오 로그인"
+
+msgid "Naver login"
+msgstr "네이버 로그인"
+

@@ -5,7 +5,7 @@ from secrets import token_urlsafe
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.auth.get_login_method import match_policy
-from botocore.vendored.requests import get
+import urllib.request
 import json
 from cloud.auth.util import already_has_account_email
 from cloud.shortuuid import uuid
@@ -20,19 +20,35 @@ info = {
     'output_format': {
         'session_id': 'str',
     },
-    'description': 'Sign-in by access_token from facebook sdk [scopes=id,email]'
+    'description': 'Sign-in by access_token from naver login sdk'
 }
 
 
-def get_facebook_response(access_token, scopes=['id', 'email']):
-    fields = '%2C'.join(scopes)
-    url = "https://graph.facebook.com/v3.3/me?fields={}&access_token={}".format(fields, access_token)
-    response = get(url)
-    result = json.loads(response.content)
-    if result.get('error'):
-        raise Exception(result)
-
-    return result
+def get_naver_profile_response(access_token):
+    token = access_token
+    header = "Bearer " + token  # Bearer 다음에 공백 추가
+    url = "https://openapi.naver.com/v1/nid/me"
+    request = urllib.request.Request(url)
+    request.add_header("Authorization", header)
+    response = urllib.request.urlopen(request)
+    rescode = response.getcode()
+    if rescode == 200:
+        response_body = response.read()
+        response_body = response_body.decode('utf8')
+        response_body = json.loads(response_body)
+        result = response_body.get('response')
+        return result
+    # {'id': '11637256',
+    # 'nickname': '자유',
+    # 'profile_image': 'https://phinf.pstatic.net/contact/20180107_94/1515294280098yI5z4_JPEG/0.jpg',
+    # 'age': '20-29',
+    # 'gender': 'M',
+    # 'email': 'kchdully@naver.com',
+    # 'name': '김창환',
+    # 'birthday': '08-12'}
+    else:
+        print("Error Code:" + rescode)
+        return None
 
 
 def create_session(resource, user):
@@ -40,19 +56,19 @@ def create_session(resource, user):
     session_id = token_urlsafe(32)
     session_item = {
         'user_id': user_id,
-        'session_type': 'facebook_login',
+        'session_type': 'naver_login',
     }
     _ = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
     return session_id
 
 
-@NeedPermission(Permission.Run.Auth.login_facebook)
+@NeedPermission(Permission.Run.Auth.login_naver)
 def do(data, resource):
     body = {}
     params = data['params']
     user = data['user']
     access_token = params.get('access_token')
-    data['params']['login_method'] = 'facebook_login'
+    data['params']['login_method'] = 'naver_login'
     login_conf = get_login_method.do(data, resource)['item']
     default_group_name = login_conf['default_group_name']
     register_policy_code = login_conf.get('register_policy_code', None)
@@ -64,39 +80,39 @@ def do(data, resource):
         enabled = False
 
     if not enabled:
-        body['error'] = error.FACEBOOK_LOGIN_INVALID
+        body['error'] = error.NAVER_LOGIN_INVALID
         return body
 
-    extra_fb_response = get_facebook_response(access_token, ['id', 'email'])
-    fb_user_id = extra_fb_response['id']
-    fb_user_email = extra_fb_response['email']
+    extra_response = get_naver_profile_response(access_token)
+    naver_user_id = extra_response['id']
+    naver_user_email = extra_response['email']
 
     if not data.get('admin', False):
-        if not match_policy(register_policy_code, extra_fb_response, None):
+        if not match_policy(register_policy_code, extra_response, None):
             body['error'] = error.REGISTER_POLICY_VIOLATION
             return body
 
     instructions = [
-        (None, ('fb_user_id', 'eq', fb_user_id)),
-        ('and', ('login_method', 'eq', 'facebook_login')),
+        (None, ('naver_user_id', 'eq', naver_user_id)),
+        ('and', ('login_method', 'eq', 'naver_login')),
     ]
     items, end_key = resource.db_query('user', instructions)
     if items:
         session_id = create_session(resource, items[0])
         body['session_id'] = session_id
         return body
-    elif not already_has_account_email(fb_user_id, resource):  # Create new user and create session also.
+    elif not already_has_account_email(naver_user_email, resource):  # Create new user and create session also.
         item = {
             'id': uuid(),
-            'email': fb_user_email,
+            'email': naver_user_email,
             'groups': [default_group_name],
-            'login_method': 'facebook_login',
-            'fb_user_id': fb_user_id,
+            'login_method': 'naver_login',
+            'naver_user_id': naver_user_id,
         }
         # Put extra value in the item
-        for key in extra_fb_response:
+        for key in extra_response:
             if key not in item:
-                item[key] = extra_fb_response[key]
+                item[key] = extra_response[key]
         resource.db_put_item('user', item)
         session_id = create_session(resource, item)
         body['session_id'] = session_id
@@ -104,3 +120,4 @@ def do(data, resource):
     else:
         body['error'] = error.EXISTING_ACCOUNT_VIA_OTHER_LOGIN_METHOD
         return body
+

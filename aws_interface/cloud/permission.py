@@ -63,6 +63,9 @@ class Permission:
             guest = 'run:cloud.auth.guest'
             login = 'run:cloud.auth.login'
             login_facebook = 'run:cloud.auth.login_facebook'
+            login_naver = 'run:cloud.auth.login_naver'
+            login_kakao = 'run:cloud.auth.login_kakao'
+            login_google = 'run:cloud.auth.login_google'
             logout = 'run:cloud.auth.logout'
             put_user_group = 'run:cloud.auth.put_user_group'
             register = 'run:cloud.auth.register'
@@ -151,6 +154,9 @@ class Permission:
         Run.Auth.guest,
         Run.Auth.login,
         Run.Auth.login_facebook,
+        Run.Auth.login_google,
+        Run.Auth.login_naver,
+        Run.Auth.login_kakao,
         Run.Auth.logout,
         Run.Auth.register,
         Run.Auth.set_me,
@@ -181,6 +187,9 @@ class Permission:
         Run.Auth.guest,
         Run.Auth.login,
         Run.Auth.login_facebook,
+        Run.Auth.login_google,
+        Run.Auth.login_naver,
+        Run.Auth.login_kakao,
         Run.Auth.logout,
         Run.Auth.register,
         Run.Auth.set_me,

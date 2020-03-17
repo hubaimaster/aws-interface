@@ -42,6 +42,15 @@ def get_default_policy_code(mode):
     elif mode == 'facebook_login':
         import cloud.auth.policy.register_facebook as source
         policy_code = inspect.getsource(source)
+    elif mode == 'google_login':
+        import cloud.auth.policy.register_google as source
+        policy_code = inspect.getsource(source)
+    elif mode == 'naver_login':
+        import cloud.auth.policy.register_naver as source
+        policy_code = inspect.getsource(source)
+    elif mode == 'kakao_login':
+        import cloud.auth.policy.register_kakao as source
+        policy_code = inspect.getsource(source)
     else:
         raise BaseException('No such policy code mode: [{}]'.format(mode))
     return policy_code
