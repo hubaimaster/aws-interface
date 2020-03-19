@@ -97,6 +97,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.notification.get_email_provider',
     'cloud.notification.get_email_providers',
     'cloud.notification.send_email',
+    'cloud.notification.send_sms',
     'cloud.notification.update_email_provider',
 }
 

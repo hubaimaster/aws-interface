@@ -1,6 +1,7 @@
 branch-defaults:
   default:
     environment: aws-interface
+    group_suffix: null
 environment-defaults:
   aws-interface-dev:
     branch: null
