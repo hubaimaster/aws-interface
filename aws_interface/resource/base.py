@@ -308,7 +308,7 @@ class Resource(metaclass=ABCMeta):
                 if value != item_value:
                     yield item
             elif condition == 'in':
-                if value in item_value:
+                if item_value and value in item_value:
                     yield item
             elif condition == 'gt':
                 if isinstance(item_value, str):
