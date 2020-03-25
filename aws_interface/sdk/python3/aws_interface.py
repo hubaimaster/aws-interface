@@ -31,7 +31,7 @@ class Client(object):
                 with open(filename, 'w+') as fp:
                     fp.write(self.session_id)
         except Exception as ex:
-            print(ex)
+            pass
 
     def load_session(self, filename=SESSION_FILE):
         try:

@@ -66,6 +66,7 @@ def do(data, resource):
             'email': email,
             'groups': [default_group_name],
             'login_method': 'guest_login',
+            'name': 'Guest'
         }
         resource.db_put_item('user', item, item_id=guest_id)
         session_id = put_guest_session(resource, guest_id)

@@ -5,7 +5,7 @@ from secrets import token_urlsafe
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.auth.get_login_method import match_policy
-from botocore.vendored.requests import get
+from requests import get
 import json
 from cloud.auth.util import already_has_account_email
 from cloud.shortuuid import uuid
@@ -67,12 +67,12 @@ def do(data, resource):
         body['error'] = error.FACEBOOK_LOGIN_INVALID
         return body
 
-    extra_fb_response = get_facebook_response(access_token, ['id', 'email'])
-    fb_user_id = extra_fb_response['id']
-    fb_user_email = extra_fb_response['email']
+    extra_response = get_facebook_response(access_token, ['id', 'email'])
+    fb_user_id = extra_response['id']
+    fb_user_email = extra_response['email']
 
     if not data.get('admin', False):
-        if not match_policy(register_policy_code, extra_fb_response, None):
+        if not match_policy(register_policy_code, extra_response, None):
             body['error'] = error.REGISTER_POLICY_VIOLATION
             return body
 
@@ -84,6 +84,7 @@ def do(data, resource):
     if items:
         session_id = create_session(resource, items[0])
         body['session_id'] = session_id
+        body['is_first_login'] = False
         return body
     elif not already_has_account_email(fb_user_id, resource):  # Create new user and create session also.
         item = {
@@ -94,12 +95,18 @@ def do(data, resource):
             'fb_user_id': fb_user_id,
         }
         # Put extra value in the item
-        for key in extra_fb_response:
+        key_map = {'name': 'name',
+                   'picture': 'profile_image'}
+        for key in extra_response:
             if key not in item:
-                item[key] = extra_fb_response[key]
+                if key in key_map:
+                    item[key_map[key]] = extra_response[key]
+                else:
+                    item[key] = extra_response[key]
         resource.db_put_item('user', item)
         session_id = create_session(resource, item)
         body['session_id'] = session_id
+        body['is_first_login'] = True
         return body
     else:
         body['error'] = error.EXISTING_ACCOUNT_VIA_OTHER_LOGIN_METHOD

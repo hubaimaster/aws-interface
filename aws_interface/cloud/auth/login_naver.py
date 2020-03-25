@@ -100,6 +100,7 @@ def do(data, resource):
     if items:
         session_id = create_session(resource, items[0])
         body['session_id'] = session_id
+        body['is_first_login'] = False
         return body
     elif not already_has_account_email(naver_user_email, resource):  # Create new user and create session also.
         item = {
@@ -110,12 +111,18 @@ def do(data, resource):
             'naver_user_id': naver_user_id,
         }
         # Put extra value in the item
+        key_map = {'nickname': 'name',
+                   'profile_image': 'profile_image'}
         for key in extra_response:
             if key not in item:
-                item[key] = extra_response[key]
+                if key in key_map:
+                    item[key_map[key]] = extra_response[key]
+                else:
+                    item[key] = extra_response[key]
         resource.db_put_item('user', item)
         session_id = create_session(resource, item)
         body['session_id'] = session_id
+        body['is_first_login'] = True
         return body
     else:
         body['error'] = error.EXISTING_ACCOUNT_VIA_OTHER_LOGIN_METHOD

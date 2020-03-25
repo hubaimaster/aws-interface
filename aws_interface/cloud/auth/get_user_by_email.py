@@ -37,3 +37,6 @@ def do(data, resource):
     elif user.get('id', None):
         body['item'] = user
         return body
+    else:
+        body['item'] = None
+        return body
