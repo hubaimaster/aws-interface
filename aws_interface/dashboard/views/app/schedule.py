@@ -22,11 +22,7 @@ class Schedule(LoginRequiredMixin, View):
         with adapter.open_api_auth() as auth_api, adapter.open_api_logic() as logic_api:
             context['user_groups'] = auth_api.get_user_groups()['groups']
             context['functions'] = logic_api.get_functions()['items']
-            context['function_tests'] = logic_api.get_function_tests()['items']
-            webhooks = logic_api.get_webhooks()['items']
-            for webhook in webhooks:
-                webhook['url'] = logic_api.get_webhook_url(webhook['name'])['url']
-            context['webhooks'] = webhooks
+
         return render(request, 'dashboard/app/schedule.html', context=context)
 
     def post(self, request, app_id):
@@ -34,8 +30,19 @@ class Schedule(LoginRequiredMixin, View):
         context['app_id'] = app_id
         cmd = request.POST.get('cmd', None)
         adapter = DjangoAdapter(app_id, request)
-        with adapter.open_api_logic() as api:
-            if cmd == 'create_email_provider':
-                api.create_email_provider()
-
-        return redirect(request.path_info)  # Redirect back
+        with adapter.open_api_schedule() as schedule_api:
+            if cmd == 'get_schedules':
+                start_key = request.POST.get('start_key', None)
+                return JsonResponse(schedule_api.get_schedules(start_key))
+            elif cmd == 'create_schedule':
+                schedule_name = request.POST.get('schedule_name')
+                schedule_expression = request.POST.get('schedule_expression')
+                function_name = request.POST.get('function_name')
+                payload = request.POST.get
+                return JsonResponse(schedule_api.create_schedule(schedule_name, schedule_expression, function_name, payload))
+            elif cmd == 'schedule_name':
+                schedule_name = request.POST.get('schedule_name')
+                return JsonResponse(schedule_api.delete_schedule(schedule_name))
+            elif cmd == 'get_schedule':
+                schedule_name = request.POST.get('schedule_name')
+                return JsonResponse(schedule_api.get_schedule(schedule_name))

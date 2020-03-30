@@ -108,7 +108,7 @@ def do(data, resource):
                   "            resp = {}({}, {})\n".format(function_method, payload, json.loads(json.dumps(user))) +\
                   "        except Exception as e:\n" +\
                   "            error = traceback.format_exc()\n" +\
-                  '    print(json.dumps({\"response\": resp, \"stdout\": std_str.getvalue(), \"error\": error}))\n'
+                  '    print(json.dumps({\"response\": resp, \"stdout\": std_str.getvalue(), \"error\": error}, default=lambda o: \"<not serializable>\"))\n'
 
         with open(virtual_handler_path, 'w+') as vh:
             vh.write(vh_code)
@@ -134,6 +134,5 @@ def do(data, resource):
             'params': params,
             'body': body,
         }), 'logic')
-
         return body
 

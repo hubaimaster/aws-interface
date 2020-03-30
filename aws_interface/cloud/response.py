@@ -18,7 +18,7 @@ class AWSResponse(dict):
         self['statusCode'] = status_code
         self['headers'] = headers
         if isinstance(body, dict):
-            self['body'] = json.dumps(body)
+            self['body'] = json.dumps(body, default=lambda o: '<not serializable>')
         else:
             self['body'] = body
         self['isBase64Encoded'] = False

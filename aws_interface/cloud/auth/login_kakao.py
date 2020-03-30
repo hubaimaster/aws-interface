@@ -79,6 +79,7 @@ def create_session(resource, user):
         'user_id': user_id,
         'session_type': 'kakao_login',
     }
+
     _ = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
     return session_id
 

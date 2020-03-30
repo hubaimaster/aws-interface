@@ -43,6 +43,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.auth.put_user_group',
     'cloud.auth.register',
     'cloud.auth.register_admin',
+    'cloud.auth.delete_my_membership',
     # 'cloud.auth.set_email_login',
     # 'cloud.auth.set_guest_login',
     'cloud.auth.set_me',

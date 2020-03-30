@@ -36,8 +36,8 @@ class Client(object):
     def load_session(self, filename=SESSION_FILE):
         try:
             with open(filename, 'r') as fp:
-                session_id = fp.read()
-                if session_id:
+                if not self.session_id:
+                    session_id = fp.read()
                     self.session_id = session_id
         except Exception as ex:
             print(ex)

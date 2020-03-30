@@ -5,7 +5,9 @@ from cloud.permission import Permission, NeedPermission
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'start_key?': 'str'
+        'start_key?': 'str',
+        'limit?': 'int',
+        'show_system_user?': 'bool'
     },
     'output_format': {
         'items': [{
@@ -30,9 +32,20 @@ def do(data, resource):
 
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
-    partition = 'user'
+    show_system_user = params.get('show_system_user', False)
 
-    items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit, reverse=True)
+    partition = 'user'
+    if show_system_user:
+        query = []
+    else:
+        query = [{
+            'condition': 'nin',
+            'field': 'email',
+            'value': '@system.com',
+            'option': 'or'
+        }]
+
+    items, end_key = resource.db_query(partition, query, start_key=start_key, limit=limit, reverse=True)
     body['items'] = items
     body['end_key'] = end_key
     return body

@@ -77,6 +77,7 @@ class Permission:
             change_password = 'run:cloud.auth.change_password'
             change_password_admin = 'run:cloud.auth.change_password_admin'
             find_password = 'run:cloud.auth.find_password'
+            delete_my_membership = 'run:cloud.auth.delete_my_membership'
 
         class Database:
             create_item = 'run:cloud.database.create_item'
@@ -161,6 +162,7 @@ class Permission:
         Run.Auth.register,
         Run.Auth.set_me,
         Run.Auth.get_login_method,
+        Run.Auth.delete_my_membership,
 
         Run.Database.create_item,
         Run.Database.delete_item,

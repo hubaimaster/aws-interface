@@ -6,20 +6,20 @@ from cloud.permission import Permission, NeedPermission
 info = {
     'input_format': {
         'session_id': 'str',
-        'user_id': 'str',
     },
     'output_format': {
         'success': 'bool'
     },
-    'description': 'Delete user and delete session'
+    'description': 'Delete my membership'
 }
 
 
-@NeedPermission(Permission.Run.Auth.delete_user)
+@NeedPermission(Permission.Run.Auth.delete_my_membership)
 def do(data, resource):
     body = {}
     params = data['params']
-    user_id = params.get('user_id', None)
+    user = data['user']
+    user_id = user.get('id')
     success = resource.db_delete_item(user_id)
     body['success'] = success
     return body

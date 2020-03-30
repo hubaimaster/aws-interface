@@ -22,7 +22,9 @@ def do(data, resource):
     params = data['params']
 
     session_id = params.get('session_id', None)
-    if resource.db_delete_item(Hash.sha3_512(session_id)):
+    item = resource.db_get_item(Hash.sha3_512(session_id))
+
+    if item and resource.db_delete_item(Hash.sha3_512(session_id)):
         body['success'] = True
         return body
     else:
