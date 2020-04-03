@@ -91,6 +91,15 @@ class Resource(metaclass=ABCMeta):
     def db_get_items(self, item_ids):
         raise NotImplementedError
 
+    def db_create_sort_index(self, sort_key, sort_key_type):
+        """
+        Create sort index table
+        :param sort_key: str ('creation_date', 'score', ...)
+        :param sort_key_type: 'N' | 'S'
+        :return:
+        """
+        raise NotImplementedError
+
     def db_get_items_in_partition(self, partition, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=None, reverse=False):
         """
         :param partition:

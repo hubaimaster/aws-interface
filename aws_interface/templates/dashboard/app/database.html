@@ -79,7 +79,93 @@
                 </div>
             {% endif %}
 
+             <div class="row mt-4">
+                    <div class="col-xl-12 mb-5 mb-xl-0">
+                        <div class="card shadow">
+                            <div class="card-header border-1">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <h4 class="mb-0">
+                                            {{ _("Sort indexes") }} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ _("The system can use fast sort indexing.") }}"></i>
+                                        </h4>
+                                    </div>
+                                    <div class="col text-right align-items-right">
+                                        <button class="btn btn-sm btn-primary"  data-toggle="modal" data-target="#modal-create-sort-index">Create sort index</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div>
+                                <div class="table-responsive">
+                            <!-- Projects table -->
+                                    <table class="table align-items-center table-flush">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th scope="col">{{ _("Sort key") }}</th>
+                                                <th scope="col">{{ _("Sort key type") }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for sort_key_index in sort_key_indexes %}
+                                            <tr>
+                                                <th>{{ sort_key_index.sort_key }}</th>
+                                                <th>{{ sort_key_index.sort_key_type }}</th>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             <div class="row mt-4">
+
+            <div class="modal fade" id="modal-create-sort-index" tabindex="-1" role="dialog" aria-labelledby="modal-create-sort-index" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Create sort index") }}</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="pl-lg-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label">{{ _("Sort key") }}</label>
+                                                                <input id="sort_key" type="text" class="form-control form-control-alternative" placeholder="{{ _("Sort key name") }}">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label">{{ _("Sort key type") }}</label>
+                                                                <select id="sort_key_type" class="form-control form-control-alternative">
+                                                                    <option value="N">Number (N)</option>
+                                                                    <option value="S">String (S)</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <p>
+                                                    {{ _("Click confirm button to create sort index") }} </br>
+                                                    {{ _("The system can query database with sorting using sort key") }}
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                <button id="create-sort-index-btn" class="btn btn-primary">{{ _("Confirm") }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                 <div class="col-xl-12 mb-5 mb-xl-0">
                     <div class="card shadow">
                         <div class="card-body" style="padding-top: 0px; padding-left: 15px; padding-right: 15px; padding-bottom: 0px;">
@@ -813,6 +899,21 @@
             }
             delete_fields(item_id, item_ids);
         }
+        function create_sort_index() {
+            $.LoadingOverlay('show', {
+                text:'Creation...'
+            });
+            var sort_key = $("#sort_key").val();
+            var sort_key_type = $("#sort_key_type").val();
+            $.post("", {
+                'cmd': 'create_sort_index',
+                'sort_key': sort_key,
+                'sort_key_type': sort_key_type
+            }, function (data) {
+                $.LoadingOverlay('hide');
+                window.location.reload();
+            });
+        }
 
     </script>
 
@@ -906,6 +1007,9 @@
             });
             $(document).ready(function () {
                 set_policy_mode('create');
+            });
+            $("#create-sort-index-btn").click(function () {
+                create_sort_index();
             });
         }
     </script>

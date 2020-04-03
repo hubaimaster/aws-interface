@@ -288,6 +288,13 @@ class AWSResource(Resource):
             end_key = json.dumps(encode_dict(end_key))
         return item_id_and_creation_date_list, end_key
 
+    def db_create_sort_index(self, sort_key, sort_key_type):
+        if sort_key_type not in ['N', 'S']:
+            raise Exception("sort_key_type must be 'N' or 'S'")
+        dynamo = DynamoDB(self.boto3_session)
+        result = dynamo.create_table(self.app_id, sort_key, sort_key_type)
+        return result
+
     # File ops
     def file_download_bin(self, file_id):
         s3 = S3(self.boto3_session)

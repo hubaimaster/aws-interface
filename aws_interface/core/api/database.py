@@ -156,3 +156,20 @@ class DatabaseAPI(API):
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
+
+    @lambda_method
+    def create_sort_index(self, sort_key, sort_key_type):
+        import cloud.database.create_sort_index as method
+        params = {
+            'sort_key': sort_key,
+            'sort_key_type': sort_key_type
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_sort_indexes(self):
+        import cloud.database.get_sort_indexes as method
+        params = {}
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)

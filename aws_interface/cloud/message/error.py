@@ -165,3 +165,7 @@ EXISTING_ACCOUNT_VIA_OTHER_LOGIN_METHOD = {
     'code': 41,
     'message': 'Existing account via other login method'
 }
+EXISTING_SORT_KEY = {
+    'code': 42,
+    'message': 'Existing sort index key'
+}

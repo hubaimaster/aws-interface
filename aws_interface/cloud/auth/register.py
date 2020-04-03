@@ -35,6 +35,7 @@ def do(data, resource):
     email = params['email']
     password = params['password']
     extra = params.get('extra', {})
+    extra = {key: value for key, value in extra.items() if value != '' and value != {} and value != []}
 
     salt = Salt.get_salt(32)
     password_hash = hash_password(password, salt)

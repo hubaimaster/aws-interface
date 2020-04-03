@@ -1,7 +1,7 @@
 from functools import wraps
 
 
-system_partitions = ['user', 'log', 'logic-function', 'files', 'session', 'webhook', 'schedule']
+system_partitions = ['user', 'log', 'logic-function', 'files', 'session', 'webhook', 'schedule', 'sort_key']
 
 
 def database_can_not_access_to_item(item):
@@ -78,6 +78,7 @@ class Permission:
             change_password_admin = 'run:cloud.auth.change_password_admin'
             find_password = 'run:cloud.auth.find_password'
             delete_my_membership = 'run:cloud.auth.delete_my_membership'
+            refresh_session = 'run:cloud.auth.refresh_session'
 
         class Database:
             create_item = 'run:cloud.database.create_item'
@@ -95,6 +96,8 @@ class Permission:
             put_policy = 'run:cloud.database.put_policy'
             query_items = 'run:cloud.database.query_items'
             update_item = 'run:cloud.database.update_item'
+            create_sort_index = 'run:cloud.database.create_sort_index'
+            get_sort_indexes = 'run:cloud.database.get_sort_indexes'
 
         class Log:
             create_log = 'run:cloud.log.create_log'
@@ -163,6 +166,7 @@ class Permission:
         Run.Auth.set_me,
         Run.Auth.get_login_method,
         Run.Auth.delete_my_membership,
+        Run.Auth.refresh_session,
 
         Run.Database.create_item,
         Run.Database.delete_item,

@@ -5,6 +5,7 @@ import botocore
 
 from boto3.dynamodb.conditions import Key, GreaterThanEquals, LessThanEquals
 from boto3.dynamodb.types import TypeDeserializer
+
 from sys import maxsize
 from decimal import Decimal
 import cloud.shortuuid as shortuuid
@@ -331,7 +332,7 @@ class DynamoDB:
     def init_table(self, table_name):
         self.create_table(table_name)
 
-    def create_table(self, table_name):
+    def create_table(self, table_name, sort_key='creation_date', sort_key_type='N'):
         try:
             response = self.client.create_table(
                 AttributeDefinitions=[
@@ -345,8 +346,8 @@ class DynamoDB:
                         'AttributeName': 'inverted_query',
                         'AttributeType': 'S'
                     }, {
-                        'AttributeName': 'creation_date',
-                        'AttributeType': 'N'
+                        'AttributeName': sort_key,
+                        'AttributeType': sort_key_type
                     }
                 ],
                 TableName=table_name,
@@ -363,13 +364,13 @@ class DynamoDB:
                 },
                 GlobalSecondaryIndexes=[
                     {
-                        'IndexName': 'partition-creation_date',
+                        'IndexName': 'partition-{}'.format(sort_key),
                         'KeySchema': [
                             {
                                 'AttributeName': 'partition',
                                 'KeyType': 'HASH'
                             }, {
-                                'AttributeName': 'creation_date',
+                                'AttributeName': '{}'.format(sort_key),
                                 'KeyType': 'RANGE'
                             },
                         ],
@@ -377,13 +378,13 @@ class DynamoDB:
                             'ProjectionType': 'ALL'
                         }
                     }, {
-                        'IndexName': 'inverted_query-creation_date',
+                        'IndexName': 'inverted_query-{}'.format(sort_key),
                         'KeySchema': [
                             {
                                 'AttributeName': 'inverted_query',
                                 'KeyType': 'HASH'
                             }, {
-                                'AttributeName': 'creation_date',
+                                'AttributeName': sort_key,
                                 'KeyType': 'RANGE'
                             },
                         ],
@@ -398,11 +399,18 @@ class DynamoDB:
             return response
         except Exception as ex:
             print(ex)
-            self.update_table(table_name, {'hash_key': 'partition', 'hash_key_type': 'S',
-                                           'sort_key': 'creation_date', 'sort_key_type': 'N'})
-            self.update_table(table_name, {'hash_key': 'inverted_query', 'hash_key_type': 'S',
-                                           'sort_key': 'creation_date', 'sort_key_type': 'N'})
-            return None
+            try:
+                self.update_table(table_name, {'hash_key': 'inverted_query', 'hash_key_type': 'S',
+                                               'sort_key': sort_key, 'sort_key_type': sort_key_type})
+            except Exception as ex:
+                print(ex)
+            try:
+                self.update_table(table_name, {'hash_key': 'partition', 'hash_key_type': 'S',
+                                               'sort_key': sort_key, 'sort_key_type': sort_key_type})
+            except Exception as ex:
+                print(ex)
+
+            return True
 
     def update_table(self, table_name, index):
         attr_updates = []
@@ -447,16 +455,20 @@ class DynamoDB:
             }
             attr_updates.append(sort_key_update)
 
-        while True:
-            try:
-                response = self.client.update_table(
-                    AttributeDefinitions=attr_updates,
-                    TableName=table_name,
-                    GlobalSecondaryIndexUpdates=index_updates
-                )
-                return response
-            except Exception as e:
-                print(e)
+        try:
+            response = self.client.update_table(
+                AttributeDefinitions=attr_updates,
+                TableName=table_name,
+                GlobalSecondaryIndexUpdates=index_updates
+            )
+            return response
+        except Exception as e:
+            if "LimitExceededException" in str(e):
+                print("Error while creating index:" + str(e) + ", RE-TRY AFTER 60 SECONDS")
+                time.sleep(60)
+                # TODO Sleep 대신 스택이나 큐에 등록해놓고 시도.. 대기열
+                return self.update_table(table_name, index)
+            else:
                 return e
 
     def delete_table(self, name):
@@ -596,7 +608,9 @@ class DynamoDB:
                                                           reverse)
             except Exception as ex:
                 print(ex)
-                response = {'Items': []}
+                response = {
+                    'Items': []
+                }
             return response
         else:
             raise BaseException('an operation is must be <in> or <eq>')

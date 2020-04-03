@@ -21,6 +21,7 @@ class Database(LoginRequiredMixin, View):
         allocate_resource_in_background(adapter)
         with adapter.open_api_auth() as auth_api, adapter.open_api_database() as database_api:
             partitions = database_api.get_partitions().get('items', [])
+            sort_indexes = database_api.get_sort_indexes().get('items', [])
             partition_dict = {}
             for partition in partitions:
                 name = partition['name']
@@ -33,6 +34,8 @@ class Database(LoginRequiredMixin, View):
 
             context['user_groups'] = auth_api.get_user_groups()['groups']
             context['partitions'] = partitions
+            context['sort_key_indexes'] = sort_indexes
+            print("sort_indexes", sort_indexes)
 
         return render(request, 'dashboard/app/database.html', context=context)
 
@@ -123,6 +126,14 @@ class Database(LoginRequiredMixin, View):
                 mode = request.POST.get('mode')
                 code = request.POST.get('code')
                 result = database_api.put_policy(partition_to_apply, mode, code)
+                return JsonResponse(result)
+            elif cmd == 'get_sort_indexes':
+                result = database_api.get_sort_indexes()
+                return JsonResponse(result)
+            elif cmd == 'create_sort_index':
+                sort_key = request.POST.get('sort_key')
+                sort_key_type = request.POST.get('sort_key_type')
+                result = database_api.create_sort_index(sort_key, sort_key_type)
                 return JsonResponse(result)
 
         return redirect(request.path_info)  # Redirect back

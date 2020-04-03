@@ -14,6 +14,7 @@ info = {
         'start_key': 'dict',
         'limit': 'int=100',
         'reverse': 'bool=False',
+        'sort_key': 'str="creation_date"'
     },
     'output_format': {
         'items?': [
@@ -28,6 +29,8 @@ info = {
     'description': 'Query items'
 }
 
+DEFAULT_SORT_KEY = 'creation_date'
+
 
 @NeedPermission(Permission.Run.Database.query_items)
 def do(data, resource):
@@ -40,12 +43,13 @@ def do(data, resource):
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
     reverse = params.get('reverse', False)
+    sort_key = params.get('sort_key', DEFAULT_SORT_KEY)
 
     if type(start_key) is str:
         start_key = json.loads(start_key)
 
     if resource.db_get_item(partition):
-        items, end_key = resource.db_query(partition, query_instructions, start_key, limit, reverse)
+        items, end_key = resource.db_query(partition, query_instructions, start_key, limit, reverse, order_by=sort_key)
         policy_code = get_policy_code(resource, partition, 'read')
         filtered = []
         for item in items:
