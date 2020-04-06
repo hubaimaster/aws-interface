@@ -107,6 +107,7 @@ def do(data, resource):
 
     extra_response = get_kakao_profile_response(access_token)
     kakao_user_id = extra_response['id']
+    print("extra_response", extra_response)
     kakao_user_email = extra_response['kakao_account']['email']
 
     if not data.get('admin', False):
