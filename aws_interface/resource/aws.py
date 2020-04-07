@@ -335,10 +335,18 @@ class AWSResource(Resource):
 
     def ev_delete_schedule(self, schedule_name):
         events = Events(self.boto3_session)
-        targets = events.get_targets(schedule_name).get('Targets', [])
+        resp = events.get_targets(schedule_name)
+        targets = resp.get('Targets', [])
+        next_token = resp.get('NextToken', None)
+        while next_token:
+            resp = events.get_targets(schedule_name)
+            targets.extend(resp.get('Targets', []))
+            next_token = resp.get('NextToken', None)
+
         target_ids = [target.get('Id') for target in targets]
-        events.delete_rule(schedule_name)
+
         resp = events.delete_targets(schedule_name, target_ids)
+        resp = events.delete_rule(schedule_name)
         return resp
 
     def sms_send_message(self, phone_number, message):

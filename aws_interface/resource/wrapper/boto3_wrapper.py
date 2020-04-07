@@ -1045,12 +1045,12 @@ class Events:
             response = self.client.list_targets_by_rule(
                 Rule=rule_name,
                 NextToken=next_token,
-                Limit=1000
+                Limit=100
             )
         else:
             response = self.client.list_targets_by_rule(
                 Rule=rule_name,
-                Limit=1000
+                Limit=100
             )
         return response
 

@@ -9,9 +9,8 @@ info = {
         'start_key': 'str?'
     },
     'output_format': {
-        'item': {
-            '...': '...'
-        },
+        'items': 'list',
+        'end_key': 'str'
     },
     'description': 'Get all list of schedules.'
 }
