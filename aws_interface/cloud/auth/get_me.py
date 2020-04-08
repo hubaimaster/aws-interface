@@ -29,12 +29,15 @@ def do(data, resource):
     params = data['params']
     session_id = params.get('session_id', None)
     try:
-        item = resource.db_get_item(Hash.sha3_512(session_id))
+        if session_id:
+            item = resource.db_get_item(Hash.sha3_512(session_id))
+        else:
+            item = None
     except BaseException as ex:
-        print(ex)
-        body['error'] = error.PERMISSION_DENIED
+        body['exception'] = str(ex)
+        body['error'] = error.INVALID_SESSION
         return body
-    print('session_item:', item)
+
     if item:
         user_id = item.get('user_id', None)
     else:

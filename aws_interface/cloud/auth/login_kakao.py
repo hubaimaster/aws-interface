@@ -107,8 +107,8 @@ def do(data, resource):
 
     extra_response = get_kakao_profile_response(access_token)
     kakao_user_id = extra_response['id']
-    print("extra_response", extra_response)
     kakao_user_email = extra_response['kakao_account']['email']
+    name = extra_response['kakao_account'].get('profile', {}).get('nickname', None)
 
     if not data.get('admin', False):
         if not match_policy(register_policy_code, extra_response, None):
@@ -132,6 +132,7 @@ def do(data, resource):
             'groups': [default_group_name],
             'login_method': 'kakao_login',
             'kakao_user_id': kakao_user_id,
+            'name': name
         }
         # Put extra value in the item
         key_map = {'nickname': 'name',
@@ -142,7 +143,7 @@ def do(data, resource):
                     item[key_map[key]] = extra_response[key]
                 else:
                     item[key] = extra_response[key]
-        resource.db_put_item('user', item)
+        resource.db_put_item('user', item, item.get('id'))
         session_id = create_session(resource, item)
         body['session_id'] = session_id
         body['is_first_login'] = True

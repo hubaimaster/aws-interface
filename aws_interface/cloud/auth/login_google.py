@@ -124,7 +124,7 @@ def do(data, resource):
                     item[key_map[key]] = extra_response[key]
                 else:
                     item[key] = extra_response[key]
-        resource.db_put_item('user', item)
+        resource.db_put_item('user', item, item.get('id'))
         session_id = create_session(resource, item)
         body['session_id'] = session_id
         body['is_first_login'] = True

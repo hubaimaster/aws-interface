@@ -529,6 +529,8 @@ class DynamoDB:
         return Decimal("%.20f" % time.time())
 
     def put_item(self, table_name, partition, item, item_id=None, creation_date=None, indexing=True):
+        if 'id' in item:
+            item_id = item.get('id')
         if item_id:
             response = self.get_item(table_name, item_id=item_id)
             if 'Item' in response:
