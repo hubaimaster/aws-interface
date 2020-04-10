@@ -10,7 +10,7 @@ info = {
     },
     'output_format': {
         'items': 'list',
-        'email_providers_end_key': 'str'
+        'end_key': 'str'
     },
     'description': 'Get all list of schedules.'
 }
@@ -24,5 +24,5 @@ def do(data, resource):
     inst = []
     items, end_key = resource.db_query('schedule', inst, start_key=start_key)
     body['items'] = items
-    body['email_providers_end_key'] = end_key
+    body['end_key'] = end_key
     return body

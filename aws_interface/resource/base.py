@@ -150,7 +150,7 @@ class Resource(metaclass=ABCMeta):
         raise NotImplementedError
 
     # SHOULD NOT RE-IMPLEMENT
-    def db_query(self, partition, instructions, start_key=None, limit=100, reverse=False, order_by='creation_date'):
+    def db_query(self, partition, instructions=None, start_key=None, limit=100, reverse=False, order_by='creation_date'):
         """:return:items:list,end_key:str"""
         # TODO 상위레이어에서 쿼리를 순차적으로 실행가능한 instructions 으로 만들어 전달 -> ORM 클래스 만들기
         if not instructions:

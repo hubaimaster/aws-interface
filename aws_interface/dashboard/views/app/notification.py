@@ -36,13 +36,13 @@ class Notification(LoginRequiredMixin, View):
                 result = notification.get_email_providers(start_key)
                 template = loader.get_template('dashboard/app/component/email_provider_table_row.html')
                 items = result.get('items', [])
-                end_key = result.get('email_providers_end_key', None)
+                end_key = result.get('end_key', None)
                 context = {
                     'items': items,
                 }
                 result = {
                     'rows': template.render(context, request),
-                    'email_providers_end_key': end_key
+                    'end_key': end_key
                 }
                 return JsonResponse(result)
             elif cmd == 'get_slack_webhook_rows':

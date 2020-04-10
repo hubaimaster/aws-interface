@@ -31,7 +31,7 @@ class Log(LoginRequiredMixin, View):
 
         with adapter.open_api_log() as log:
             log_result = log.get_logs(event_source, event_name, event_param, user_id)
-            context['logs'], context['email_providers_end_key'] = log_result['items'], log_result['email_providers_end_key']
+            context['logs'], context['end_key'] = log_result['items'], log_result['end_key']
             return render(request, 'dashboard/app/log.html', context=context)
 
     def post(self, request, app_id):
@@ -56,12 +56,12 @@ class Log(LoginRequiredMixin, View):
                 result = log.get_logs(event_source, event_name, event_param, user_id, start_key, reverse=True)
                 template = loader.get_template('dashboard/app/component/log_table_row.html')
                 items = result.get('items', [])
-                end_key = result.get('email_providers_end_key', None)
+                end_key = result.get('end_key', None)
                 context = {
                     'items': items,
                 }
                 result = {
                     'rows': template.render(context, request),
-                    'email_providers_end_key': end_key
+                    'end_key': end_key
                 }
                 return JsonResponse(result)

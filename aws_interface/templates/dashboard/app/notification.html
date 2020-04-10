@@ -128,6 +128,180 @@
             </div>
 
 
+
+            <div class="row mt-7">
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col-3">
+                                    <h3 class="mb-0">
+                                        {{ _('Slack webhooks') }}
+                                    </h3>
+                                </div>
+
+                                <div class="col-9">
+                                    <div class="row" style="text-align: right;">
+
+                                            <div class="col-12">
+                                                <button data-toggle="modal" data-target="#modal-create-slack-webhook" class="btn btn-sm btn-primary">
+                                                    <span class="btn-inner--text" style="color: white;">{{ _('Create slack webhook') }}</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div id="slack-webhook-table" class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">name</th>
+                                    <th scope="col">webhook_url</th>
+                                    <th scope="col">creationDate</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="modal fade" id="modal-create-slack-webhook" tabindex="-1" role="dialog" aria-labelledby="modal-create-slack-webhook" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Create slack webhook") }}</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <form method="post">{% csrf_token %}
+                                                <input name="cmd" value="create_slack_webhook" hidden>
+                                                <div class="modal-body">
+                                                    <div class="pl-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="slack-webhook-name">{{ _("Name") }}</label>
+                                                                    <input id="slack-webhook-name" name="slack-webhook-name" type="text" class="form-control form-control-alternative" placeholder="{{ _("Slack webhook name") }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="email-provider-url">{{ _("Webhook Url") }}</label>
+                                                                    <input id="email-slack-webhook-url" name="slack-webhook-url" type="text" class="form-control form-control-alternative" placeholder="{{ _("URL") }}">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p>
+                                                        {{ _("Click the confirm button to create the slack webhook") }}
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                    <button id="create-slack-webhook" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                        <button id="load-more-slack-webhook-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_slack_webhooks();">
+                            {{ _('More items') }} +
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row mt-7">
+                <div class="col-xl-12">
+                    <div class="card shadow">
+                        <div class="card-header border-0">
+                            <div class="row align-items-center">
+                                <div class="col-6">
+                                    <h3 class="mb-0">
+                                        {{ _('Slack webhooks for system notification') }}
+                                    </h3>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="row" style="text-align: right;">
+                                            <div class="col-12">
+                                                <button data-toggle="modal" data-target="#modal-create-slack-webhook-for-system-notification" class="btn btn-sm btn-primary">
+                                                    <span class="btn-inner--text" style="color: white;">{{ _('Create slack webhook for system notification') }}</span>
+                                                </button>
+                                            </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div id="system-notification-slack-webhook-table" class="table-responsive">
+                            <!-- Projects table -->
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">name</th>
+                                    <th scope="col">creationDate</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="modal fade" id="modal-create-slack-webhook-for-system-notification" tabindex="-1" role="dialog" aria-labelledby="modal-create-slack-webhook-for-system-notification" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Create slack webhook for system notification") }}</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <form method="post">{% csrf_token %}
+                                                <input name="cmd" value="create_system_notification_slack_webhook" hidden>
+                                                <div class="modal-body">
+                                                    <div class="pl-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label class="form-control-label" for="slack-webhook-name">{{ _("Name") }}</label>
+                                                                    <select name="system-notification-slack-webhook-name" class="form-control">
+                                                                        {% for slack_webhook in slack_webhooks.items %}
+                                                                            <option value="{{ slack_webhook.name }}">{{ slack_webhook.name }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p>
+                                                        {{ _("Click the confirm button to create the slack webhook") }}
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                    <button id="create-system-notification-slack-webhook" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                        <button id="load-more-system-notification-slack-webhook-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_system_notification_slack_webhooks();">
+                            {{ _('More items') }} +
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="row mt-7">
 
                 <div class="col-xl-12">
@@ -200,6 +374,9 @@
 
     <script>
         var end_key = null;
+        var slack_webhooks_end_key = null;
+        var system_notification_slack_webhooks_end_key = null;
+
         function load_more_email_providers(){
             var item = {
                 cmd: 'get_email_provider_rows',
@@ -214,6 +391,40 @@
                 }
                 const rows = data['rows'];
                 $("#email-provider-table>table").append(rows);
+            });
+        }
+
+        function load_more_slack_webhooks(){
+            var item = {
+                cmd: 'get_slack_webhook_rows',
+            };
+            if (slack_webhooks_end_key != null){
+                item['start_key'] = slack_webhooks_end_key;
+            }
+            $.post("", item, function (data) {
+                slack_webhooks_end_key = data['end_key'];
+                if (slack_webhooks_end_key == null){
+                    $("#load-more-slack-webhook-btn").hide();
+                }
+                const rows = data['rows'];
+                $("#slack-webhook-table>table").append(rows);
+            });
+        }
+        
+        function load_more_system_notification_slack_webhooks() {
+            var item = {
+                cmd: 'get_system_notification_slack_webhook_rows'
+            };
+            if (system_notification_slack_webhooks_end_key != null){
+                item['start_key'] = system_notification_slack_webhooks_end_key;
+            }
+            $.post("", item, function (data) {
+                system_notification_slack_webhooks_end_key = data['end_key'];
+                if (system_notification_slack_webhooks_end_key == null){
+                    $("#load-more-system-notification-slack-webhook-btn").hide();
+                }
+                const rows = data['rows'];
+                $("#system-notification-slack-webhook-table>table").append(rows);
             });
         }
 
@@ -250,6 +461,8 @@
         window.onload = function () {
             $(document).ready(function () {
                 load_more_email_providers();
+                load_more_slack_webhooks();
+                load_more_system_notification_slack_webhooks();
             });
         };
     </script>

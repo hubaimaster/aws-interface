@@ -464,10 +464,11 @@ class DynamoDB:
             return response
         except Exception as e:
             if "LimitExceededException" in str(e):
-                print("Error while creating index:" + str(e) + ", RE-TRY AFTER 60 SECONDS")
-                time.sleep(60)
-                # TODO Sleep 대신 스택이나 큐에 등록해놓고 시도.. 대기열
-                return self.update_table(table_name, index)
+                # print("Error while creating index:" + str(e) + ", RE-TRY AFTER 60 SECONDS")
+                # time.sleep(60)
+                # # TODO Sleep 대신 스택이나 큐에 등록해놓고 시도.. 대기열
+                # return self.update_table(table_name, index)
+                return
             else:
                 return e
 

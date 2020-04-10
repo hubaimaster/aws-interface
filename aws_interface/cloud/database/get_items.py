@@ -20,9 +20,9 @@ info = {
             'creation_date': 'float',
             '...': '...',
         }],
-        'email_providers_end_key?': 'str',
+        'end_key?': 'str',
     },
-    'description': 'Get items and its email_providers_end_key to iterate'
+    'description': 'Get items and its end_key to iterate'
 }
 
 
@@ -50,10 +50,10 @@ def do(data, resource):
             if match_policy(policy_code, user, item):
                 filtered.append(item)
         body['items'] = filtered
-        body['email_providers_end_key'] = end_key
+        body['end_key'] = end_key
         return body
     else:
         body['items'] = None
-        body['email_providers_end_key'] = None
+        body['end_key'] = None
         body['error'] = error.PERMISSION_DENIED
         return body

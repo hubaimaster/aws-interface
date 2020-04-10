@@ -9,7 +9,7 @@ info = {
     },
     'output_format': {
         'items': 'list',
-        'email_providers_end_key': 'str',
+        'end_key': 'str',
     },
     'description': 'Return function test list'
 }
@@ -33,5 +33,5 @@ def do(data, resource):
             break
 
     body['items'] = items
-    body['email_providers_end_key'] = end_key
+    body['end_key'] = end_key
     return body

@@ -25,5 +25,5 @@ def do(data, resource):
     inst = []
     items, end_key = resource.db_get_items_in_partition('email_provider', start_key=start_key)
     body['items'] = items
-    body['email_providers_end_key'] = end_key
+    body['end_key'] = end_key
     return body

@@ -16,7 +16,7 @@ info = {
                 'description': 'str',
             }
         ],
-        'email_providers_end_key': 'str?',
+        'end_key': 'str?',
     },
     'description': 'Return webhook info'
 }
@@ -30,5 +30,5 @@ def do(data, resource):
 
     items, end_key = resource.db_get_items_in_partition('webhook', start_key=start_key)
     body['items'] = items
-    body['email_providers_end_key'] = end_key
+    body['end_key'] = end_key
     return body

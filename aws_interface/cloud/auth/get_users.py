@@ -19,7 +19,7 @@ info = {
             'group': 'str',
             '...': '...',
         }, ],
-        'email_providers_end_key?': 'str'
+        'end_key?': 'str'
     },
     'description': 'Return all users in system'
 }
@@ -47,5 +47,5 @@ def do(data, resource):
 
     items, end_key = resource.db_query(partition, query, start_key=start_key, limit=limit, reverse=True)
     body['items'] = items
-    body['email_providers_end_key'] = end_key
+    body['end_key'] = end_key
     return body
