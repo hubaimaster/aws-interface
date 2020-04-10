@@ -11,6 +11,7 @@ import subprocess
 from zipfile import ZipFile
 from cloud.log.create_log import create_event
 
+import cloud.notification.send_slack_message_as_system_notification as slack
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -127,12 +128,15 @@ def do(data, resource):
             error_traceback = traceback.format_exc()
             body['error'] = error.FUNCTION_ERROR
             body['error']['message'] = body['error']['message'].format('{}, {}'.format(ex, error_traceback))
+            slack.send(resource, str(body))
         os.remove(zip_temp_dir)
 
         # Logging
-        create_event(resource, user, 'run_function:{}'.format(function_name), json.dumps({
+        content = json.dumps({
             'params': params,
             'body': body,
-        }), 'logic')
+        })
+        content = content[:1000 * 1000 * 2]
+        create_event(resource, user, 'run_function:{}'.format(function_name), content, 'logic')
         return body
 

@@ -9,7 +9,7 @@ info = {
     },
     'output_format': {
         'items': [{'str': 'any'}],
-        'end_key': 'str'
+        'email_providers_end_key': 'str'
     },
     'description': 'Return sessions'
 }
@@ -24,5 +24,5 @@ def do(data, resource):
     partition = 'session'
     items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit, reverse=True)
     body['items'] = items
-    body['end_key'] = end_key
+    body['email_providers_end_key'] = end_key
     return body

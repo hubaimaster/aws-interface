@@ -1,29 +1,32 @@
 
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
+from uuid import uuid4
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'start_key': 'str?'
+        'start_key': 'str?',
     },
     'output_format': {
-        'success': 'bool',
+        'error': 'dict?',
+        'success': 'bool'
     },
-    'description': 'Get all email providers.'
+    'description': 'Create slack webhook.'
 }
 
 
-@NeedPermission(Permission.Run.Notification.get_email_providers)
+@NeedPermission(Permission.Run.Notification.get_slack_webhooks)
 def do(data, resource):
     body = {}
     params = data['params']
+    user = data.get('user', None)
 
     start_key = params.get('start_key', None)
 
-    inst = []
-    items, end_key = resource.db_get_items_in_partition('email_provider', start_key=start_key)
+    items, end_key = resource.db_query('slack_webhook', start_key=start_key)
     body['items'] = items
-    body['email_providers_end_key'] = end_key
+    body['end_key'] = end_key
+
     return body

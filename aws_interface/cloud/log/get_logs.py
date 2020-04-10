@@ -14,7 +14,7 @@ info = {
         'reverse?': 'bool',
     },
     'output_format': {
-        'end_key': 'str',
+        'email_providers_end_key': 'str',
         'items': 'list',
     },
     'description': 'Get logs in system'
@@ -43,6 +43,6 @@ def do(data, resource):
         items, end_key = resource.db_query(partition, instructions, start_key=start_key, reverse=reverse)
     else:
         items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, reverse=reverse)
-    body['end_key'] = end_key
+    body['email_providers_end_key'] = end_key
     body['items'] = items
     return body

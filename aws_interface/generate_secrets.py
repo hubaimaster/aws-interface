@@ -35,4 +35,3 @@ if __name__ == '__main__':
     base_json = os.path.join(secret_dir, 'base.json')
     with open(base_json, 'w') as f:
         json.dump(data, f)
-

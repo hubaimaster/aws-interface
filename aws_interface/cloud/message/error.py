@@ -169,3 +169,11 @@ EXISTING_SORT_KEY = {
     'code': 42,
     'message': 'Existing sort index key'
 }
+EXISTING_SLACK_WEBHOOK_NAME = {
+    'code': 43,
+    'message': 'Existing slack webhook name'
+}
+NO_SUCH_SLACK_WEBHOOK = {
+    'code': 44,
+    'message': 'No such slack webhook'
+}

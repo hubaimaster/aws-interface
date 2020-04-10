@@ -24,7 +24,7 @@ info = {
                 '...': '...',
             }
         ],
-        'end_key?': 'str',
+        'email_providers_end_key?': 'str',
     },
     'description': 'Query items'
 }
@@ -57,10 +57,10 @@ def do(data, resource):
                 filtered.append(item)
 
         body['items'] = filtered
-        body['end_key'] = end_key
+        body['email_providers_end_key'] = end_key
         return body
     else:
         body['items'] = None
-        body['end_key'] = None
+        body['email_providers_end_key'] = None
         body['error'] = error.NO_SUCH_PARTITION
         return body

@@ -120,6 +120,7 @@ class Adapter(metaclass=ABCMeta):
         client = Client()
         client.session_id = self.generate_session_id(['admin'])
         client.url = self.get_rest_api_url()
+        print('client.url:', client.url, ', client.session_id:', client.session_id)
         with self.open_api_auth() as auth_api:
             yield client
             resp = client.auth_get_me()

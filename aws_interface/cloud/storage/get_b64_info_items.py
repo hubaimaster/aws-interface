@@ -12,7 +12,7 @@ info = {
     },
     'output_format': {
         'items': [{'str': 'any'}],
-        'end_key?': 'str',
+        'email_providers_end_key?': 'str',
     },
     'description': 'Return file item lists'
 }
@@ -31,6 +31,6 @@ def do(data, resource):  # This is for admins
     items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, limit=limit, reverse=reverse)
 
     body['items'] = list(filter(lambda x: x.get('next_file_id', None) is None, items))
-    body['end_key'] = end_key
+    body['email_providers_end_key'] = end_key
     return body
 

@@ -79,3 +79,72 @@ class NotificationAPI(API):
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
+
+    @lambda_method
+    def create_slack_webhook(self, name, url):
+        import cloud.notification.create_slack_webhook as method
+        params = {
+            'name': name,
+            'url': url,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def delete_slack_webhook(self, name):
+        import cloud.notification.delete_slack_webhook as method
+        params = {
+            'name': name
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_slack_webhooks(self, start_key):
+        import cloud.notification.get_slack_webhooks as method
+        params = {
+            'start_key': start_key,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def send_slack_message(self, slack_webhook_name, text, username=None, icon_url=None, icon_emoji=None, channel=None):
+        import cloud.notification.send_slack_message as method
+        params = {
+            'slack_webhook_name': slack_webhook_name,
+            'text': text,
+            'username': username,
+            'icon_url': icon_url,
+            'icon_emoji': icon_emoji,
+            'channel': channel,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def create_system_notification_slack_webhook(self, name):
+        import cloud.notification.create_system_notification_slack_webhook as method
+        params = {
+            'name': name,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def delete_system_notification_slack_webhook(self, name):
+        import cloud.notification.delete_system_notification_slack_webhook as method
+        params = {
+            'name': name
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_system_notification_slack_webhook_names(self, start_key):
+        import cloud.notification.get_system_notification_slack_webhook_names as method
+        params = {
+            'start_key': start_key,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)

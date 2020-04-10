@@ -134,7 +134,7 @@ class Auth(LoginRequiredMixin, View):
         with adapter.open_api_auth() as api:
             result = api.get_users(start_key, limit=1000)
             users = result['items']
-            end_key = result.get('end_key')
+            end_key = result.get('email_providers_end_key')
             user_groups = api.get_user_groups()['groups']
             visible_user_fields = ['id', 'creation_date', 'email', 'groups']
             none_extra_fields = ['id', 'creation_date', 'email', 'groups',
@@ -148,7 +148,7 @@ class Auth(LoginRequiredMixin, View):
             }
             return {
                 'user_rows': template.render(context, request),
-                'end_key': end_key
+                'email_providers_end_key': end_key
             }
 
     def _get_session_rows(self, request, app_id, start_key=None):
@@ -156,7 +156,7 @@ class Auth(LoginRequiredMixin, View):
         with adapter.open_api_auth() as api:
             result = api.get_sessions(start_key, limit=1000)
             sessions = result['items']
-            end_key = result.get('end_key')
+            end_key = result.get('email_providers_end_key')
 
             template = loader.get_template('dashboard/app/component/auth_session_table_row.html')
             context = {
@@ -164,5 +164,5 @@ class Auth(LoginRequiredMixin, View):
             }
             return {
                 'session_rows': template.render(context, request),
-                'end_key': end_key
+                'email_providers_end_key': end_key
             }

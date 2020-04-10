@@ -1,7 +1,11 @@
 from functools import wraps
 
 
-system_partitions = ['user', 'log', 'logic-function', 'files', 'session', 'webhook', 'schedule', 'sort_key']
+system_partitions = ['user', 'log',
+                     'logic-function', 'files',
+                     'session', 'webhook',
+                     'schedule', 'sort_key',
+                     'slack_webhook']
 
 
 def database_can_not_access_to_item(item):
@@ -151,6 +155,14 @@ class Permission:
             update_email_provider = 'run:cloud.notification.update_email_provider'
             send_email = 'run:cloud.notification.send_email'
             send_sms = 'run:cloud.notification.send_sms'
+            create_slack_webhook = 'run:cloud.notification.create_slack_webhook'
+            delete_slack_webhook = 'run:cloud.notification.delete_slack_webhook'
+            get_slack_webhooks = 'run:cloud.notification.get_slack_webhooks'
+            send_slack_message = 'run:cloud.notification.send_slack_message'
+            create_system_notification_slack_webhook = 'run:cloud.notification.create_system_notification_slack_webhook'
+            get_system_notification_slack_webhook_names = 'run:cloud.notification.get_system_notification_slack_webhook_names'
+            delete_system_notification_slack_webhook = 'run:cloud.notification.delete_system_notification_slack_webhook'
+            send_slack_message_as_system_notification = 'run:cloud.notification.send_slack_message_as_system_notification'
 
     default_user_permissions = [
         Run.Auth.get_me,
