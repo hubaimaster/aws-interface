@@ -1,0 +1,15 @@
+{% load timetags %}
+
+{% for item in items %}
+    <tr>
+        <th scope="row">
+            {{ item.name }}
+        </th>
+        <th>
+            {{ item.url }}
+        </th>
+        <td>
+            {{ item.creation_date|to_date }}
+        </td>
+    </tr>
+{% endfor %}
