@@ -144,7 +144,7 @@ def abstracted_gateway(params, query_params, resource):
             'error': error.PERMISSION_DENIED,
             'traceback': '{}'.format(error_traceback)
         }
-        slack.send(resource, str(body))
+        slack.send_system_slack_message(resource, str(body).replace('\\', ''))
         return body
     except Exception as ex:
         error_traceback = traceback.format_exc()
@@ -154,7 +154,7 @@ def abstracted_gateway(params, query_params, resource):
             'error': error.INVALID_REQUEST,
             'traceback': '{}'.format(error_traceback)
         }
-        slack.send(resource, str(body))
+        slack.send_system_slack_message(resource, str(body).replace('\\', ''))
         return body
 
 

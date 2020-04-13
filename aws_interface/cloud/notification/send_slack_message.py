@@ -1,7 +1,8 @@
 
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
-from cloud.libs.requests import post
+from requests import post
+import json
 
 
 # Define the input output format of the function.
@@ -25,7 +26,6 @@ info = {
 
 @NeedPermission(Permission.Run.Notification.send_slack_message)
 def do(data, resource):
-    body = {}
     params = data['params']
     user = data.get('user', None)
 
@@ -35,7 +35,11 @@ def do(data, resource):
     icon_emoji = params.get('icon_emoji', None)
     text = params.get('text')
     channel = params.get('channel', None)
+    return send_slack_message(resource, slack_webhook_name, text, username, icon_url, icon_emoji, channel)
 
+
+def send_slack_message(resource, slack_webhook_name, text, username, icon_url, icon_emoji, channel):
+    body = {}
     query = [{
         'condition': 'eq',
         'field': 'name',
@@ -45,7 +49,7 @@ def do(data, resource):
     items, _ = resource.db_query('slack_webhook', query)
     if items:
         item = items[0]
-        webhook_url = item.get('webhook_url')
+        webhook_url = item.get('url')
         data = {
             'text': text
         }
@@ -57,6 +61,7 @@ def do(data, resource):
             data['icon_emoji'] = icon_emoji
         if channel:
             data['channel'] = channel
+        data = json.dumps(data)
         result = post(webhook_url, data)
         body['result'] = result
     else:

@@ -123,12 +123,15 @@ def do(data, resource):
             err = return_value.get('error', None)
             if err:
                 body['error'] = err
+                r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
+                print('slack response:', r)
 
         except Exception as ex:
             error_traceback = traceback.format_exc()
             body['error'] = error.FUNCTION_ERROR
             body['error']['message'] = body['error']['message'].format('{}, {}'.format(ex, error_traceback))
-            slack.send(resource, str(body))
+            r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
+            print('slack response:', r)
         os.remove(zip_temp_dir)
 
         # Logging

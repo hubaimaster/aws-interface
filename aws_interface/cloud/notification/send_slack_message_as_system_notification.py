@@ -30,25 +30,19 @@ def do(data, resource):
     icon_emoji = params.get('icon_emoji', None)
     text = params.get('text')
     channel = params.get('channel', None)
-    return send(resource, text, icon_url, icon_emoji, username, channel)
+    return send_system_slack_message(resource, text, icon_url, icon_emoji, username, channel)
 
 
-def send(resource, text, icon_url=None, icon_emoji=None, username=None, channel=None):
+def send_system_slack_message(resource, text, icon_url=None, icon_emoji=None, username=None, channel=None):
     query = []
     resps = []
     items, _ = resource.db_query('system_notification_slack_webhook', query)
+    print('items', items)
     for item in items:
         try:
             slack_webhook_name = item.get('slack_webhook_name')
-            resp = send_slack_message.do({
-                'slack_webhook_name': slack_webhook_name,
-                'text': text,
-                'username': username,
-                'icon_url': icon_url,
-                'icon_emoji': icon_emoji,
-                'channel': channel
-            }, resource)
+            resp = send_slack_message.send_slack_message(resource, slack_webhook_name, text, username, icon_url, icon_emoji, channel)
             resps.append(resp)
         except Exception as ex:
-            pass
+            print(ex)
     return resps
