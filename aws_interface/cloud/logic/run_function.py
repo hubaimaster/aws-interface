@@ -132,6 +132,7 @@ def do(data, resource):
             body['error']['message'] = body['error']['message'].format('{}, {}'.format(ex, error_traceback))
             r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
             print('slack response:', r)
+
         os.remove(zip_temp_dir)
 
         # Logging

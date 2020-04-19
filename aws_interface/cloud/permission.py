@@ -83,6 +83,7 @@ class Permission:
             find_password = 'run:cloud.auth.find_password'
             delete_my_membership = 'run:cloud.auth.delete_my_membership'
             refresh_session = 'run:cloud.auth.refresh_session'
+            update_user = 'run:cloud.auth.update_user'
 
         class Database:
             create_item = 'run:cloud.database.create_item'

@@ -50,6 +50,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     # 'cloud.auth.set_guest_login',
     'cloud.auth.set_me',
     'cloud.auth.set_user',
+    'cloud.auth.update_user',
     # database
     'cloud.database.create_partition',  # admin
     'cloud.database.delete_partition',  # admin
