@@ -2,20 +2,43 @@
 
 {% for log in items %}
     <tr>
-        <th scope="row">
-            {{ log.owner }}
+        <th scope="row" style="width: 30%">
+            <div class="row">
+                <div class="col-12">
+                     <label>owner</label><br/>
+                 </div>
+                 <div class="col-12">
+                     <p>{{ log.owner }}</p>
+                 </div>
+            </div>
+             <div class="row">
+                 <div class="col-12">
+                     <label>creation_date</label><br/>
+                 </div>
+                 <div class="col-12">
+                     <p>{{ log.creation_date|to_date }}</p>
+                 </div>
+            </div>
+             <div class="row">
+                 <div class="col-12">
+                     <label>event_source</label><br/>
+                 </div>
+                 <div class="col-12">
+                     <p>{{ log.event_source }}</p>
+                 </div>
+            </div>
+             <div class="row">
+                 <div class="col-12">
+                     <label>event_name</label><br/>
+                 </div>
+                 <div class="col-12">
+                     <p>{{ log.event_name }}</p>
+                 </div>
+            </div>
         </th>
-        <td>
-            {{ log.creation_date|to_date }}
-        </td>
-        <td>
-            {{ log.event_source }}
-        </td>
-        <td>
-            {{ log.event_name }}
-        </td>
-        <td>
-            {{ log.event_param }}
+
+        <td style="width: 70%;">
+            <textarea class="form-control form-control-alternative" style="width: 100%; height: 200px;">{{ log.event_param }}</textarea>
         </td>
     </tr>
 {% endfor %}
