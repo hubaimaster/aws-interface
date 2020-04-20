@@ -3,6 +3,7 @@ from cloud.message import error
 
 import uuid
 import os
+import shutil
 import tempfile
 import cloud.libs.simplejson as json
 import traceback
@@ -134,6 +135,7 @@ def do(data, resource):
             print('slack response:', r)
 
         os.remove(zip_temp_dir)
+        shutil.rmtree(extracted_dir, ignore_errors=True)
 
         # Logging
         content = json.dumps({

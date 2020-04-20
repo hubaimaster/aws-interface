@@ -6,6 +6,7 @@ from core.adapter.django import DjangoAdapter
 from django.http import JsonResponse
 from django.template import loader
 from dashboard.views.utils import Util, page_manage
+import json
 
 
 class Log(LoginRequiredMixin, View):
@@ -56,6 +57,13 @@ class Log(LoginRequiredMixin, View):
                 result = log.get_logs(event_source, event_name, event_param, user_id, start_key, reverse=True)
                 template = loader.get_template('dashboard/app/component/log_table_row.html')
                 items = result.get('items', [])
+                items = [{
+                    'owner': item.get('owmer', None),
+                    'creation_date': item.get('creation_date'),
+                    'event_source': item.get('event_source', None),
+                    'event_name': item.get('event_name', None),
+                    'event_param': json.dumps(json.loads(item.get('event_param')), sort_keys=True, indent=4),
+                } for item in items]
                 end_key = result.get('end_key', None)
                 context = {
                     'items': items,

@@ -40,7 +40,7 @@ class Client(object):
                     session_id = fp.read()
                     self.session_id = session_id
         except Exception as ex:
-            print(ex)
+            pass
 
     @classmethod
     def _post(cls, url, data):
