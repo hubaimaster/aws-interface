@@ -287,9 +287,10 @@ class Condition(object):
 class Query(list):
     """Generate query list
     """
-    def __init__(self, condition, field, value):
+    def __init__(self, condition=None, field=None, value=None):
         super(Query, self).__init__()
-        self._add(None, condition, field, value)
+        if condition and field:
+            self._add(None, condition, field, value)
 
     def _add(self, logical_operator, condition, field, value):
         if len(self) == 0:

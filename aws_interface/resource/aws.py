@@ -246,8 +246,21 @@ class AWSResource(Resource):
         return items, end_key
 
     def db_put_item(self, partition, item, item_id=None, creation_date=None):
+        def remove_blanks(it):
+            if isinstance(it, dict):
+                it = {key: remove_blanks(value) for key, value in it.items() if value != '' and value != {} and value != []}
+                return it
+            elif isinstance(it, list):
+                it = [remove_blanks(i) for i in it]
+                return it
+            else:
+                if it == '':
+                    return None
+                else:
+                    return it
         dynamo = DynamoDB(self.boto3_session)
         item = decode_dict(item)
+        item = remove_blanks(item)
         result = dynamo.put_item(self.app_id, partition, item, item_id, creation_date)
         return bool(result)
 
