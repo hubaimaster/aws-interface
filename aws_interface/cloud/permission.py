@@ -5,7 +5,7 @@ system_partitions = ['user', 'log',
                      'logic-function', 'files',
                      'session', 'webhook',
                      'schedule', 'sort_key',
-                     'slack_webhook']
+                     'slack_webhook', 'system_notification']
 
 
 def database_can_not_access_to_item(item):
@@ -161,9 +161,9 @@ class Permission:
             delete_slack_webhook = 'run:cloud.notification.delete_slack_webhook'
             get_slack_webhooks = 'run:cloud.notification.get_slack_webhooks'
             send_slack_message = 'run:cloud.notification.send_slack_message'
-            create_system_notification_slack_webhook = 'run:cloud.notification.create_system_notification_slack_webhook'
-            get_system_notification_slack_webhook_names = 'run:cloud.notification.get_system_notification_slack_webhook_names'
-            delete_system_notification_slack_webhook = 'run:cloud.notification.delete_system_notification_slack_webhook'
+            create_system_notification = 'run:cloud.notification.create_system_notification'
+            get_system_notifications = 'run:cloud.notification.get_system_notifications'
+            delete_system_notification = 'run:cloud.notification.delete_system_notification'
             send_slack_message_as_system_notification = 'run:cloud.notification.send_slack_message_as_system_notification'
 
     default_user_permissions = [

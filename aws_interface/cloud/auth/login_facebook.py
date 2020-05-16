@@ -84,6 +84,7 @@ def do(data, resource):
     if items:
         session_id = create_session(resource, items[0])
         body['session_id'] = session_id
+        body['user_id'] = items[0]['id']
         body['is_first_login'] = False
         return body
     elif not already_has_account_email(fb_user_id, resource):  # Create new user and create session also.
@@ -107,6 +108,7 @@ def do(data, resource):
         session_id = create_session(resource, item)
         body['session_id'] = session_id
         body['is_first_login'] = True
+        body['user_id'] = item['id']
         return body
     else:
         body['error'] = error.EXISTING_ACCOUNT_VIA_OTHER_LOGIN_METHOD

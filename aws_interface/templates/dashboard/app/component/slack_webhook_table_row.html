@@ -11,5 +11,8 @@
         <td>
             {{ item.creation_date|to_date }}
         </td>
+        <td>
+            <button onclick="deleteSlackWebhook('{{ item.name }}');" class="btn btn-sm btn-danger">{{ _('Delete') }}</button>
+        </td>
     </tr>
 {% endfor %}

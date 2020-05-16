@@ -60,10 +60,10 @@ class Notification(LoginRequiredMixin, View):
                 }
                 return JsonResponse(result)
 
-            elif cmd == 'get_system_notification_slack_webhook_rows':
+            elif cmd == 'get_system_notification_rows':
                 start_key = request.POST.get('start_key', None)
-                result = notification.get_system_notification_slack_webhook_names(start_key)
-                template = loader.get_template('dashboard/app/component/system_notification_slack_webhook_table_row.html')
+                result = notification.get_system_notifications(start_key)
+                template = loader.get_template('dashboard/app/component/system_notification_table_row.html')
                 items = result.get('items', [])
                 end_key = result.get('end_key', None)
                 context = {
@@ -90,8 +90,8 @@ class Notification(LoginRequiredMixin, View):
                 result = notification.send_sms(message, phone_number)
                 return JsonResponse(result)
             elif cmd == 'create_slack_webhook':
-                name = request.POST.get('slack-webhook-name')
-                url = request.POST.get('slack-webhook-url')
+                name = request.POST.get('name')
+                url = request.POST.get('url')
                 result = notification.create_slack_webhook(name, url)
                 return JsonResponse(result)
             elif cmd == 'delete_slack_webhook':
@@ -112,13 +112,17 @@ class Notification(LoginRequiredMixin, View):
                 result = notification.send_slack_message(slack_webhook_name, text, username, icon_url, icon_emoji, channel)
                 return JsonResponse(result)
 
-            elif cmd == 'create_system_notification_slack_webhook':
-                name = request.POST.get('system-notification-slack-webhook-name')
-                result = notification.create_system_notification_slack_webhook(name)
+            elif cmd == 'create_system_notification':
+                slack_webhook_name = request.POST.get('slack_webhook_name')
+                result = notification.create_system_notification(slack_webhook_name)
                 return JsonResponse(result)
-            elif cmd == 'delete_system_notification_slack_webhook':
-                name = request.POST.get('system-notification-slack-webhook-name')
-                result = notification.delete_system_notification_slack_webhook(name)
+            elif cmd == 'delete_system_notification':
+                system_notification_id = request.POST.get('system_notification_id')
+                result = notification.delete_system_notification(system_notification_id)
+                return JsonResponse(result)
+            elif cmd == 'delete_email_provider':
+                name = request.POST.get('name')
+                result = notification.delete_email_provider(name)
                 return JsonResponse(result)
 
 

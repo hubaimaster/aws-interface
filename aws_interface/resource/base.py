@@ -170,7 +170,7 @@ class Resource(metaclass=ABCMeta):
                 elif isinstance(option_statement, tuple):
                     (option, statement) = option_statement
                 elif isinstance(option_statement, dict):
-                    option = option_statement['option']
+                    option = option_statement.get('option', None)
                     statement = (option_statement['field'], option_statement['condition'], option_statement['value'])
                 else:
                     raise BaseException('Unknown instruction type')

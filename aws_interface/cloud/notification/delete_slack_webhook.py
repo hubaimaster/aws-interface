@@ -21,7 +21,6 @@ info = {
 def do(data, resource):
     body = {}
     params = data['params']
-    user = data.get('user', None)
 
     name = params.get('name')
 

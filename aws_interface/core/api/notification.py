@@ -123,26 +123,26 @@ class NotificationAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def create_system_notification_slack_webhook(self, name):
-        import cloud.notification.create_system_notification_slack_webhook as method
+    def create_system_notification(self, slack_webhook_name):
+        import cloud.notification.create_system_notification as method
         params = {
-            'name': name,
+            'slack_webhook_name': slack_webhook_name,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
 
     @lambda_method
-    def delete_system_notification_slack_webhook(self, name):
-        import cloud.notification.delete_system_notification_slack_webhook as method
+    def delete_system_notification(self, system_notification_id):
+        import cloud.notification.delete_system_notification as method
         params = {
-            'name': name
+            'system_notification_id': system_notification_id
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_system_notification_slack_webhook_names(self, start_key):
-        import cloud.notification.get_system_notification_slack_webhook_names as method
+    def get_system_notifications(self, start_key):
+        import cloud.notification.get_system_notifications as method
         params = {
             'start_key': start_key,
         }

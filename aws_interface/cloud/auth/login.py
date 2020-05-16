@@ -61,6 +61,7 @@ def do(data, resource):
             }
             _ = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
             body['session_id'] = session_id
+            body['user_id'] = user_id
         else:
             body['error'] = error.WRONG_PASSWORD
     else:

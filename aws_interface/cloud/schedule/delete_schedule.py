@@ -27,7 +27,9 @@ def do(data, resource):
     if items:
         schedule_relation_name = items[0].get('schedule_relation_name')
         message = resource.ev_delete_schedule(schedule_relation_name)
+        resource.db_delete_item(items[0]['id'])
         body['message'] = message
+        body['success'] = True
         return body
     else:
         body['error'] = NO_SUCH_SCHEDULE

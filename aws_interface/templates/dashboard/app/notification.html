@@ -22,114 +22,9 @@
         </div>
         <!-- Page content -->
         <div class="container-fluid mt--7">
-            <div class="row">
-                <div class="col-xl-12">
-                    <div class="card shadow">
-                        <div class="card-header border-0">
-                            <div class="row align-items-center">
-                                <div class="col-3">
-                                    <h3 class="mb-0">
-                                        {{ _('Email Providers') }}
-                                    </h3>
-                                </div>
-
-                                <div class="col-9">
-                                    <div class="row" style="text-align: right;">
-
-                                            <div class="col-12">
-                                                <button data-toggle="modal" data-target="#modal-create-email-provider" class="btn btn-sm btn-primary">
-                                                    <span class="btn-inner--text" style="color: white;">{{ _('Create email provider') }}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div id="email-provider-table" class="table-responsive">
-                            <!-- Projects table -->
-                            <table class="table align-items-center table-flush">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th scope="col">name</th>
-                                    <th scope="col">description</th>
-                                    <th scope="col">url</th>
-                                    <th scope="col">port</th>
-                                    <th scope="col">email</th>
-                                    <th scope="col">creationDate</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="modal fade" id="modal-create-email-provider" tabindex="-1" role="dialog" aria-labelledby="modal-create-email-provider" aria-hidden="true">
-                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="modal-title-default">{{ _("Create email provider") }}</h4>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">×</span>
-                                                </button>
-                                            </div>
-                                            <form method="post">{% csrf_token %}
-                                                <input name="cmd" value="create_email_provider" hidden>
-                                                <div class="modal-body">
-                                                    <div class="pl-lg-12">
-                                                        <div class="row">
-                                                            <div class="col-lg-12">
-                                                                <div class="form-group">
-                                                                    <label class="form-control-label" for="email-provider-name">{{ _("Name") }}</label>
-                                                                    <input id="email-provider-name" name="email-provider-name" type="text" class="form-control form-control-alternative" placeholder="{{ _("Email provider name") }}">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label class="form-control-label" for="email-provider-description">{{ _("Description") }}</label>
-                                                                    <input id="email-provider-description" name="email-provider-description" type="text" class="form-control form-control-alternative" placeholder="{{ _("Email provider description") }}">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label class="form-control-label" for="email-provider-url">{{ _("URL") }}</label>
-                                                                    <input id="email-provider-url" name="email-provider-url" type="text" class="form-control form-control-alternative" placeholder="{{ _("URL") }}">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label class="form-control-label" for="email-provider-port">{{ _("Port") }}</label>
-                                                                    <input id="email-provider-port" name="email-provider-port" type="number" class="form-control form-control-alternative" placeholder="{{ _("Port") }}">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label class="form-control-label" for="email-provider-email">{{ _("Email") }}</label>
-                                                                    <input id="email-provider-email" name="email-provider-email" type="email" class="form-control form-control-alternative" placeholder="{{ _("Email") }}">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label class="form-control-label" for="email-provider-password">{{ _("Password") }}</label>
-                                                                    <input id="email-provider-password" name="email-provider-password" type="password" class="form-control form-control-alternative" placeholder="{{ _("Password") }}">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <p>
-                                                        {{ _("Click the confirm button to create the email provider") }}
-                                                    </p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
-                                                    <button id="create-email-provider" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                        <button id="load-more-email-provider-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_email_providers();">
-                            {{ _('More items') }} +
-                        </button>
-                    </div>
-                </div>
-            </div>
 
 
-
-            <div class="row mt-7">
+            <div class="row mt-3">
                 <div class="col-xl-12">
                     <div class="card shadow">
                         <div class="card-header border-0">
@@ -161,6 +56,7 @@
                                     <th scope="col">name</th>
                                     <th scope="col">webhook_url</th>
                                     <th scope="col">creationDate</th>
+                                    <th scope="col">modification</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -178,8 +74,8 @@
                                                     <span aria-hidden="true">×</span>
                                                 </button>
                                             </div>
-                                            <form method="post">{% csrf_token %}
-                                                <input name="cmd" value="create_slack_webhook" hidden>
+
+
                                                 <div class="modal-body">
                                                     <div class="pl-lg-12">
                                                         <div class="row">
@@ -201,9 +97,9 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
-                                                    <button id="create-slack-webhook" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
+                                                    <button onclick="createSlackWebhook();" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
                                                 </div>
-                                            </form>
+
                                         </div>
                                     </div>
                                 </div>
@@ -239,13 +135,14 @@
 
                             </div>
                         </div>
-                        <div id="system-notification-slack-webhook-table" class="table-responsive">
+                        <div id="system-notification-table" class="table-responsive">
                             <!-- Projects table -->
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                 <tr>
                                     <th scope="col">name</th>
                                     <th scope="col">creationDate</th>
+                                    <th scope="col">modification</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -263,15 +160,14 @@
                                                     <span aria-hidden="true">×</span>
                                                 </button>
                                             </div>
-                                            <form method="post">{% csrf_token %}
-                                                <input name="cmd" value="create_system_notification_slack_webhook" hidden>
+
                                                 <div class="modal-body">
                                                     <div class="pl-lg-12">
                                                         <div class="row">
                                                             <div class="col-lg-12">
                                                                 <div class="form-group">
                                                                     <label class="form-control-label" for="slack-webhook-name">{{ _("Name") }}</label>
-                                                                    <select name="system-notification-slack-webhook-name" class="form-control">
+                                                                    <select id="system_notification_slack_webhook_name" class="form-control">
                                                                         {% for slack_webhook in slack_webhooks.items %}
                                                                             <option value="{{ slack_webhook.name }}">{{ slack_webhook.name }}</option>
                                                                         {% endfor %}
@@ -287,14 +183,13 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
-                                                    <button id="create-system-notification-slack-webhook" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
+                                                    <button onclick="createSystemNotification();" type="submit" class="btn btn-primary">{{ _("Confirm") }}</button>
                                                 </div>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>
 
-                        <button id="load-more-system-notification-slack-webhook-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_system_notification_slack_webhooks();">
+                        <button id="load-more-system-notification-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_system_notifications();">
                             {{ _('More items') }} +
                         </button>
                     </div>
@@ -375,22 +270,68 @@
     <script>
         var end_key = null;
         var slack_webhooks_end_key = null;
-        var system_notification_slack_webhooks_end_key = null;
+        var system_notifications_end_key = null;
+        
+        function createSlackWebhook() {
+            const name = $("#slack-webhook-name").val();
+            const url = $("#slack-webhook-url").val();
+            $.post("", {
+                cmd: 'create_slack_webhook',
+                name: name,
+                url: url
+            }, function (data) {
+                alert(JSON.stringify(data));
+                window.location.reload();
+            });
+        }
+        
+        function createSystemNotification() {
+            const slack_webhook_name = $("#system_notification_slack_webhook_name").val();
+            $.post("", {
+                cmd: 'create_system_notification',
+                slack_webhook_name: slack_webhook_name,
+            }, function (data) {
+                alert(JSON.stringify(data));
+                window.location.reload();
+            });
+        }
 
-        function load_more_email_providers(){
-            var item = {
-                cmd: 'get_email_provider_rows',
-            };
-            if (end_key != null){
-                item['start_key'] = end_key;
+        function deleteEmailProvider(name) {
+            if (!confirm("{{ _('Are you sure you want to delete?') }}")){
+                return;
             }
-            $.post("", item, function (data) {
-                end_key = data['end_key'];
-                if (end_key == null){
-                    $("#load-more-email-provider-btn").hide();
-                }
-                const rows = data['rows'];
-                $("#email-provider-table>table").append(rows);
+            $.post("", {
+                cmd: 'delete_email_provider',
+                name: name
+            }, function (data) {
+                alert(JSON.stringify(data));
+                window.location.reload();
+            });
+        }
+
+        function deleteSlackWebhook(name) {
+            if (!confirm("{{ _('Are you sure you want to delete?') }}")){
+                return;
+            }
+            $.post("", {
+                cmd: 'delete_slack_webhook',
+                name: name
+            }, function (data) {
+                alert(JSON.stringify(data));
+                window.location.reload();
+            });
+        }
+
+        function deleteSystemNotificationSlackWebhook(system_notification_id) {
+            if (!confirm("{{ _('Are you sure you want to delete?') }}")){
+                return;
+            }
+            $.post("", {
+                cmd: 'delete_system_notification',
+                system_notification_id: system_notification_id
+            }, function (data) {
+                alert(JSON.stringify(data));
+                window.location.reload();
             });
         }
 
@@ -411,20 +352,20 @@
             });
         }
         
-        function load_more_system_notification_slack_webhooks() {
+        function load_more_system_notifications() {
             var item = {
-                cmd: 'get_system_notification_slack_webhook_rows'
+                cmd: 'get_system_notification_rows'
             };
-            if (system_notification_slack_webhooks_end_key != null){
-                item['start_key'] = system_notification_slack_webhooks_end_key;
+            if (system_notifications_end_key != null){
+                item['start_key'] = system_notifications_end_key;
             }
             $.post("", item, function (data) {
-                system_notification_slack_webhooks_end_key = data['end_key'];
-                if (system_notification_slack_webhooks_end_key == null){
-                    $("#load-more-system-notification-slack-webhook-btn").hide();
+                system_notifications_end_key = data['end_key'];
+                if (system_notifications_end_key == null){
+                    $("#load-more-system-notification-btn").hide();
                 }
                 const rows = data['rows'];
-                $("#system-notification-slack-webhook-table>table").append(rows);
+                $("#system-notification-table>table").append(rows);
             });
         }
 
@@ -460,9 +401,8 @@
 
         window.onload = function () {
             $(document).ready(function () {
-                load_more_email_providers();
                 load_more_slack_webhooks();
-                load_more_system_notification_slack_webhooks();
+                load_more_system_notifications();
             });
         };
     </script>

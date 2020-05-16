@@ -5,6 +5,7 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from dashboard.views.utils import Util, page_manage
+from django.template import loader
 from dashboard.views.app.overview import allocate_resource_in_background
 
 import json
@@ -38,11 +39,34 @@ class Schedule(LoginRequiredMixin, View):
                 schedule_name = request.POST.get('schedule_name')
                 schedule_expression = request.POST.get('schedule_expression')
                 function_name = request.POST.get('function_name')
-                payload = request.POST.get
-                return JsonResponse(schedule_api.create_schedule(schedule_name, schedule_expression, function_name, payload))
-            elif cmd == 'schedule_name':
+                payload = request.POST.get('payload')
+                print(schedule_name, schedule_expression, function_name, payload)
+                try:
+                    result = schedule_api.create_schedule(schedule_name, schedule_expression, function_name, payload)
+                    return JsonResponse(result)
+                except Exception as e:
+                    return JsonResponse({
+                        'message': str(e),
+                        'success': False
+                    })
+            elif cmd == 'delete_schedule':
                 schedule_name = request.POST.get('schedule_name')
                 return JsonResponse(schedule_api.delete_schedule(schedule_name))
             elif cmd == 'get_schedule':
                 schedule_name = request.POST.get('schedule_name')
                 return JsonResponse(schedule_api.get_schedule(schedule_name))
+            elif cmd == 'get_schedule_rows':
+                start_key = request.POST.get('start_key', None)
+                result = schedule_api.get_schedules(start_key, reverse=True)
+                template = loader.get_template('dashboard/app/component/schedule_table_row.html')
+                items = result.get('items', [])
+                print(items)
+                end_key = result.get('end_key', None)
+                context = {
+                    'items': items,
+                }
+                result = {
+                    'rows': template.render(context, request),
+                    'end_key': end_key
+                }
+                return JsonResponse(result)

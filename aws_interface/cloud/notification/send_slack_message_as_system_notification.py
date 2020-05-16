@@ -36,7 +36,7 @@ def do(data, resource):
 def send_system_slack_message(resource, text, icon_url=None, icon_emoji=None, username=None, channel=None):
     query = []
     resps = []
-    items, _ = resource.db_query('system_notification_slack_webhook', query)
+    items, _ = resource.db_query('system_notification', query)
     print('items', items)
     for item in items:
         try:

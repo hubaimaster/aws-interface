@@ -34,10 +34,11 @@ class ScheduleAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_schedules(self, start_key=None):
+    def get_schedules(self, start_key=None, reverse=False):
         import cloud.schedule.get_schedules as method
         params = {
             'start_key': start_key,
+            'reverse': reverse
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

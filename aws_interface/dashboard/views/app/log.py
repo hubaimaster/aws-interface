@@ -63,7 +63,8 @@ class Log(LoginRequiredMixin, View):
                     'event_source': item.get('event_source', None),
                     'event_name': item.get('event_name', None),
                     'event_param': json.dumps(json.loads(item.get('event_param')), sort_keys=True, indent=4),
-                } for item in items]
+                } for item in items if item.get('event_param')]
+                print(items)
                 end_key = result.get('end_key', None)
                 context = {
                     'items': items,

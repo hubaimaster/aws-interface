@@ -1074,8 +1074,8 @@ class Events:
 
 
 class SNS:
-    def __init__(self, boto3_session):
-        self.client = boto3_session.client('sns', 'us-east-1')
+    def __init__(self, boto3_session, region='us-east-1'):
+        self.client = boto3_session.client('sns', region)
 
     def send_message(self, phone_number, message):
         return self.client.publish(PhoneNumber=phone_number, Message=message)

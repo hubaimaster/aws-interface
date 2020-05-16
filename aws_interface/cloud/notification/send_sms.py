@@ -23,12 +23,12 @@ def do(data, resource):
 
     message = params.get('message')
     phone_number = params.get('phone_number')
+    region = params.get('region', 'us-east-1')
 
     try:
-        resp = resource.sms_send_message(phone_number, message)
+        resp = resource.sms_send_message(phone_number, message, region)
         body['response'] = resp
     except Exception as ex:
         body['error'] = str(ex)
 
     return body
-

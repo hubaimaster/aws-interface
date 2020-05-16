@@ -33,6 +33,10 @@ info = {
 }
 
 
+cache = {
+    # Cache for speed
+}
+
 def copy_configfile(destination, sdk_config, config_name='aws_interface_config.json'):
     config_filepath = os.path.join(destination, config_name)
     if not os.path.exists(config_filepath):
@@ -44,6 +48,14 @@ def run_subprocess(python_file):
     proc = subprocess.Popen(['python', python_file], stdout=subprocess.PIPE)
     resp = proc.stdout.read().decode('utf-8')
     return resp
+
+
+def put_cache(key, sub_key, value):
+    cache['{}{}'.format(key, sub_key)] = value
+
+
+def get_cache(key, sub_key):
+    return cache.get('{}{}'.format(key, sub_key), None)
 
 
 # TODO now it can only invoke python3.6 runtime. any other runtimes (java, node, ..) will be able to invoke.
@@ -72,28 +84,30 @@ def do(data, resource):
         function_package = '.'.join(function_handler.split('.')[:-1])
         function_method = function_handler.split('.')[-1]
 
-        zip_file_bin = resource.file_download_bin(zip_file_id)
+        zip_temp_dir = get_cache(zip_file_id, 'zip_temp_dir')
+        extracted_dir = get_cache(zip_file_id, 'extracted_dir')
 
-        zip_temp_dir = tempfile.mktemp()
+        if (zip_temp_dir is None) or (extracted_dir is None):
+            zip_file_bin = resource.file_download_bin(zip_file_id)
+            zip_temp_dir = tempfile.mktemp()
+            extracted_dir = tempfile.mkdtemp()
 
-        extracted_dir = tempfile.mkdtemp()
+            with open(zip_temp_dir, 'wb') as zip_temp:
+                zip_temp.write(zip_file_bin)
 
-        with open(zip_temp_dir, 'wb') as zip_temp:
-            zip_temp.write(zip_file_bin)
+            # Extract function files and copy configs
+            with ZipFile(zip_temp_dir) as zip_file:
+                zip_file.extractall(extracted_dir)
+                copy_configfile(extracted_dir, sdk_config)
 
-        # Extract function files and copy configs
-        with ZipFile(zip_temp_dir) as zip_file:
-            zip_file.extractall(extracted_dir)
-            copy_configfile(extracted_dir, sdk_config)
-
-        # Extract requirements folders and files
-        if requirements_zip_file_id:
-            requirements_zip_temp_dir = tempfile.mktemp()
-            requirements_zip_file_bin = resource.file_download_bin(requirements_zip_file_id)
-            with open(requirements_zip_temp_dir, 'wb') as zip_temp:
-                zip_temp.write(requirements_zip_file_bin)
-            with ZipFile(requirements_zip_temp_dir) as zip_temp:
-                zip_temp.extractall(extracted_dir)
+            # Extract requirements folders and files
+            if requirements_zip_file_id:
+                requirements_zip_temp_dir = tempfile.mktemp()
+                requirements_zip_file_bin = resource.file_download_bin(requirements_zip_file_id)
+                with open(requirements_zip_temp_dir, 'wb') as zip_temp:
+                    zip_temp.write(requirements_zip_file_bin)
+                with ZipFile(requirements_zip_temp_dir) as zip_temp:
+                    zip_temp.extractall(extracted_dir)
 
         virtual_handler = 'virtual_handler{}.py'.format(uuid.uuid4())
         virtual_handler_path = os.path.join(extracted_dir, virtual_handler)
@@ -134,8 +148,11 @@ def do(data, resource):
             r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
             print('slack response:', r)
 
-        os.remove(zip_temp_dir)
-        shutil.rmtree(extracted_dir, ignore_errors=True)
+        # os.remove(zip_temp_dir)
+        # shutil.rmtree(extracted_dir, ignore_errors=True)
+        os.remove(virtual_handler_path)
+        put_cache(zip_file_id, 'zip_temp_dir', zip_temp_dir)
+        put_cache(zip_file_id, 'extracted_dir', extracted_dir)
 
         # Logging
         content = json.dumps({

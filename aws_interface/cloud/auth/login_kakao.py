@@ -122,6 +122,7 @@ def do(data, resource):
     items, end_key = resource.db_query('user', instructions)
     if items:
         session_id = create_session(resource, items[0])
+        body['user_id'] = items[0]['id']
         body['session_id'] = session_id
         body['is_first_login'] = False
         return body
@@ -146,6 +147,7 @@ def do(data, resource):
         resource.db_put_item('user', item, item.get('id'))
         session_id = create_session(resource, item)
         body['session_id'] = session_id
+        body['user_id'] = item['id']
         body['is_first_login'] = True
         return body
     else:

@@ -26,47 +26,28 @@
                 <div class="col-xl-12">
                     <div class="card shadow">
                         <div class="card-header border-0">
-                            <div class="row align-items-center">
-                                <div class="col-3">
+                            <div class="row align-items-right">
+                                <div class="col">
                                     <h3 class="mb-0">
-                                        {{ _('Events') }}
+                                        {{ _('Schedule') }}
                                     </h3>
                                 </div>
 
-                                <div class="col-9">
-                                    <form method="get" action="">
-                                        <div class="row">
-                                            <div class="col-4">
-                                                <input name="user_id" type="text" class="form-control form-control-sm" placeholder="OWNER" value="{{ user_id }}">
-                                            </div>
-                                            <div class="col-3">
-                                                <input name="event_source" type="text" class="form-control form-control-sm" placeholder="SOURCE" value="{{ event_source }}">
-                                            </div>
-                                            <div class="col-3">
-                                                <input name="event_name" type="text" class="form-control form-control-sm" placeholder="NAME" value="{{ event_name }}">
-                                            </div>
-
-                                            <div class="col-2">
-                                                <button type="submit" id="search-event-btn" class="btn btn-sm btn-primary">
-                                                    <span class="btn-inner--text" style="color: white;">{{ _('Search') }}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
+                                <div class="col text-right">
+                                    <button id="search-event-btn" class="btn btn-sm btn-primary" onclick="showCreateModal();">
+                                        <span class="btn-inner--text" style="color: white;">{{ _('Create') }}</span>
+                                    </button>
                                 </div>
 
                             </div>
                         </div>
-                        <div id="log-table" class="table-responsive">
+                        <div id="schedule_table" class="table-responsive">
                             <!-- Projects table -->
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                 <tr>
-                                    <th scope="col">owner</th>
-                                    <th scope="col">createDate</th>
-                                    <th scope="col">event_source</th>
-                                    <th scope="col">event_name</th>
-                                    <th scope="col">event_param</th>
+                                    <th scope="col">Info</th>
+                                    <th scope="col">Payload</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -74,7 +55,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <button id="load-more-logs-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_logs();">
+                        <button id="load-more-schedules-btn" class="btn-primary btn-block rounded-bottom" onclick="load_more_schedules();">
                             {{ _('More items') }} +
                         </button>
                     </div>
@@ -96,35 +77,125 @@
         </div>
     </div>
 
-    <script>
-        var logs_end_key = null;
-        function load_more_logs(){
-            const user_id = '{{ user_id }}';
-            const event_source = '{{ event_source }}';
-            const event_name = '{{ event_name }}';
+    <div class="modal fade" id="modal-create-schedule" tabindex="-1" role="dialog" aria-labelledby="modal-create-schedule" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modal-title-default">{{ _("Create schedule") }}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
 
-            var item = {
-                cmd: 'get_log_rows',
-                user_id: user_id,
-                event_source: event_source,
-                event_name: event_name,
+                <div class="modal-body">
+                    <div class="pl-lg-12">
+                        <div class="row">
+                            <div class="col-lg-12">
+
+
+                                <div class="form-group">
+                                    <label class="form-control-label" for="file-parent-path">{{ _("Schedule name") }}</label>
+                                    <input name="schedule_name" type="text" id="schedule_name" class="form-control form-control-alternative" placeholder="Name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-control-label" for="file-parent-path">{{ _("Cron schedule expression") }}</label>
+                                    <input name="schedule_expression" type="text" id="schedule_expression" class="form-control form-control-alternative" placeholder="cron(str str str str str str str)">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-control-label" for="file-parent-path">{{ _("Function name to schedule") }}</label>
+                                    <select id="function_name" class="form-control form-control-alternative">
+                                        {% for function in functions %}
+                                            <option value="{{ function.function_name }}">{{ function.function_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-control-label" for="file-parent-path">{{ _("Payload") }}</label>
+                                    <textarea name="payload" type="text" id="payload" class="form-control form-control-alternative" placeholder='{ "cmd": "payment" }'></textarea>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <p>
+                        {{ _("Click the confirm button to create schedule") }}
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                    <button onclick="createSchedule();" class="btn btn-primary">{{ _("Confirm") }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var start_key = null;
+        
+        function showCreateModal() {
+            $("#modal-create-schedule").modal('show');
+        }
+
+        function createSchedule() {
+            const schedule_name = $("#schedule_name").val();
+            const schedule_expression = $("#schedule_expression").val();
+            const function_name = $("#function_name").val();
+            const payload = $("#payload").val();
+            const request_item = {
+                cmd: 'create_schedule',
+                schedule_name: schedule_name,
+                schedule_expression: schedule_expression,
+                function_name: function_name,
+                payload: payload
+            };
+            $.post("", request_item, function (data) {
+                if (!data.success){
+                    alert(JSON.stringify(data));
+                }
+                window.location.reload();
+            });
+            $("#modal-create-schedule").modal('hide');
+        }
+
+        function deleteSchedule(schedule_name) {
+            if (!confirm("{{ _('Are you sure you want to delete?') }}")){
+                return;
+            }
+            const request_item = {
+                cmd: 'delete_schedule',
+                schedule_name: schedule_name
+            };
+            $.post("", request_item, function (data) {
+                if (!data.success){
+                    alert(JSON.stringify(data.message));
+                }
+                window.location.reload();
+            });
+        }
+
+
+        function load_more_schedules(){
+            const request_item = {
+                cmd: 'get_schedule_rows',
+                start_key: start_key
             };
 
-            if (logs_end_key != null){
-                item['start_key'] = logs_end_key;
-            }
-            $.post("", item, function (data) {
-                logs_end_key = data['end_key'];
-                if (logs_end_key == null){
-                    $("#load-more-logs-btn").hide();
+            $.post("", request_item, function (data) {
+                start_key = data['end_key'];
+                if (start_key == null){
+                    $("#load-more-schedules-btn").hide();
                 }
                 const rows = data['rows'];
-                $("#log-table>table").append(rows);
+                $("#schedule_table>table").append(rows);
             });
         }
         window.onload = function () {
             $(document).ready(function () {
-                load_more_logs();
+                load_more_schedules();
             });
         };
     </script>

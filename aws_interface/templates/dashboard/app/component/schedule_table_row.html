@@ -1,0 +1,65 @@
+{% load timetags %}
+
+{% for item in items %}
+    <tr>
+        <th scope="row" style="width: 30%;">
+            <div class="row">
+                <div class="col-12">
+                    <label>Schedule name</label>
+
+                </div>
+                 <div class="col-12">
+                    <p>{{ item.schedule_name }}</p>
+                 </div>
+            </div>
+
+             <div class="row">
+                <div class="col-12">
+                    <label>Schedule expression</label>
+
+                </div>
+                 <div class="col-12">
+                    <p>{{ item.schedule_expression }}</p>
+                 </div>
+            </div>
+
+             <div class="row">
+                <div class="col-12">
+                    <label>Function name</label>
+                </div>
+                 <div class="col-12">
+                     <p>{{ item.function_name }}</p>
+                 </div>
+            </div>
+
+
+             <div class="row">
+                <div class="col-12">
+                    <label>Creation date</label>
+                </div>
+                 <div class="col-12">
+                     <p>{{ item.creation_date|to_date }}</p>
+                 </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-12">
+                    <label>Modification</label>
+                </div>
+                 <div class="col-12">
+                     <button onClick="deleteSchedule('{{ item.schedule_name }}');" class="btn btn-sm btn-block btn-danger">{{ _('Delete schedule') }}</button>
+                 </div>
+            </div>
+
+
+        </th>
+        <td style="width: 70%;">
+
+            <label>Payload</label>
+            <textarea edit="false" class="form-control form-control-alternative" style="width: 100%; height: 300px;">{{ item.payload }}</textarea>
+
+
+        </td>
+    </tr>
+{% endfor %}

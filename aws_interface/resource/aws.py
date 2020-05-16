@@ -362,7 +362,7 @@ class AWSResource(Resource):
         resp = events.delete_rule(schedule_name)
         return resp
 
-    def sms_send_message(self, phone_number, message):
-        sns = SNS(self.boto3_session)
+    def sms_send_message(self, phone_number, message, region='us-east-1'):
+        sns = SNS(self.boto3_session, region)
         resp = sns.send_message(phone_number, message)
         return resp

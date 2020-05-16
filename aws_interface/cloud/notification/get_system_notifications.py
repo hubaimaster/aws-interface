@@ -13,11 +13,11 @@ info = {
         'items': 'list',
         'end_key': 'str'
     },
-    'description': 'Get slack webhook names for system notification.'
+    'description': 'Get system notifications.'
 }
 
 
-@NeedPermission(Permission.Run.Notification.get_system_notification_slack_webhook_names)
+@NeedPermission(Permission.Run.Notification.get_system_notifications)
 def do(data, resource):
     body = {}
     params = data['params']
@@ -26,7 +26,7 @@ def do(data, resource):
     start_key = params.get('start_key', None)
 
     query = []
-    items, end_key = resource.db_query('system_notification_slack_webhook', query, start_key=start_key)
+    items, end_key = resource.db_query('system_notification', query, start_key=start_key)
     body['items'] = items
     body['end_key'] = end_key
 

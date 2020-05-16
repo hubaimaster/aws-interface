@@ -8,5 +8,8 @@
         <td>
             {{ item.creation_date|to_date }}
         </td>
+        <td>
+            <button onclick="deleteSystemNotificationSlackWebhook('{{ item.id }}');" class="btn btn-sm btn-danger">{{ _('Delete') }}</button>
+        </td>
     </tr>
 {% endfor %}

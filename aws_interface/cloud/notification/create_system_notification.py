@@ -7,7 +7,7 @@ from uuid import uuid4
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'name': 'str',
+        'slack_webhook_name': 'str',
     },
     'output_format': {
         'error': 'dict?',
@@ -17,13 +17,12 @@ info = {
 }
 
 
-@NeedPermission(Permission.Run.Notification.create_system_notification_slack_webhook)
+@NeedPermission(Permission.Run.Notification.create_system_notification)
 def do(data, resource):
     body = {}
     params = data['params']
-    user = data.get('user', None)
 
-    slack_webhook_name = params.get('name')
+    slack_webhook_name = params.get('slack_webhook_name')
 
     query = [{
         'condition': 'eq',
@@ -36,7 +35,7 @@ def do(data, resource):
         item = items[0]
         item_id = item.get('id')
         name = item.get('name')
-        success = resource.db_put_item('system_notification_slack_webhook', {
+        success = resource.db_put_item('system_notification', {
             'slack_webhook_id': item_id,
             'slack_webhook_name': name
         })

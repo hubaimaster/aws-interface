@@ -28,15 +28,10 @@ def do(data, resource):
     body = {}
     params = data['params']
     email = params.get('email', None)
-    user = data.get('user', {})
 
-    if 'admin' in user.get('groups', []):
-        items, end_key = resource.db_query('user', [{'option': None, 'field': 'email', 'value': email, 'condition': 'eq'}])
+    items, end_key = resource.db_query('user', [{'option': None, 'field': 'email', 'value': email, 'condition': 'eq'}])
+    if items:
         body['item'] = items[0]
-        return body
-    elif user.get('id', None):
-        body['item'] = user
-        return body
     else:
         body['item'] = None
-        return body
+    return body

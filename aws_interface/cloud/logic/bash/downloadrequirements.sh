@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 cd $1
+pip install requirements.txt -t $2
 pip download -d $2 -r requirements.txt
 cd ..
 cd $2
