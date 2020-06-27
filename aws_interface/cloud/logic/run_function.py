@@ -37,6 +37,7 @@ cache = {
     # Cache for speed
 }
 
+
 def copy_configfile(destination, sdk_config, config_name='aws_interface_config.json'):
     config_filepath = os.path.join(destination, config_name)
     if not os.path.exists(config_filepath):

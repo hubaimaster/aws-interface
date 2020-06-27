@@ -31,8 +31,7 @@ def do(data, resource):
     for field in user:
         if field in ['id', 'email', 'password_hash', 'salt', 'groups', 'login_method']:
             body['error'] = error.FORBIDDEN_MODIFICATION
-            if not body['forbidden_fields']:
-                body['forbidden_fields'] = []
+            body.setdefault('forbidden_fields', [])
             body['forbidden_fields'].append(field)
         user_to_update[field] = user[field]
 

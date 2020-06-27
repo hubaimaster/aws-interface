@@ -2,6 +2,7 @@ from abc import ABCMeta
 from concurrent.futures import ThreadPoolExecutor
 import time
 import json
+from collections.abc import Iterable
 
 
 class ResourceAllocator(metaclass=ABCMeta):
@@ -153,7 +154,14 @@ class Resource(metaclass=ABCMeta):
     def db_query(self, partition, instructions=None, start_key=None, limit=100, reverse=False, order_by='creation_date'):
         """:return:items:list,end_key:str"""
         # TODO 상위레이어에서 쿼리를 순차적으로 실행가능한 instructions 으로 만들어 전달 -> ORM 클래스 만들기
-        if not instructions:
+        if instructions:
+            if isinstance(instructions[0], tuple) and instructions[0][0] == 'and':
+                instructions[0] = (None, (instructions[0][1][0], instructions[0][1][1], instructions[0][1][2]))
+            elif isinstance(instructions[0], dict) and instructions[0].get('option', None) == 'and':
+                instructions[0]['option'] = None
+            elif isinstance(instructions[0], list) and instructions[0][0] == 'and':
+                instructions[0][0] = None
+        else:
             instructions = [{'field': 'partition', 'value': partition, 'condition': 'eq', 'option': None}]
 
         def get_items(_start_key_list, _sub_limit):
@@ -180,18 +188,23 @@ class Resource(metaclass=ABCMeta):
                     if option == 'and':
                         pairs, _end_key_list[idx] = self._db_index_items(statement, partition, order_by, order_min,
                                                                          order_max, _start_key_list[idx], _sub_limit, reverse)
-                        if reverse and pairs:
-                            order_min = pairs[-1][order_by]
-                        elif pairs:
-                            order_max = pairs[-1][order_by]
+                        if idx == 0:
+                            if reverse and pairs:
+                                order_min = pairs[-1][order_by]
+                            elif pairs:
+                                order_max = pairs[-1][order_by]
+                        if idx == 0:
+                            # 0번째 inst. option 이 and 이면 무시
+                            item_set = set(pairs)
                         item_set &= set(pairs)
                     elif option == 'or' or option is None:
                         pairs, _end_key_list[idx] = self._db_index_items(statement, partition, order_by, order_min,
                                                                          order_max, _start_key_list[idx], _sub_limit, reverse)
-                        if reverse and pairs:
-                            order_min = pairs[-1][order_by]
-                        elif pairs:
-                            order_max = pairs[-1][order_by]
+                        if idx == 0:
+                            if reverse and pairs:
+                                order_min = pairs[-1][order_by]
+                            elif pairs:
+                                order_max = pairs[-1][order_by]
                         item_set |= set(pairs)
                 elif instruction_type == 'filter':
                     if option == 'and':
@@ -202,18 +215,20 @@ class Resource(metaclass=ABCMeta):
                     if option == 'and':
                         pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, order_by, order_min, order_max,
                                                                         _start_key_list[idx], _sub_limit, reverse)
-                        if reverse and pairs:
-                            order_min = pairs[-1][order_by]
-                        elif pairs:
-                            order_max = pairs[-1][order_by]
+                        if idx == 0:
+                            if reverse and pairs:
+                                order_min = pairs[-1][order_by]
+                            elif pairs:
+                                order_max = pairs[-1][order_by]
                         item_set &= set(pairs)
                     elif option == 'or' or option is None:
                         pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, order_by, order_min, order_max,
                                                                         _start_key_list[idx], _sub_limit, reverse)
-                        if reverse and pairs:
-                            order_min = pairs[-1][order_by]
-                        elif pairs:
-                            order_max = pairs[-1][order_by]
+                        if idx == 0:
+                            if reverse and pairs:
+                                order_min = pairs[-1][order_by]
+                            elif pairs:
+                                order_max = pairs[-1][order_by]
                         item_set |= set(pairs)
             return list(item_set), _end_key_list
 
@@ -224,7 +239,7 @@ class Resource(metaclass=ABCMeta):
             start_index = 0
             start_key_list = None
 
-        sub_limit = 1000
+        sub_limit = 500
         if not limit:
             limit = 100
 
@@ -242,7 +257,8 @@ class Resource(metaclass=ABCMeta):
                     end_index = 0
                     start_key_list = end_key_list
                 break
-            if all(end_key is None for end_key in end_key_list):
+
+            if all(end_key is None or end_key is False for end_key in end_key_list):
                 end_index = 0
                 no_more_items = True
                 break
@@ -263,7 +279,7 @@ class Resource(metaclass=ABCMeta):
         field, condition, value = statement
         if option == 'and':
             if condition == 'eq':
-                return 'filter'
+                return 'index'
             else:
                 return 'filter'
         elif option == 'or':
@@ -298,18 +314,41 @@ class Resource(metaclass=ABCMeta):
         return [IDDict(item) for item in items]
 
     def _db_index_items(self, statement, partition, order_by, order_min, order_max, start_key, limit, reverse):
+        if start_key is False:
+            # 이미 탐색이 끝난 경우에 대해 탐색하지 않고 빈 리스트 반환
+            return [], False
         field, condition, value = statement
         if condition != 'eq':
             raise BaseException('You cannot use condition : [{}] for indexing'.format(condition))
         pairs, end_key = self.db_get_item_id_and_orders(partition, field, value, order_by, order_min, order_max, start_key, limit, reverse)
         pairs = [IDDict(self._db_get_fake_item(pair, order_by)) for pair in pairs]
+        if not end_key:
+            # 탐색이 완전히 끝났음을 알려줌
+            end_key = False
         return pairs, end_key
+
+    def _db_scan_items(self, statement, partition, order_by, order_min, order_max, start_key, limit, reverse):
+        if start_key is False:
+            # 이미 탐색이 끝난 경우에 대해 탐색하지 않고 빈 리스트 반환
+            return [], False
+        items, end_key = self.db_get_items_in_partition(partition, order_by, order_min, order_max, start_key, limit, reverse)
+        items = [IDDict(item) for item in self._db_filter_items(statement, items)]
+        if not end_key:
+            # 탐색이 완전히 끝났음을 알려줌
+            end_key = False
+        return items, end_key
 
     def _db_filter_items(self, statement, items):
         field, condition, value = statement
         items = self._db_batch_fake_items_to_real(items)
         for item in items:
-            item_value = item.get(field, None)
+            if '.' in field:
+                item_value = item
+                for key in field.split('.'):
+                    if item_value is not None:
+                        item_value = item_value.get(key, None)
+            else:
+                item_value = item.get(field, None)
             if condition == 'eq':
                 if value == item_value:
                     yield item
@@ -317,7 +356,7 @@ class Resource(metaclass=ABCMeta):
                 if value != item_value:
                     yield item
             elif condition == 'in':
-                if item_value and value in item_value:
+                if item_value and isinstance(item_value, Iterable) and value in item_value:
                     yield item
             elif condition == 'nin':
                 if item_value and value not in item_value:
@@ -327,36 +366,31 @@ class Resource(metaclass=ABCMeta):
                     if str(value) < str(item_value):
                         yield item
                 else:
-                    if float(value) < float(item_value):
+                    if item_value is not None and value is not None and float(value) < float(item_value):
                         yield item
             elif condition == 'ls':
                 if isinstance(item_value, str):
                     if str(value) > str(item_value):
                         yield item
                 else:
-                    if float(value) > float(item_value):
+                    if item_value is not None and value is not None and float(value) > float(item_value):
                         yield item
             elif condition == 'ge':
                 if isinstance(item_value, str):
                     if str(value) <= str(item_value):
                         yield item
                 else:
-                    if float(value) <= float(item_value):
+                    if item_value is not None and value is not None and float(value) <= float(item_value):
                         yield item
             elif condition == 'le':
                 if isinstance(item_value, str):
                     if str(value) >= str(item_value):
                         yield item
                 else:
-                    if float(value) >= float(item_value):
+                    if item_value is not None and value is not None and float(value) >= float(item_value):
                         yield item
             else:
                 raise BaseException('No such condition : [{}]'.format(condition))
-
-    def _db_scan_items(self, statement, partition, order_by, order_min, order_max, start_key, limit, reverse):
-        items, end_key = self.db_get_items_in_partition(partition, order_by, order_min, order_max, start_key, limit, reverse)
-        items = [IDDict(item) for item in self._db_filter_items(statement, items)]
-        return items, end_key
 
     # Event scheduling
     def ev_put_schedule(self, schedule_name, cron_exp, params):

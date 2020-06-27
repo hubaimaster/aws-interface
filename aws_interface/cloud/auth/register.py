@@ -68,7 +68,7 @@ def do(data, resource):
         return body
 
     instructions = [
-        (None, ('email', 'eq', email))
+        [None, 'email', 'eq', email]
     ]
     items, end_key = resource.db_query(partition, instructions)
     users = list(items)

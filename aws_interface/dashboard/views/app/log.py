@@ -58,7 +58,7 @@ class Log(LoginRequiredMixin, View):
                 template = loader.get_template('dashboard/app/component/log_table_row.html')
                 items = result.get('items', [])
                 items = [{
-                    'owner': item.get('owmer', None),
+                    'owner': item.get('owner', None),
                     'creation_date': item.get('creation_date'),
                     'event_source': item.get('event_source', None),
                     'event_name': item.get('event_name', None),

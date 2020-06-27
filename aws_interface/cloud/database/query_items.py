@@ -10,8 +10,11 @@ info = {
     'input_format': {
         'session_id': 'str',
         'partition': 'str',
-        'query': 'list',
-        'start_key': 'dict',
+        'query': "[{'condition': 'eq' | 'neq' | 'in' | 'nin' | 'gt' | 'ge' | 'ls' | 'le', \
+                    'option': 'or' | 'and' | None, \
+                    'field': 'str', \
+                    'value': 'object'}, ...]",
+        'start_key': 'str',
         'limit': 'int=100',
         'reverse': 'bool=False',
         'sort_key': 'str="creation_date"'
@@ -39,7 +42,7 @@ def do(data, resource):
     user = data['user']
 
     partition = params.get('partition', None)
-    query_instructions = params.get('query', None)
+    query_instructions = params.get('query', [])
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
     reverse = params.get('reverse', False)
@@ -47,6 +50,14 @@ def do(data, resource):
 
     if type(start_key) is str:
         start_key = json.loads(start_key)
+
+    # 쿼리 유효성 검사
+    policy_code = get_policy_code(resource, partition, 'query')
+    if not match_policy(policy_code, user, query_instructions):
+        body['items'] = None
+        body['end_key'] = None
+        body['error'] = error.REGISTER_POLICY_VIOLATION
+        return body
 
     if resource.db_get_item(partition):
         items, end_key = resource.db_query(partition, query_instructions, start_key, limit, reverse, order_by=sort_key)

@@ -2,13 +2,14 @@
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import inspect
+import os
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
         'partition_to_apply': 'str',
-        'mode': '"create" | "read" | "update" | "delete"',
+        'mode': '"create" | "read" | "update" | "delete" | "query"',
     },
     'output_format': {
         'policy_code?': 'str',
@@ -26,12 +27,14 @@ def match_policy_after_get_policy_code(resource, mode, partition, user, item):
 
 
 def match_policy(policy_code, user, item):
-    if user and 'admin' in user.get('groups', []):
+    # if user and 'admin' in user.get('groups', []):
+    #     return True
+    os_env = os.environ.get('AWS_EXECUTION_ENV', None)
+    if os_env is None:
         return True
-    else:
-        exec(policy_code)
-        result = eval('has_permission(user, item)')
-        return result
+    exec(policy_code)
+    result = eval('has_permission(user, item)')
+    return result
 
 
 def get_policy_code(resource, partition, mode):
@@ -53,6 +56,9 @@ def get_policy_code(resource, partition, mode):
             policy_code = inspect.getsource(source)
         elif mode == 'delete':
             import cloud.database.policy.delete as source
+            policy_code = inspect.getsource(source)
+        elif mode == 'query':
+            import cloud.database.policy.query as source
             policy_code = inspect.getsource(source)
         else:
             policy_code = None

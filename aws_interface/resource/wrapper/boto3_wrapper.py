@@ -403,12 +403,12 @@ class DynamoDB:
                 self.update_table(table_name, {'hash_key': 'inverted_query', 'hash_key_type': 'S',
                                                'sort_key': sort_key, 'sort_key_type': sort_key_type})
             except Exception as ex:
-                print(ex)
+                pass
             try:
                 self.update_table(table_name, {'hash_key': 'partition', 'hash_key_type': 'S',
                                                'sort_key': sort_key, 'sort_key_type': sort_key_type})
             except Exception as ex:
-                print(ex)
+                pass
 
             return True
 
@@ -602,10 +602,10 @@ class DynamoDB:
             hash_key = '{}-{}-{}-{}'.format(partition, field, operand, operation)
             index_name = '{}-{}'.format(hash_key_name, sort_key_name)
             key_expression = Key(hash_key_name).eq(hash_key)
-            if order_min:
-                key_expression = key_expression & Key(sort_key_name).gte(order_min)
-            elif order_max:
-                key_expression = key_expression & Key(sort_key_name).lte(order_max)
+            # if order_min:
+            #     key_expression = key_expression & Key(sort_key_name).gte(order_min)
+            # elif order_max:
+            #     key_expression = key_expression & Key(sort_key_name).lte(order_max)
             try:
                 response = self.get_items_with_key_expression(table_name, index_name, key_expression, start_key, limit,
                                                           reverse)
@@ -707,6 +707,11 @@ class DynamoDB:
             for field, value in item.items():
                 for operand in self._eq_operands(value):
                     self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date)
+                if isinstance(value, dict):
+                    for field2, value2 in value.items():
+                        for operand2 in self._eq_operands(value2):
+                            # key.key2 eq val 와 같이 사용 할 수 있도록
+                            self._put_inverted_query_field(batch, partition, '{}.{}'.format(field, field2), operand2, 'eq', item_id, creation_date)
 
     def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date):
         if len(str(operand)) > 1024:
@@ -1075,7 +1080,7 @@ class Events:
 
 class SNS:
     def __init__(self, boto3_session, region='us-east-1'):
-        self.client = boto3_session.client('sns', region)
+        self.client = boto3_session.client('sns', region_name=region)
 
     def send_message(self, phone_number, message):
         return self.client.publish(PhoneNumber=phone_number, Message=message)
