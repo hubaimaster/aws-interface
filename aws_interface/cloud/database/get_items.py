@@ -2,6 +2,8 @@
 from cloud.database.get_policy_code import match_policy, get_policy_code
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
+from concurrent.futures import ThreadPoolExecutor
+from cloud.database import util
 import json
 
 # Define the input output format of the function.
@@ -13,6 +15,9 @@ info = {
         'start_key': 'dict',
         'limit': 'int=100',
         'reverse': 'bool=False',
+        'join': "{\"user_id\": \"user\", "
+                " \"info.user_id\": \"info.user\","
+                " \"info_user_id\": \"user\", ...}"
     },
     'output_format': {
         'items?': [{
@@ -36,6 +41,7 @@ def do(data, resource):
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
     reverse = params.get('reverse', False)
+    join = params.get('join', {})
 
     if not limit:
         limit = 100
@@ -49,6 +55,10 @@ def do(data, resource):
         for item in items:
             if match_policy(policy_code, user, item):
                 filtered.append(item)
+
+        if join:
+            util.join_items(resource, user, filtered, join)
+
         body['items'] = filtered
         body['end_key'] = end_key
         return body

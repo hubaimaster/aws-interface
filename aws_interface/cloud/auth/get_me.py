@@ -2,6 +2,7 @@
 from cloud.crypto import Hash
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
+import time
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -45,6 +46,9 @@ def do(data, resource):
 
     if user_id:
         user = resource.db_get_item(user_id)
+        if user:
+            user['latest_accessed_date'] = int(time.time())
+            resource.db_update_item(user_id, user)
         body['item'] = user
     else:
         body['item'] = None

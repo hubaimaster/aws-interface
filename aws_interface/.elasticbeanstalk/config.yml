@@ -16,6 +16,6 @@ global:
   instance_profile: null
   platform_name: null
   platform_version: null
-  profile: eb-cli
+  profile: kchdully
   sc: null
   workspace_type: Application

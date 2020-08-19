@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-eb deploy aws-interface-prod
+eb deploy aws-interface-prod --profile kchdully

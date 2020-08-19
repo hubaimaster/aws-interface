@@ -11,7 +11,7 @@ info = {
         'session_id': 'str',
         'item_id': 'str',
         'field_name': 'str',
-        'field_value?': 'any',
+        'field_value': 'any',
     },
     'output_format': {
         'success': 'bool'

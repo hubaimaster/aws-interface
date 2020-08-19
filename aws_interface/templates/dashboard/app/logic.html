@@ -369,6 +369,7 @@
                                 <thead class="thead-light">
                                 <tr>
                                     <th scope="col">function_name</th>
+                                    <th scope="col">version</th>
                                     <th scope="col">runtime</th>
                                     <th scope="col">handler</th>
                                     <th scope="col">creation_date</th>
@@ -384,7 +385,12 @@
                                             </a>
                                         </th>
                                         <td>
+                                            {{ function.function_version }}
+                                        </td>
+                                        <td>
                                             {{ function.runtime }}
+                                        </td>
+                                        <td>
                                             {{ function.handler }}
                                         </td>
                                         <td>
@@ -395,6 +401,7 @@
                                             <form method="post">{% csrf_token %}
                                                 <input name="cmd" value="delete_function" hidden>
                                                 <input name="function_name" value="{{ function.function_name }}" hidden>
+                                                <input name="function_version" value="{{ function.function_version }}" hidden>
                                                 <button type="submit" class="btn btn-danger btn-sm">{{ _("Remove") }}</button>
                                             </form>
                                         </td>

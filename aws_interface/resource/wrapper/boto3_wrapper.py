@@ -529,6 +529,9 @@ class DynamoDB:
     def time(self):
         return Decimal("%.20f" % time.time())
 
+    def to_decimal(self, timestamp):
+        return Decimal("%.20f" % timestamp)
+
     def put_item(self, table_name, partition, item, item_id=None, creation_date=None, indexing=True):
         if 'id' in item:
             item_id = item.get('id')
@@ -614,6 +617,8 @@ class DynamoDB:
                 response = {
                     'Items': []
                 }
+            print('start_key:', start_key)
+            print('get_inverted_queries:', len(response.get('Items', [])), response)
             return response
         else:
             raise BaseException('an operation is must be <in> or <eq>')
@@ -629,7 +634,7 @@ class DynamoDB:
         if start_key:
             for key in start_key:
                 if isinstance(start_key[key], float):
-                    start_key[key] = Decimal(start_key[key])
+                    start_key[key] = self.to_decimal(start_key[key])
 
         scan_index_forward = not reverse
         table = self.resource.Table(table_name)
@@ -707,11 +712,16 @@ class DynamoDB:
             for field, value in item.items():
                 for operand in self._eq_operands(value):
                     self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date)
-                if isinstance(value, dict):
-                    for field2, value2 in value.items():
-                        for operand2 in self._eq_operands(value2):
-                            # key.key2 eq val 와 같이 사용 할 수 있도록
-                            self._put_inverted_query_field(batch, partition, '{}.{}'.format(field, field2), operand2, 'eq', item_id, creation_date)
+                self._put_deep_inverted_query(batch, partition, item_id, creation_date, field, value)
+
+    def _put_deep_inverted_query(self, batch, partition, item_id, creation_date, field, value):
+        if isinstance(value, dict):
+            for field2, value2 in value.items():
+                for operand2 in self._eq_operands(value2):
+                    # key.key2 eq val 와 같이 사용 할 수 있도록
+                    self._put_inverted_query_field(batch, partition, '{}.{}'.format(field, field2), operand2, 'eq',
+                                                   item_id, creation_date)
+                self._put_deep_inverted_query(batch, partition, item_id, creation_date, '{}.{}'.format(field, field2), value2)
 
     def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date):
         if len(str(operand)) > 1024:

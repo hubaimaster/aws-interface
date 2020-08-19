@@ -276,66 +276,109 @@ class AWSResource(Resource):
         count = item.get('count')
         return count
 
-    def get_end_key(self, item, order_by):
+    def get_end_key(self, item, order_by, index_key='partition'):
+        if not item:
+            return item
         end_key = {
             'id': item['id'],
             order_by: item[order_by],
-            'partition': item['partition']
+            index_key: item[index_key]
         }
 
         if isinstance(item[order_by], int) or isinstance(item[order_by], float) or isinstance(item[order_by], Decimal):
-            end_key[order_by] = Decimal(item[order_by])
+            end_key[order_by] = Decimal("%.20f" % item[order_by])
 
         return end_key
 
     def db_get_items_in_partition(self, partition, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):
+
+        def should_contains(key, min_value, max_value):
+            if min_value:
+                return key >= min_value
+            if max_value:
+                return key <= max_value
+            return True
+
         if isinstance(start_key, str):
             start_key = json.loads(start_key)
         dynamo = DynamoDB(self.boto3_session)
+
+        start_key = self.get_end_key(start_key, order_by)
+
         result = dynamo.get_items_in_partition_by_order(self.app_id, partition, order_by, None, None, start_key, limit, reverse)
         end_key = result.get('LastEvaluatedKey', None)
         items = result.get('Items', [])
+        if end_key:
+            end_key = self.get_end_key(items[-1], order_by)
 
-        if order_min:
-            filter_items = [item for item in items if item[order_by] >= order_min]
-            if len(filter_items) < len(items) and filter_items:
-                end_key = self.get_end_key(filter_items[-1], order_by)
-            items = filter_items
-        elif order_max:
-            filter_items = [item for item in items if item[order_by] <= order_max]
-            if len(filter_items) < len(items) and filter_items:
-                end_key = self.get_end_key(filter_items[-1], order_by)
-            items = filter_items
+        filter_items = [item for item in items if should_contains(item[order_by], order_min, order_max)]
+        if len(filter_items) < len(items) and filter_items:
+            end_key = self.get_end_key(filter_items[-1], order_by)
+        elif end_key and (order_min or order_max):
+            while end_key is not None:
+                result = dynamo.get_items_in_partition_by_order(self.app_id, partition, order_by, None, None, end_key,
+                                                                limit, reverse)
+                end_key = result.get('LastEvaluatedKey', None)
+                sub_items = result.get('Items', [])
+                sub_filter_items = [item for item in sub_items if should_contains(item[order_by], order_min, order_max)]
 
-        if end_key is not None:
+                items.extend(sub_items)
+                filter_items.extend(sub_filter_items)
+
+                if len(filter_items) < len(items) and filter_items:
+                    end_key = self.get_end_key(filter_items[-1], order_by)
+                    break
+
+        if end_key is not None and end_key is not False:
             end_key = json.dumps(encode_dict(end_key))
 
-        return items, end_key
+        return filter_items, end_key
 
     def db_get_item_id_and_orders(self, partition, field, value, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):
+
+        def should_contains(key, min_value, max_value):
+            if min_value:
+                return key >= min_value
+            if max_value:
+                return key <= max_value
+            return True
+
         # order_field 가 'creation_date' 이 아니면 아직 사용 불가능
         if isinstance(start_key, str):
             start_key = json.loads(start_key)
+
+        start_key = self.get_end_key(start_key, order_by, 'inverted_query')
+
         dynamo = DynamoDB(self.boto3_session)
         response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by, None, None, start_key, limit, reverse)
         items = response.get('Items', [])
         end_key = response.get('LastEvaluatedKey', None)
+        if end_key:
+            end_key = self.get_end_key(items[-1], order_by, 'inverted_query')
 
-        if order_min:
-            filter_items = [item for item in items if item[order_by] >= order_min]
-            if len(filter_items) < len(items) and filter_items:
-                end_key = self.get_end_key(filter_items[-1], order_by)
-            items = filter_items
-        elif order_max:
-            filter_items = [item for item in items if item[order_by] <= order_max]
-            if len(filter_items) < len(items) and filter_items:
-                end_key = self.get_end_key(filter_items[-1], order_by)
-            items = filter_items
+        filter_items = [item for item in items if should_contains(item[order_by], order_min, order_max)]
+        if len(filter_items) < len(items) and filter_items:
+            end_key = self.get_end_key(filter_items[-1], order_by, 'inverted_query')
+        elif end_key and (order_min or order_max):
+            while end_key is not None:
+                response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by, None, None,
+                                                       end_key, limit, reverse)
+                sub_items = response.get('Items', [])
+                end_key = response.get('LastEvaluatedKey', None)
+                sub_filter_items = [item for item in sub_items if should_contains(item[order_by], order_min, order_max)]
+
+                items.extend(sub_items)
+                filter_items.extend(sub_filter_items)
+
+                if len(filter_items) < len(items) and filter_items:
+                    end_key = self.get_end_key(filter_items[-1], order_by, 'inverted_query')
+                    break
 
         item_id_and_creation_date_list = [{'item_id': item.get('item_id'), order_by: item.get(order_by)}
-                                          for item in items]
-        if end_key is not None:
+                                          for item in filter_items]
+        if end_key is not None and end_key is not False:
             end_key = json.dumps(encode_dict(end_key))
+
         return item_id_and_creation_date_list, end_key
 
     def db_create_sort_index(self, sort_key, sort_key_type):

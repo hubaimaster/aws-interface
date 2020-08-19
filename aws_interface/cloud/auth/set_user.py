@@ -30,7 +30,7 @@ def do(data, resource):
     user = resource.db_get_item(user_id)
 
     # For security
-    if field in ['id', 'email', 'password_hash', 'salt', 'groups', 'login_method']:
+    if field in ['id', 'password_hash', 'salt', 'groups', 'login_method']:
         body['error'] = error.FORBIDDEN_MODIFICATION
         return body
     else:

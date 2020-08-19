@@ -33,6 +33,7 @@ def do(data, resource):
     params = data['params']
 
     function_name = params.get('function_name')
+    function_version = params.get('function_version', None)
     file_path = params.get('file_path')
     file_content = params.get('file_content')
     file_type = params.get('file_type', 'text')
@@ -46,6 +47,7 @@ def do(data, resource):
     items, _ = resource.db_query(partition,
                                  [{'option': None, 'field': 'function_name', 'value': function_name,
                                    'condition': 'eq'}])
+    items = list(filter(lambda x: x.get('function_version', None) == function_version, items))
 
     if len(items) == 0:
         body['message'] = 'function_name: {} did not exist'.format(function_name)

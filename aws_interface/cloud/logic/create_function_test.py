@@ -9,6 +9,7 @@ info = {
     'input_format': {
         'test_name': 'str',
         'function_name': 'str',
+        'function_version?': 'str',
         'test_input': 'dict',
     },
     'output_format': {
@@ -26,6 +27,7 @@ def do(data, resource):
 
     test_name = params.get('test_name')
     function_name = params.get('function_name')
+    function_version = params.get('function_version', None)
     test_input = params.get('test_input')
     if isinstance(test_input, dict):
         test_input = json.dumps(test_input)
@@ -33,6 +35,7 @@ def do(data, resource):
     item = dict()
     item['test_name'] = test_name
     item['function_name'] = function_name
+    item['function_version'] = function_version
     item['test_input'] = test_input
 
     item_ids, _ = resource.db_get_item_id_and_orders(partition, 'test_name', test_name)

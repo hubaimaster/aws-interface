@@ -77,6 +77,7 @@ class Permission:
             set_login_method = 'run:cloud.auth.set_login_method'
             set_user = 'run:cloud.auth.set_user'
             set_me = 'run:cloud.auth.set_me'
+            set_my_email = 'run:cloud.auth.set_my_email'
             get_login_method = 'run:cloud.auth.get_login_method'
             change_password = 'run:cloud.auth.change_password'
             change_password_admin = 'run:cloud.auth.change_password_admin'

@@ -2,6 +2,7 @@
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
+from cloud.database import util
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -9,6 +10,9 @@ info = {
     'input_format': {
         'session_id': 'str',
         'item_id': 'str',
+        'join': "{\"user_id\": \"user\", "
+                " \"info.user_id\": \"info.user\","
+                " \"info_user_id\": \"user\", ...}"
     },
     'output_format': {
         'item': {
@@ -28,9 +32,12 @@ def do(data, resource):
     user = data['user']
 
     item_id = params.get('item_id', None)
+    join = params.get('join', {})
     item = resource.db_get_item(item_id)
 
     if match_policy_after_get_policy_code(resource, 'read', item['partition'], user, item):
+        if join:
+            util.join_item(resource, user, item, join)
         body['item'] = item
     else:
         body['error'] = error.PERMISSION_DENIED

@@ -19,10 +19,11 @@ class LogicAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def delete_function(self, function_name):
+    def delete_function(self, function_name, function_version=None):
         import cloud.logic.delete_function as method
         params = {
             'function_name': function_name,
+            'function_version': function_version,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

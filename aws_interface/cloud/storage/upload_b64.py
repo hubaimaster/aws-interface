@@ -14,6 +14,7 @@ info = {
         'parent_file_id?': 'str',
         'file_name?': 'str',
         'file_b64': 'str',
+        'use_plain': 'bool=false',
 
         'meta_info?': 'dict',
     },
@@ -35,6 +36,7 @@ def do(data, resource):
     parent_file_id = params.get('parent_file_id', None)
     file_name = params.get('file_name', uuid())
     file_b64 = params.get('file_b64')
+    use_plain = params.get('use_plain', False)
 
     meta_info = params.get('meta_info', {})
 
@@ -69,7 +71,8 @@ def do(data, resource):
             resource.db_update_item(parent_file_id, parent_file_info)
 
         file_b64 = file_b64.encode('utf-8')
-        file_b64 = base64.b64decode(file_b64)
+        if not use_plain:
+            file_b64 = base64.b64decode(file_b64)
         resource.file_upload_bin(file_id, file_b64)
 
         body['file_id'] = file_id

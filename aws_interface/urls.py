@@ -26,6 +26,7 @@ from dashboard.views.login import Login
 from dashboard.views.index import Index
 from dashboard.views.accesskey import AccessKey
 from dashboard.views.apps import Apps
+from dashboard.views.changepassword import ChangePassword
 
 from dashboard.views.app.auth import Auth
 from dashboard.views.app.overview import Overview
@@ -49,6 +50,7 @@ urlpatterns = [
     path('apps/', Apps.as_view(), name='apps'),
     path('logout/', Logout.as_view(), name='logout'),
     path('accesskey/', AccessKey.as_view(), name='accesskey'),
+    path('changepassword/', ChangePassword.as_view(), name='changepassword'),
 
     path('<app_id>/overview', Overview.as_view(), name='overview'),
     path('<app_id>/guide', Guide.as_view(), name='guide'),

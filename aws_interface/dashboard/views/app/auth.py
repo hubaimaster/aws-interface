@@ -17,9 +17,9 @@ class Auth(LoginRequiredMixin, View):
     def get(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-
         adapter = DjangoAdapter(app_id, request)
         allocate_resource_in_background(adapter)
+
         with adapter.open_api_auth() as api:
             context['user_groups'] = api.get_user_groups()['groups']
             context['user_count'] = api.get_user_count()
@@ -28,6 +28,7 @@ class Auth(LoginRequiredMixin, View):
             context['visible_user_fields'] = ['id', 'creation_date', 'email', 'groups']
             context['none_extra_fields'] = ['id', 'creation_date', 'email', 'groups',
                                             'password_hash', 'salt', 'partition', 'login_method']
+            print('app_id:', app_id)
             context['sessions'] = api.get_sessions()
 
             context['email_login'] = api.get_login_method('email_login')['item']

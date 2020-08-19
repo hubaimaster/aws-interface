@@ -22,6 +22,7 @@ info = {
         'payload': {
             '...': '...',
         },
+        'logging': 'bool',
     },
     'output_format': {
         'response': {
@@ -69,8 +70,9 @@ def do(data, resource):
 
     function_name = params.get('function_name')
     payload = params.get('payload')
+    logging = params.get('logging', True)
 
-    items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}])
+    items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}], reverse=True)
 
     if len(items) == 0:
         body['error'] = error.NO_SUCH_FUNCTION
@@ -156,11 +158,13 @@ def do(data, resource):
         put_cache(zip_file_id, 'extracted_dir', extracted_dir)
 
         # Logging
-        content = json.dumps({
-            'params': params,
-            'body': body,
-        })
-        content = content[:1000 * 1000 * 2]
-        create_event(resource, user, 'run_function:{}'.format(function_name), content, 'logic')
+        if logging:
+            content = json.dumps({
+                'params': params,
+                'body': body,
+            })
+            content = content[:1000 * 1000 * 2]
+            create_event(resource, user, 'run_function:{}'.format(function_name), content, 'logic')
+
         return body
 

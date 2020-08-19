@@ -86,6 +86,9 @@ class User(AbstractUser):
             credentials = json.loads(credentials)
         else:
             credentials = dict()
+        if not credentials:
+            credentials = dict()
+
         credentials[vendor] = credential
         credentials = json.dumps(credentials)
         self.c_credentials = self._encrypt(raw_password, credentials)
@@ -103,9 +106,13 @@ class User(AbstractUser):
 
     def get_credentials(self, raw_password):
         assert (self.check_password(raw_password))
-        credentials = self._decrypt(raw_password, self.c_credentials)
-        credentials = json.loads(credentials)
-        return credentials
+        try:
+            credentials = self._decrypt(raw_password, self.c_credentials)
+            credentials = json.loads(credentials)
+            return credentials
+        except Exception as e:
+            print(e)
+            return None
 
 
 class App(models.Model):

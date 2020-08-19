@@ -104,6 +104,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.notification.send_email2',
     'cloud.notification.send_sms',
     'cloud.notification.update_email_provider',
+    'cloud.notification.send_slack_message'
 }
 
 

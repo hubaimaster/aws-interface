@@ -82,7 +82,8 @@ class Logic(LoginRequiredMixin, View):
                 logic_api.delete_function_test(test_name)
             elif cmd == 'delete_function':
                 function_name = request.POST.get('function_name')
-                logic_api.delete_function(function_name)
+                function_version = request.POST.get('function_version', None)
+                logic_api.delete_function(function_name, function_version)
             elif cmd == 'create_webhook':
                 name = request.POST.get('name')
                 description = request.POST.get('description')

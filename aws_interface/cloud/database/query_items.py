@@ -2,6 +2,7 @@
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy, get_policy_code
+from cloud.database import util
 import json
 
 # Define the input output format of the function.
@@ -10,14 +11,17 @@ info = {
     'input_format': {
         'session_id': 'str',
         'partition': 'str',
-        'query': "[{'condition': 'eq' | 'neq' | 'in' | 'nin' | 'gt' | 'ge' | 'ls' | 'le', \
-                    'option': 'or' | 'and' | None, \
-                    'field': 'str', \
-                    'value': 'object'}, ...]",
+        'query': "[{\"condition\": \"eq\" | \"neq\" | \"in\" | \"nin\" | \"gt\" | \"ge\" | \"ls\" | \"le\", \
+                    \"option\": \"or\" | \"and\" | None, \
+                    \"field\": \"str\", \
+                    \"value\": \"object\"}, ...]",
         'start_key': 'str',
         'limit': 'int=100',
         'reverse': 'bool=False',
-        'sort_key': 'str="creation_date"'
+        'sort_key': 'str="creation_date"',
+        'join': "{\"user_id\": \"user\", "
+                " \"info.user_id\": \"info.user\","
+                " \"info_user_id\": \"user\", ...}"
     },
     'output_format': {
         'items?': [
@@ -47,6 +51,7 @@ def do(data, resource):
     limit = params.get('limit', 100)
     reverse = params.get('reverse', False)
     sort_key = params.get('sort_key', DEFAULT_SORT_KEY)
+    join = params.get('join', {})
 
     if type(start_key) is str:
         start_key = json.loads(start_key)
@@ -56,7 +61,7 @@ def do(data, resource):
     if not match_policy(policy_code, user, query_instructions):
         body['items'] = None
         body['end_key'] = None
-        body['error'] = error.REGISTER_POLICY_VIOLATION
+        body['error'] = error.QUERY_POLICY_VIOLATION
         return body
 
     if resource.db_get_item(partition):
@@ -66,6 +71,9 @@ def do(data, resource):
         for item in items:
             if match_policy(policy_code, user, item):
                 filtered.append(item)
+
+        if join:
+            util.join_items(resource, user, filtered, join)
 
         body['items'] = filtered
         body['end_key'] = end_key

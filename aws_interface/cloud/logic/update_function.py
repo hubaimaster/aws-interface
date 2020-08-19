@@ -30,6 +30,7 @@ def do(data, resource):
     params = data['params']
 
     function_name = params.get('function_name')
+    function_version = params.get('function_version', None)
     description = params.get('description', None)
     zip_file = params.get('zip_file', None)
     runtime = params.get('runtime', None)
@@ -39,7 +40,7 @@ def do(data, resource):
 
     items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'condition': 'eq',
                                               'value': function_name}])
-
+    items = list(filter(lambda x: x.get('function_version', None) == function_version, items))
     if items:
         item = items[0]
         if description:

@@ -52,15 +52,21 @@ def do(data, resource):
     item['sdk_config'] = sdk_config
 
     item_ids, _ = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
-    if len(item_ids) == 0:
-        zip_file_b64 = zip_file.encode('utf-8')
-        zip_file_bin = base64.b64decode(zip_file_b64)
-        requirements_zip_file_bin = generate_requirements_zipfile(zip_file_bin)
-        resource.file_upload_bin(zip_file_id, zip_file_bin)
-        resource.file_upload_bin(requirements_zip_file_id, requirements_zip_file_bin)
-        resource.db_put_item(partition, item)
-        body['function_name'] = function_name
-        return body
-    else:
-        body['error'] = error.EXISTING_FUNCTION
-        return body
+    function_version = str(len(item_ids))
+    item['function_version'] = function_version
+
+    zip_file_b64 = zip_file.encode('utf-8')
+    zip_file_bin = base64.b64decode(zip_file_b64)
+    requirements_zip_file_bin = generate_requirements_zipfile(zip_file_bin)
+    resource.file_upload_bin(zip_file_id, zip_file_bin)
+    resource.file_upload_bin(requirements_zip_file_id, requirements_zip_file_bin)
+    resource.db_put_item(partition, item)
+    body['function_name'] = function_name
+    body['function_version'] = function_version
+    return body
+    #
+    # if len(item_ids) == 0:
+    #
+    # else:
+    #     body['error'] = error.EXISTING_FUNCTION
+    #     return body

@@ -36,7 +36,7 @@ def do(data, resource):
 
     items, _ = resource.db_query(partition,
                                  [{'option': None, 'field': 'function_name', 'value': function_name,
-                                   'condition': 'eq'}])
+                                   'condition': 'eq'}], reverse=True)
 
     if len(items) == 0:
         body['error'] = error.NO_SUCH_FUNCTION
