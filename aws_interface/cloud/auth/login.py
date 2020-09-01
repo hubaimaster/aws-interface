@@ -17,6 +17,7 @@ info = {
             'code': 'int',
             'message': 'str',
         },
+        'user_id': 'str',
         'session_id': 'str',
     },
     'description': 'Sign-in by email and password'

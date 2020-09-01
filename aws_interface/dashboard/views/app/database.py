@@ -35,7 +35,6 @@ class Database(LoginRequiredMixin, View):
             context['user_groups'] = auth_api.get_user_groups()['groups']
             context['partitions'] = partitions
             context['sort_key_indexes'] = sort_indexes
-            print("sort_indexes", sort_indexes)
 
         return render(request, 'dashboard/app/database.html', context=context)
 

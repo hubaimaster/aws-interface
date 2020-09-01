@@ -33,21 +33,22 @@ def do(data, resource):
     params = data['params']
 
     function_name = params.get('function_name')
-    function_version = params.get('function_version', None)
+    function_version = params.get('function_version', 0)
     file_path = params.get('file_path')
     file_content = params.get('file_content')
     file_type = params.get('file_type', 'text')
-
-    print(params)
 
     if file_type not in SUPPORT_TYPES:
         body['error'] = error.UNSUPPORTED_FILE_TYPE
         return body
 
+    if function_version is None:
+        function_version = 0
+
     items, _ = resource.db_query(partition,
                                  [{'option': None, 'field': 'function_name', 'value': function_name,
                                    'condition': 'eq'}])
-    items = list(filter(lambda x: x.get('function_version', None) == function_version, items))
+    items = list(filter(lambda x: int(x.get('function_version', 0)) == int(function_version), items))
 
     if len(items) == 0:
         body['message'] = 'function_name: {} did not exist'.format(function_name)
@@ -80,12 +81,12 @@ def do(data, resource):
             success = resource.db_update_item(item['id'], item)
             body['success'] = success
 
-        if 'requirements.txt' in file_path:
-            requirements_zipfile_id = uuid()
-            requirements_zipfile_bin = generate_requirements_zipfile(zip_file_bin)
-            resource.file_upload_bin(requirements_zipfile_id, requirements_zipfile_bin)
-            if 'requirements_zipfile_id' in item:
-                resource.file_delete_bin(item['requirements_zipfile_id'])
-            item['requirements_zipfile_id'] = requirements_zipfile_id
+        # if 'requirements.txt' in file_path:
+        #     requirements_zipfile_id = uuid()
+        #     requirements_zipfile_bin = generate_requirements_zipfile(zip_file_bin)
+        #     resource.file_upload_bin(requirements_zipfile_id, requirements_zipfile_bin)
+        #     if 'requirements_zipfile_id' in item:
+        #         resource.file_delete_bin(item['requirements_zipfile_id'])
+        #     item['requirements_zipfile_id'] = requirements_zipfile_id
 
         return body

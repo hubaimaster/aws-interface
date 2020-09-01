@@ -20,12 +20,14 @@ def do(data, resource):
     params = data['params']
 
     function_name = params.get('function_name')
-    function_version = params.get('function_version', None)
+    function_version = params.get('function_version', 0)
+    if function_version is None:
+        function_version = 0
 
     query = [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}]
     items, _ = resource.db_query(partition, query, reverse=True)
     for item in items:
-        if item.get('function_version', None) == function_version:
+        if int(item.get('function_version', -1)) == int(function_version):
             success = resource.db_delete_item(item['id'])
             body['success'] = success
 

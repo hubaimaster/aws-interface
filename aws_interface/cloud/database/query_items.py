@@ -64,6 +64,14 @@ def do(data, resource):
         body['error'] = error.QUERY_POLICY_VIOLATION
         return body
 
+    # Join 유효성 검사
+    policy_code = get_policy_code(resource, partition, 'join')
+    if not match_policy(policy_code, user, join):
+        body['items'] = None
+        body['end_key'] = None
+        body['error'] = error.JOIN_POLICY_VIOLATION
+        return body
+
     if resource.db_get_item(partition):
         items, end_key = resource.db_query(partition, query_instructions, start_key, limit, reverse, order_by=sort_key)
         policy_code = get_policy_code(resource, partition, 'read')

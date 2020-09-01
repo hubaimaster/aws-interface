@@ -51,15 +51,21 @@ def do(data, resource):
     item['requirements_zip_file_id'] = requirements_zip_file_id
     item['sdk_config'] = sdk_config
 
-    item_ids, _ = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
-    function_version = str(len(item_ids))
+    functions, _ = resource.db_query(partition, [
+        {'condition': 'eq', 'field': 'function_name', 'value': function_name}
+    ], None, 1000, False)
+    # item_ids, _ = resource.db_get_item_id_and_orders(partition, 'function_name', function_name)
+    function_version = 0
+    if functions:
+        function_version = int(functions[-1].get('function_version', 0)) + 1
+
     item['function_version'] = function_version
 
     zip_file_b64 = zip_file.encode('utf-8')
     zip_file_bin = base64.b64decode(zip_file_b64)
-    requirements_zip_file_bin = generate_requirements_zipfile(zip_file_bin)
+    # equirements_zip_file_bin = generate_requirements_zipfile(zip_file_bin)
     resource.file_upload_bin(zip_file_id, zip_file_bin)
-    resource.file_upload_bin(requirements_zip_file_id, requirements_zip_file_bin)
+    # resource.file_upload_bin(requirements_zip_file_id, requirements_zip_file_bin)
     resource.db_put_item(partition, item)
     body['function_name'] = function_name
     body['function_version'] = function_version

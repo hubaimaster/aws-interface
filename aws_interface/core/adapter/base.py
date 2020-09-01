@@ -136,7 +136,6 @@ class Adapter(metaclass=ABCMeta):
                 'role': 'Admin session for running function'
             })
             session_id = auth_api.create_session(email, password)['session_id']
-            print('session_id:', session_id)
             user_id = auth_api.get_user_by_email(email)['item']['id']
             for group in groups:
                 auth_api.attach_user_group(user_id, group)

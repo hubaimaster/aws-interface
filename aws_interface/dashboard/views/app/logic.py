@@ -98,14 +98,15 @@ class Logic(LoginRequiredMixin, View):
 
 class LogicEdit(LoginRequiredMixin, View):
     @page_manage
-    def get(self, request, app_id, function_name):
+    def get(self, request, app_id, function_name, function_version=None):
         context = Util.get_context(request)
         context['app_id'] = app_id
 
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_logic() as logic_api:
-            function = logic_api.get_function(function_name)['item']
-            file_paths = logic_api.get_function_file_paths(function_name).get('file_paths', [])
+            function = logic_api.get_function(function_name, function_version)
+            function = function['item']
+            file_paths = logic_api.get_function_file_paths(function_name, function_version).get('file_paths', [])
             handler_prefix = '/'.join(function['handler'].split('.')[:-1])
             current_path = None
             for file_path in file_paths:
@@ -115,10 +116,10 @@ class LogicEdit(LoginRequiredMixin, View):
             context['function'] = function
             context['file_paths'] = file_paths
             context['current_path'] = current_path
-            context['current_file'] = logic_api.get_function_file(function_name, current_path).get('item')
+            context['current_file'] = logic_api.get_function_file(function_name, current_path, function_version).get('item')
         return render(request, 'dashboard/app/logic_edit.html', context=context)
 
-    def post(self, request, app_id, function_name):
+    def post(self, request, app_id, function_name, function_version=None):
         context = Util.get_context(request)
         context['app_id'] = app_id
         cmd = request.POST.get('cmd', None)
@@ -126,27 +127,32 @@ class LogicEdit(LoginRequiredMixin, View):
         with adapter.open_api_logic() as logic_api:
             if cmd == 'get_function_file':
                 function_name = request.POST.get('function_name')
+                function_version = request.POST.get('function_version', None)
                 file_path = request.POST.get('file_path')
-                result = logic_api.get_function_file(function_name, file_path)
+                result = logic_api.get_function_file(function_name, file_path, function_version)
                 return JsonResponse(result)
             elif cmd == 'put_function_file':
                 function_name = request.POST.get('function_name')
+                function_version = request.POST.get('function_version', None)
                 file_path = request.POST.get('file_path')
                 file_content = request.POST.get('file_content')
                 file_type = request.POST.get('file_type', 'text')
-                result = logic_api.put_function_file(function_name, file_path, file_content, file_type)
+                result = logic_api.put_function_file(function_name, file_path, file_content, file_type, function_version)
                 allocate_resource_in_background(adapter)
                 return JsonResponse(result)
             elif cmd == 'update_function':
                 function_name = request.POST.get('function_name', None)
+                function_version = request.POST.get('function_version', None)
                 description = request.POST.get('description', None)
                 handler = request.POST.get('handler', None)
                 runtime = request.POST.get('runtime', None)
                 sdk_config = get_sdk_config(adapter)
                 result = logic_api.update_function(function_name=function_name, description=description,
-                                                   handler=handler, runtime=runtime, sdk_config=sdk_config)
+                                                   handler=handler, runtime=runtime, sdk_config=sdk_config,
+                                                   function_version=function_version)
                 return JsonResponse(result)
             elif cmd == 'get_function_file_paths':
                 function_name = request.POST.get('function_name')
-                item = logic_api.get_function_file_paths(function_name)
+                function_version = request.POST.get('function_version', None)
+                item = logic_api.get_function_file_paths(function_name, function_version)
                 return JsonResponse(item)

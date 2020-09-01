@@ -1,5 +1,6 @@
 
 from cloud.permission import Permission, NeedPermission
+from cloud.database.util import get_index_keys_to_index
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.

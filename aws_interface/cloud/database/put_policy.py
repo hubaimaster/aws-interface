@@ -7,7 +7,7 @@ from cloud.message import error
 info = {
     'input_format': {
         'partition_to_apply': 'str',
-        'mode': '"create" | "read" | "update" | "delete" | "query"',
+        'mode': '"create" | "read" | "update" | "delete" | "query" | "join" | "index"',
         'policy_code': 'str',
     },
     'output_format': {
@@ -17,7 +17,7 @@ info = {
 }
 
 SERVICE = 'database'
-POLICY_MODES = ['create', 'read', 'update', 'delete', 'query']
+POLICY_MODES = ['create', 'read', 'update', 'delete', 'query', 'join', 'index']
 
 
 @NeedPermission(Permission.Run.Database.put_policy)

@@ -30,6 +30,9 @@ def do(data, resource):
         if not start_key:
             break
 
+    for item in items:
+        item.setdefault('function_version', 0)
+
     body['items'] = items
     body['end_key'] = end_key
     return body

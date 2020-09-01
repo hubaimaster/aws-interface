@@ -30,11 +30,16 @@ def do(data, resource):
     params = data['params']
 
     function_name = params.get('function_name')
+    function_version = params.get('function_version', 0)
     file_path = params.get('file_path')
 
     items, _ = resource.db_query(partition,
                                  [{'option': None, 'field': 'function_name', 'value': function_name,
                                    'condition': 'eq'}])
+
+    if function_version is None:
+        function_version = 0
+    items = list(filter(lambda x: int(x.get('function_version', 0)) == int(function_version), items))
 
     if not file_path:
         body['error'] = error.NO_SUCH_FILE

@@ -30,7 +30,7 @@ def do(data, resource):
     params = data['params']
 
     function_name = params.get('function_name')
-    function_version = params.get('function_version', None)
+    function_version = params.get('function_version', 0)
     description = params.get('description', None)
     zip_file = params.get('zip_file', None)
     runtime = params.get('runtime', None)
@@ -40,7 +40,11 @@ def do(data, resource):
 
     items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'condition': 'eq',
                                               'value': function_name}])
-    items = list(filter(lambda x: x.get('function_version', None) == function_version, items))
+
+    if function_version is None:
+        function_version = 0
+    items = list(filter(lambda x: int(x.get('function_version', 0)) == int(function_version), items))
+
     if items:
         item = items[0]
         if description:
@@ -55,14 +59,14 @@ def do(data, resource):
             item['sdk_config'] = sdk_config
         if zip_file:
             zip_file_id = uuid()
-            requirements_zip_file_id = uuid()
+            # requirements_zip_file_id = uuid()
             zip_file_b64 = zip_file.encode('utf-8')
             zip_file_bin = base64.b64decode(zip_file_b64)
-            requirements_zip_file_bin = generate_requirements_zipfile(zip_file_bin)
+            # requirements_zip_file_bin = generate_requirements_zipfile(zip_file_bin)
             resource.file_upload_bin(zip_file_id, zip_file_bin)
-            resource.file_upload_bin(requirements_zip_file_id, requirements_zip_file_bin)
+            # resource.file_upload_bin(requirements_zip_file_id, requirements_zip_file_bin)
             item['zip_file_id'] = zip_file_id
-            item['requirements_zip_file_id'] = requirements_zip_file_id
+            # item['requirements_zip_file_id'] = requirements_zip_file_id
 
         resource.db_update_item(item['id'], item)
         body['function_name'] = function_name

@@ -43,11 +43,18 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="form-group">
                                         <label class="form-control-label" for="function-name">{{ _('Name') }}</label>
                                         <input id="function-name" name="function_name" type="text" class="form-control form-control-alternative"
                                                placeholder="{{ _('Function name') }}" value="{{ function.function_name }}" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="function-name">{{ _('Version') }}</label>
+                                        <input id="function-name" name="function_name" type="text" class="form-control form-control-alternative"
+                                               placeholder="{{ _('Function version') }}" value="{{ function.function_version }}" disabled>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
@@ -197,12 +204,14 @@
 
     <script>
         const function_name = "{{ function.function_name }}";
+        const function_version = "{{ function.function_version }}";
         var current_file_path = "{{ current_path }}";
         function save_current_file() {
             const file_content = editor.getValue();
             $.post("", {
                 'cmd': 'put_function_file',
                 'function_name': function_name,
+                'function_version': function_version,
                 'file_path': current_file_path,
                 'file_content': file_content,
             }, function (data) {
@@ -217,6 +226,7 @@
             $.post("", {
                 'cmd': 'update_function',
                 'function_name': function_name,
+                'function_version': function_version,
                 'runtime': function_runtime,
                 'description': function_description,
             }, function (data) {
@@ -227,6 +237,7 @@
             $.post("", {
                 'cmd': 'get_function_file_paths',
                 'function_name': function_name,
+                'function_version': function_version
             }, function (data) {
                 $("#table-file-paths>tbody").empty();
                 for (const file_path of data.file_paths){
@@ -241,6 +252,7 @@
             $.post("", {
                 'cmd': 'get_function_file',
                 'function_name': function_name,
+                'function_version': function_version,
                 'file_path': file_path,
             }, function (data) {
                 if ("item" in data){

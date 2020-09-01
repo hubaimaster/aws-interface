@@ -29,7 +29,7 @@ class LogicAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def update_function(self, function_name, description, runtime=None, handler=None, sdk_config=None, zip_file=None, runnable=None):
+    def update_function(self, function_name, description, runtime=None, handler=None, sdk_config=None, zip_file=None, runnable=None, function_version=0):
         import cloud.logic.update_function as method
         params = {
             'function_name': function_name,
@@ -39,6 +39,7 @@ class LogicAPI(API):
             'zip_file': zip_file,
             'runnable': runnable,
             'sdk_config': sdk_config,
+            'function_version': function_version
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
@@ -51,10 +52,11 @@ class LogicAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_function(self, function_name):
+    def get_function(self, function_name, function_version=0):
         import cloud.logic.get_function as method
         params = {
             'function_name': function_name,
+            'function_version': function_version
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
@@ -88,10 +90,11 @@ class LogicAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_function_zip_b64(self, function_name):
+    def get_function_zip_b64(self, function_name, function_version=0):
         import cloud.logic.get_function_zip_b64 as method
         params = {
             'function_name': function_name,
+            'function_version': function_version
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
@@ -106,32 +109,35 @@ class LogicAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_function_file(self, function_name, file_path):
+    def get_function_file(self, function_name, file_path, function_version=0):
         import cloud.logic.get_function_file as method
         params = {
             'function_name': function_name,
             'file_path': file_path,
+            'function_version': function_version
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_function_file_paths(self, function_name):
+    def get_function_file_paths(self, function_name, function_version=0):
         import cloud.logic.get_function_file_paths as method
         params = {
             'function_name': function_name,
+            'function_version': function_version
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
 
     @lambda_method
-    def put_function_file(self, function_name, file_path, file_content, file_type):
+    def put_function_file(self, function_name, file_path, file_content, file_type, function_version=0):
         import cloud.logic.put_function_file as method
         params = {
             'function_name': function_name,
             'file_path': file_path,
             'file_content': file_content,
             'file_type': file_type,
+            'function_version': function_version
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

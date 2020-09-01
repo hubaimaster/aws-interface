@@ -22,7 +22,7 @@ info = {
         'payload': {
             '...': '...',
         },
-        'logging': 'bool',
+        'logging': 'bool?=False',
     },
     'output_format': {
         'response': {
@@ -70,7 +70,7 @@ def do(data, resource):
 
     function_name = params.get('function_name')
     payload = params.get('payload')
-    logging = params.get('logging', True)
+    logging = params.get('logging', False)
 
     items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}], reverse=True)
 
@@ -104,13 +104,16 @@ def do(data, resource):
                 copy_configfile(extracted_dir, sdk_config)
 
             # Extract requirements folders and files
-            if requirements_zip_file_id:
-                requirements_zip_temp_dir = tempfile.mktemp()
-                requirements_zip_file_bin = resource.file_download_bin(requirements_zip_file_id)
-                with open(requirements_zip_temp_dir, 'wb') as zip_temp:
-                    zip_temp.write(requirements_zip_file_bin)
-                with ZipFile(requirements_zip_temp_dir) as zip_temp:
-                    zip_temp.extractall(extracted_dir)
+            try:
+                if requirements_zip_file_id:
+                    requirements_zip_temp_dir = tempfile.mktemp()
+                    requirements_zip_file_bin = resource.file_download_bin(requirements_zip_file_id)
+                    with open(requirements_zip_temp_dir, 'wb') as zip_temp:
+                        zip_temp.write(requirements_zip_file_bin)
+                    with ZipFile(requirements_zip_temp_dir) as zip_temp:
+                        zip_temp.extractall(extracted_dir)
+            except Exception as ex:
+                pass
 
         virtual_handler = 'virtual_handler{}.py'.format(uuid.uuid4())
         virtual_handler_path = os.path.join(extracted_dir, virtual_handler)

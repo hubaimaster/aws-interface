@@ -2,6 +2,35 @@ from concurrent.futures import ThreadPoolExecutor
 from cloud.database.get_policy_code import get_policy_code, match_policy
 
 
+def get_index_keys_to_index(resource, user, partition, item):
+    """
+    인덱싱 할 키 목록 가져오기
+    :param resource:
+    :param user:
+    :param partition:
+    :param item:
+    :return:
+    """
+    default_index_keys = ['id', 'partition', 'creation_date', 'owner']
+    policy_code = get_policy_code(resource, partition, 'index')
+    index_keys = []
+
+    def generate_keys(_item, _index_keys):
+        for _key in _item:
+            _index_keys.append(_key)
+            if isinstance(_item[_key], dict):
+                generate_keys(_item[_key], _index_keys)
+
+    generate_keys(item, index_keys)
+    index_keys_to_index = match_policy(policy_code, user, index_keys)
+    if isinstance(index_keys_to_index, list):
+        index_keys_to_index.extend(default_index_keys)
+        index_keys_to_index = list(set(index_keys_to_index))
+
+    print('index_keys_to_index:', index_keys_to_index)
+    return index_keys_to_index
+
+
 def _get_joined_item_id(item, key, joined_item_ids=[]):
     if key.startswith('.') or key.endswith('.'):
         raise Exception('Invalid join key error: {}'.format(key))
@@ -11,7 +40,10 @@ def _get_joined_item_id(item, key, joined_item_ids=[]):
         if item:
             return _get_joined_item_id(item, '.'.join(keys[1:]), joined_item_ids)
         return None
-    return item.get(key, None)
+    if isinstance(item, dict):
+        return item.get(key, None)
+    else:
+        return None
 
 
 def _put_joined_item(item, target, joined_item):
@@ -63,7 +95,7 @@ def join_items(resource, user, items, join):
     for item in items:
         for key, target in join.items():
             joined_item_id = _get_joined_item_id(item, key)
-            if joined_item_id:
+            if joined_item_id and isinstance(joined_item_id, str):
                 joined_item_ids.append(joined_item_id)
 
     joined_item_ids = list(set(joined_item_ids))

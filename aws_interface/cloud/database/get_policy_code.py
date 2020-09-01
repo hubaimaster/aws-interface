@@ -9,7 +9,7 @@ import os
 info = {
     'input_format': {
         'partition_to_apply': 'str',
-        'mode': '"create" | "read" | "update" | "delete" | "query"',
+        'mode': '"create" | "read" | "update" | "delete" | "query" | "join" | "index"',
     },
     'output_format': {
         'policy_code?': 'str',
@@ -30,8 +30,17 @@ def match_policy(policy_code, user, item):
     # if user and 'admin' in user.get('groups', []):
     #     return True
     os_env = os.environ.get('AWS_EXECUTION_ENV', None)
+    # if os_env is None:
+    #     return True
+    exec(policy_code)
+    result = eval('has_permission(user, item)')
+    return result
+
+
+def run_policy(policy_code, user, item):
+    os_env = os.environ.get('AWS_EXECUTION_ENV', None)
     if os_env is None:
-        return True
+        return False
     exec(policy_code)
     result = eval('has_permission(user, item)')
     return result
@@ -59,6 +68,12 @@ def get_policy_code(resource, partition, mode):
             policy_code = inspect.getsource(source)
         elif mode == 'query':
             import cloud.database.policy.query as source
+            policy_code = inspect.getsource(source)
+        elif mode == 'join':
+            import cloud.database.policy.join as source
+            policy_code = inspect.getsource(source)
+        elif mode == 'index':
+            import cloud.database.policy.index as source
             policy_code = inspect.getsource(source)
         else:
             policy_code = None

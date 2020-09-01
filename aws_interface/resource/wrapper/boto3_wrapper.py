@@ -724,7 +724,7 @@ class DynamoDB:
                 self._put_deep_inverted_query(batch, partition, item_id, creation_date, '{}.{}'.format(field, field2), value2)
 
     def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date):
-        if len(str(operand)) > 1024:
+        if len(str(operand)) > 256:
             return False
         _inverted_query = '{}-{}-{}-{}'.format(partition, field, operand, operation)
         query = {

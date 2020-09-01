@@ -63,6 +63,7 @@ urlpatterns = [
     path('<app_id>/storage', Storage.as_view(), name='storage'),
     path('<app_id>/logic', Logic.as_view(), name='logic'),
     path('<app_id>/logic/<function_name>', LogicEdit.as_view(), name='logic_edit'),
+    path('<app_id>/logic/<function_name>/<function_version>', LogicEdit.as_view(), name='logic_edit'),
     path('<app_id>/log', Log.as_view(), name='log'),
     path('<app_id>/notification', Notification.as_view(), name='notification'),
     path('<app_id>/schedule', Schedule.as_view(), name='schedule'),

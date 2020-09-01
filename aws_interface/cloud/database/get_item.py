@@ -1,7 +1,7 @@
 
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
-from cloud.database.get_policy_code import match_policy_after_get_policy_code
+from cloud.database.get_policy_code import match_policy_after_get_policy_code, get_policy_code, match_policy
 from cloud.database import util
 
 # Define the input output format of the function.
@@ -34,6 +34,13 @@ def do(data, resource):
     item_id = params.get('item_id', None)
     join = params.get('join', {})
     item = resource.db_get_item(item_id)
+
+    # Join 유효성 검사
+    policy_code = get_policy_code(resource, item['partition'], 'join')
+    if not match_policy(policy_code, user, join):
+        body['item'] = None
+        body['error'] = error.JOIN_POLICY_VIOLATION
+        return body
 
     if match_policy_after_get_policy_code(resource, 'read', item['partition'], user, item):
         if join:

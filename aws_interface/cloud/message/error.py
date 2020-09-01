@@ -181,3 +181,7 @@ QUERY_POLICY_VIOLATION = {
     'code': 45,
     'message': 'Query policy violation'
 }
+JOIN_POLICY_VIOLATION = {
+    'code': 46,
+    'message': 'Join policy violation'
+}
