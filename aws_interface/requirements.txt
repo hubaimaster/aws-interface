@@ -19,7 +19,7 @@ pyaes==1.6.1
 pyasn1==0.4.5
 python-dateutil==2.7.5
 pytz==2018.7
-pyyaml==3.13
+pyyaml==5.1
 requests==2.20.1
 rsa==3.4.2
 s3transfer==0.2.0
