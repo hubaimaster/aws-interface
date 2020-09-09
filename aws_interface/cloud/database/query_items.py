@@ -73,7 +73,9 @@ def do(data, resource):
         return body
 
     if resource.db_get_item(partition):
-        items, end_key = resource.db_query(partition, query_instructions, start_key, limit, reverse, order_by=sort_key)
+        index_keys = util.get_index_keys_to_index(resource, user, partition)
+        items, end_key = resource.db_query(partition, query_instructions, start_key, limit,
+                                           reverse, order_by=sort_key, index_keys=index_keys)
         policy_code = get_policy_code(resource, partition, 'read')
         filtered = []
         for item in items:

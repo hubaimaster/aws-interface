@@ -2,33 +2,20 @@ from concurrent.futures import ThreadPoolExecutor
 from cloud.database.get_policy_code import get_policy_code, match_policy
 
 
-def get_index_keys_to_index(resource, user, partition, item):
+def get_index_keys_to_index(resource, user, partition):
     """
     인덱싱 할 키 목록 가져오기
     :param resource:
     :param user:
     :param partition:
-    :param item:
     :return:
     """
-    default_index_keys = ['id', 'partition', 'creation_date', 'owner']
     policy_code = get_policy_code(resource, partition, 'index')
-    index_keys = []
-
-    def generate_keys(_item, _index_keys):
-        for _key in _item:
-            _index_keys.append(_key)
-            if isinstance(_item[_key], dict):
-                generate_keys(_item[_key], _index_keys)
-
-    generate_keys(item, index_keys)
-    index_keys_to_index = match_policy(policy_code, user, index_keys)
-    if isinstance(index_keys_to_index, list):
-        index_keys_to_index.extend(default_index_keys)
-        index_keys_to_index = list(set(index_keys_to_index))
-
-    print('index_keys_to_index:', index_keys_to_index)
-    return index_keys_to_index
+    index_keys = match_policy(policy_code, user, None)
+    if isinstance(index_keys, list):
+        index_keys.extend(['partition'])
+        index_keys = list(set(index_keys))
+    return index_keys
 
 
 def _get_joined_item_id(item, key, joined_item_ids=[]):

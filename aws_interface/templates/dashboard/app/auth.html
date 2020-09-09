@@ -658,6 +658,102 @@
                 </div>
             </div>
 
+        <div class="modal fade" id="modal-query-user" tabindex="-1" role="dialog" aria-labelledby="modal-query-user" aria-hidden="true">
+                                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title" id="modal-title-default">{{ _("Search items") }}</h4>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="pl-lg-12">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <div class="form-group">
+                                                                                <label class="form-control-label">{{ _("Add query") }}</label>
+
+                                                                                <div class="row">
+                                                                                    <div class="col-4">
+                                                                                        <input id="query-field-name" class="form-control form-control-alternative" type="text" placeholder="{{ _("Field name") }}"/>
+                                                                                    </div>
+                                                                                    <div class="col-4">
+                                                                                        <select id="query-operation" class="form-control">
+                                                                                            <option value="eq">==</option>
+                                                                                            <option value="neq">!=</option>
+                                                                                            <option value="in">contains</option>
+                                                                                            <option value="nin">not contains</option>
+                                                                                            <option value="gt"> > </option>
+                                                                                            <option value="ls"> < </option>
+                                                                                            <option value="ge"> >= </option>
+                                                                                            <option value="le"> <= </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-4">
+                                                                                        <input id="query-field-value" class="form-control form-control-alternative" type="text" placeholder="{{ _("Field value") }}"/>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row mt-3">
+                                                                                    <div class="col-6">
+                                                                                        <select id="logic-operation" class="form-control" disabled>
+                                                                                            <option value="or">OR</option>
+                                                                                            <option value="and">AND</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-6">
+                                                                                        <input onclick="put_query();" type="button" class="form-control btn btn-success" value="+">
+                                                                                    </div>
+
+                                                                                </div>
+
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label class="form-control-label">{{ _("Query") }}</label>
+                                                                                <div class="table-responsive">
+                                                                                    <table id="query-list" class="table table-sm table-hover scroll-content">
+                                                                                        <thead class="thead-light">
+                                                                                        <tr>
+                                                                                            <th>
+                                                                                                {{ _("option") }}
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                {{ _("field") }}
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                {{ _("condition") }}
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                {{ _("value") }}
+                                                                                            </th>
+                                                                                            <th>
+
+                                                                                            </th>
+                                                                                        </tr>
+                                                                                        </thead>
+                                                                                        <tbody style="background: white;">
+
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label class="form-control-label">{{ _("Generated Query") }}</label>
+                                                                                <textarea id="query-text" class="form-control form-control-alternative" disabled></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                                <button id="query-item-btn" class="btn btn-primary">{{ _("Search") }}</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
             <div class="row mt-4">
                 <div class="col-xl-12">
                     <div class="card shadow">
@@ -670,6 +766,9 @@
                                 </div>
 
                                 <div class="col text-right">
+                                    <a id="search-user-button" data-toggle="modal" data-target="#modal-query-user" class="btn btn-sm">
+                                        <span class="btn-inner--text" style="color: black;">{{ _("Search") }}</span>
+                                    </a>
                                     <a id="create-user-button" data-toggle="modal" data-target="#modal-put-user" class="btn btn-sm btn-primary">
                                         <span class="btn-inner--text" style="color: white;">{{ _("Create member") }}</span>
                                     </a>
@@ -888,6 +987,8 @@
 
     </script>
     <script>
+        var query_instructions = [];
+
         var sessions_end_key = null;
         var users_end_key = null;
 
@@ -1115,9 +1216,14 @@
             });
         }
 
+        function clear_users() {
+            $("#user-table>table").empty();
+        }
+
         function load_more_users(){
             var item = {
                 cmd: 'get_user_rows',
+                'query[]': query_instructions,
             };
 
             if (users_end_key != null){
@@ -1131,6 +1237,13 @@
                 }
                 $("#user-table>table").append(user_rows);
             });
+        }
+
+
+        function query_items(instructions) {
+            query_instructions = instructions;
+            clear_users();
+            load_more_users();
         }
 
         window.onload = function(){
@@ -1159,11 +1272,84 @@
             $("#check-all-users").click(function () {
                 $("input[name='checkbox-user']").prop('checked', this.checked);
             });
+
+            $("#query-item-btn").click(function () {
+                var query_json_instructions = [];
+                for (var i = 0; i < query_instructions.length; i++){
+                    query_json_instructions.push(query_instructions[i]);
+                }
+                query_items(query_json_instructions);
+            });
+
             $(document).ready(function () {
                 load_more_users();
                 load_more_sessions();
             });
         }
+
+        function render_query_list() {
+            $("#query-list>tbody").empty();
+            if (query_instructions.length > 0){
+                $("#logic-operation").prop("disabled", false);
+            }else{
+                $("#logic-operation").prop("disabled", true);
+                $("#logic-operation").val('or');
+            }
+            $("#query-text").val(query_instructions);
+            for (var i = 0; i < query_instructions.length; i++){
+                var query = query_instructions[i];
+                query = JSON.parse(query);
+                if (i == 0){
+                    query['option'] = '';
+                }
+                var tag = "" +
+                    "<tr>\n" +
+                    "<td>\n" +
+                    query['option'] +
+                    "</td>\n" +
+                    "<td>\n" +
+                    query['field'] +
+                    "</td>\n" +
+                    "<td>\n" +
+                    query['condition'] +
+                    "</td>\n" +
+                    "<td>\n" +
+                    query['value'] +
+                    "</td>\n" +
+                    "<td>\n" +
+                    "<a class=\"btn btn-danger btn-sm text text-white\" style=\"padding-top:0; padding-bottom:0;\" onclick=\"remove_query(" + i + ");\"><i class=\"fas fa-trash\"></i></a>" +
+                    "</td>\n" +
+                    "</tr>";
+                $("#query-list").append(tag);
+            }
+        }
+
+        function make_query(logic_operation, field_name, query_operation, field_value) {
+            _query = {
+                'option': logic_operation,
+                'field': field_name,
+                'condition': query_operation,
+                'value': field_value,
+            };
+            _query = String(JSON.stringify(_query));
+            return _query;
+        }
+        function put_query() {
+            var logic_operation = $("#logic-operation").val();
+            var field_name = $("#query-field-name").val();
+            var query_operation = $("#query-operation").val();
+            var field_value = $("#query-field-value").val();
+            var query = make_query(logic_operation, field_name, query_operation, field_value);
+            query_instructions.push(query);
+            render_query_list();
+        }
+
+        function remove_query(_query_idx) {
+            query_instructions.splice(_query_idx, 1);
+            render_query_list();
+        }
+
+
     </script>
 
 {% endblock %}

@@ -120,10 +120,10 @@ class AuthAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_users(self, start_key=None, limit=100):
+    def get_users(self, start_key=None, limit=100, query=[]):
         import cloud.auth.get_users as method
         params = {'start_key': start_key,
-                  'limit': limit}
+                  'limit': limit, 'query': query}
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
 

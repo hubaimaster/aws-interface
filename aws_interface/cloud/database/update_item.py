@@ -3,6 +3,7 @@ from cloud.permission import database_can_not_access_to_item
 from cloud.permission import Permission, NeedPermission
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
 from cloud.message import error
+from cloud.database import util
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -44,7 +45,8 @@ def do(data, resource):
                 new_item.pop(key)
 
         new_item = {key: value for key, value in new_item.items() if value != '' and value != {} and value != []}
-        success = resource.db_update_item(item_id, new_item)
+        index_keys = util.get_index_keys_to_index(resource, user, item['partition'])
+        success = resource.db_update_item(item_id, new_item, index_keys=index_keys)
         body['success'] = success
     else:
         body['error'] = error.NO_SUCH_PARTITION

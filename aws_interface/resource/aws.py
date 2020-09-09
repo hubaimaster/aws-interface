@@ -234,7 +234,7 @@ class AWSResource(Resource):
         result = dynamo.get_items(self.app_id, item_ids)
         return result.get('Items', [])
 
-    def db_put_item(self, partition, item, item_id=None, creation_date=None):
+    def db_put_item(self, partition, item, item_id=None, creation_date=None, index_keys=None):
         def remove_blanks(it):
             if isinstance(it, dict):
                 it = {key: remove_blanks(value) for key, value in it.items() if value != '' and value != {} and value != []}
@@ -250,13 +250,13 @@ class AWSResource(Resource):
         dynamo = DynamoDB(self.boto3_session)
         item = decode_dict(item)
         item = remove_blanks(item)
-        result = dynamo.put_item(self.app_id, partition, item, item_id, creation_date)
+        result = dynamo.put_item(self.app_id, partition, item, item_id, creation_date, index_keys=index_keys)
         return bool(result)
 
-    def db_update_item(self, item_id, item):
+    def db_update_item(self, item_id, item, index_keys=None):
         dynamo = DynamoDB(self.boto3_session)
         item = decode_dict(item)
-        result = dynamo.update_item(self.app_id, item_id, item)
+        result = dynamo.update_item(self.app_id, item_id, item, index_keys=index_keys)
         return bool(result)
 
     def db_get_count(self, partition, field=None, value=None):

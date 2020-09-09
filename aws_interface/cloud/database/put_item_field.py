@@ -3,6 +3,7 @@ from cloud.permission import database_can_not_access_to_item
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
+from cloud.database import util
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -39,7 +40,8 @@ def do(data, resource):
         item[field_name] = field_value
         if field_value is None:
             item.pop(field_name)
-        success = resource.db_update_item(item_id, item)
+        index_keys = util.get_index_keys_to_index(resource, user, item['partition'])
+        success = resource.db_update_item(item_id, item, index_keys=index_keys)
         body['success'] = success
     else:
         body['error'] = error.PERMISSION_DENIED

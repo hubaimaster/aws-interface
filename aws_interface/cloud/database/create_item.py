@@ -3,6 +3,7 @@ from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
 from cloud.shortuuid import uuid
+from cloud.database import util
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -41,7 +42,8 @@ def do(data, resource):
     # Check partition has been existed
     if resource.db_get_item(partition):
         if match_policy_after_get_policy_code(resource, 'create', partition, user, item):
-            resource.db_put_item(partition, item, item_id=item['id'])
+            index_keys = util.get_index_keys_to_index(resource, user, partition)
+            resource.db_put_item(partition, item, item_id=item['id'], index_keys=index_keys)
             body['item_id'] = item.get('id', None)
             return body
         else:

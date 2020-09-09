@@ -63,7 +63,7 @@ def do(data, resource):
 
     zip_file_b64 = zip_file.encode('utf-8')
     zip_file_bin = base64.b64decode(zip_file_b64)
-    # equirements_zip_file_bin = generate_requirements_zipfile(zip_file_bin)
+    # requirements_zip_file_bin = generate_requirements_zipfile(zip_file_bin)
     resource.file_upload_bin(zip_file_id, zip_file_bin)
     # resource.file_upload_bin(requirements_zip_file_id, requirements_zip_file_bin)
     resource.db_put_item(partition, item)

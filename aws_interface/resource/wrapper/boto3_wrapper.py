@@ -532,7 +532,7 @@ class DynamoDB:
     def to_decimal(self, timestamp):
         return Decimal("%.20f" % timestamp)
 
-    def put_item(self, table_name, partition, item, item_id=None, creation_date=None, indexing=True):
+    def put_item(self, table_name, partition, item, item_id=None, creation_date=None, indexing=True, index_keys=None):
         if 'id' in item:
             item_id = item.get('id')
         if item_id:
@@ -556,11 +556,11 @@ class DynamoDB:
         if need_counting:
             """ Counting if the item is a new one """
             self._add_item_count(table_name, '{}-count'.format(partition))
-            for field, value in item.items():
-                self._add_item_count(table_name, '{}-{}-{}-count'.format(partition, field, value))
+            # for field, value in item.items():
+            #     self._add_item_count(table_name, '{}-{}-{}-count'.format(partition, field, value))
         if indexing:
             self._delete_inverted_query(table_name, item_id)
-            self._put_inverted_query(table_name, partition, item)
+            self._put_inverted_query(table_name, partition, item, index_keys=index_keys)
         return response
 
     def get_items(self, table_name, item_ids):
@@ -657,7 +657,7 @@ class DynamoDB:
             )
         return response
 
-    def update_item(self, table_name, item_id, item):
+    def update_item(self, table_name, item_id, item, index_keys=None):
         table = self.resource.Table(table_name)
         item['id'] = item_id
         response = table.put_item(
@@ -666,7 +666,7 @@ class DynamoDB:
         )
         partition = item.get('partition')
         self._delete_inverted_query(table_name, item_id)
-        self._put_inverted_query(table_name, partition, item)
+        self._put_inverted_query(table_name, partition, item, index_keys=index_keys)
         return response
 
     def _put_item_count(self, table_name, count_id, value):
@@ -704,27 +704,30 @@ class DynamoDB:
         value = str(value)
         return [value]
 
-    def _put_inverted_query(self, table_name, partition, item):
+    def _put_inverted_query(self, table_name, partition, item, index_keys=None):
         table = self.resource.Table(table_name)
         item_id = item.get('id')
         creation_date = item.get('creation_date', self.time())
         with table.batch_writer() as batch:
             for field, value in item.items():
                 for operand in self._eq_operands(value):
-                    self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date)
-                self._put_deep_inverted_query(batch, partition, item_id, creation_date, field, value)
+                    self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date, index_keys=index_keys)
+                self._put_deep_inverted_query(batch, partition, item_id, creation_date, field, value, index_keys=index_keys)
 
-    def _put_deep_inverted_query(self, batch, partition, item_id, creation_date, field, value):
+    def _put_deep_inverted_query(self, batch, partition, item_id, creation_date, field, value, index_keys=None):
         if isinstance(value, dict):
             for field2, value2 in value.items():
                 for operand2 in self._eq_operands(value2):
                     # key.key2 eq val 와 같이 사용 할 수 있도록
                     self._put_inverted_query_field(batch, partition, '{}.{}'.format(field, field2), operand2, 'eq',
-                                                   item_id, creation_date)
-                self._put_deep_inverted_query(batch, partition, item_id, creation_date, '{}.{}'.format(field, field2), value2)
+                                                   item_id, creation_date, index_keys=index_keys)
+                self._put_deep_inverted_query(batch, partition, item_id, creation_date, '{}.{}'.format(field, field2),
+                                              value2, index_keys=index_keys)
 
-    def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date):
+    def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date, index_keys=None):
         if len(str(operand)) > 256:
+            return False
+        if isinstance(index_keys, list) and field not in index_keys:
             return False
         _inverted_query = '{}-{}-{}-{}'.format(partition, field, operand, operation)
         query = {

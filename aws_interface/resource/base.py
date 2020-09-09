@@ -2,6 +2,7 @@ from abc import ABCMeta
 from concurrent.futures import ThreadPoolExecutor
 import time
 import json
+import copy
 from collections.abc import Iterable
 
 
@@ -114,7 +115,7 @@ class Resource(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    def db_put_item(self, partition, item, item_id=None, creation_date=None):
+    def db_put_item(self, partition, item, item_id=None, creation_date=None, index_keys=None):
         """This is connected with db_get_count"""
         raise NotImplementedError
 
@@ -151,7 +152,8 @@ class Resource(metaclass=ABCMeta):
         raise NotImplementedError
 
     # SHOULD NOT RE-IMPLEMENT
-    def db_query(self, partition, instructions=None, start_key=None, limit=100, reverse=False, order_by='creation_date'):
+    def db_query(self, partition, instructions=None, start_key=None, limit=100, reverse=False, order_by='creation_date',
+                 index_keys=None):
         """:return:items:list,end_key:str"""
         # TODO 상위레이어에서 쿼리를 순차적으로 실행가능한 instructions 으로 만들어 전달 -> ORM 클래스 만들기
         if instructions and instructions[0]:
@@ -183,7 +185,7 @@ class Resource(metaclass=ABCMeta):
                 else:
                     raise BaseException('Unknown instruction type')
 
-                instruction_type = self._db_instruction_type(statement, option)
+                instruction_type = self._db_instruction_type(statement, option, index_keys=index_keys)
                 if instruction_type == 'index':
                     if option == 'and':
                         pairs, _end_key_list[idx] = self._db_index_items(statement, partition, order_by, order_min,
@@ -255,7 +257,7 @@ class Resource(metaclass=ABCMeta):
         no_more_items = False
         while True:
             # 탐색
-            items, end_key_list = get_items(start_key_list, sub_limit)
+            items, end_key_list = get_items(copy.deepcopy(start_key_list), sub_limit)
 
             # 아이템 추가
             all_items.extend(items)
@@ -310,7 +312,7 @@ class Resource(metaclass=ABCMeta):
         #     start_key_list = end_key_list
 
         end_index = end_index % sub_limit
-
+        all_items = list(set(all_items))
         all_items = sorted(all_items, key=lambda item: (item[order_by], item['id']), reverse=reverse)
         all_items = all_items[start_index: start_index + limit]
         all_items = self._db_batch_fake_items_to_real(all_items)
@@ -322,20 +324,25 @@ class Resource(metaclass=ABCMeta):
         print('end_time:', time.time() - ct)
         return list(all_items), end_key_set
 
-    def _db_instruction_type(self, statement, option):
+    def _db_instruction_type(self, statement, option, index_keys=None):
+        def can_index(_field):
+            if isinstance(index_keys, list) and _field not in index_keys:
+                return False
+            return True
+
         field, condition, value = statement
         if option == 'and':
-            if condition == 'eq':
+            if condition == 'eq' and can_index(field):
                 return 'index'
             else:
                 return 'filter'
         elif option == 'or':
-            if condition == 'eq':
+            if condition == 'eq' and can_index(field):
                 return 'index'
             else:
                 return 'scan'
         elif option is None:
-            if condition == 'eq':
+            if condition == 'eq' and can_index(field):
                 return 'index'
             else:
                 return 'scan'
