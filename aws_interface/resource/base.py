@@ -324,6 +324,7 @@ class Resource(metaclass=ABCMeta):
         print('end_time:', time.time() - ct)
         return list(all_items), end_key_set
 
+    # DB
     def _db_instruction_type(self, statement, option, index_keys=None):
         def can_index(_field):
             if isinstance(index_keys, list) and _field not in index_keys:
