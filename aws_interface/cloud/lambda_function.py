@@ -56,6 +56,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.database.delete_partition',  # admin
     'cloud.database.delete_partitions',  # admin
     'cloud.database.create_item',
+    'cloud.database.create_items',
     'cloud.database.delete_item',
     'cloud.database.delete_items',
     'cloud.database.get_item',
@@ -65,6 +66,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.database.put_item_field',
     'cloud.database.query_items',
     'cloud.database.update_item',
+    'cloud.database.update_items',
     # log
     'cloud.log.create_log',
     'cloud.log.get_logs',
@@ -104,7 +106,12 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.notification.send_email2',
     'cloud.notification.send_sms',
     'cloud.notification.update_email_provider',
-    'cloud.notification.send_slack_message'
+    'cloud.notification.send_slack_message',
+
+    # trigger
+    'cloud.trigger.create_trigger',
+    'cloud.trigger.delete_trigger',
+    'cloud.trigger.get_triggers',
 }
 
 

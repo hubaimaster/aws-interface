@@ -10,7 +10,7 @@ global:
   application_name: aws-interface
   default_ec2_keyname: aws-interface
   default_platform: arn:aws:elasticbeanstalk:ap-northeast-2::platform/Python 3.6 running
-    on 64bit Amazon Linux/2.8.3
+    on 64bit Amazon Linux/2.9.13
   default_region: ap-northeast-2
   include_git_submodules: true
   instance_profile: null

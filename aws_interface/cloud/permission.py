@@ -36,6 +36,7 @@ class Permission:
             cls.Run.Log,
             cls.Run.Schedule,
             cls.Run.Notification,
+            cls.Run.Trigger,
         ]
         for permission_cls in permission_cls_list:
             obj = permission_cls()
@@ -88,6 +89,7 @@ class Permission:
 
         class Database:
             create_item = 'run:cloud.database.create_item'
+            create_items = 'run:cloud.database.create_items'
             create_partition = 'run:cloud.database.create_partition'
             delete_item = 'run:cloud.database.delete_item'
             delete_items = 'run:cloud.database.delete_items'
@@ -102,6 +104,7 @@ class Permission:
             put_policy = 'run:cloud.database.put_policy'
             query_items = 'run:cloud.database.query_items'
             update_item = 'run:cloud.database.update_item'
+            update_items = 'run:cloud.database.update_items'
             create_sort_index = 'run:cloud.database.create_sort_index'
             get_sort_indexes = 'run:cloud.database.get_sort_indexes'
 
@@ -167,6 +170,11 @@ class Permission:
             delete_system_notification = 'run:cloud.notification.delete_system_notification'
             send_slack_message_as_system_notification = 'run:cloud.notification.send_slack_message_as_system_notification'
 
+        class Trigger:
+            create_trigger = 'run:cloud.trigger.create_trigger'
+            delete_trigger = 'run:cloud.trigger.delete_trigger'
+            get_triggers = 'run:cloud.trigger.get_triggers'
+
     default_user_permissions = [
         Run.Auth.get_me,
         Run.Auth.get_session,
@@ -184,6 +192,7 @@ class Permission:
         Run.Auth.refresh_session,
 
         Run.Database.create_item,
+        Run.Database.create_items,
         Run.Database.delete_item,
         Run.Database.delete_items,
         Run.Database.get_item,
@@ -192,6 +201,7 @@ class Permission:
         Run.Database.put_item_field,
         Run.Database.query_items,
         Run.Database.update_item,
+        Run.Database.update_items,
 
         Run.Log.create_log,
 
@@ -217,6 +227,7 @@ class Permission:
         Run.Auth.get_login_method,
 
         Run.Database.create_item,
+        Run.Database.create_items,
         Run.Database.delete_item,
         Run.Database.delete_items,
         Run.Database.get_item,
@@ -225,6 +236,7 @@ class Permission:
         Run.Database.put_item_field,
         Run.Database.query_items,
         Run.Database.update_item,
+        Run.Database.update_items,
 
         Run.Log.create_log,
 

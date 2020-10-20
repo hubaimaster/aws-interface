@@ -76,6 +76,9 @@ class Database(LoginRequiredMixin, View):
                 partition = request.POST['partition']
                 start_key = request.POST.get('start_key', None)
                 result = database_api.get_items(partition, start_key=start_key)
+                # result = database_api.query_items(partition, [
+                #     {'condition': 'eq', 'option': None, 'field': 'partition', 'value': partition}
+                # ], start_key=start_key, reverse=True)
                 result = Util.encode_dict(result)
                 return JsonResponse(result)
             elif cmd == 'get_item':

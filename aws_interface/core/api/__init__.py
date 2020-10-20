@@ -7,6 +7,7 @@ from .logic import LogicAPI
 from .log import LogAPI
 from .schedule import ScheduleAPI
 from .notification import NotificationAPI
+from .trigger import TriggerAPI
 
 api_list = [
     BillAPI,
@@ -17,4 +18,5 @@ api_list = [
     LogAPI,
     ScheduleAPI,
     NotificationAPI,
+    TriggerAPI,
 ]

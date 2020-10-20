@@ -185,3 +185,15 @@ JOIN_POLICY_VIOLATION = {
     'code': 46,
     'message': 'Join policy violation'
 }
+UPDATE_POLICY_VIOLATION = {
+    'code': 47,
+    'message': 'Update policy violation',
+}
+DELETE_POLICY_VIOLATION = {
+    'code': 48,
+    'message': 'Delete policy violation',
+}
+CREATE_POLICY_VIOLATION = {
+    'code': 49,
+    'message': 'Create policy violation',
+}

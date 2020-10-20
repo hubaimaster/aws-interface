@@ -2,12 +2,13 @@ awsebcli
 blessed==1.15.0
 boto3
 botocore
+mysqlclient
 cached-property==1.5.1
 cement==2.8.2
 certifi==2018.11.29
 chardet==3.0.4
-colorama==0.3.9
-Django
+colorama==0.3.7
+Django==2.1.9
 docopt==0.6.2
 docutils==0.14
 future==0.16.0
@@ -19,7 +20,7 @@ pyaes==1.6.1
 pyasn1==0.4.5
 python-dateutil==2.7.5
 pytz==2018.7
-pyyaml==3.13
+pyyaml>=4.2b1
 requests==2.20.1
 rsa==3.4.2
 s3transfer==0.2.0
@@ -35,4 +36,4 @@ websocket-client==0.56.0
 selenium
 django_storages
 Pillow
-mysqlclient==2.0.1
+jsonfield

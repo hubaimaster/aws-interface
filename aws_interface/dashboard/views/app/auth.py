@@ -123,7 +123,9 @@ class Auth(LoginRequiredMixin, View):
             elif cmd == 'get_user_rows':
                 start_key = request.POST.get('start_key', None)
                 query = request.POST.getlist('query[]', [])
-                result = self._get_user_rows(request, app_id, start_key, query=query)
+                if start_key:
+                    start_key = json.loads(start_key)
+                result = self._get_user_rows(request, app_id, start_key=start_key, query=query)
                 return JsonResponse(result)
             elif cmd == 'get_session_rows':
                 start_key = request.POST.get('start_key', None)

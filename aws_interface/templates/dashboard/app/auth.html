@@ -1221,18 +1221,19 @@
         }
 
         function load_more_users(){
+            var self = this;
             var item = {
                 cmd: 'get_user_rows',
                 'query[]': query_instructions,
             };
 
-            if (users_end_key != null){
-                item['start_key'] = users_end_key;
+            if (this.users_end_key){
+                item['start_key'] = JSON.stringify(this.users_end_key);
             }
             $.post("", item, function (data) {
                 const user_rows = data['user_rows'];
-                users_end_key = data['end_key'];
-                if (users_end_key == null){
+                self.users_end_key = data['end_key'];
+                if (self.users_end_key == null){
                     $("#load-more-users-btn").hide();
                 }
                 $("#user-table>table").append(user_rows);

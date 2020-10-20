@@ -3,6 +3,7 @@ from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.auth._constant import LOGIN_METHODS
 import inspect
+from cloud.env import safe_to_run_code
 
 
 # Define the input output format of the function.
@@ -25,6 +26,8 @@ info = {
 def match_policy(policy_code, extra, password_meta):
     # If admin user can invoke custom code via exec and eval, It can cause serious security issues.
     # This is because the admin user can run code on the dashboard server.
+    if not safe_to_run_code():
+        return True
     exec(policy_code)
     result = eval('can_register(extra, password_meta)')
     return result

@@ -4,13 +4,21 @@ from .utils import make_data, lambda_method
 
 class DatabaseAPI(API):
     @lambda_method
-    def create_item(self, partition, item, read_groups, write_groups):
+    def create_item(self, partition, item):
         import cloud.database.create_item as method
         params = {
             'partition': partition,
             'item': item,
-            'read_groups': read_groups,
-            'write_groups': write_groups,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def create_items(self, partition, items):
+        import cloud.database.create_items as method
+        params = {
+            'partition': partition,
+            'items': items,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
@@ -23,6 +31,15 @@ class DatabaseAPI(API):
             'item': item,
             'read_groups': read_groups,
             'write_groups': write_groups,
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def update_items(self, pairs):
+        import cloud.database.update_items as method
+        params = {
+            'pairs': pairs,
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

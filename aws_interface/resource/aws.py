@@ -356,7 +356,7 @@ class AWSResource(Resource):
         if end_key:
             end_key = self.get_end_key(items[-1], order_by, 'inverted_query')
 
-        filter_items = [item for item in items if should_contains(item[order_by], order_min, order_max)]
+        filter_items = list([item for item in items if should_contains(item[order_by], order_min, order_max)])
         if len(filter_items) < len(items) and filter_items:
             end_key = self.get_end_key(filter_items[-1], order_by, 'inverted_query')
         elif end_key and (order_min or order_max):

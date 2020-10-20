@@ -117,8 +117,7 @@ def do(data, resource):
 
         virtual_handler = 'virtual_handler{}.py'.format(uuid.uuid4())
         virtual_handler_path = os.path.join(extracted_dir, virtual_handler)
-        vh_code = "from {} import {}".format(function_package, function_method) + '\n' +\
-                  "import io\n" + \
+        vh_code = "import io\n" + \
                   "import json\n" + \
                   "import traceback\n" + \
                   "from contextlib import redirect_stdout\n" +\
@@ -126,7 +125,8 @@ def do(data, resource):
                   "    std_str = io.StringIO()\n" +\
                   "    with redirect_stdout(std_str):\n" + \
                   "        resp, error = None, None\n" + \
-                  "        try:\n" +\
+                  "        try:\n" + \
+                  "            from {} import {}".format(function_package, function_method) + '\n' + \
                   "            resp = {}({}, {})\n".format(function_method, payload, json.loads(json.dumps(user))) +\
                   "        except Exception as e:\n" +\
                   "            error = traceback.format_exc()\n" +\
@@ -135,12 +135,16 @@ def do(data, resource):
         with open(virtual_handler_path, 'w+') as vh:
             vh.write(vh_code)
 
+        return_value = {}
         try:
             return_value = run_subprocess(virtual_handler_path)
-            return_value = json.loads(return_value)
+            if return_value:
+                return_value = json.loads(return_value)
+            else:
+                return_value = {}
 
-            body['response'] = return_value.get('response')
-            body['stdout'] = return_value.get('stdout')
+            body['response'] = return_value.get('response', None)
+            body['stdout'] = return_value.get('stdout', None)
             err = return_value.get('error', None)
             if err:
                 body['error'] = err
@@ -150,7 +154,7 @@ def do(data, resource):
         except Exception as ex:
             error_traceback = traceback.format_exc()
             body['error'] = error.FUNCTION_ERROR
-            body['error']['message'] = body['error']['message'].format('{}, {}'.format(ex, error_traceback))
+            body['error']['message'] = body['error']['message'].format('{}, {}, {}'.format(ex, error_traceback, return_value))
             r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
             print('slack response:', r)
 

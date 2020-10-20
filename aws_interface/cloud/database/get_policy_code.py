@@ -3,6 +3,7 @@ from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import inspect
 import os
+from cloud.env import safe_to_run_code
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -27,20 +28,8 @@ def match_policy_after_get_policy_code(resource, mode, partition, user, item):
 
 
 def match_policy(policy_code, user, item):
-    # if user and 'admin' in user.get('groups', []):
-    #     return True
-    os_env = os.environ.get('AWS_EXECUTION_ENV', None)
-    # if os_env is None:
-    #     return True
-    exec(policy_code)
-    result = eval('has_permission(user, item)')
-    return result
-
-
-def run_policy(policy_code, user, item):
-    os_env = os.environ.get('AWS_EXECUTION_ENV', None)
-    if os_env is None:
-        return False
+    if not safe_to_run_code():
+        return True
     exec(policy_code)
     result = eval('has_permission(user, item)')
     return result

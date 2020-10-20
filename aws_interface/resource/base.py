@@ -166,6 +166,7 @@ class Resource(metaclass=ABCMeta):
         else:
             instructions = [{'field': 'partition', 'value': partition, 'condition': 'eq', 'option': None}]
 
+        # TODO 현재 _db_filter_items 하는 부분에 문제가 있는것으로 보임. 중복값
         def get_items(_start_key_list, _sub_limit):
             if not _start_key_list:
                 _start_key_list = [None] * len(instructions)
@@ -204,6 +205,7 @@ class Resource(metaclass=ABCMeta):
                     elif option == 'or' or option is None:
                         pairs, _end_key_list[idx] = self._db_index_items(statement, partition, order_by, order_min,
                                                                          order_max, _start_key_list[idx], _sub_limit, reverse)
+
                         if order_min is None and order_max is None:
                             if reverse and pairs:
                                 order_min = pairs[-1][order_by]
@@ -220,6 +222,7 @@ class Resource(metaclass=ABCMeta):
                     if option == 'and':
                         pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, order_by, order_min, order_max,
                                                                         _start_key_list[idx], _sub_limit, reverse)
+
                         if order_min is None and order_max is None:
                             if reverse and pairs:
                                 order_min = pairs[-1][order_by]
@@ -230,6 +233,7 @@ class Resource(metaclass=ABCMeta):
                     elif option == 'or' or option is None:
                         pairs, _end_key_list[idx] = self._db_scan_items(statement, partition, order_by, order_min, order_max,
                                                                         _start_key_list[idx], _sub_limit, reverse)
+
                         if order_min is None and order_max is None:
                             if reverse and pairs:
                                 order_min = pairs[-1][order_by]
@@ -255,20 +259,22 @@ class Resource(metaclass=ABCMeta):
         all_items = []
 
         no_more_items = False
+        end_key_offset = 0
         while True:
             # 탐색
             items, end_key_list = get_items(copy.deepcopy(start_key_list), sub_limit)
-
+            # end_key_offset = max(sub_limit - len(items), end_key_offset)
             # 아이템 추가
             all_items.extend(items)
 
             # 모든 아이템 개수가 limit 짜를 수 있을만큼 있으면
-            if len(all_items) >= start_index + limit:
+            if len(all_items) > start_index + limit:
                 # 탐색 끝
                 if all([end_key is None or end_key is False for end_key in end_key_list]):
                     # 짜르고 남음
                     if start_index + limit < len(all_items):
                         end_index = start_index + limit
+                        #end_index = start_index + limit + (len(all_items) - sub_limit)
                         break
                     else:  # 안남음
                         end_index = 0
@@ -279,6 +285,7 @@ class Resource(metaclass=ABCMeta):
                     # 짜르고 남음
                     if start_index + limit < len(all_items):
                         end_index = start_index + limit
+                        #end_index = start_index + limit + (len(all_items) - sub_limit)
                         break
                     else:  # 짜르고 안남음
                         end_index = 0
@@ -310,7 +317,7 @@ class Resource(metaclass=ABCMeta):
         #         no_more_items = True
         #         break
         #     start_key_list = end_key_list
-
+        end_index += end_key_offset
         end_index = end_index % sub_limit
         all_items = list(set(all_items))
         all_items = sorted(all_items, key=lambda item: (item[order_by], item['id']), reverse=reverse)

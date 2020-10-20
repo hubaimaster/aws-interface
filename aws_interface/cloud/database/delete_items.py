@@ -12,7 +12,7 @@ info = {
         'item_ids': '[str]',
     },
     'output_format': {
-        'success': 'bool'
+        'success_list': '[bool]'
     },
     'description': 'Delete items'
 }
@@ -25,14 +25,17 @@ def do(data, resource):
     user = data['user']
 
     item_ids = params.get('item_ids', [])
+    success_list = [False] * len(item_ids)
+
     if len(item_ids) > 128:
         body['error'] = error.NUM_OF_BATCH_ITEMS_MUST_BE_LESS_THAN_128
+        print(body['error'])
         return body
 
     policy_codes_by_partition = {}
-    with ThreadPoolExecutor(max_workers=32) as executor:
-        for _item_id in item_ids:
-            def delete_item(item_id):
+    with ThreadPoolExecutor(max_workers=len(item_ids)) as executor:
+        for _idx, _item_id in enumerate(item_ids):
+            def delete_item(idx, item_id):
                 item = resource.db_get_item(item_id)
                 if item['partition'] in policy_codes_by_partition:
                     policy_code = policy_codes_by_partition[item['partition']]
@@ -41,7 +44,10 @@ def do(data, resource):
                     policy_codes_by_partition[item['partition']] = policy_code
 
                 if item and match_policy(policy_code, user, item):
-                    resource.db_delete_item(item_id)
-            executor.submit(delete_item, _item_id)
-    body['success'] = True
+                    success = resource.db_delete_item(item_id)
+                    success_list[idx] = success
+
+            executor.submit(delete_item, _idx, _item_id)
+
+    body['success_list'] = success_list
     return body

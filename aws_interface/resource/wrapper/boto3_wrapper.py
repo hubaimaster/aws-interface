@@ -617,8 +617,6 @@ class DynamoDB:
                 response = {
                     'Items': []
                 }
-            print('start_key:', start_key)
-            print('get_inverted_queries:', len(response.get('Items', [])), response)
             return response
         else:
             raise BaseException('an operation is must be <in> or <eq>')
@@ -668,6 +666,31 @@ class DynamoDB:
         self._delete_inverted_query(table_name, item_id)
         self._put_inverted_query(table_name, partition, item, index_keys=index_keys)
         return response
+
+    def update_item_with_strong_read(self, table_name, item_id, item, index_keys):
+        """
+        일관된 읽기 후 업데이트
+        :return:
+        """
+        # attr_names = {'#{}'.format(key): key for key, _ in item.items}
+        # attr_values = {':{}'.format(key): {''}}
+        # response = self.client.update_item(
+        #     ExpressionAttributeNames=attr_names,
+        #     ExpressionAttributeValues={
+        #         ':v': {
+        #             'N': str(value_to_add),
+        #         }
+        #     },
+        #     Key={
+        #         'id': {
+        #             'S': item_id,
+        #         }
+        #     },
+        #     ReturnValues='ALL_NEW',
+        #     TableName=table_name,
+        #     UpdateExpression='ADD #A :v',
+        # )
+        return
 
     def _put_item_count(self, table_name, count_id, value):
         response = self.put_item(table_name, 'meta_info', {'count': value}, item_id=count_id)

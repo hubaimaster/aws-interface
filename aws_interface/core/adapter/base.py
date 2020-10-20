@@ -77,6 +77,11 @@ class Adapter(metaclass=ABCMeta):
         api = NotificationAPI(self._get_vendor(), self._get_credential(), self._get_app_id())
         yield api
 
+    @contextmanager
+    def open_api_trigger(self):
+        api = TriggerAPI(self._get_vendor(), self._get_credential(), self._get_app_id())
+        yield api
+
     def generate_sdk(self, platform):
         allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
         return allocator.generate_sdk(platform)

@@ -34,7 +34,7 @@ def do(data, resource):
         body['error'] = error.NO_SUCH_PARTITION
         return body
 
-    if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item):
+    if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, new_item):
         # Put the value in the previous item that is not in the new field
         for key in item:
             if key not in new_item:
