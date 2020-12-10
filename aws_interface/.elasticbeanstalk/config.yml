@@ -1,21 +1,21 @@
 branch-defaults:
-  default:
-    environment: aws-interface
-    group_suffix: null
+  master:
+    environment: aws-interface-prod
 environment-defaults:
-  aws-interface-dev:
+  aws-interface-prod:
     branch: null
     repository: null
 global:
   application_name: aws-interface
+  branch: null
   default_ec2_keyname: aws-interface
-  default_platform: arn:aws:elasticbeanstalk:ap-northeast-2::platform/Python 3.6 running
-    on 64bit Amazon Linux/2.9.16
+  default_platform: Docker running on 64bit Amazon Linux 2/3.2.2
   default_region: ap-northeast-2
   include_git_submodules: true
   instance_profile: null
   platform_name: null
   platform_version: null
-  profile: kchdully
-  sc: null
+  profile: null
+  repository: null
+  sc: git
   workspace_type: Application
