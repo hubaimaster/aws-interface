@@ -4,13 +4,14 @@ from .utils import lambda_method, make_data
 
 class ScheduleAPI(API):
     @lambda_method
-    def create_schedule(self, schedule_name, schedule_expression, function_name, payload):
+    def create_schedule(self, schedule_name, schedule_expression, function_name, payload, session_id):
         import cloud.schedule.create_schedule as method
         params = {
             'schedule_name': schedule_name,
             'schedule_expression': schedule_expression,
             'function_name': function_name,
-            'payload': payload
+            'payload': payload,
+            'session_id': session_id
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

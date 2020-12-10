@@ -35,6 +35,33 @@ def match_policy(policy_code, user, item):
     return result
 
 
+def get_default_policy_code(mode):
+    if mode == 'create':
+        import cloud.database.policy.create as source
+        policy_code = inspect.getsource(source)
+    elif mode == 'read':
+        import cloud.database.policy.read as source
+        policy_code = inspect.getsource(source)
+    elif mode == 'update':
+        import cloud.database.policy.update as source
+        policy_code = inspect.getsource(source)
+    elif mode == 'delete':
+        import cloud.database.policy.delete as source
+        policy_code = inspect.getsource(source)
+    elif mode == 'query':
+        import cloud.database.policy.query as source
+        policy_code = inspect.getsource(source)
+    elif mode == 'join':
+        import cloud.database.policy.join as source
+        policy_code = inspect.getsource(source)
+    elif mode == 'index':
+        import cloud.database.policy.index as source
+        policy_code = inspect.getsource(source)
+    else:
+        policy_code = None
+    return policy_code
+
+
 def get_policy_code(resource, partition, mode):
     item_id = '{}-policy-{}-{}'.format(SERVICE, partition, mode)
     item = resource.db_get_item(item_id)
@@ -43,29 +70,7 @@ def get_policy_code(resource, partition, mode):
     else:
         """ Assign default item that has default policy code
         """
-        if mode == 'create':
-            import cloud.database.policy.create as source
-            policy_code = inspect.getsource(source)
-        elif mode == 'read':
-            import cloud.database.policy.read as source
-            policy_code = inspect.getsource(source)
-        elif mode == 'update':
-            import cloud.database.policy.update as source
-            policy_code = inspect.getsource(source)
-        elif mode == 'delete':
-            import cloud.database.policy.delete as source
-            policy_code = inspect.getsource(source)
-        elif mode == 'query':
-            import cloud.database.policy.query as source
-            policy_code = inspect.getsource(source)
-        elif mode == 'join':
-            import cloud.database.policy.join as source
-            policy_code = inspect.getsource(source)
-        elif mode == 'index':
-            import cloud.database.policy.index as source
-            policy_code = inspect.getsource(source)
-        else:
-            policy_code = None
+        policy_code = get_default_policy_code(mode)
     return policy_code
 
 

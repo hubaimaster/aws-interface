@@ -42,7 +42,8 @@ class Schedule(LoginRequiredMixin, View):
                 payload = request.POST.get('payload')
                 print(schedule_name, schedule_expression, function_name, payload)
                 try:
-                    result = schedule_api.create_schedule(schedule_name, schedule_expression, function_name, payload)
+                    session_id = adapter.generate_session_id(['admin'])
+                    result = schedule_api.create_schedule(schedule_name, schedule_expression, function_name, payload, session_id)
                     return JsonResponse(result)
                 except Exception as e:
                     return JsonResponse({

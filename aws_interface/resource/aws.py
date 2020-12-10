@@ -172,6 +172,8 @@ class AWSResource(Resource):
             self.boto3_session = boto3_session
         elif credential:
             self.boto3_session = get_boto3_session(credential)
+        self.dynamo = DynamoDB(self.boto3_session)
+        self.s3 = S3(self.boto3_session)
 
     def get_rest_api_url(self):
         api_gateway = APIGateway(self.boto3_session)
@@ -192,71 +194,62 @@ class AWSResource(Resource):
 
     # DB ops
     def db_create_partition(self, partition):
-        dynamo = DynamoDB(self.boto3_session)
-        response = dynamo.create_partition(self.app_id, partition)
+        response = self.dynamo.create_partition(self.app_id, partition)
         return bool(response)
 
     def db_delete_partition(self, partition):
-        dynamo = DynamoDB(self.boto3_session)
-        response = dynamo.delete_partition(self.app_id, partition)
+        response = self.dynamo.delete_partition(self.app_id, partition)
         return bool(response)
 
     def db_has_partition(self, partition):
-        dynamo = DynamoDB(self.boto3_session)
-        response = dynamo.get_partition(self.app_id, partition)
+        response = self.dynamo.get_partition(self.app_id, partition)
         return bool(response)
 
     def db_get_partitions(self):
-        dynamo = DynamoDB(self.boto3_session)
-        response = dynamo.get_partitions(self.app_id)
+        response = self.dynamo.get_partitions(self.app_id)
         items = response.get('Items', [])
         return items
 
     def db_delete_item(self, item_id):
-        dynamo = DynamoDB(self.boto3_session)
-        result = dynamo.delete_item(self.app_id, item_id)
+        result = self.dynamo.delete_item(self.app_id, item_id)
         return bool(result)
 
     def db_delete_item_batch(self, item_ids):
         result = True
-        dynamo = DynamoDB(self.boto3_session)
         for item_id in item_ids:
-            result &= bool(dynamo.delete_item(self.app_id, item_id))
+            result &= bool(self.dynamo.delete_item(self.app_id, item_id))
         return result
 
     def db_get_item(self, item_id):
-        dynamo = DynamoDB(self.boto3_session)
-        item = dynamo.get_item(self.app_id, item_id)
+        item = self.dynamo.get_item(self.app_id, item_id)
         return item.get('Item', None)
 
     def db_get_items(self, item_ids):
-        dynamo = DynamoDB(self.boto3_session)
-        result = dynamo.get_items(self.app_id, item_ids)
+        result = self.dynamo.get_items(self.app_id, item_ids)
         return result.get('Items', [])
 
-    def db_put_item(self, partition, item, item_id=None, creation_date=None, index_keys=None):
-        def remove_blanks(it):
-            if isinstance(it, dict):
-                it = {key: remove_blanks(value) for key, value in it.items() if value != '' and value != {} and value != []}
-                return it
-            elif isinstance(it, list):
-                it = [remove_blanks(i) for i in it]
-                return it
+    def _remove_blanks(self, it):
+        if isinstance(it, dict):
+            it = {key: self._remove_blanks(value) for key, value in it.items() if value != '' and value != {} and value != []}
+            return it
+        elif isinstance(it, list):
+            it = [self._remove_blanks(i) for i in it]
+            return it
+        else:
+            if it == '':
+                return None
             else:
-                if it == '':
-                    return None
-                else:
-                    return it
-        dynamo = DynamoDB(self.boto3_session)
+                return it
+
+    def db_put_item(self, partition, item, item_id=None, creation_date=None, index_keys=None):
         item = decode_dict(item)
-        item = remove_blanks(item)
-        result = dynamo.put_item(self.app_id, partition, item, item_id, creation_date, index_keys=index_keys)
+        item = self._remove_blanks(item)
+        result = self.dynamo.put_item(self.app_id, partition, item, item_id, creation_date, index_keys=index_keys)
         return bool(result)
 
     def db_update_item(self, item_id, item, index_keys=None):
-        dynamo = DynamoDB(self.boto3_session)
         item = decode_dict(item)
-        result = dynamo.update_item(self.app_id, item_id, item, index_keys=index_keys)
+        result = self.dynamo.update_item(self.app_id, item_id, item, index_keys=index_keys)
         return bool(result)
 
     def db_get_count(self, partition, field=None, value=None):
@@ -267,14 +260,31 @@ class AWSResource(Resource):
         :param value: Field value to find out
         :return:
         """
-        dynamo = DynamoDB(self.boto3_session)
         if field and value:
             count_id = '{}-{}-{}-count'.format(partition, field, value)
         else:
             count_id = '{}-count'.format(partition)
-        item = dynamo.get_item_count(self.app_id, count_id).get('Item', {'count': 0})
+        item = self.dynamo.get_item_count(self.app_id, count_id).get('Item', {'count': 0})
         count = item.get('count')
         return count
+
+    def get_end_key_indexing(self, item, order_by):
+        """
+        인덱싱할때 페이지네이션 키
+        :param item:
+        :param order_by:
+        :return:
+        """
+        return self.get_end_key(item, order_by, 'inverted_query')
+
+    def get_end_key_scan(self, item, order_by):
+        """
+        스캔시 페이지네이션 키
+        :param item:
+        :param order_by:
+        :return:
+        """
+        return self.get_end_key(item, order_by)
 
     def get_end_key(self, item, order_by, index_key='partition'):
         if not item:
@@ -287,11 +297,13 @@ class AWSResource(Resource):
 
         if isinstance(item[order_by], int) or isinstance(item[order_by], float) or isinstance(item[order_by], Decimal):
             end_key[order_by] = Decimal("%.20f" % item[order_by])
+            #end_key[order_by] = Decimal(str(item[order_by]))
 
         return end_key
 
-    def db_get_items_in_partition(self, partition, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):
-
+    def db_get_items_in_partition(self, partition, order_by='creation_date',
+                                  order_min=None, order_max=None, start_key=None, limit=100, reverse=False,
+                                  sort_min=None, sort_max=None):
         def should_contains(key, min_value, max_value):
             if min_value:
                 return key >= min_value
@@ -301,13 +313,12 @@ class AWSResource(Resource):
 
         if isinstance(start_key, str):
             start_key = json.loads(start_key)
-        dynamo = DynamoDB(self.boto3_session)
 
         start_key = self.get_end_key(start_key, order_by)
-
-        result = dynamo.get_items_in_partition_by_order(self.app_id, partition, order_by, None, None, start_key, limit, reverse)
-        end_key = result.get('LastEvaluatedKey', None)
-        items = result.get('Items', [])
+        response = self.dynamo.get_items_in_partition_by_order(self.app_id, partition, order_by,
+                                                               sort_min, sort_max, start_key, limit, reverse)
+        items = response.get('Items', [])
+        end_key = response.get('LastEvaluatedKey', None)
         if end_key:
             end_key = self.get_end_key(items[-1], order_by)
 
@@ -316,10 +327,11 @@ class AWSResource(Resource):
             end_key = self.get_end_key(filter_items[-1], order_by)
         elif end_key and (order_min or order_max):
             while end_key is not None:
-                result = dynamo.get_items_in_partition_by_order(self.app_id, partition, order_by, None, None, end_key,
-                                                                limit, reverse)
-                end_key = result.get('LastEvaluatedKey', None)
-                sub_items = result.get('Items', [])
+                response = self.dynamo.get_items_in_partition_by_order(self.app_id, partition, order_by,
+                                                                       sort_min, sort_max,
+                                                                       end_key, limit, reverse)
+                sub_items = response.get('Items', [])
+                end_key = response.get('LastEvaluatedKey', None)
                 sub_filter_items = [item for item in sub_items if should_contains(item[order_by], order_min, order_max)]
 
                 items.extend(sub_items)
@@ -334,8 +346,9 @@ class AWSResource(Resource):
 
         return filter_items, end_key
 
-    def db_get_item_id_and_orders(self, partition, field, value, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):
-
+    def db_get_item_id_and_orders(self, partition, field, value, order_by='creation_date',
+                                  order_min=None, order_max=None, start_key=None, limit=100, reverse=False,
+                                  sort_min=None, sort_max=None):
         def should_contains(key, min_value, max_value):
             if min_value:
                 return key >= min_value
@@ -349,8 +362,8 @@ class AWSResource(Resource):
 
         start_key = self.get_end_key(start_key, order_by, 'inverted_query')
 
-        dynamo = DynamoDB(self.boto3_session)
-        response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by, None, None, start_key, limit, reverse)
+        response = self.dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by,
+                                                    sort_min, sort_max, start_key, limit, reverse)
         items = response.get('Items', [])
         end_key = response.get('LastEvaluatedKey', None)
         if end_key:
@@ -361,8 +374,8 @@ class AWSResource(Resource):
             end_key = self.get_end_key(filter_items[-1], order_by, 'inverted_query')
         elif end_key and (order_min or order_max):
             while end_key is not None:
-                response = dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by, None, None,
-                                                       end_key, limit, reverse)
+                response = self.dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by,
+                                                            sort_min, sort_max, end_key, limit, reverse)
                 sub_items = response.get('Items', [])
                 end_key = response.get('LastEvaluatedKey', None)
                 sub_filter_items = [item for item in sub_items if should_contains(item[order_by], order_min, order_max)]
@@ -384,24 +397,20 @@ class AWSResource(Resource):
     def db_create_sort_index(self, sort_key, sort_key_type):
         if sort_key_type not in ['N', 'S']:
             raise Exception("sort_key_type must be 'N' or 'S'")
-        dynamo = DynamoDB(self.boto3_session)
-        result = dynamo.create_table(self.app_id, sort_key, sort_key_type)
+        result = self.dynamo.create_table(self.app_id, sort_key, sort_key_type)
         return result
 
     # File ops
     def file_download_bin(self, file_id):
-        s3 = S3(self.boto3_session)
-        binary = s3.download_bin(self.app_id, file_id)
+        binary = self.s3.download_bin(self.app_id, file_id)
         return binary
 
     def file_upload_bin(self, file_id, binary):
-        s3 = S3(self.boto3_session)
-        result = s3.upload_bin(self.app_id, file_id, binary)
+        result = self.s3.upload_bin(self.app_id, file_id, binary)
         return bool(result)
 
     def file_delete_bin(self, file_id):
-        s3 = S3(self.boto3_session)
-        result = s3.delete_bin(self.app_id, file_id)
+        result = self.s3.delete_bin(self.app_id, file_id)
         return bool(result)
 
     # Event scheduling

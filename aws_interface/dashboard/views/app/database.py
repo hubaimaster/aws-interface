@@ -137,5 +137,9 @@ class Database(LoginRequiredMixin, View):
                 sort_key_type = request.POST.get('sort_key_type')
                 result = database_api.create_sort_index(sort_key, sort_key_type)
                 return JsonResponse(result)
+            # elif cmd == 'reindex_partition':
+            #     partition = request.POST.get('partition')
+            #     result = database_api.reindex_partition(partition)
+            #     return JsonResponse(result)
 
         return redirect(request.path_info)  # Redirect back

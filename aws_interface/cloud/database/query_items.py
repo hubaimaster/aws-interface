@@ -1,4 +1,3 @@
-
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy, get_policy_code
@@ -73,7 +72,7 @@ def do(data, resource):
         return body
 
     if resource.db_get_item(partition):
-        index_keys = util.get_index_keys_to_index(resource, user, partition)
+        index_keys = util.get_index_keys_to_index(resource, user, partition, 'r')
         items, end_key = resource.db_query(partition, query_instructions, start_key, limit,
                                            reverse, order_by=sort_key, index_keys=index_keys)
         policy_code = get_policy_code(resource, partition, 'read')

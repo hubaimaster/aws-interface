@@ -328,6 +328,7 @@ class DynamoDB:
     def __init__(self, boto3_session):
         self.client = boto3_session.client('dynamodb')
         self.resource = boto3_session.resource('dynamodb')
+        self.table_cache = {}
 
     def init_table(self, table_name):
         self.create_table(table_name)
@@ -519,8 +520,17 @@ class DynamoDB:
         self._delete_inverted_query(table_name, item_id)
         return response
 
+    def get_table(self, table_name):
+        # 캐싱된 테이블 객체 반환
+        if table_name in self.table_cache:
+            table = self.table_cache[table_name]
+        else:
+            table = self.resource.Table(table_name)
+            self.table_cache[table_name] = table
+        return table
+
     def get_item(self, table_name, item_id):
-        table = self.resource.Table(table_name)
+        table = self.get_table(table_name)
         item = table.get_item(Key={
             'id': item_id
         })
@@ -546,7 +556,7 @@ class DynamoDB:
             need_counting = True
         if not creation_date:
             creation_date = self.time()
-        table = self.resource.Table(table_name)
+        table = self.get_table(table_name)
         item['id'] = item_id
         item['creation_date'] = creation_date
         item['partition'] = partition
@@ -591,9 +601,10 @@ class DynamoDB:
         index_name = 'partition-{}'.format(order_by)
         key_expression = Key('partition').eq(partition)
         if order_min:
-            key_expression = key_expression & Key(order_by).gte(order_min)
-        elif order_max:
-            key_expression = key_expression & Key(order_by).lte(order_max)
+            key_expression = key_expression & Key(order_by).gte(Decimal(order_min))
+        if order_max:
+            key_expression = key_expression & Key(order_by).lte(Decimal(order_max))
+
         response = self.get_items_with_key_expression(table_name, index_name, key_expression, start_key, limit,
                                                       reverse)
         return response
@@ -605,10 +616,10 @@ class DynamoDB:
             hash_key = '{}-{}-{}-{}'.format(partition, field, operand, operation)
             index_name = '{}-{}'.format(hash_key_name, sort_key_name)
             key_expression = Key(hash_key_name).eq(hash_key)
-            # if order_min:
-            #     key_expression = key_expression & Key(sort_key_name).gte(order_min)
-            # elif order_max:
-            #     key_expression = key_expression & Key(sort_key_name).lte(order_max)
+            if order_min:
+                key_expression = key_expression & Key(sort_key_name).gte(Decimal(order_min))
+            if order_max:
+                key_expression = key_expression & Key(sort_key_name).lte(Decimal(order_max))
             try:
                 response = self.get_items_with_key_expression(table_name, index_name, key_expression, start_key, limit,
                                                           reverse)
@@ -656,7 +667,7 @@ class DynamoDB:
         return response
 
     def update_item(self, table_name, item_id, item, index_keys=None):
-        table = self.resource.Table(table_name)
+        table = self.get_table(table_name)
         item['id'] = item_id
         response = table.put_item(
             TableName=table_name,

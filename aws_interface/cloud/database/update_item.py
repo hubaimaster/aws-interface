@@ -45,9 +45,9 @@ def do(data, resource):
                 new_item.pop(key)
 
         new_item = {key: value for key, value in new_item.items() if value != '' and value != {} and value != []}
-        index_keys = util.get_index_keys_to_index(resource, user, item['partition'])
+        index_keys = util.get_index_keys_to_index(resource, user, item['partition'], 'w')
         success = resource.db_update_item(item_id, new_item, index_keys=index_keys)
         body['success'] = success
     else:
-        body['error'] = error.NO_SUCH_PARTITION
+        body['error'] = error.UPDATE_POLICY_VIOLATION
     return body

@@ -86,6 +86,7 @@ class Permission:
             delete_my_membership = 'run:cloud.auth.delete_my_membership'
             refresh_session = 'run:cloud.auth.refresh_session'
             update_user = 'run:cloud.auth.update_user'
+            has_account = 'run:cloud.auth.has_account'
 
         class Database:
             create_item = 'run:cloud.database.create_item'
@@ -103,6 +104,7 @@ class Permission:
             get_policy_code = 'run:cloud.database.get_policy_code'
             put_policy = 'run:cloud.database.put_policy'
             query_items = 'run:cloud.database.query_items'
+            reindex_partition = 'run:cloud.database.reindex_partition'
             update_item = 'run:cloud.database.update_item'
             update_items = 'run:cloud.database.update_items'
             create_sort_index = 'run:cloud.database.create_sort_index'

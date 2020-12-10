@@ -5,6 +5,7 @@ from cloud.database.get_policy_code import match_policy, get_policy_code
 from cloud.shortuuid import uuid
 from cloud.database import util
 from concurrent.futures import ThreadPoolExecutor
+import time
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -44,21 +45,22 @@ def do(data, resource):
     error_list = [None] * len(items)
     item_ids = [None] * len(items)
 
-    index_keys = util.get_index_keys_to_index(resource, user, partition)
+    index_keys = util.get_index_keys_to_index(resource, user, partition, 'w')
     policy_code = get_policy_code(resource, partition, 'create')
+
+    def try_put_item(idx, item):
+        item['id'] = uuid()
+        if 'owner' not in item:
+            item['owner'] = user_id
+        item = {key: value for key, value in item.items() if value != '' and value != {} and value != []}
+        if match_policy(policy_code, user, item):
+            resource.db_put_item(partition, item, item_id=item['id'], index_keys=index_keys)
+            item_ids[idx] = item.get('id', None)
+        else:
+            error_list[idx] = error.PERMISSION_DENIED
 
     with ThreadPoolExecutor(max_workers=len(items)) as exc:
         for _idx, _item in enumerate(items):
-            def try_put_item(idx, item):
-                item['id'] = uuid()
-                if 'owner' not in item:
-                    item['owner'] = user_id
-                item = {key: value for key, value in item.items() if value != '' and value != {} and value != []}
-                if match_policy(policy_code, user, item):
-                    resource.db_put_item(partition, item, item_id=item['id'], index_keys=index_keys)
-                    item_ids[idx] = item.get('id', None)
-                else:
-                    error_list[idx] = error.PERMISSION_DENIED
             exc.submit(try_put_item, _idx, _item)
 
     body['error_list'] = error_list

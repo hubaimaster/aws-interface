@@ -34,37 +34,38 @@ def do(data, resource):
 
     policy_codes_by_partition = {}
 
+    def update_work(idx, item_id):
+        new_item = pairs[item_id]
+        item = resource.db_get_item(item_id)
+        if database_can_not_access_to_item(item):
+            error_list[idx] = error.NO_SUCH_PARTITION
+            return
+
+        if item['partition'] in policy_codes_by_partition:
+            policy_code = policy_codes_by_partition[item['partition']]
+        else:
+            policy_code = get_policy_code(resource, item['partition'], 'update')
+            policy_codes_by_partition[item['partition']] = policy_code
+
+        if match_policy(policy_code, user, new_item):
+            # Put the value in the previous item that is not in the new field
+            for key in item:
+                if key not in new_item:
+                    new_item[key] = item[key]
+            # Remove field if value is None
+            for key, value in new_item.copy().items():
+                if value is None:
+                    new_item.pop(key)
+
+            new_item = {key: value for key, value in new_item.items() if value != '' and value != {} and value != []}
+            index_keys = util.get_index_keys_to_index(resource, user, item['partition'], 'w')
+            success = resource.db_update_item(item_id, new_item, index_keys=index_keys)
+            success_list[idx] = success
+        else:
+            error_list[idx] = error.UPDATE_POLICY_VIOLATION
+
     with ThreadPoolExecutor(max_workers=len(pairs)) as exc:
         for _idx, _item_id in enumerate(pairs):
-            def update_work(idx, item_id):
-                new_item = pairs[item_id]
-                item = resource.db_get_item(item_id)
-                if database_can_not_access_to_item(item):
-                    error_list[idx] = error.NO_SUCH_PARTITION
-                    return
-
-                if item['partition'] in policy_codes_by_partition:
-                    policy_code = policy_codes_by_partition[item['partition']]
-                else:
-                    policy_code = get_policy_code(resource, item['partition'], 'update')
-                    policy_codes_by_partition[item['partition']] = policy_code
-
-                if match_policy(policy_code, user, new_item):
-                    # Put the value in the previous item that is not in the new field
-                    for key in item:
-                        if key not in new_item:
-                            new_item[key] = item[key]
-                    # Remove field if value is None
-                    for key, value in new_item.copy().items():
-                        if value is None:
-                            new_item.pop(key)
-
-                    new_item = {key: value for key, value in new_item.items() if value != '' and value != {} and value != []}
-                    index_keys = util.get_index_keys_to_index(resource, user, item['partition'])
-                    success = resource.db_update_item(item_id, new_item, index_keys=index_keys)
-                    success_list[idx] = success
-                else:
-                    error_list[idx] = error.UPDATE_POLICY_VIOLATION
             exc.submit(update_work, _idx, _item_id)
 
     body['error_list'] = error_list

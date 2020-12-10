@@ -2,19 +2,28 @@ from concurrent.futures import ThreadPoolExecutor
 from cloud.database.get_policy_code import get_policy_code, match_policy
 
 
-def get_index_keys_to_index(resource, user, partition):
+def get_index_keys_to_index(resource, user, partition, mode):
     """
     인덱싱 할 키 목록 가져오기
     :param resource:
     :param user:
     :param partition:
+    :param mode: 'r' | 'w' 읽기 / 쓰기
     :return:
     """
     policy_code = get_policy_code(resource, partition, 'index')
     index_keys = match_policy(policy_code, user, None)
+
+    # 모드에 따라 인덱싱 키가 배정됨. 튜플일 경우만!
+    if mode == 'r' and isinstance(index_keys, tuple) and len(index_keys) == 2:
+        index_keys = index_keys[0]
+    if mode == 'w' and isinstance(index_keys, tuple) and len(index_keys) == 2:
+        index_keys = index_keys[1]
+
     if isinstance(index_keys, list):
         index_keys.extend(['partition'])
         index_keys = list(set(index_keys))
+
     return index_keys
 
 

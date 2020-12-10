@@ -40,7 +40,7 @@ def do(data, resource):
         item[field_name] = field_value
         if field_value is None:
             item.pop(field_name)
-        index_keys = util.get_index_keys_to_index(resource, user, item['partition'])
+        index_keys = util.get_index_keys_to_index(resource, user, item['partition'], 'w')
         success = resource.db_update_item(item_id, item, index_keys=index_keys)
         body['success'] = success
     else:

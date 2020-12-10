@@ -190,3 +190,12 @@ class DatabaseAPI(API):
         params = {}
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
+
+    # @lambda_method
+    # def reindex_partition(self, partition):
+    #     import cloud.database.reindex_partition as method
+    #     params = {
+    #         'partition': partition
+    #     }
+    #     data = make_data(self.app_id, params)
+    #     return method.do(data, self.resource)

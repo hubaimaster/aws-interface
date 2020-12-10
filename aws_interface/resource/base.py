@@ -102,7 +102,9 @@ class Resource(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    def db_get_items_in_partition(self, partition, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=None, reverse=False):
+    def db_get_items_in_partition(self, partition, order_by='creation_date', order_min=None, order_max=None,
+                                  start_key=None, limit=None, reverse=False,
+                                  sort_min=None, sort_max=None):
         """
         :param partition:
         :param order_by:
@@ -111,7 +113,9 @@ class Resource(metaclass=ABCMeta):
         :param start_key:
         :param limit:
         :param reverse:
-        :return: items, end_key
+        :param sort_min:
+        :param sort_max:
+        :return:
         """
         raise NotImplementedError
 
@@ -119,13 +123,16 @@ class Resource(metaclass=ABCMeta):
         """This is connected with db_get_count"""
         raise NotImplementedError
 
-    def db_update_item(self, item_id, item):
+    def db_update_item(self, item_id, item, index_keys=None):
         raise NotImplementedError
 
     def db_get_count(self, partition, field=None, value=None):
         raise NotImplementedError
 
-    def db_get_item_id_and_orders(self, partition, field, value, order_by='creation_date', order_min=None, order_max=None, start_key=None, limit=100, reverse=False):
+    def db_get_item_id_and_orders(self, partition, field, value,
+                                  order_by='creation_date', order_min=None, order_max=None,
+                                  start_key=None, limit=100, reverse=False,
+                                  sort_min=None, sort_max=None):
         """
         item_id 와 order 필드 값들을 빠르게 가져와야함
         :param partition: 대상을 가져올 파티션
@@ -137,6 +144,8 @@ class Resource(metaclass=ABCMeta):
         :param start_key: 탐색 시작점
         :param limit: 반환되는 아이템 리스트 길이
         :param reverse: False 면 오름차순, True 면 내림차순
+        :param sort_min:
+        :param sort_max:
         :return: [{'item_id' : str, order_field: str}, ...]
         """
         raise NotImplementedError
@@ -166,7 +175,6 @@ class Resource(metaclass=ABCMeta):
         else:
             instructions = [{'field': 'partition', 'value': partition, 'condition': 'eq', 'option': None}]
 
-        # TODO 현재 _db_filter_items 하는 부분에 문제가 있는것으로 보임. 중복값
         def get_items(_start_key_list, _sub_limit):
             if not _start_key_list:
                 _start_key_list = [None] * len(instructions)
@@ -186,7 +194,7 @@ class Resource(metaclass=ABCMeta):
                 else:
                     raise BaseException('Unknown instruction type')
 
-                instruction_type = self._db_instruction_type(statement, option, index_keys=index_keys)
+                instruction_type = self._db_instruction_type(idx, statement, option, index_keys=index_keys)
                 if instruction_type == 'index':
                     if option == 'and':
                         pairs, _end_key_list[idx] = self._db_index_items(statement, partition, order_by, order_min,
@@ -241,14 +249,16 @@ class Resource(metaclass=ABCMeta):
                                 order_max = pairs[-1][order_by]
                         pairs = [IDDict(item) for item in self._db_filter_items(statement, pairs)]
                         item_set |= set(pairs)
-            return list(item_set), _end_key_list
+            item_set = list(item_set)
+            item_set = sorted(item_set, key=lambda x: (x[order_by], x['id']), reverse=reverse)
+            return item_set, _end_key_list
 
         if start_key:
-            start_index = start_key.get('index', 0)
             start_key_list = start_key.get('key_list', None)
+            start_item_id = start_key.get('last_item_id', None)
         else:
-            start_index = 0
             start_key_list = None
+            start_item_id = None
 
         sub_limit = 500
         if not limit:
@@ -257,82 +267,53 @@ class Resource(metaclass=ABCMeta):
         ct = time.time()
 
         all_items = []
-
-        no_more_items = False
-        end_key_offset = 0
+        start_index = 0
         while True:
             # 탐색
-            items, end_key_list = get_items(copy.deepcopy(start_key_list), sub_limit)
-            # end_key_offset = max(sub_limit - len(items), end_key_offset)
+            items, end_key_list = get_items(start_key_list, sub_limit)
+
+            # 첫번째 아이템 인덱스 구하기
+            if start_item_id:
+                for idx, item in enumerate(items):
+                    item_id = item['id']
+                    if item_id == start_item_id:
+                        start_index = idx + 1
+                        break
+
             # 아이템 추가
             all_items.extend(items)
+            no_more_end_key = all([(end_key is None) or (end_key is False) for end_key in end_key_list])
+            if no_more_end_key:
+                break
+            split_count = len(all_items[start_index: start_index + limit])
+            if split_count >= limit:
+                break
+            start_key_list = end_key_list
 
-            # 모든 아이템 개수가 limit 짜를 수 있을만큼 있으면
-            if len(all_items) > start_index + limit:
-                # 탐색 끝
-                if all([end_key is None or end_key is False for end_key in end_key_list]):
-                    # 짜르고 남음
-                    if start_index + limit < len(all_items):
-                        end_index = start_index + limit
-                        #end_index = start_index + limit + (len(all_items) - sub_limit)
-                        break
-                    else:  # 안남음
-                        end_index = 0
-                        start_key_list = None
-                        no_more_items = True
-                        break
-                else:  # 탐색 안 끝
-                    # 짜르고 남음
-                    if start_index + limit < len(all_items):
-                        end_index = start_index + limit
-                        #end_index = start_index + limit + (len(all_items) - sub_limit)
-                        break
-                    else:  # 짜르고 안남음
-                        end_index = 0
-                        start_key_list = end_key_list
-                        break
-            else:  # limit 짜를만큼 없음
-                # 탐색 끝
-                if all(end_key is None or end_key is False for end_key in end_key_list):
-                    end_index = 0
-                    start_key_list = None
-                    no_more_items = True
-                    break
-                else:  # 탐색 안끝
-                    start_key_list = end_key_list
-                    pass
-        # no_more_items = False
-        # while True:
-        #     items, end_key_list = get_items(start_key_list, sub_limit)
-        #     all_items.extend(items)
-        #     if len(all_items) >= start_index + limit:
-        #         end_index = len(items) - (len(all_items) - (start_index + limit))
-        #         if end_index % sub_limit == 0:
-        #             end_index = 0
-        #             start_key_list = end_key_list
-        #         break
-        #
-        #     if all(end_key is None or end_key is False for end_key in end_key_list):
-        #         end_index = 0
-        #         no_more_items = True
-        #         break
-        #     start_key_list = end_key_list
-        end_index += end_key_offset
-        end_index = end_index % sub_limit
         all_items = list(set(all_items))
-        all_items = sorted(all_items, key=lambda item: (item[order_by], item['id']), reverse=reverse)
+        all_items = sorted(all_items, key=lambda x: (x[order_by], x['id']), reverse=reverse)
+
+        if len(all_items) > start_index + limit:
+            no_more_items = False
+        else:
+            no_more_items = True
+            start_key_list = end_key_list
+
         all_items = all_items[start_index: start_index + limit]
         all_items = self._db_batch_fake_items_to_real(all_items)
-        all_items = sorted(all_items, key=lambda item: (item[order_by], item['id']), reverse=reverse)
-        if no_more_items:
+        all_items = sorted(all_items, key=lambda x: (x[order_by], x['id']), reverse=reverse)
+        if no_more_end_key and no_more_items:
             end_key_set = None
         else:
-            end_key_set = {'index': end_index, 'key_list': start_key_list}
+            last_item_id = None
+            if all_items:
+                last_item_id = all_items[-1]['id']
+            end_key_set = {'key_list': start_key_list, 'last_item_id': last_item_id}
         print('end_time:', time.time() - ct)
         return list(all_items), end_key_set
 
     # DB
-    def _db_instruction_type(self, statement, option, index_keys=None):
+    def _db_instruction_type(self, idx, statement, option, index_keys=None):
         def can_index(_field):
             if isinstance(index_keys, list) and _field not in index_keys:
                 return False
@@ -341,7 +322,10 @@ class Resource(metaclass=ABCMeta):
         field, condition, value = statement
         if option == 'and':
             if condition == 'eq' and can_index(field):
-                return 'index'
+                if idx == 0:
+                    return 'index'
+                else:
+                    return 'filter'
             else:
                 return 'filter'
         elif option == 'or':
@@ -380,9 +364,17 @@ class Resource(metaclass=ABCMeta):
             # 이미 탐색이 끝난 경우에 대해 탐색하지 않고 빈 리스트 반환
             return [], False
         field, condition, value = statement
-        if condition != 'eq':
+        sort_min, sort_max = None, None
+        if condition in ['gt', 'ge', 'ls', 'le'] and field == order_by:
+            if condition in ['gt', 'ge']:
+                sort_min = value
+            if condition in ['ls', 'le']:
+                sort_max = value
+        elif condition != 'eq':
             raise BaseException('You cannot use condition : [{}] for indexing'.format(condition))
-        pairs, end_key = self.db_get_item_id_and_orders(partition, field, value, order_by, order_min, order_max, start_key, limit, reverse)
+        pairs, end_key = self.db_get_item_id_and_orders(partition, field, value,
+                                                        order_by, order_min, order_max, start_key, limit, reverse,
+                                                        sort_min, sort_max)
         pairs = [IDDict(self._db_get_fake_item(pair, order_by)) for pair in pairs]
         if not end_key:
             # 탐색이 완전히 끝났음을 알려줌
@@ -393,7 +385,17 @@ class Resource(metaclass=ABCMeta):
         if start_key is False:
             # 이미 탐색이 끝난 경우에 대해 탐색하지 않고 빈 리스트 반환
             return [], False
-        items, end_key = self.db_get_items_in_partition(partition, order_by, order_min, order_max, start_key, limit, reverse)
+        field, condition, value = statement
+        sort_min, sort_max = None, None
+        if condition in ['gt', 'ge', 'ls', 'le'] and field == order_by:
+            if condition in ['gt', 'ge']:
+                sort_min = value
+            if condition in ['ls', 'le']:
+                sort_max = value
+        items, end_key = self.db_get_items_in_partition(partition, order_by, order_min, order_max,
+                                                        start_key, limit, reverse,
+                                                        sort_min, sort_max)
+
         if not end_key:
             # 탐색이 완전히 끝났음을 알려줌
             end_key = False

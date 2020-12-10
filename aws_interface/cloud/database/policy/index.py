@@ -10,5 +10,7 @@ def has_permission(user, _):
     return True
     ___ Or if you do not want to index
     return []
+    --- Case of separating Read/Write index (Read as first element, Write as second element in tuple)
+    return ['name', 'phone'], True
     """
     return True
