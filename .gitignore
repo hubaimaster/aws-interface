@@ -115,3 +115,4 @@ aws_interface/.idea/workspace.xml
 !.aws_interface/elasticbeanstalk/*.cfg.yml
 !.aws_interface/elasticbeanstalk/*.global.yml
 aws_interface/media/*
+aws_interface/.elasticbeanstalk/config.yml

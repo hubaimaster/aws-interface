@@ -2,6 +2,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from cloud.permission import Permission, NeedPermission
 from cloud.database.get_policy_code import match_policy, get_policy_code
+from cloud.message import error
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -35,6 +36,11 @@ def do(data, resource):
 
     def delete_item(idx, item_id):
         item = resource.db_get_item(item_id)
+        # 등록된 파티션이 아닌경우
+        if not resource.db_has_partition(item['partition']):
+            success_list[idx] = False
+            return
+
         if item['partition'] in policy_codes_by_partition:
             policy_code = policy_codes_by_partition[item['partition']]
         else:

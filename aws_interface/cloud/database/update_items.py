@@ -37,8 +37,12 @@ def do(data, resource):
     def update_work(idx, item_id):
         new_item = pairs[item_id]
         item = resource.db_get_item(item_id)
-        if database_can_not_access_to_item(item):
-            error_list[idx] = error.NO_SUCH_PARTITION
+        # if database_can_not_access_to_item(item):
+        #     error_list[idx] = error.NO_SUCH_PARTITION
+        #     return
+        # 등록된 파티션이 아닌경우
+        if not resource.db_has_partition(item['partition']):
+            error_list[idx] = error.UNREGISTERED_PARTITION
             return
 
         if item['partition'] in policy_codes_by_partition:

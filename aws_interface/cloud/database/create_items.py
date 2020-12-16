@@ -37,7 +37,7 @@ def do(data, resource):
     partition = params.get('partition', None)
 
     # Check partition has been existed
-    if not resource.db_get_item(partition):
+    if not resource.db_has_partition(partition):
         body['error'] = error.NO_SUCH_PARTITION
         return body
 

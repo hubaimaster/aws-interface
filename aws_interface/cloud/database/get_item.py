@@ -1,5 +1,5 @@
 
-from cloud.permission import Permission, NeedPermission
+from cloud.permission import Permission, NeedPermission, database_can_not_access_to_item
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code, get_policy_code, match_policy
 from cloud.database import util
@@ -34,6 +34,17 @@ def do(data, resource):
     item_id = params.get('item_id', None)
     join = params.get('join', {})
     item = resource.db_get_item(item_id)
+
+    if item is None:
+        body['item'] = None
+        body['error'] = error.NO_SUCH_ITEM
+        return body
+
+    # 등록된 파티션이 아닌경우
+    if not resource.db_has_partition(item['partition']):
+        body['item'] = None
+        body['error'] = error.UNREGISTERED_PARTITION
+        return body
 
     # Join 유효성 검사
     policy_code = get_policy_code(resource, item['partition'], 'join')

@@ -197,3 +197,15 @@ CREATE_POLICY_VIOLATION = {
     'code': 49,
     'message': 'Create policy violation',
 }
+NOT_USER_PARTITION = {
+    'code': 50,
+    'message': 'Not a user partition'
+}
+READ_POLICY_VIOLATION = {
+    'code': 51,
+    'message': 'Read policy violation',
+}
+UNREGISTERED_PARTITION = {
+    'code': 52,
+    'message': 'Unregistered partition',
+}

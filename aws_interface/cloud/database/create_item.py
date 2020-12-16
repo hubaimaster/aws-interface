@@ -40,7 +40,7 @@ def do(data, resource):
 
     item = {key: value for key, value in item.items() if value != '' and value != {} and value != []}
     # Check partition has been existed
-    if resource.db_get_item(partition):
+    if resource.db_has_partition(partition):
         if match_policy_after_get_policy_code(resource, 'create', partition, user, item):
             index_keys = util.get_index_keys_to_index(resource, user, partition, 'w')
             resource.db_put_item(partition, item, item_id=item['id'], index_keys=index_keys)

@@ -30,8 +30,14 @@ def do(data, resource):
     new_item = params.get('item', {})
 
     item = resource.db_get_item(item_id)
-    if database_can_not_access_to_item(item):
-        body['error'] = error.NO_SUCH_PARTITION
+    # if database_can_not_access_to_item(item):
+    #     body['error'] = error.PERMISSION_DENIED
+    #     return body
+
+    # 등록된 파티션이 아닌경우
+    if not resource.db_has_partition(item['partition']):
+        body['item'] = None
+        body['error'] = error.UNREGISTERED_PARTITION
         return body
 
     if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, new_item):

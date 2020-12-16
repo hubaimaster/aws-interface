@@ -26,6 +26,10 @@ def do(data, resource):
     user = params.get('user')
 
     user_to_update = resource.db_get_item(user_id)
+    if user_to_update['partition'] != 'user':
+        body['error'] = error.NOT_USER_PARTITION
+        body['success'] = False
+        return body
 
     # For security
     for field in user:

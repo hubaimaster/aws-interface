@@ -71,7 +71,7 @@ def do(data, resource):
         body['error'] = error.JOIN_POLICY_VIOLATION
         return body
 
-    if resource.db_get_item(partition):
+    if resource.db_has_partition(partition):
         index_keys = util.get_index_keys_to_index(resource, user, partition, 'r')
         items, end_key = resource.db_query(partition, query_instructions, start_key, limit,
                                            reverse, order_by=sort_key, index_keys=index_keys)

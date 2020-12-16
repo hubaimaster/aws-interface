@@ -32,8 +32,11 @@ def do(data, resource):
     field_value = params.get('field_value', None)
 
     item = resource.db_get_item(item_id)
-    if database_can_not_access_to_item(item):
-        body['error'] = error.PERMISSION_DENIED
+    # if database_can_not_access_to_item(item):
+    #     body['error'] = error.PERMISSION_DENIED
+    #     return body
+    if not resource.db_has_partition(item['partition']):
+        body['error'] = error.NO_SUCH_PARTITION
         return body
 
     if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item):
