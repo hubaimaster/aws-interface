@@ -59,6 +59,7 @@ def do(data, resource):
             session_item = {
                 'user_id': user_id,
                 'session_type': 'email_login',
+                'client_ip': data.get('client_ip', None)
             }
             _ = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
             body['session_id'] = session_id

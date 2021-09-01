@@ -33,12 +33,14 @@ def do(data, resource):
     schedule_expression = params.get('schedule_expression')
     function_name = params.get('function_name')
     payload = params.get('payload', {})
+    logging = params.get('logging', True)
 
     schedule_params = {
         'module_name': 'cloud.logic.run_function',
         'payload': payload,
         'function_name': function_name,
-        'session_id': session_id
+        'session_id': session_id,
+        'logging': logging
     }
     inst = [
         {'field': 'schedule_name', 'value': schedule_name, 'option': None, 'condition': 'eq'}
@@ -56,7 +58,8 @@ def do(data, resource):
         'schedule_relation_name': schedule_relation_name,
         'schedule_expression': schedule_expression,
         'function_name': function_name,
-        'payload': payload
+        'payload': payload,
+        'logging': logging,
     })
     body['message'] = message
     body['success'] = success

@@ -45,7 +45,8 @@ class Log(LoginRequiredMixin, View):
                 event_name = request.POST.get('event_name', None)
                 event_param = request.POST.get('event_param', None)
                 user_id = request.POST.get('user_id', None)
-                log_result = log.get_logs(event_source, event_name, event_param, user_id, start_key)
+
+                log_result = log.get_logs(event_source, event_name, event_param, user_id, start_key, limit=50)
                 return JsonResponse(log_result)
             elif cmd == 'get_log_rows':
                 start_key = request.POST.get('start_key', None)
@@ -54,17 +55,25 @@ class Log(LoginRequiredMixin, View):
                 event_param = request.POST.get('event_param', None)
                 user_id = request.POST.get('user_id', None)
 
-                result = log.get_logs(event_source, event_name, event_param, user_id, start_key, reverse=True)
+                result = log.get_logs(event_source, event_name, event_param, user_id, start_key, reverse=True, limit=50)
                 template = loader.get_template('dashboard/app/component/log_table_row.html')
                 items = result.get('items', [])
+
+                def get_event_param(_event_param):
+                    try:
+                        if isinstance(_event_param, dict):
+                            return json.dumps(json.loads(_event_param), sort_keys=True, indent=4)
+                    except Exception as _:
+                        pass
+                    return str(_event_param)
+
                 items = [{
                     'owner': item.get('owner', None),
                     'creation_date': item.get('creation_date'),
                     'event_source': item.get('event_source', None),
                     'event_name': item.get('event_name', None),
-                    'event_param': json.dumps(json.loads(item.get('event_param')), sort_keys=True, indent=4),
+                    'event_param': get_event_param(item.get('event_param')),
                 } for item in items if item.get('event_param')]
-                print(items)
                 end_key = result.get('end_key', None)
                 context = {
                     'items': items,

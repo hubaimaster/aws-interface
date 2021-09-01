@@ -11,9 +11,13 @@ import traceback
 class Util:
     @classmethod
     def _pop_alert(cls, request, context):
-        alert = request.session.get('alert', None)
-        request.session['alert'] = None
-        context['alert'] = alert
+        cls.pop_value(request, context, 'alert')
+
+    @classmethod
+    def pop_value(cls, request, context, name, default=None):
+        hidden = request.session.get(name, default)
+        request.session[name] = default
+        context[name] = hidden
 
     @classmethod
     def add_alert(cls, request, alert):

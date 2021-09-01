@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models.functions import Upper
-from .models import User, App, Log, MarketplaceLogic, MarketplaceLogicComment, MarketplaceLogicSetup
+from .models import User, App, Log, MarketplaceLogic, MarketplaceLogicComment, MarketplaceLogicSetup, OTPCode
 
 
 class CustomUserAdmin(UserAdmin):
@@ -41,9 +41,15 @@ class MarketplaceLogicAdmin(admin.ModelAdmin):
     ordering = ['creation_date']
 
 
+class OTPCodeAdmin(admin.ModelAdmin):
+    readonly_fields = ['id', 'email']
+    list_display = ('id', 'email')
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(App, AppAdmin)
 admin.site.register(Log, LogAdmin)
+admin.site.register(OTPCode, OTPCodeAdmin)
 
 admin.site.register(MarketplaceLogic, MarketplaceLogicAdmin)
 admin.site.register(MarketplaceLogicComment)

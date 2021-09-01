@@ -211,3 +211,14 @@ class MarketplaceLogicComment(models.Model):
     marketplace_logic = models.ForeignKey(MarketplaceLogic, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
+
+
+class OTPCode(models.Model):
+    """ Otp auth code
+    """
+    id = models.CharField(max_length=255, primary_key=True, default=shortuuid.uuid, editable=False)
+    # creation_date = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False)
+
+    email = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    code = models.CharField(max_length=128)

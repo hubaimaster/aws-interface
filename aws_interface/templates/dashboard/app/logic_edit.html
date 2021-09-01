@@ -1,5 +1,5 @@
 {% extends 'dashboard/app/base.html' %}
-{% load staticfiles %}
+{% load static %}
 {% block content %}
 
     {% load timetags %}
@@ -82,6 +82,24 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="function-use-logging">{{ _('Use logging') }}</label>
+                                        <input id="function-use-logging" name="use_logging" type="checkbox" class="form-control form-control-alternative"
+                                               placeholder="{{ _('Use logging') }}" {% if function.use_logging %} checked {% endif %}>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="function-use-traceback">{{ _('Use traceback') }}</label>
+                                        <input id="function-use-traceback" name="use_traceback" type="checkbox" class="form-control form-control-alternative"
+                                               placeholder="{{ _('Use traceback') }}" {% if function.use_traceback %} checked {% endif %}>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -223,12 +241,17 @@
             const function_runtime = $("#function-runtime").val();
             const function_handler = $("#function-handler").val();
             const function_description = $("#function-description").val();
+            const function_use_logging = $("#function-use-logging").is(":checked");
+            const function_use_traceback = $("#function-use-traceback").is(":checked");
             $.post("", {
                 'cmd': 'update_function',
                 'function_name': function_name,
                 'function_version': function_version,
+                'function_handler': function_handler,
                 'runtime': function_runtime,
                 'description': function_description,
+                'use_logging': function_use_logging,
+                'use_traceback': function_use_traceback
             }, function (data) {
                 alert('Function saved');
             });

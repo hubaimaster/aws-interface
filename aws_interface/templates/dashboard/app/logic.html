@@ -1,5 +1,5 @@
 {% extends 'dashboard/app/base.html' %}
-{% load staticfiles %}
+{% load static %}
 {% block content %}
 
     {% load timetags %}
@@ -346,6 +346,16 @@
                                                                 <input name="handler" type="text" id="function-handler" class="form-control form-control-alternative" placeholder="package.method">
                                                             </div>
 
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="function-use-logging">{{ _("Use logging") }} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ _("Use logging") }}"></i></label>
+                                                                <input name="use_logging" type="checkbox" id="function-use-logging" class="form-control form-control-alternative">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="function-use-traceback">{{ _("Use traceback") }} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ _("Use traceback") }}"></i></label>
+                                                                <input name="use_traceback" type="checkbox" id="function-use-traceback" class="form-control form-control-alternative">
+                                                            </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -436,7 +446,7 @@
     <script>
 
 
-        function create_function(function_name, description, handler, runtime, zip_file) {
+        function create_function(function_name, description, handler, runtime, zip_file, use_logging, use_traceback) {
             var formData = new FormData();
             formData.append('cmd', 'create_function');
             formData.append('function_name', function_name);
@@ -444,6 +454,8 @@
             formData.append('handler', handler);
             formData.append('runtime', runtime);
             formData.append('zip_file', zip_file);
+            formData.append('use_logging', use_logging);
+            formData.append('use_traceback', use_traceback);
             $.LoadingOverlay('show', {
                 text:'Creating function...',
             });
@@ -481,6 +493,8 @@
                 const handler = $("#function-handler").val();
                 const runtime = $("#function-runtime").val();
                 const zip_file = $('#function-zipfile')[0].files[0];
+                const use_logging = $("#function-use-logging").is(":checked");
+                const use_traceback = $("#function-use-traceback").is(":checked");
                 if (function_name == null || function_name.length == 0) {
                     alert("{{ _("Please enter the function name") }}");
                     return;
@@ -489,7 +503,7 @@
                     alert("{{ _("Please specify the zipfile") }}");
                     return;
                 }
-                create_function(function_name, description, handler, runtime, zip_file);
+                create_function(function_name, description, handler, runtime, zip_file, use_logging, use_traceback);
                 $("#modal-create-function").modal('hide');
             });
 

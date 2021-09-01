@@ -3,6 +3,7 @@ from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import inspect
 import os
+import time
 from cloud.env import safe_to_run_code
 
 # Define the input output format of the function.
@@ -19,19 +20,26 @@ info = {
 }
 
 SERVICE = 'database'
+cache = {}
 
 
-def match_policy_after_get_policy_code(resource, mode, partition, user, item):
+def match_policy_after_get_policy_code(resource, mode, partition, user, item, new_item={}):
     policy_code = get_policy_code(resource, partition, mode)
-    result = match_policy(policy_code, user, item)
+    result = match_policy(policy_code, user, item, new_item)
     return result
 
 
-def match_policy(policy_code, user, item):
+def match_policy(policy_code, user, item, new_item={}):
     if not safe_to_run_code():
         return True
     exec(policy_code)
-    result = eval('has_permission(user, item)')
+    params_len = eval('len(inspect.signature(has_permission).parameters)')
+    if params_len == 2:
+        result = eval('has_permission(user, item)')
+    elif params_len == 3:
+        result = eval('has_permission(user, item, new_item)')
+    else:
+        result = False
     return result
 
 
@@ -62,8 +70,14 @@ def get_default_policy_code(mode):
     return policy_code
 
 
-def get_policy_code(resource, partition, mode):
+def get_policy_code(resource, partition, mode, use_cache=True):
     item_id = '{}-policy-{}-{}'.format(SERVICE, partition, mode)
+
+    # 캐싱
+    key = '{}-{}'.format(item_id, int(time.time() / 100))
+    if key in cache and use_cache:
+        return cache[key]
+
     item = resource.db_get_item(item_id)
     if item:
         policy_code = item.get('code')
@@ -71,6 +85,8 @@ def get_policy_code(resource, partition, mode):
         """ Assign default item that has default policy code
         """
         policy_code = get_default_policy_code(mode)
+
+    cache[key] = policy_code
     return policy_code
 
 
@@ -82,7 +98,7 @@ def do(data, resource):
     partition_to_apply = params.get('partition_to_apply')
     mode = params.get('mode')
 
-    policy_code = get_policy_code(resource, partition_to_apply, mode)
+    policy_code = get_policy_code(resource, partition_to_apply, mode, use_cache=False)
     if policy_code:
         body['code'] = policy_code
     else:

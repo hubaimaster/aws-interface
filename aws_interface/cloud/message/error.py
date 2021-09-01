@@ -209,3 +209,26 @@ UNREGISTERED_PARTITION = {
     'code': 52,
     'message': 'Unregistered partition',
 }
+SESSION_SECURITY_VIOLATION = {
+    'code': 53,
+    'message': 'This is a group that has session security hardened. '
+               'Session access was rejected because '
+               'it was different from the region you accessed when logging in.',
+}
+
+SESSION_NOT_VERIFICATION = {
+    'code': 54,
+    'message': 'Session security hardened. '
+               'Session access was rejected because '
+               'it was different from the region you accessed when logging in.',
+}
+
+INVALID_ITEM_ID = {
+    'code': 55,
+    'message': 'Invalid item_id'
+}
+
+LOGIN_IS_REQUIRED = {
+    'code': 56,
+    'message': 'Login is required'
+}

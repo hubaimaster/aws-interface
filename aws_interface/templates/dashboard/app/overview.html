@@ -1,5 +1,5 @@
 {% extends 'dashboard/app/base.html' %}
-{% load staticfiles %}
+{% load static %}
 {% block content %}
 
     <div class="main-content">
@@ -18,6 +18,10 @@
                         <h1 class="display-2 text-white">{{ app_name }}</h1>
                         <h2 class="text-white">{{ _("Welcome") }} :)</h2>
                         <p class="text-white mt-0 mb-5">{{ _("Create powerful backends and easily manage them") }}</p>
+
+                        <a href="#" onclick="reDeploy();" class="btn btn-warning btn-icon mt-2">
+                            <i class="fab fa-deploydog mr-2"></i> <span class="nav-link-inner--text">{{ _("RE-Deploy on Cloud") }}</span>
+                        </a>
 
                         <div class="dropdown">
                             <button id="show-sdk-button" class="btn btn-info mt-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -53,9 +57,14 @@
                             </div>
                         </div>
 
+
+
                         <a href="https://github.com/hubaimaster/aws-interface" target="_blank" class="btn btn-dark btn-icon mt-2">
                             <i class="fab fa-github mr-2"></i> <span class="nav-link-inner--text">Github repo</span>
                         </a>
+
+
+
                     </div>
                 </div>
             </div>
@@ -181,5 +190,19 @@
             </footer>
         </div>
     </div>
+
+    <script>
+        function reDeploy() {
+            if (!window.confirm("정말 재배포 하시겠습니까?")){
+                return;
+            }
+             alert("재배포중입니다.. 기다려주세요");
+            $.post("", {
+                'cmd': 'redeploy',
+            }, function (data) {
+                alert("재배포가 백그라운드에 작업에 요청되었습니다. 약 1-2분 대기 후 자동으로 배포됩니다..");
+            });
+        }
+    </script>
 
 {% endblock %}

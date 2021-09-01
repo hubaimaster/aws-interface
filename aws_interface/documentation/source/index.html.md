@@ -742,6 +742,90 @@ session_id? | str
 
 
 
+## cloud.auth.detach_user_group
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.auth.detach_user_group",
+"user_id": "str",
+"group_name": "str",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.auth.detach_user_group", {
+ "group_name": "str",
+ "session_id?": "str",
+ "user_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.auth.detach_user_group", {
+ "group_name": "str",
+ "session_id?": "str",
+ "user_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("user_id", "str");
+data.put("group_name", "str");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.auth.detach_user_group", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"user_id": "str",
+"group_name": "str",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "success": "bool"
+}
+```
+
+Detach user group from user
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.auth.detach_user_group"
+user_id | str
+group_name | str
+session_id? | str
+
+
+
 ## cloud.auth.find_password
 
 > The question mark after the parameter means that the parameter is not required
@@ -914,11 +998,13 @@ session_id? | str
 ```shell
 curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.auth.get_me",
-"session_id": "str"}'
+"session_id": "str",
+"__est": "str?"}'
 ```
 
 ```python
 response = client.call_api("cloud.auth.get_me", {
+ "__est": "str?",
  "session_id": "str"
 })
 print(response)
@@ -926,6 +1012,7 @@ print(response)
 
 ```javascript
 client.callAPI("cloud.auth.get_me", {
+ "__est": "str?",
  "session_id": "str"
 }).then(function(response){
   console.log(JSON.stringify(response));
@@ -938,6 +1025,7 @@ client.callAPI("cloud.auth.get_me", {
 ```java
 HashMap<String, Object> data = new HashMap<>();
 data.put("session_id", "str");
+data.put("__est", "str?");
 
 client.callAPI("cloud.auth.get_me", data, (response, hasError)->{
   System.out.println(response);
@@ -947,6 +1035,7 @@ client.callAPI("cloud.auth.get_me", data, (response, hasError)->{
 ```swift
 client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_id": "str",
+"__est": "str?",
 ]) { (response) in
   print(response)
 }
@@ -985,6 +1074,7 @@ Parameter | Type | Value
 --------- | ----------- | -----
 module_name | str | "cloud.auth.get_me"
 session_id | str
+__est | str?
 
 
 
@@ -1145,11 +1235,13 @@ session_id? | str
 curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.auth.get_sessions",
 "start_key": "str",
+"query": "list?",
 "session_id?": "str"}'
 ```
 
 ```python
 response = client.call_api("cloud.auth.get_sessions", {
+ "query": "list?",
  "session_id?": "str",
  "start_key": "str"
 })
@@ -1158,6 +1250,7 @@ print(response)
 
 ```javascript
 client.callAPI("cloud.auth.get_sessions", {
+ "query": "list?",
  "session_id?": "str",
  "start_key": "str"
 }).then(function(response){
@@ -1171,6 +1264,7 @@ client.callAPI("cloud.auth.get_sessions", {
 ```java
 HashMap<String, Object> data = new HashMap<>();
 data.put("start_key", "str");
+data.put("query", "list?");
 data.put("session_id?", "str");
 
 client.callAPI("cloud.auth.get_sessions", data, (response, hasError)->{
@@ -1181,6 +1275,7 @@ client.callAPI("cloud.auth.get_sessions", data, (response, hasError)->{
 ```swift
 client.callAPI(module_name: "cloud.auth.guest", data: [
 "start_key": "str",
+"query": "list?",
 "session_id?": "str",
 ]) { (response) in
   print(response)
@@ -1216,6 +1311,7 @@ Parameter | Type | Value
 --------- | ----------- | -----
 module_name | str | "cloud.auth.get_sessions"
 start_key | str
+query | list?
 session_id? | str
 
 
@@ -2202,6 +2298,92 @@ session_id? | str
 
 
 
+## cloud.auth.login_secure
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.auth.login_secure",
+"email": "str",
+"password": "str",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.auth.login_secure", {
+ "email": "str",
+ "password": "str",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.auth.login_secure", {
+ "email": "str",
+ "password": "str",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("email", "str");
+data.put("password", "str");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.auth.login_secure", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"email": "str",
+"password": "str",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "__spk": "str",
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "session_id": "str",
+ "user_id": "str"
+}
+```
+
+Secure Login: When you request to server from client, you should insert key name &#34;__est&#34;: SHA3_512(&lt;str(int(time.time()))&gt; + __spk) in payloadtime.time() must be seconds (NOT MS) 
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.auth.login_secure"
+email | str
+password | str
+session_id? | str
+
+
+
 ## cloud.auth.logout
 
 > The question mark after the parameter means that the parameter is not required
@@ -2894,6 +3076,91 @@ user | dict
 # database
 Manage database operation
 
+## cloud.database.batch_get_items
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.database.batch_get_items",
+"session_id": "str",
+"item_ids": "[str]",
+"max_workers": "int?"}'
+```
+
+```python
+response = client.call_api("cloud.database.batch_get_items", {
+ "item_ids": "[str]",
+ "max_workers": "int?",
+ "session_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.database.batch_get_items", {
+ "item_ids": "[str]",
+ "max_workers": "int?",
+ "session_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id", "str");
+data.put("item_ids", "[str]");
+data.put("max_workers", "int?");
+
+client.callAPI("cloud.database.batch_get_items", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id": "str",
+"item_ids": "[str]",
+"max_workers": "int?",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "errors": "[dict]",
+ "items": "[dict]"
+}
+```
+
+Batch get items
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.database.batch_get_items"
+session_id | str
+item_ids | [str]
+max_workers | int?
+
+
+
 ## cloud.database.create_item
 
 > The question mark after the parameter means that the parameter is not required
@@ -2987,12 +3254,14 @@ curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.database.create_items",
 "session_id": "str",
 "items": "[dict]",
-"partition": "str"}'
+"partition": "str",
+"max_workers": "int?"}'
 ```
 
 ```python
 response = client.call_api("cloud.database.create_items", {
  "items": "[dict]",
+ "max_workers": "int?",
  "partition": "str",
  "session_id": "str"
 })
@@ -3002,6 +3271,7 @@ print(response)
 ```javascript
 client.callAPI("cloud.database.create_items", {
  "items": "[dict]",
+ "max_workers": "int?",
  "partition": "str",
  "session_id": "str"
 }).then(function(response){
@@ -3017,6 +3287,7 @@ HashMap<String, Object> data = new HashMap<>();
 data.put("session_id", "str");
 data.put("items", "[dict]");
 data.put("partition", "str");
+data.put("max_workers", "int?");
 
 client.callAPI("cloud.database.create_items", data, (response, hasError)->{
   System.out.println(response);
@@ -3028,6 +3299,7 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_id": "str",
 "items": "[dict]",
 "partition": "str",
+"max_workers": "int?",
 ]) { (response) in
   print(response)
 }
@@ -3060,6 +3332,7 @@ module_name | str | "cloud.database.create_items"
 session_id | str
 items | [dict]
 partition | str
+max_workers | int?
 
 
 
@@ -3227,12 +3500,14 @@ item_id | str
 curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.database.delete_items",
 "session_id": "str",
-"item_ids": "[str]"}'
+"item_ids": "[str]",
+"max_workers": "int?"}'
 ```
 
 ```python
 response = client.call_api("cloud.database.delete_items", {
  "item_ids": "[str]",
+ "max_workers": "int?",
  "session_id": "str"
 })
 print(response)
@@ -3241,6 +3516,7 @@ print(response)
 ```javascript
 client.callAPI("cloud.database.delete_items", {
  "item_ids": "[str]",
+ "max_workers": "int?",
  "session_id": "str"
 }).then(function(response){
   console.log(JSON.stringify(response));
@@ -3254,6 +3530,7 @@ client.callAPI("cloud.database.delete_items", {
 HashMap<String, Object> data = new HashMap<>();
 data.put("session_id", "str");
 data.put("item_ids", "[str]");
+data.put("max_workers", "int?");
 
 client.callAPI("cloud.database.delete_items", data, (response, hasError)->{
   System.out.println(response);
@@ -3264,6 +3541,7 @@ client.callAPI("cloud.database.delete_items", data, (response, hasError)->{
 client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_id": "str",
 "item_ids": "[str]",
+"max_workers": "int?",
 ]) { (response) in
   print(response)
 }
@@ -3294,6 +3572,7 @@ Parameter | Type | Value
 module_name | str | "cloud.database.delete_items"
 session_id | str
 item_ids | [str]
+max_workers | int?
 
 
 
@@ -4094,7 +4373,7 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
 }
 ```
 
-Update item
+Update item version 2.0, Low update WCU consumed
 
 ### HTTP Request
 
@@ -4111,6 +4390,90 @@ item | map
 
 
 
+## cloud.database.update_item_v2
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.database.update_item_v2",
+"session_id": "str",
+"item_id": "str",
+"item": "map"}'
+```
+
+```python
+response = client.call_api("cloud.database.update_item_v2", {
+ "item": "map",
+ "item_id": "str",
+ "session_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.database.update_item_v2", {
+ "item": "map",
+ "item_id": "str",
+ "session_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id", "str");
+data.put("item_id", "str");
+data.put("item", "map");
+
+client.callAPI("cloud.database.update_item_v2", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id": "str",
+"item_id": "str",
+"item": "map",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "success": "bool"
+}
+```
+
+Update item version 2.0, Low update WCU consumed
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.database.update_item_v2"
+session_id | str
+item_id | str
+item | map
+
+
+
 ## cloud.database.update_items
 
 > The question mark after the parameter means that the parameter is not required
@@ -4119,11 +4482,13 @@ item | map
 curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.database.update_items",
 "session_id": "str",
-"pairs": "[item_id: item]"}'
+"pairs": "[item_id: item]",
+"max_workers": "int?"}'
 ```
 
 ```python
 response = client.call_api("cloud.database.update_items", {
+ "max_workers": "int?",
  "pairs": "[item_id: item]",
  "session_id": "str"
 })
@@ -4132,6 +4497,7 @@ print(response)
 
 ```javascript
 client.callAPI("cloud.database.update_items", {
+ "max_workers": "int?",
  "pairs": "[item_id: item]",
  "session_id": "str"
 }).then(function(response){
@@ -4146,6 +4512,7 @@ client.callAPI("cloud.database.update_items", {
 HashMap<String, Object> data = new HashMap<>();
 data.put("session_id", "str");
 data.put("pairs", "[item_id: item]");
+data.put("max_workers", "int?");
 
 client.callAPI("cloud.database.update_items", data, (response, hasError)->{
   System.out.println(response);
@@ -4156,6 +4523,7 @@ client.callAPI("cloud.database.update_items", data, (response, hasError)->{
 client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_id": "str",
 "pairs": "[item_id: item]",
+"max_workers": "int?",
 ]) { (response) in
   print(response)
 }
@@ -4187,6 +4555,92 @@ Parameter | Type | Value
 module_name | str | "cloud.database.update_items"
 session_id | str
 pairs | [item_id: item]
+max_workers | int?
+
+
+
+## cloud.database.update_items_v2
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.database.update_items_v2",
+"session_id": "str",
+"pairs": "[item_id: item]",
+"max_workers": "int?"}'
+```
+
+```python
+response = client.call_api("cloud.database.update_items_v2", {
+ "max_workers": "int?",
+ "pairs": "[item_id: item]",
+ "session_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.database.update_items_v2", {
+ "max_workers": "int?",
+ "pairs": "[item_id: item]",
+ "session_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id", "str");
+data.put("pairs", "[item_id: item]");
+data.put("max_workers", "int?");
+
+client.callAPI("cloud.database.update_items_v2", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id": "str",
+"pairs": "[item_id: item]",
+"max_workers": "int?",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "error_list": "[dict]",
+ "success_list": "[bool]"
+}
+```
+
+Update items
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.database.update_items_v2"
+session_id | str
+pairs | [item_id: item]
+max_workers | int?
 
 
 

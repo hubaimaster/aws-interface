@@ -21,7 +21,7 @@ def do(data, resource):
     body = {}
     params = data['params']
     group_name = params['group_name']
-    permission = params.get('permission')
+    permission = params.get('permission', None)
 
     if group_name == 'admin':
         body['error'] = error.ADMIN_GROUP_CANNOT_BE_MODIFIED
@@ -30,6 +30,7 @@ def do(data, resource):
     item = resource.db_get_item('user-group-{}'.format(group_name))
     item_permissions = item.get('permissions', [])
     item_permissions.remove(permission)
+    item_permissions = [item_permission for item_permission in item_permissions if item_permission]
     item_permissions = list(set(item_permissions))
     item['permissions'] = item_permissions
 

@@ -220,8 +220,14 @@ class AWSResource(Resource):
             result &= bool(self.dynamo.delete_item(self.app_id, item_id))
         return result
 
-    def db_get_item(self, item_id):
-        item = self.dynamo.get_item(self.app_id, item_id)
+    def db_get_item(self, item_id, projection_keys=None):
+        """
+        Projection keys 가 있으면, projection_keys 만 반환.
+        :param item_id:
+        :param projection_keys:
+        :return:
+        """
+        item = self.dynamo.get_item(self.app_id, item_id, projection_keys=projection_keys)
         return item.get('Item', None)
 
     def db_get_items(self, item_ids):
@@ -250,6 +256,11 @@ class AWSResource(Resource):
     def db_update_item(self, item_id, item, index_keys=None):
         item = decode_dict(item)
         result = self.dynamo.update_item(self.app_id, item_id, item, index_keys=index_keys)
+        return bool(result)
+
+    def db_update_item_v2(self, item_id, item, index_keys=None):
+        item = decode_dict(item)
+        result = self.dynamo.update_item_v2(self.app_id, item_id, item, index_keys=index_keys)
         return bool(result)
 
     def db_get_count(self, partition, field=None, value=None):
@@ -289,14 +300,16 @@ class AWSResource(Resource):
     def get_end_key(self, item, order_by, index_key='partition'):
         if not item:
             return item
+        if item.get('id', None) is None:
+            return None
         end_key = {
             'id': item['id'],
-            order_by: item[order_by],
-            index_key: item[index_key]
+            order_by: item.get(order_by, 0),
+            index_key: item.get(index_key, None)
         }
 
-        if isinstance(item[order_by], int) or isinstance(item[order_by], float) or isinstance(item[order_by], Decimal):
-            end_key[order_by] = Decimal("%.20f" % item[order_by])
+        if isinstance(item.get(order_by, 0), int) or isinstance(item.get(order_by, 0), float) or isinstance(item.get(order_by, 0), Decimal):
+            end_key[order_by] = Decimal("%.20f" % item.get(order_by, 0))
             #end_key[order_by] = Decimal(str(item[order_by]))
 
         return end_key
@@ -323,8 +336,13 @@ class AWSResource(Resource):
             end_key = self.get_end_key(items[-1], order_by)
 
         filter_items = [item for item in items if should_contains(item[order_by], order_min, order_max)]
-        if len(filter_items) < len(items) and filter_items:
-            end_key = self.get_end_key(filter_items[-1], order_by)
+        if len(filter_items) < len(items):
+            if filter_items:
+                end_key = self.get_end_key(filter_items[-1], order_by)
+            else:
+                end_key = {
+                    'id': None
+                }
         elif end_key and (order_min or order_max):
             while end_key is not None:
                 response = self.dynamo.get_items_in_partition_by_order(self.app_id, partition, order_by,
@@ -348,7 +366,7 @@ class AWSResource(Resource):
 
     def db_get_item_id_and_orders(self, partition, field, value, order_by='creation_date',
                                   order_min=None, order_max=None, start_key=None, limit=100, reverse=False,
-                                  sort_min=None, sort_max=None):
+                                  sort_min=None, sort_max=None, operation='eq'):
         def should_contains(key, min_value, max_value):
             if min_value:
                 return key >= min_value
@@ -362,7 +380,7 @@ class AWSResource(Resource):
 
         start_key = self.get_end_key(start_key, order_by, 'inverted_query')
 
-        response = self.dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by,
+        response = self.dynamo.get_inverted_queries(self.app_id, partition, field, value, operation, order_by,
                                                     sort_min, sort_max, start_key, limit, reverse)
         items = response.get('Items', [])
         end_key = response.get('LastEvaluatedKey', None)
@@ -370,11 +388,16 @@ class AWSResource(Resource):
             end_key = self.get_end_key(items[-1], order_by, 'inverted_query')
 
         filter_items = list([item for item in items if should_contains(item[order_by], order_min, order_max)])
-        if len(filter_items) < len(items) and filter_items:
-            end_key = self.get_end_key(filter_items[-1], order_by, 'inverted_query')
+        if len(filter_items) < len(items):
+            if filter_items:
+                end_key = self.get_end_key(filter_items[-1], order_by, 'inverted_query')
+            else:
+                end_key = {
+                    'id': None
+                }
         elif end_key and (order_min or order_max):
             while end_key is not None:
-                response = self.dynamo.get_inverted_queries(self.app_id, partition, field, value, 'eq', order_by,
+                response = self.dynamo.get_inverted_queries(self.app_id, partition, field, value, operation, order_by,
                                                             sort_min, sort_max, end_key, limit, reverse)
                 sub_items = response.get('Items', [])
                 end_key = response.get('LastEvaluatedKey', None)
@@ -382,7 +405,7 @@ class AWSResource(Resource):
 
                 items.extend(sub_items)
                 filter_items.extend(sub_filter_items)
-
+                # 필터 아이템이 0개인 경우가 있음 이거 예외처리해줘야해
                 if len(filter_items) < len(items) and filter_items:
                     end_key = self.get_end_key(filter_items[-1], order_by, 'inverted_query')
                     break

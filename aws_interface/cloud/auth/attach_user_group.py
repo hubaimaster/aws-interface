@@ -1,6 +1,8 @@
 
 from cloud.permission import Permission, NeedPermission
 from cloud.database.util import get_index_keys_to_index
+from cloud.message import error
+import time
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -24,10 +26,18 @@ def do(data, resource):
     group_name = params.get('group_name')
 
     user = resource.db_get_item(user_id)
+    if user.get('partition', None) != 'user':
+        body['error'] = error.NOT_USER_PARTITION
+        body['success'] = False
+        return body
     groups = user.get('groups', [])
     groups.append(group_name)
     groups = list(set(groups))
-    user['groups'] = groups
-    success = resource.db_update_item(user_id, user)
+
+    success = resource.db_update_item_v2(user_id, {
+        'partition': 'user',
+        'groups': groups,
+        'updated_date': float(time.time())
+    })
     body['success'] = success
     return body

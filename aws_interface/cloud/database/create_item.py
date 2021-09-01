@@ -1,5 +1,5 @@
 
-from cloud.permission import Permission, NeedPermission
+from cloud.permission import Permission, NeedPermission, database_can_not_access_to_item
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy_after_get_policy_code
 from cloud.shortuuid import uuid
@@ -39,6 +39,11 @@ def do(data, resource):
         item['owner'] = user_id
 
     item = {key: value for key, value in item.items() if value != '' and value != {} and value != []}
+
+    # 시스템 파티션 접근 제한
+    if database_can_not_access_to_item(partition):
+        body['error'] = error.PERMISSION_DENIED
+        return body
     # Check partition has been existed
     if resource.db_has_partition(partition):
         if match_policy_after_get_policy_code(resource, 'create', partition, user, item):

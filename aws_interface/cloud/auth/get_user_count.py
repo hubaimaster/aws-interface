@@ -19,7 +19,8 @@ info = {
 @NeedPermission(Permission.Run.Auth.get_user_count)
 def do(data, resource):
     body = {}
-    count_system_user = data.get('count_system_user', False)
+    params = data.get('params', {})
+    count_system_user = params.get('count_system_user', False)
     partition = 'user'
     count = resource.db_get_count(partition)
     if not count_system_user:

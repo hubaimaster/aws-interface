@@ -33,6 +33,21 @@ def match_policy(policy_code, extra, password_meta):
     return result
 
 
+def match_has_permission(policy_code, user, user_to_do):
+    """
+    사용자를 읽고 쓸 권한이 있는지 체크
+    :param policy_code:
+    :param user:
+    :param user_to_do:
+    :return:
+    """
+    if not safe_to_run_code():
+        return True
+    exec(policy_code)
+    result = eval('has_permission(user, user_to_do)')
+    return result
+
+
 def get_default_policy_code(mode):
     """ Assign default item that has default policy code
     """
@@ -54,6 +69,12 @@ def get_default_policy_code(mode):
     elif mode == 'kakao_login':
         import cloud.auth.policy.register_kakao as source
         policy_code = inspect.getsource(source)
+    elif mode == 'read':
+        import cloud.auth.policy.read as source
+        policy_code = inspect.getsource(source)
+    elif mode == 'update':
+        import cloud.auth.policy.update as source
+        policy_code = inspect.getsource(source)
     else:
         raise BaseException('No such policy code mode: [{}]'.format(mode))
     return policy_code
@@ -67,8 +88,8 @@ def do(data, resource):
     if login_method not in LOGIN_METHODS:
         body['error'] = error.NO_SUCH_LOGIN_METHOD
         return body
-
-    item = resource.db_get_item('auth-login-method-{}'.format(login_method))
+    item_id = 'auth-login-method-{}'.format(login_method)
+    item = resource.db_get_item(item_id)
     default_policy_code = get_default_policy_code(login_method)
 
     if not item:
@@ -77,7 +98,7 @@ def do(data, resource):
             'default_group_name': 'user',
             'register_policy_code': default_policy_code,
         }
-        resource.db_put_item('meta-info', item, login_method)
+        resource.db_put_item('meta-info', item, item_id)
     if item.get('register_policy_code', None) is None:
         item['register_policy_code'] = default_policy_code
 

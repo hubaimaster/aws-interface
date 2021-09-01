@@ -3,6 +3,7 @@ from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import inspect
 from cloud.env import safe_to_run_code
+import time
 
 
 # Define the input output format of the function.
@@ -18,6 +19,7 @@ info = {
 }
 
 SERVICE = 'storage'
+cache = {}
 
 
 def match_policy_after_get_policy_code(resource, mode, partition, user, item):
@@ -36,6 +38,12 @@ def match_policy(policy_code, user, item):
 
 def get_policy_code(resource, partition, mode):
     item_id = '{}-policy-{}-{}'.format(SERVICE, partition, mode)
+
+    # 캐싱
+    key = '{}-{}'.format(item_id, int(time.time() / 10))
+    if key in cache:
+        return cache[key]
+
     item = resource.db_get_item(item_id)
     if item:
         policy_code = item.get('code')
@@ -53,6 +61,7 @@ def get_policy_code(resource, partition, mode):
             policy_code = inspect.getsource(source)
         else:
             policy_code = None
+    cache[key] = policy_code
     return policy_code
 
 

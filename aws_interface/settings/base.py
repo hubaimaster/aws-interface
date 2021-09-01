@@ -7,6 +7,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRETS_DIR = os.path.join(BASE_DIR, 'secret')
 SECRETS_BASE = os.path.join(SECRETS_DIR, 'base.json')
 
+SESSION_COOKIE_AGE = 60 * 60 * 6
+SESSION_SAVE_EVERY_REQUEST = True
+
 try:
     secrets_base = json.load(open(SECRETS_BASE, 'rt'))
 except FileNotFoundError:
@@ -18,6 +21,9 @@ except FileNotFoundError:
     """
 
 SECRET_KEY = secrets_base['SECRET_KEY']
+
+EMAIL_USER = secrets_base['EMAIL_USER']
+EMAIL_PASSWORD = secrets_base['EMAIL_PASSWORD']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -37,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'storages',
-    'dashboard.apps.DashboardConfig'
+    'dashboard.apps.DashboardConfig',
+    'django_otp',
+    'django_otp.plugins.otp_totp'
 ]
 
 MIDDLEWARE = [
@@ -49,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_otp.middleware.OTPMiddleware'
 ]
 
 ROOT_URLCONF = 'urls'

@@ -4,11 +4,15 @@ import tempfile
 import botocore
 
 from boto3.dynamodb.conditions import Key, GreaterThanEquals, LessThanEquals
-from boto3.dynamodb.types import TypeDeserializer
+from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 
 from sys import maxsize
 from decimal import Decimal
 import cloud.shortuuid as shortuuid
+from resource.config import MAX_N_GRAM
+
+type_deserializer = TypeDeserializer()
+type_serializer = TypeSerializer()
 
 
 def get_boto3_session(credentials):
@@ -103,7 +107,7 @@ class APIGateway:
             'url': url,
             'path': path_part,
             'redirection_uri': redirection_uri,
-            }
+        }
 
     def delete_resource(self, rest_api_id, resource_id):
         response = self.client.delete_resource(
@@ -517,7 +521,7 @@ class DynamoDB:
             self._add_item_count(table_name, '{}-count'.format(partition), value_to_add=-1)
             for field, value in item.get('Item', {}).items():
                 self._add_item_count(table_name, '{}-{}-{}-count'.format(partition, field, value), value_to_add=-1)
-        self._delete_inverted_query(table_name, item_id)
+        self._delete_inverted_query(table_name, partition, item_id)
         return response
 
     def get_table(self, table_name):
@@ -529,11 +533,33 @@ class DynamoDB:
             self.table_cache[table_name] = table
         return table
 
-    def get_item(self, table_name, item_id):
+    def get_projection_expression(self, expression_attribute_names):
+        expression = ', '.join(expression_attribute_names)
+        return expression
+
+    def get_projection_expression_attribute_names(self, projection_keys):
+        expression_attribute_names = {}
+        for projection_key in projection_keys:
+            key = '#key{}'.format(projection_key)
+            val = projection_key
+            expression_attribute_names[key] = val
+        return expression_attribute_names
+
+    def get_item(self, table_name, item_id, projection_keys=None):
         table = self.get_table(table_name)
-        item = table.get_item(Key={
-            'id': item_id
-        })
+        if projection_keys:
+            expression_attribute_names = self.get_projection_expression_attribute_names(projection_keys)
+            projection_expression = self.get_projection_expression(expression_attribute_names)
+            item = table.get_item(Key={
+                'id': item_id
+            },
+                ProjectionExpression=projection_expression,
+                ExpressionAttributeNames=expression_attribute_names
+            )
+        else:
+            item = table.get_item(Key={
+                'id': item_id
+            })
         return item
 
     def time(self):
@@ -560,16 +586,22 @@ class DynamoDB:
         item['id'] = item_id
         item['creation_date'] = creation_date
         item['partition'] = partition
-        response = table.put_item(
-            Item=item,
-        )
+
+        try:
+            response = table.put_item(
+                Item=item,
+            )
+        except Exception as ex:
+            print(ex)
+            return False
+
         if need_counting:
             """ Counting if the item is a new one """
             self._add_item_count(table_name, '{}-count'.format(partition))
             # for field, value in item.items():
             #     self._add_item_count(table_name, '{}-{}-{}-count'.format(partition, field, value))
         if indexing:
-            self._delete_inverted_query(table_name, item_id)
+            self._delete_inverted_query(table_name, partition, item_id)
             self._put_inverted_query(table_name, partition, item, index_keys=index_keys)
         return response
 
@@ -583,7 +615,6 @@ class DynamoDB:
                 }
             }
         )
-        type_deserializer = TypeDeserializer()
         items = response['Responses'][table_name]
         for item in items:
             for key, value in item.items():
@@ -610,7 +641,7 @@ class DynamoDB:
         return response
 
     def get_inverted_queries(self, table_name, partition, field, operand, operation, order_by, order_min, order_max, start_key=None, limit=100, reverse=False):
-        if operation == 'in' or operation == 'eq':
+        if operation in ['in', 'ins', 'eq']:
             hash_key_name = 'inverted_query'
             sort_key_name = '{}'.format(order_by)
             hash_key = '{}-{}-{}-{}'.format(partition, field, operand, operation)
@@ -666,6 +697,37 @@ class DynamoDB:
             )
         return response
 
+    def get_target_fields(self, item, prefix='', target_fields=None):
+        if target_fields is None:
+            target_fields = []
+        for key in item:
+            value = item[key]
+            if isinstance(value, dict):
+                self.get_target_fields(value, key + '.', target_fields)
+            else:
+                target_fields.append(prefix + key)
+        return target_fields
+
+    def get_update_expression_attrs_pair(self, item):
+        """
+        item 에서 업데이트 표현식과 속성을 튜플로 반환합니다.
+        :param item:
+        :return: (UpdateExpression, ExpressionAttributeValues)
+        """
+        expression = 'set'
+        attr_names = {}
+        attr_values = {}
+        for idx, (key, value) in enumerate(item.items()):
+            attr_key = '#key{}'.format(idx)
+            attr_value = ':val{}'.format(idx)
+            expression += ' {}={}'.format(attr_key, attr_value)
+
+            attr_names['{}'.format(attr_key)] = key
+            attr_values['{}'.format(attr_value)] = value
+            if idx != len(item) - 1:
+                expression += ','
+        return expression, attr_names, attr_values
+
     def update_item(self, table_name, item_id, item, index_keys=None):
         table = self.get_table(table_name)
         item['id'] = item_id
@@ -674,8 +736,32 @@ class DynamoDB:
             Item=item,
         )
         partition = item.get('partition')
-        self._delete_inverted_query(table_name, item_id)
+        self._delete_inverted_query(table_name, partition, item_id)
         self._put_inverted_query(table_name, partition, item, index_keys=index_keys)
+        return response
+
+    def update_item_v2(self, table_name, item_id, item, index_keys=None):
+        table = self.get_table(table_name)
+        partition = item.get('partition')
+        pop_list = ['id', 'partition']
+        for pop_field in pop_list:
+            if pop_field in item:
+                item.pop(pop_field)
+        if not item:
+            return True
+
+        expression, attr_names, attr_values = self.get_update_expression_attrs_pair(item)
+        response = table.update_item(
+            Key={'id': item_id},
+            UpdateExpression=expression,
+            ExpressionAttributeValues=attr_values,
+            ExpressionAttributeNames=attr_names,
+            ReturnValues="UPDATED_NEW",
+        )
+        target_fields = self.get_target_fields(item)
+        item['id'] = item_id
+        self._delete_inverted_query(table_name, partition, item_id, target_fields=target_fields)
+        self._put_inverted_query(table_name, partition, item, index_keys=index_keys, target_fields=target_fields)
         return response
 
     def update_item_with_strong_read(self, table_name, item_id, item, index_keys):
@@ -710,25 +796,32 @@ class DynamoDB:
     def _add_item_count(self, table_name, count_id, value_to_add=1):
         if len(str(count_id)) > 1024:  # Index size max is 1024
             return False
-        response = self.client.update_item(
-            ExpressionAttributeNames={
-                '#A': 'count',
-            },
-            ExpressionAttributeValues={
-                ':v': {
-                    'N': str(value_to_add),
-                }
-            },
-            Key={
-                'id': {
-                    'S': count_id,
-                }
-            },
-            ReturnValues='ALL_NEW',
-            TableName=table_name,
-            UpdateExpression='ADD #A :v',
-        )
-        return response
+        count = 0
+        while count < 3:
+            count += 1
+            try:
+                response = self.client.update_item(
+                    ExpressionAttributeNames={
+                        '#A': 'count',
+                    },
+                    ExpressionAttributeValues={
+                        ':v': {
+                            'N': str(value_to_add),
+                        }
+                    },
+                    Key={
+                        'id': {
+                            'S': count_id,
+                        }
+                    },
+                    ReturnValues='ALL_NEW',
+                    TableName=table_name,
+                    UpdateExpression='ADD #A :v',
+                )
+                return response
+            except Exception as ex:
+                print(ex)
+                time.sleep(0.3)
 
     def get_item_count(self, table_name, count_id):
         response = self.get_item(table_name, count_id)
@@ -738,31 +831,67 @@ class DynamoDB:
         value = str(value)
         return [value]
 
-    def _put_inverted_query(self, table_name, partition, item, index_keys=None):
+    def _make_n_gram(self, value):
+        max_len = len(value)
+        tokens = []
+        for i in range(1, min(MAX_N_GRAM, max_len) + 1):
+            for j in range(0, max_len - i + 1):
+                token = value[j:j + i]
+                tokens.append(token)
+        return tokens
+
+    def _ins_operands(self, value):
+        if isinstance(value, str):
+            return self._make_n_gram(value)
+        else:
+            return []
+
+    def _put_inverted_query(self, table_name, partition, item, index_keys=None, target_fields=None):
         table = self.resource.Table(table_name)
         item_id = item.get('id')
         creation_date = item.get('creation_date', self.time())
         with table.batch_writer() as batch:
             for field, value in item.items():
                 for operand in self._eq_operands(value):
-                    self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date, index_keys=index_keys)
-                self._put_deep_inverted_query(batch, partition, item_id, creation_date, field, value, index_keys=index_keys)
+                    self._put_inverted_query_field(batch, partition, field, operand, 'eq', item_id, creation_date, index_keys=index_keys, target_fields=target_fields)
+                for operand_ins in self._ins_operands(value):
+                    self._put_inverted_query_field(batch, partition, field, operand_ins, 'ins', item_id, creation_date, index_keys=index_keys, target_fields=target_fields)
+                self._put_deep_inverted_query(batch, partition, item_id, creation_date, field, value, index_keys=index_keys, target_fields=target_fields)
 
-    def _put_deep_inverted_query(self, batch, partition, item_id, creation_date, field, value, index_keys=None):
+    def _put_deep_inverted_query(self, batch, partition, item_id, creation_date, field, value, index_keys=None, target_fields=None):
         if isinstance(value, dict):
             for field2, value2 in value.items():
                 for operand2 in self._eq_operands(value2):
                     # key.key2 eq val 와 같이 사용 할 수 있도록
                     self._put_inverted_query_field(batch, partition, '{}.{}'.format(field, field2), operand2, 'eq',
-                                                   item_id, creation_date, index_keys=index_keys)
-                self._put_deep_inverted_query(batch, partition, item_id, creation_date, '{}.{}'.format(field, field2),
-                                              value2, index_keys=index_keys)
+                                                   item_id, creation_date, index_keys=index_keys, target_fields=target_fields)
+                for operand2_ins in self._ins_operands(value2):
+                    self._put_inverted_query_field(batch, partition, '{}.{}'.format(field, field2), operand2_ins, 'ins',
+                                                   item_id, creation_date, index_keys=index_keys, target_fields=target_fields)
 
-    def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date, index_keys=None):
+                self._put_deep_inverted_query(batch, partition, item_id, creation_date, '{}.{}'.format(field, field2),
+                                              value2, index_keys=index_keys, target_fields=target_fields)
+
+
+    def _put_inverted_query_field(self, table, partition, field, operand, operation, item_id, creation_date, index_keys=None, target_fields=None):
+        advanced_index_operations = ['ins']
         if len(str(operand)) > 256:
             return False
-        if isinstance(index_keys, list) and field not in index_keys:
-            return False
+        if isinstance(index_keys, list):
+            has_key = False
+            for index_key in index_keys:
+                if isinstance(index_key, str) and index_key == field and operation not in advanced_index_operations:  # 일반 인덱싱
+                    has_key = True
+                if isinstance(index_key, tuple) and index_key == (field, operation):  # 고급 인덱싱 / 풀텍스트 등
+                    has_key = True
+            if not has_key:
+                return False
+        elif operation in advanced_index_operations:
+            return False  # 고급 인덱싱은 인덱스 리스트에 포함되어있어야 인덱싱.
+
+        if target_fields is not None:
+            if field not in target_fields:
+                return False
         _inverted_query = '{}-{}-{}-{}'.format(partition, field, operand, operation)
         query = {
             'id': 'query-{}'.format(shortuuid.uuid()),
@@ -771,22 +900,48 @@ class DynamoDB:
             'creation_date': creation_date,
             'item_id': item_id,
         }
-        response = table.put_item(
-            Item=query,
-        )
-        return response
+        count = 0
+        while count < 3:
+            count += 1
+            try:
+                response = table.put_item(
+                    Item=query,
+                )
+                return response
+            except Exception as ex:
+                print(ex)
+                time.sleep(0.5 * count)
 
-    def _delete_inverted_query(self, table_name, item_id):
+    def _delete_inverted_query(self, table_name, partition, item_id, target_fields=None):
         table = self.resource.Table(table_name)
         items = self.get_items_in_partition(table_name, 'index-{}'.format(item_id), limit=maxsize).get('Items', [])
         with table.batch_writer() as batch:
             for item in items:
-                inverted_query_id = item.get('id', None)
-                batch.delete_item(
-                    Key={
-                        'id': inverted_query_id
-                    }
-                )
+                inverted_query = item.get('inverted_query', None)
+                # Target fields 에 있는 필드만
+                is_target = True
+                if target_fields is not None:
+                    is_target = False
+                    for target_field in target_fields:
+                        prefix = '{}-{}-'.format(partition, target_field)
+                        if inverted_query.startswith(prefix):
+                            is_target = True
+                            break
+                if is_target:
+                    inverted_query_id = item.get('id', None)
+                    count = 0
+                    while count < 3:
+                        count += 1
+                        try:
+                            batch.delete_item(
+                                Key={
+                                    'id': inverted_query_id
+                                }
+                            )
+                            break
+                        except Exception as ex:
+                            print(ex)
+                            time.sleep(0.5 * count)
 
 
 class Lambda:

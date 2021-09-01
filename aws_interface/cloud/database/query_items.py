@@ -20,7 +20,8 @@ info = {
         'sort_key': 'str="creation_date"',
         'join': "{\"user_id\": \"user\", "
                 " \"info.user_id\": \"info.user\","
-                " \"info_user_id\": \"user\", ...}"
+                " \"info_user_id\": \"user\", ...}",
+        'projection_keys': 'list',
     },
     'output_format': {
         'items?': [
@@ -38,6 +39,23 @@ info = {
 DEFAULT_SORT_KEY = 'creation_date'
 
 
+def filter_projection_keys(item, projection_keys):
+    """
+    projection_keys 에 표현된 키만 필터링합니다.
+    :param item:
+    :param projection_keys:
+    :return:
+    """
+    if projection_keys is None or not isinstance(projection_keys, list):
+        return item
+    new_item = {}
+    projection_keys.extend(['id', 'partition', 'creation_date'])
+    for projection_key in projection_keys:
+        if projection_key in item:
+            new_item[projection_key] = item.get(projection_key, None)
+    return new_item
+
+
 @NeedPermission(Permission.Run.Database.query_items)
 def do(data, resource):
     body = {}
@@ -51,6 +69,7 @@ def do(data, resource):
     reverse = params.get('reverse', False)
     sort_key = params.get('sort_key', DEFAULT_SORT_KEY)
     join = params.get('join', {})
+    projection_keys = params.get('projection_keys', None)
 
     if type(start_key) is str:
         start_key = json.loads(start_key)
@@ -84,7 +103,8 @@ def do(data, resource):
         if join:
             util.join_items(resource, user, filtered, join)
 
-        body['items'] = filtered
+        items = [filter_projection_keys(item, projection_keys) for item in filtered]
+        body['items'] = items
         body['end_key'] = end_key
         return body
     else:

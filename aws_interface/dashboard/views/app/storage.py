@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, HttpResponse
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -19,7 +18,7 @@ class Storage(LoginRequiredMixin, View):
         context = Util.get_context(request)
         context['app_id'] = app_id
         adapter = DjangoAdapter(app_id, request)
-        allocate_resource_in_background(adapter)
+        # allocate_resource_in_background(adapter)
         with adapter.open_api_auth() as auth_api, adapter.open_api_storage() as storage_api:
             cmd = request.GET.get('cmd', None)
             if cmd == 'download_file':

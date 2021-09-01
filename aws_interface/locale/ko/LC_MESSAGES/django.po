@@ -969,3 +969,5 @@ msgstr "카카오 로그인"
 msgid "Naver login"
 msgstr "네이버 로그인"
 
+msgid "RE-Deploy on Cloud"
+msgstr "클라우드에 재배포"

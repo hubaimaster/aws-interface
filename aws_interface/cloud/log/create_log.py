@@ -26,7 +26,7 @@ def create_event(resource, user, name, param, source):
     item['event_source'] = source
     if user and user.get('id', None):
         item['owner'] = user.get('id')
-    success = resource.db_put_item('log', item)
+    success = resource.db_put_item('log', item, index_keys=[])
     return success
 
 

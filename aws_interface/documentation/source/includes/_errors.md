@@ -54,3 +54,8 @@ Error Code | Message
 47 | Update policy violation
 48 | Delete policy violation
 49 | Create policy violation
+50 | Not a user partition
+51 | Read policy violation
+52 | Unregistered partition
+53 | This is a group that has session security hardened. Session access was rejected because it was different from the region you accessed when logging in.
+54 | Session security hardened. Session access was rejected because it was different from the region you accessed when logging in.

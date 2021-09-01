@@ -31,14 +31,15 @@ def do(data, resource):
         body['error'] = error.NO_SUCH_ITEM
         return body
 
+    # 시스템 파티션 제한
+    if database_can_not_access_to_item(item['partition']):
+        body['error'] = error.PERMISSION_DENIED
+        return body
+
     # 등록된 파티션이 아닌경우
     if not resource.db_has_partition(item['partition']):
         body['item'] = None
         body['error'] = error.UNREGISTERED_PARTITION
-        return body
-
-    if database_can_not_access_to_item(item):
-        body['error'] = error.PERMISSION_DENIED
         return body
 
     if match_policy_after_get_policy_code(resource, 'delete', item['partition'], user, item):

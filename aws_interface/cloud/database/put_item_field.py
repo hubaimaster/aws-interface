@@ -1,4 +1,3 @@
-
 from cloud.permission import database_can_not_access_to_item
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -32,19 +31,23 @@ def do(data, resource):
     field_value = params.get('field_value', None)
 
     item = resource.db_get_item(item_id)
-    # if database_can_not_access_to_item(item):
-    #     body['error'] = error.PERMISSION_DENIED
-    #     return body
+    # 시스템 파티션 접근 제한
+    if database_can_not_access_to_item(item['partition']):
+        body['error'] = error.PERMISSION_DENIED
+        return body
     if not resource.db_has_partition(item['partition']):
         body['error'] = error.NO_SUCH_PARTITION
         return body
 
-    if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item):
-        item[field_name] = field_value
-        if field_value is None:
-            item.pop(field_name)
+    new_item = {
+        'id': item_id,
+        field_name: field_value,
+        'partition': item['partition']
+    }
+
+    if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item, new_item=new_item):
         index_keys = util.get_index_keys_to_index(resource, user, item['partition'], 'w')
-        success = resource.db_update_item(item_id, item, index_keys=index_keys)
+        success = resource.db_update_item_v2(item_id, new_item, index_keys=index_keys)
         body['success'] = success
     else:
         body['error'] = error.PERMISSION_DENIED

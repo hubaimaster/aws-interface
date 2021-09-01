@@ -1,5 +1,6 @@
 
 from cloud.permission import Permission, NeedPermission
+from cloud.auth import get_policy_code
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -30,6 +31,7 @@ info = {
 def do(data, resource):
     body = {}
     params = data['params']
+    user = data.get('user', None)
 
     start_key = params.get('start_key', None)
     limit = params.get('limit', 100)
@@ -48,6 +50,12 @@ def do(data, resource):
         })
 
     items, end_key = resource.db_query(partition, query, start_key=start_key, limit=limit, reverse=True)
-    body['items'] = items
+    policy_code = get_policy_code.get_policy_code(resource, partition, 'read')
+    filtered = []
+    for item in items:
+        if get_policy_code.match_policy(policy_code, user, item):
+            filtered.append(item)
+
+    body['items'] = filtered
     body['end_key'] = end_key
     return body

@@ -24,3 +24,4 @@ def generate_requirements_zipfile(zipfile_bin):
     # shutil.rmtree(requirements_zipfile_path)
     # os.remove(output_filename)
     return zipfile_bin
+

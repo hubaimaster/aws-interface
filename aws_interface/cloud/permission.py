@@ -8,8 +8,7 @@ system_partitions = ['user', 'log',
                      'slack_webhook', 'system_notification']
 
 
-def database_can_not_access_to_item(item):
-    partition = item.get('partition', None)
+def database_can_not_access_to_item(partition):
     if not partition:
         return True
     if partition in system_partitions:
@@ -57,6 +56,7 @@ class Permission:
             get_email_login = 'run:cloud.auth.get_email_login'
             get_guest_login = 'run:cloud.auth.get_guest_login'
             get_me = 'run:cloud.auth.get_me'
+            get_policy_code = 'run:cloud.auth.get_policy_code'
             get_session = 'run:cloud.auth.get_session'
             get_session_count = 'run:cloud.auth.get_session_count'
             get_sessions = 'run:cloud.auth.get_sessions'
@@ -67,18 +67,23 @@ class Permission:
             get_users = 'run:cloud.auth.get_users'
             guest = 'run:cloud.auth.guest'
             login = 'run:cloud.auth.login'
+            login_secure = 'run:cloud.auth.login_secure'
             login_facebook = 'run:cloud.auth.login_facebook'
             login_naver = 'run:cloud.auth.login_naver'
             login_kakao = 'run:cloud.auth.login_kakao'
             login_google = 'run:cloud.auth.login_google'
             logout = 'run:cloud.auth.logout'
+            put_policy = 'run:cloud.auth.put_policy'
             put_user_group = 'run:cloud.auth.put_user_group'
             register = 'run:cloud.auth.register'
             register_admin = 'run:cloud.auth.register_admin'
+            set_group_session_security_enhancement = 'run:cloud.auth.set_group_session_security_enhancement'
             set_login_method = 'run:cloud.auth.set_login_method'
             set_user = 'run:cloud.auth.set_user'
             set_me = 'run:cloud.auth.set_me'
+            update_me = 'run:cloud.auth.update_me'
             set_my_email = 'run:cloud.auth.set_my_email'
+            set_user_email = 'run:cloud.auth.set_user_email'
             get_login_method = 'run:cloud.auth.get_login_method'
             change_password = 'run:cloud.auth.change_password'
             change_password_admin = 'run:cloud.auth.change_password_admin'
@@ -89,6 +94,7 @@ class Permission:
             has_account = 'run:cloud.auth.has_account'
 
         class Database:
+            batch_get_items = 'run:cloud.database.batch_get_items'
             create_item = 'run:cloud.database.create_item'
             create_items = 'run:cloud.database.create_items'
             create_partition = 'run:cloud.database.create_partition'
@@ -106,7 +112,9 @@ class Permission:
             query_items = 'run:cloud.database.query_items'
             reindex_partition = 'run:cloud.database.reindex_partition'
             update_item = 'run:cloud.database.update_item'
+            update_item_v2 = 'run:cloud.database.update_item_v2'
             update_items = 'run:cloud.database.update_items'
+            update_items_v2 = 'run:cloud.database.update_items_v2'
             create_sort_index = 'run:cloud.database.create_sort_index'
             get_sort_indexes = 'run:cloud.database.get_sort_indexes'
 
@@ -182,6 +190,7 @@ class Permission:
         Run.Auth.get_session,
         Run.Auth.guest,
         Run.Auth.login,
+        Run.Auth.login_secure,
         Run.Auth.login_facebook,
         Run.Auth.login_google,
         Run.Auth.login_naver,
@@ -189,6 +198,7 @@ class Permission:
         Run.Auth.logout,
         Run.Auth.register,
         Run.Auth.set_me,
+        Run.Auth.update_me,
         Run.Auth.get_login_method,
         Run.Auth.delete_my_membership,
         Run.Auth.refresh_session,
@@ -203,7 +213,9 @@ class Permission:
         Run.Database.put_item_field,
         Run.Database.query_items,
         Run.Database.update_item,
+        Run.Database.update_item_v2,
         Run.Database.update_items,
+        Run.Database.update_items_v2,
 
         Run.Log.create_log,
 
@@ -226,6 +238,7 @@ class Permission:
         Run.Auth.logout,
         Run.Auth.register,
         Run.Auth.set_me,
+        Run.Auth.update_me,
         Run.Auth.get_login_method,
 
         Run.Database.create_item,
@@ -238,7 +251,9 @@ class Permission:
         Run.Database.put_item_field,
         Run.Database.query_items,
         Run.Database.update_item,
+        Run.Database.update_item_v2,
         Run.Database.update_items,
+        Run.Database.update_items_v2,
 
         Run.Log.create_log,
 

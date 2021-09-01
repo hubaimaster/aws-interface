@@ -1,5 +1,5 @@
 {% extends 'dashboard/app/base.html' %}
-{% load staticfiles %}
+{% load static %}
 {% load timetags %}
 {% block content %}
 
@@ -117,6 +117,9 @@
                                 <tr>
                                     <th scope="col">{{ _("Name") }}</th>
                                     <th scope="col">{{ _("Description") }}</th>
+                                    <th scope="col">{{ _("Enhance session security") }}
+                                        <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ _("Enables the session security function of the user group. If this option is enabled, one session of users in the group can only be accessed from one IP registered at the time of login.") }}"></i>
+                                    </th>
                                     <th scope="col">{{ _("Permissions") }}</th>
                                     <th scope="col"></th>
                                 </tr>
@@ -129,6 +132,16 @@
                                         </th>
                                         <td name="group-description">
                                             {{ group.description }}
+                                        </td>
+                                        <td name="group-description">
+                                            <label class="custom-toggle">
+                                            {% if group.session_security_enhancement %}
+                                                <input onclick="set_group_session_security_enhancement('{{ group.name }}', false)" type="checkbox" checked>
+                                            {% else %}
+                                                <input onclick="set_group_session_security_enhancement('{{ group.name }}', true)" type="checkbox">
+                                            {% endif %}
+                                            <span class="custom-toggle-slider rounded-circle"></span>
+                                        </label>
                                         </td>
                                         <td name="group-description">
                                             <button id="modify-permissions-{{ group.name }}" data-toggle="modal"  data-target="#modal-permissions-{{ group.name }}" class="btn btn-sm btn-info"> {{ _("Manage") }} ({{ group.permissions|length }}) </button>
@@ -658,6 +671,52 @@
                 </div>
             </div>
 
+        <div class="row mt-4">
+                <div class="col-xl-12 mb-5 mb-xl-0">
+                    <div class="card shadow">
+                        <div class="card-header border-1">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <h4 class="mb-0">
+
+                                        {{ _("Policy") }} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ _("If the value of the has_permission function is True, each Create, Read, and Delete operation is allowed") }}"></i>
+
+                                        {{ _("Mode") }}:
+                                        <select class="form-control-alternative" onchange="set_policy_mode(this.value);">
+                                            <option value="read"><span>Read</span></option>
+                                            <option value="update"><span>Update</span></option>
+                                        </select>
+
+                                    </h4>
+                                </div>
+                                <div class="text-right">
+                                    <button class="btn btn-sm btn-primary" onclick="save_policy();">Save</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div>
+                            <div id="code-editor" style="height: 250px;">
+                                <!-- CODE EDITOR -->
+                                <style type="text/css" media="screen">
+                                    #editor {
+                                        margin: 0;
+                                        margin-top: 69px;
+                                        position: absolute;
+                                        top: 0;
+                                        bottom: 0;
+                                        left: 0;
+                                        right: 0;
+                                    }
+                                </style>
+                                <pre id="editor"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         <div class="modal fade" id="modal-query-user" tabindex="-1" role="dialog" aria-labelledby="modal-query-user" aria-hidden="true">
                                                     <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
                                                         <div class="modal-content">
@@ -986,6 +1045,38 @@
          kakao_policy_code_editor.session.setMode("ace/mode/python");
 
     </script>
+
+    <script>
+        const editor = ace.edit("editor");
+        editor.session.setMode("ace/mode/python");
+
+        function set_policy_mode(mode) {
+            policy_mode = mode;
+            $("#set-policy-btn").html(mode);
+            $.post("", {
+                'cmd': 'get_policy_code',
+                'mode': mode,
+            }, function (data) {
+                editor.setValue(data.code, -1);
+            });
+        }
+
+        function save_policy() {
+            const code = editor.getValue();
+            $.post("", {
+                'cmd': 'put_policy',
+                'mode': policy_mode,
+                'code': code,
+            }, function (data) {
+                if ('error' in data){
+                    alert(data.error.message);
+                }else{
+                    alert('Your policy code has been saved');
+                }
+            });
+        }
+    </script>
+
     <script>
         var query_instructions = [];
 
@@ -1021,6 +1112,23 @@
 
             });
             $("#modal-facebook-register-policy").modal('hide');
+        }
+
+        function set_group_session_security_enhancement(group_name, enabled) {
+            if (group_name === 'admin'){
+                alert("{{ _("The admin group cannot enhance session security. If possible, give admin privileges only to trusted people.") }}");
+                return;
+            }
+            if (!confirm("{{ _("Enabling session security enhancement allows logged-in users to automatically log out when they access the session. Would you like to proceed anyway?") }}")){
+                return;
+            }
+            $.post("", {
+                cmd: "set_group_session_security_enhancement",
+                group_name: group_name,
+                enabled: enabled,
+            }, function (data) {
+                window.location.reload();
+            });
         }
         
         function set_google_login(){
@@ -1267,6 +1375,27 @@
                 set_facebook_login()
             });
 
+            $("#google_default_group").change(function () {
+                set_google_login()
+            });
+            $("#google_enabled").change(function () {
+                set_google_login()
+            });
+
+            $("#naver_default_group").change(function () {
+                set_naver_login()
+            });
+            $("#naver_enabled").change(function () {
+                set_naver_login()
+            });
+
+            $("#kakao_default_group").change(function () {
+                set_kakao_login()
+            });
+            $("#kakao_enabled").change(function () {
+                set_kakao_login()
+            });
+
             $("#check-all-sessions").click(function () {
                 $("input[name='checkbox-session']").prop('checked', this.checked);
             });
@@ -1285,6 +1414,7 @@
             $(document).ready(function () {
                 load_more_users();
                 load_more_sessions();
+                set_policy_mode('read');
             });
         }
 

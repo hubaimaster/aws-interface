@@ -38,7 +38,9 @@ from dashboard.views.app.notification import Notification
 from dashboard.views.app.schedule import Schedule
 from dashboard.views.app.marketplace import Marketplace, MarketplaceCreate, MarketplaceDetail, MarketplaceEdit
 from dashboard.views.app.guide import Guide
+from django_otp.admin import OTPAdminSite
 
+admin.site.__class__ = OTPAdminSite
 
 urlpatterns = [
     path('admin/', admin.site.urls),

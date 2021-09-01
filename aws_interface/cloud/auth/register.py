@@ -4,6 +4,7 @@ from cloud.auth.get_login_method import do as get_login_method
 from cloud.permission import Permission, NeedPermission
 from cloud.auth.get_login_method import match_policy
 from cloud.message import error
+from cloud.shortuuid import uuid
 import string
 
 # Define the input output format of the function.
@@ -77,6 +78,7 @@ def do(data, resource):
         return body
     else:
         item = {
+            'id': str(uuid()),
             'email': email,
             'password_hash': password_hash,
             'salt': salt,
@@ -87,6 +89,6 @@ def do(data, resource):
         for key in extra:
             if key not in item:
                 item[key] = extra[key]
-        resource.db_put_item(partition, item)
+        resource.db_put_item(partition, item, item_id=item['id'])
         body['item'] = item
         return body

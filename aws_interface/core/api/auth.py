@@ -128,10 +128,10 @@ class AuthAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def get_user_count(self):
+    def get_user_count(self, count_system_user=False):
         import cloud.auth.get_user_count as method
         params = {
-
+            'count_system_user': count_system_user
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
@@ -254,6 +254,37 @@ class AuthAPI(API):
         import cloud.auth.get_all_permissions as method
         params = {
 
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def set_group_session_security_enhancement(self, group_name, enabled):
+        import cloud.auth.set_group_session_security_enhancement as method
+        params = {
+            'group_name': group_name,
+            'enabled': enabled
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def get_policy_code(self, partition_to_apply, mode):
+        import cloud.auth.get_policy_code as method
+        params = {
+            'partition_to_apply': partition_to_apply,
+            'mode': mode
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def put_policy(self, partition_to_apply, mode, code):
+        import cloud.auth.put_policy as method
+        params = {
+            'partition_to_apply': partition_to_apply,
+            'mode': mode,
+            'code': code
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

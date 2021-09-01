@@ -4,7 +4,8 @@ from .utils import lambda_method, make_data
 
 class LogicAPI(API):
     @lambda_method
-    def create_function(self, function_name, description, runtime, handler, sdk_config, zip_file=None, runnable=True):
+    def create_function(self, function_name, description, runtime, handler, sdk_config, zip_file=None, runnable=True,
+                        use_logging=False, use_traceback=False):
         import cloud.logic.create_function as method
         params = {
             'function_name': function_name,
@@ -14,6 +15,8 @@ class LogicAPI(API):
             'zip_file': zip_file,
             'runnable': runnable,
             'sdk_config': sdk_config,
+            'use_logging': use_logging,
+            'use_traceback': use_traceback
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)
@@ -29,7 +32,8 @@ class LogicAPI(API):
         return method.do(data, self.resource)
 
     @lambda_method
-    def update_function(self, function_name, description, runtime=None, handler=None, sdk_config=None, zip_file=None, runnable=None, function_version=0):
+    def update_function(self, function_name, description, runtime=None, handler=None, sdk_config=None, zip_file=None,
+                        runnable=None, function_version=0, use_logging=None, use_traceback=None):
         import cloud.logic.update_function as method
         params = {
             'function_name': function_name,
@@ -39,7 +43,9 @@ class LogicAPI(API):
             'zip_file': zip_file,
             'runnable': runnable,
             'sdk_config': sdk_config,
-            'function_version': function_version
+            'function_version': function_version,
+            'use_logging': use_logging,
+            'use_traceback': use_traceback
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

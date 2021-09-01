@@ -33,6 +33,11 @@ def do(data, resource):
 
     item_id = params.get('item_id', None)
     join = params.get('join', {})
+    if not item_id:
+        body['item'] = None
+        body['error'] = error.INVALID_ITEM_ID
+        return body
+
     item = resource.db_get_item(item_id)
 
     if item is None:
@@ -53,6 +58,7 @@ def do(data, resource):
         body['error'] = error.JOIN_POLICY_VIOLATION
         return body
 
+    # 읽기 권한 검사
     if match_policy_after_get_policy_code(resource, 'read', item['partition'], user, item):
         if join:
             util.join_item(resource, user, item, join)

@@ -1,5 +1,5 @@
 {% extends 'dashboard/app/base.html' %}
-{% load staticfiles %}
+{% load static %}
 {% block content %}
 
     <div class="main-content">
@@ -204,7 +204,7 @@
                                             </th>
                                         </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody style="display: block; min-height: 500px; max-height: 500px; overflow-y: auto;">
                                         {% for partition in partitions %}
                                             <tr>
                                                 <th id="{{ partition.name }}" name="partition" scope="row" onclick="set_partition('{{ partition.name }}');">
@@ -310,6 +310,7 @@
                                                                                             <option value="eq">==</option>
                                                                                             <option value="neq">!=</option>
                                                                                             <option value="in">contains</option>
+                                                                                            <option value="ins">contains-index</option>
                                                                                             <option value="nin">not contains</option>
                                                                                             <option value="gt"> > </option>
                                                                                             <option value="ls"> < </option>
@@ -384,7 +385,7 @@
                                         </tr>
                                         </thead>
 
-                                        <tbody style="display: block; max-height: 500px; overflow-y: auto;">
+                                        <tbody style="display: block; min-height: 500px; max-height: 500px; overflow-y: auto;">
 
                                         </tbody>
 
@@ -500,7 +501,7 @@
                                             </th>
                                         </tr>
                                         </thead>
-                                        <tbody style="display: block; max-height: 500px; overflow-y: auto;">
+                                        <tbody style="display: block; min-height: 500px; max-height: 500px; overflow-y: auto;">
 
                                         </tbody>
                                     </table>

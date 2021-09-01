@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -6,7 +5,6 @@ from django.http import JsonResponse
 
 from core.adapter.django import DjangoAdapter
 from dashboard.views.utils import Util, page_manage
-from dashboard.views.app.overview import allocate_resource_in_background
 from decimal import Decimal
 import json
 
@@ -18,7 +16,7 @@ class Database(LoginRequiredMixin, View):
         context['app_id'] = app_id
 
         adapter = DjangoAdapter(app_id, request)
-        allocate_resource_in_background(adapter)
+        # allocate_resource_in_background(adapter)
         with adapter.open_api_auth() as auth_api, adapter.open_api_database() as database_api:
             partitions = database_api.get_partitions().get('items', [])
             sort_indexes = database_api.get_sort_indexes().get('items', [])
@@ -31,7 +29,6 @@ class Database(LoginRequiredMixin, View):
                     'item_count': result['item']['count']
                 }
             partitions = partition_dict.values()
-
             context['user_groups'] = auth_api.get_user_groups()['groups']
             context['partitions'] = partitions
             context['sort_key_indexes'] = sort_indexes
@@ -51,9 +48,7 @@ class Database(LoginRequiredMixin, View):
                 _ = database_api.create_partition(partition_name)
             elif cmd == 'add_item':
                 partition = request.POST['partition']
-                read_groups = request.POST.getlist('read_groups[]')
-                write_groups = request.POST.getlist('write_groups[]')
-                _ = database_api.create_item(partition, {}, read_groups, write_groups)
+                _ = database_api.create_item(partition, {})
             elif cmd == 'add_field':
                 item_id = request.POST['item_id']
                 field_name = request.POST['field_name']

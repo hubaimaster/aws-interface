@@ -1,5 +1,5 @@
 
-from cloud.permission import Permission, NeedPermission
+from cloud.permission import Permission, NeedPermission, database_can_not_access_to_item
 from cloud.message import error
 from cloud.database.get_policy_code import match_policy, get_policy_code
 from cloud.shortuuid import uuid
@@ -14,6 +14,7 @@ info = {
         'session_id': 'str',
         'items': '[dict]',
         'partition': 'str',
+        'max_workers': 'int?'
     },
     'output_format': {
         'item_ids': '[str]',
@@ -35,6 +36,11 @@ def do(data, resource):
         user_id = None
 
     partition = params.get('partition', None)
+    max_workers = params.get('max_workers', None)
+
+    if database_can_not_access_to_item(partition):
+        body['error'] = error.PERMISSION_DENIED
+        return body
 
     # Check partition has been existed
     if not resource.db_has_partition(partition):
@@ -59,7 +65,10 @@ def do(data, resource):
         else:
             error_list[idx] = error.PERMISSION_DENIED
 
-    with ThreadPoolExecutor(max_workers=len(items)) as exc:
+    if not max_workers:
+        max_workers = len(items)
+    max_workers = int(max_workers)
+    with ThreadPoolExecutor(max_workers=max_workers) as exc:
         for _idx, _item in enumerate(items):
             exc.submit(try_put_item, _idx, _item)
 

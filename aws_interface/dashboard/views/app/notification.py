@@ -6,11 +6,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from dashboard.views.utils import Util, page_manage
 from django.template import loader
-from dashboard.views.app.overview import allocate_resource_in_background
-
-import json
-import base64
-import time
 
 
 class Notification(LoginRequiredMixin, View):

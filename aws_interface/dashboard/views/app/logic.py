@@ -12,12 +12,15 @@ import base64
 import time
 
 
-def get_sdk_config(adapter):
+def get_sdk_config(adapter, use_localhost=False):
     sdk_config = {
         'rest_api_url': adapter.get_rest_api_url(),
         'session_id': adapter.generate_session_id(['admin'])
     }
-    print('sdk_config', sdk_config)
+    if use_localhost:
+        sdk_config['external_api_url'] = sdk_config['rest_api_url']
+        sdk_config['rest_api_url'] = 'http://localhost:20131'
+    # print('sdk_config', sdk_config)
     return sdk_config
 
 
@@ -50,7 +53,9 @@ class Logic(LoginRequiredMixin, View):
                 description = request.POST['description']
                 runtime = request.POST['runtime']
                 handler = request.POST['handler']
-                sdk_config = get_sdk_config(adapter)
+                use_logging = request.POST['use_logging'] == 'true'
+                use_traceback = request.POST['use_traceback'] == 'true'
+                sdk_config = get_sdk_config(adapter, use_localhost=False)
 
                 zip_file.seek(0)
                 zip_file_bin = zip_file.read()
@@ -58,7 +63,8 @@ class Logic(LoginRequiredMixin, View):
                 zip_file_bin = zip_file_bin.decode('utf-8')
                 if not description:
                     description = None
-                logic_api.create_function(function_name, description, runtime, handler, sdk_config, zip_file_bin, True)
+                logic_api.create_function(function_name, description, runtime, handler, sdk_config, zip_file_bin, True,
+                                          use_logging, use_traceback)
             elif cmd == 'create_function_test':
                 test_name = request.POST.get('test_name')
                 function_name = request.POST.get('function_name')
@@ -75,7 +81,7 @@ class Logic(LoginRequiredMixin, View):
                     data = sdk_client.logic_run_function(function_name, payload)
                     end = time.time()
                     data['duration'] = end - start
-                    print('data:', data)
+                    # print('data:', data)
                     return JsonResponse(data)
             elif cmd == 'delete_function_test':
                 test_name = request.POST.get('test_name')
@@ -138,7 +144,7 @@ class LogicEdit(LoginRequiredMixin, View):
                 file_content = request.POST.get('file_content')
                 file_type = request.POST.get('file_type', 'text')
                 result = logic_api.put_function_file(function_name, file_path, file_content, file_type, function_version)
-                allocate_resource_in_background(adapter)
+                # allocate_resource_in_background(adapter)
                 return JsonResponse(result)
             elif cmd == 'update_function':
                 function_name = request.POST.get('function_name', None)
@@ -146,10 +152,15 @@ class LogicEdit(LoginRequiredMixin, View):
                 description = request.POST.get('description', None)
                 handler = request.POST.get('handler', None)
                 runtime = request.POST.get('runtime', None)
+                use_logging = request.POST.get('use_logging', None) == 'true'
+                use_traceback = request.POST.get('use_traceback', None) == 'true'
+                print('use_logging:', use_logging, type(use_logging))
+                print('use_traceback:', use_traceback, type(use_traceback))
                 sdk_config = get_sdk_config(adapter)
                 result = logic_api.update_function(function_name=function_name, description=description,
                                                    handler=handler, runtime=runtime, sdk_config=sdk_config,
-                                                   function_version=function_version)
+                                                   function_version=function_version, use_logging=use_logging,
+                                                   use_traceback=use_traceback)
                 return JsonResponse(result)
             elif cmd == 'get_function_file_paths':
                 function_name = request.POST.get('function_name')

@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 <!DOCTYPE html>
 <html>
 
@@ -69,25 +69,39 @@
                 <div class="card bg-secondary shadow border-0">
                     <div class="card-body px-lg-5 py-lg-5">
                         <form role="form" method="post">{% csrf_token %}
-                            <div class="form-group mb-3">
+
+                            {% if otp_hidden %}
+                                <div class="form-group mb-3">
                                 <div class="input-group input-group-alternative">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                                     </div>
                                     <input id="email" name="email" class="form-control" placeholder="Email" type="email">
                                 </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="input-group input-group-alternative">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
-                                    </div>
-                                    <input id="password" name="password" class="form-control" placeholder="Password" type="password">
                                 </div>
-                            </div>
+
+                            {% else %}
+
+                                <div class="form-group">
+                                    <div class="input-group input-group-alternative">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                                        </div>
+                                        <input id="password" name="password" class="form-control" placeholder="Password" type="password">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="input-group input-group-alternative">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                                        </div>
+                                        <input id="otp_code" name="otp_code" class="form-control" placeholder="OTP code" type="text">
+                                    </div>
+                                </div>
+                            {% endif %}
                             <div class="text-center">
-                                <button id="login" type="submitm" class="btn btn-block btn-primary my-4">{{ _('Sign-in') }}</button>
+                                <button id="login" type="submit" class="btn btn-block btn-primary my-4">{{ _('Sign-in') }}</button>
                             </div>
                         </form>
                     </div>

@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, redirect, HttpResponse
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,6 +7,7 @@ from dashboard.models import App
 import os
 import threading
 import time
+from django.http import JsonResponse
 
 
 def allocate_resource_in_background(adapter):
@@ -32,7 +32,7 @@ class Overview(LoginRequiredMixin, View):
         cmd = request.GET.get('cmd', None)
         platform = request.GET.get('platform', 'python3')
         adapter = DjangoAdapter(app_id, request)
-        allocate_resource_in_background(adapter)
+        # allocate_resource_in_background(adapter)
         if cmd == 'download_sdk':
             Util.log('app-overview', request.user, 'download-sdk-{}'.format(platform))
             sdk_bin = adapter.generate_sdk(platform)
@@ -49,3 +49,17 @@ class Overview(LoginRequiredMixin, View):
             app = App.objects.get(id=app_id, user=request.user)
             context['app_name'] = app.name
             return render(request, 'dashboard/app/overview.html', context=context)
+
+    @page_manage
+    def post(self, request, app_id):
+        context = Util.get_context(request)
+        context['app_id'] = app_id
+
+        adapter = DjangoAdapter(app_id, request)
+        cmd = request.POST['cmd']
+
+        if cmd == 'redeploy':
+            allocate_resource_in_background(adapter)
+            return JsonResponse({
+                'success': True
+            })

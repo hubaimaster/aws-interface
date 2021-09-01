@@ -11,7 +11,7 @@ info = {
     'input_format': {
         'email_from': 'str',
         'name_from': 'str',
-        'email_to': 'list',
+        'email_to_list': 'list',
 
         'title': 'str',
         'content': 'str',

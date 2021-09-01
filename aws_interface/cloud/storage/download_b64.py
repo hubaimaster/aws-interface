@@ -33,6 +33,10 @@ def do(data, resource):
     file_id = params.get('file_id')
     use_plain = params.get('use_plain', False)
 
+    if not file_id:
+        body['error'] = error.INVALID_FILE_KEY
+        return body
+
     item = resource.db_get_item(file_id)
     if item:
         if match_policy_after_get_policy_code(resource, 'read', 'files', user, item):

@@ -5,6 +5,7 @@ from cloud.auth.get_login_method import do as get_login_method
 from cloud.permission import Permission, NeedPermission
 from cloud.auth.get_login_method import match_policy
 import string
+import time
 
 
 # Define the input output format of the function.
@@ -54,6 +55,7 @@ def do(data, resource):
     if hash_password(current_password, salt) == password_hash:
         new_password_hash = hash_password(new_password, salt)
         user['password_hash'] = new_password_hash
+        user['updated_date'] = float(time.time())
         user_id = user.get('id')
         success = resource.db_update_item(user_id, user)
         body['user_id'] = user.get('id')

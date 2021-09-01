@@ -11,25 +11,31 @@ from dashboard.views.app.overview import allocate_resource_in_background
 from core.adapter.django import DjangoAdapter
 from concurrent.futures import ThreadPoolExecutor
 import json
+import time
 
 
 class Auth(LoginRequiredMixin, View):
     @page_manage
     def get(self, request, app_id):
+        start = time.time()
         context = Util.get_context(request)
         context['app_id'] = app_id
         adapter = DjangoAdapter(app_id, request)
-        allocate_resource_in_background(adapter)
+
+        # allocate_resource_in_background(adapter)
 
         with adapter.open_api_auth() as api:
-            context['user_groups'] = api.get_user_groups()['groups']
-            context['user_count'] = api.get_user_count()
+            user_groups = api.get_user_groups()['groups']
+            for user_group in user_groups:
+                user_group.setdefault('permissions', [])
+            context['user_groups'] = user_groups
+            context['user_count'] = api.get_user_count(count_system_user=True)
             context['session_count'] = api.get_session_count()
             context['users'] = api.get_users()
             context['visible_user_fields'] = ['id', 'creation_date', 'email', 'groups']
             context['none_extra_fields'] = ['id', 'creation_date', 'email', 'groups',
                                             'password_hash', 'salt', 'partition', 'login_method']
-            print('app_id:', app_id)
+
             context['sessions'] = api.get_sessions()
 
             context['email_login'] = api.get_login_method('email_login')['item']
@@ -40,7 +46,6 @@ class Auth(LoginRequiredMixin, View):
             context['kakao_login'] = api.get_login_method('kakao_login')['item']
 
             context['all_permissions'] = api.get_all_permissions()['permissions']
-
         return render(request, 'dashboard/app/auth.html', context=context)
 
     @page_manage
@@ -114,11 +119,11 @@ class Auth(LoginRequiredMixin, View):
                 api.detach_user_group(user_id, group_name)
             elif cmd == 'get_sessions':
                 start_key = request.POST.get('start_key', None)
-                result = api.get_sessions(start_key=start_key, limit=200)
+                result = api.get_sessions(start_key=start_key, limit=20)
                 return JsonResponse(result)
             elif cmd == 'get_users':
                 start_key = request.POST.get('start_key', None)
-                result = api.get_users(start_key=start_key, limit=200)
+                result = api.get_users(start_key=start_key, limit=20)
                 return JsonResponse(result)
             elif cmd == 'get_user_rows':
                 start_key = request.POST.get('start_key', None)
@@ -131,6 +136,25 @@ class Auth(LoginRequiredMixin, View):
                 start_key = request.POST.get('start_key', None)
                 result = self._get_session_rows(request, app_id, start_key)
                 return JsonResponse(result)
+            elif cmd == 'set_group_session_security_enhancement':
+                group_name = request.POST.get('group_name')
+                enabled = request.POST.get('enabled')
+                if enabled == 'false':
+                    enabled = False
+                elif enabled == 'true':
+                    enabled = True
+                result = api.set_group_session_security_enhancement(group_name, enabled)
+                return JsonResponse(result)
+            elif cmd == 'get_policy_code':
+                mode = request.POST.get('mode')
+                result = api.get_policy_code('user', mode)
+                print(result)
+                return JsonResponse(result)
+            elif cmd == 'put_policy':
+                mode = request.POST.get('mode')
+                code = request.POST.get('code')
+                result = api.put_policy('user', mode, code)
+                return JsonResponse(result)
 
         return redirect(request.path_info)  # Redirect back
 
@@ -138,7 +162,7 @@ class Auth(LoginRequiredMixin, View):
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_auth() as api:
             query = list(map(lambda x: json.loads(x), query))
-            result = api.get_users(start_key, limit=200, query=query)
+            result = api.get_users(start_key, limit=20, query=query)
             users = result['items']
             end_key = result.get('end_key')
             user_groups = api.get_user_groups()['groups']
@@ -160,7 +184,7 @@ class Auth(LoginRequiredMixin, View):
     def _get_session_rows(self, request, app_id, start_key=None):
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_auth() as api:
-            result = api.get_sessions(start_key, limit=200)
+            result = api.get_sessions(start_key, limit=20)
             sessions = result['items']
             end_key = result.get('end_key')
 

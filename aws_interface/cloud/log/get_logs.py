@@ -32,6 +32,7 @@ def do(data, resource):
     user_id = params.get('user_id', None)
     start_key = params.get('start_key', None)
     reverse = params.get('reverse', False)
+    limit = params.get('limit', 100)
 
     operation = None
     instructions = []
@@ -40,9 +41,9 @@ def do(data, resource):
             instructions.append((operation, (field_name, 'eq', value)))
             operation = 'and'
     if len(instructions) > 0:
-        items, end_key = resource.db_query(partition, instructions, start_key=start_key, reverse=reverse)
+        items, end_key = resource.db_query(partition, instructions, start_key=start_key, reverse=reverse, limit=limit)
     else:
-        items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, reverse=reverse)
+        items, end_key = resource.db_get_items_in_partition(partition, start_key=start_key, reverse=reverse, limit=limit)
     body['end_key'] = end_key
     body['items'] = items
     return body

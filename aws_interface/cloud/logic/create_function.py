@@ -37,6 +37,8 @@ def do(data, resource):
     handler = params.get('handler')
     runnable = params.get('runnable', True)
     sdk_config = params.get('sdk_config', {})
+    use_logging = params.get('use_logging', False)
+    use_traceback = params.get('use_traceback', False)
 
     zip_file_id = uuid()
     requirements_zip_file_id = uuid()
@@ -50,6 +52,8 @@ def do(data, resource):
     item['zip_file_id'] = zip_file_id
     item['requirements_zip_file_id'] = requirements_zip_file_id
     item['sdk_config'] = sdk_config
+    item['use_logging'] = use_logging
+    item['use_traceback'] = use_traceback
 
     functions, _ = resource.db_query(partition, [
         {'condition': 'eq', 'field': 'function_name', 'value': function_name}

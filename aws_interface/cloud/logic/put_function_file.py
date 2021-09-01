@@ -42,7 +42,8 @@ def do(data, resource):
         body['error'] = error.UNSUPPORTED_FILE_TYPE
         return body
 
-    if function_version is None:
+    # 나중에 주석과 같이 업데이트해야하는데 테스트가 부족해서 보류.
+    if function_version is None:  # or function_version == '':
         function_version = 0
 
     items, _ = resource.db_query(partition,

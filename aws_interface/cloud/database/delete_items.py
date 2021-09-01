@@ -1,6 +1,6 @@
 
 from concurrent.futures import ThreadPoolExecutor
-from cloud.permission import Permission, NeedPermission
+from cloud.permission import Permission, NeedPermission, database_can_not_access_to_item
 from cloud.database.get_policy_code import match_policy, get_policy_code
 from cloud.message import error
 
@@ -10,6 +10,7 @@ info = {
     'input_format': {
         'session_id': 'str',
         'item_ids': '[str]',
+        'max_workers': 'int?'
     },
     'output_format': {
         'success_list': '[bool]'
@@ -25,6 +26,7 @@ def do(data, resource):
     user = data['user']
 
     item_ids = params.get('item_ids', [])
+    max_workers = params.get('max_workers', None)
     success_list = [False] * len(item_ids)
 
     # if len(item_ids) > 128:
@@ -36,6 +38,11 @@ def do(data, resource):
 
     def delete_item(idx, item_id):
         item = resource.db_get_item(item_id)
+
+        # 시스템 파티션 접근 제한
+        if database_can_not_access_to_item(item['partition']):
+            success_list[idx] = False
+            return
         # 등록된 파티션이 아닌경우
         if not resource.db_has_partition(item['partition']):
             success_list[idx] = False
@@ -50,8 +57,10 @@ def do(data, resource):
         if item and match_policy(policy_code, user, item):
             success = resource.db_delete_item(item_id)
             success_list[idx] = success
-
-    with ThreadPoolExecutor(max_workers=len(item_ids)) as executor:
+    if not max_workers:
+        max_workers = len(item_ids)
+    max_workers = int(max_workers)
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for _idx, _item_id in enumerate(item_ids):
             executor.submit(delete_item, _idx, _item_id)
 

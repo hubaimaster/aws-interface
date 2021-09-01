@@ -72,12 +72,13 @@ def get_kakao_profile_response(access_token):
         return None
 
 
-def create_session(resource, user):
+def create_session(resource, user, data):
     user_id = user['id']
     session_id = token_urlsafe(32)
     session_item = {
         'user_id': user_id,
         'session_type': 'kakao_login',
+        'client_ip': data.get('client_ip', None)
     }
 
     _ = resource.db_put_item('session', session_item, Hash.sha3_512(session_id))
@@ -121,7 +122,7 @@ def do(data, resource):
     ]
     items, end_key = resource.db_query('user', instructions)
     if items:
-        session_id = create_session(resource, items[0])
+        session_id = create_session(resource, items[0], data)
         body['user_id'] = items[0]['id']
         body['session_id'] = session_id
         body['is_first_login'] = False
@@ -145,7 +146,7 @@ def do(data, resource):
                 else:
                     item[key] = extra_response[key]
         resource.db_put_item('user', item, item.get('id'))
-        session_id = create_session(resource, item)
+        session_id = create_session(resource, item, data)
         body['session_id'] = session_id
         body['user_id'] = item['id']
         body['is_first_login'] = True

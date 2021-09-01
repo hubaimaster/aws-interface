@@ -1,18 +1,16 @@
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
+import cloud.notification.send_slack_message_as_system_notification as slack
 
 import uuid
 import os
-import shutil
 import tempfile
 import cloud.libs.simplejson as json
 import traceback
 import subprocess
-
 from zipfile import ZipFile
 from cloud.log.create_log import create_event
-
-import cloud.notification.send_slack_message_as_system_notification as slack
+import importlib.util
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -21,14 +19,14 @@ info = {
         'function_name': 'str',
         'payload': {
             '...': '...',
-        },
-        'logging': 'bool?=False',
+        }
     },
     'output_format': {
         'response': {
             '...': '...'
         },
         'stdout?': 'str',
+        'traceback?': 'str'
     },
     'description': 'Run function and return response'
 }
@@ -37,6 +35,8 @@ info = {
 cache = {
     # Cache for speed
 }
+
+can_run_subprocess = False
 
 
 def copy_configfile(destination, sdk_config, config_name='aws_interface_config.json'):
@@ -70,7 +70,7 @@ def do(data, resource):
 
     function_name = params.get('function_name')
     payload = params.get('payload')
-    logging = params.get('logging', False)
+    # logging = params.get('logging', False)
 
     items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}], reverse=True)
 
@@ -83,9 +83,12 @@ def do(data, resource):
         zip_file_id = item['zip_file_id']
         requirements_zip_file_id = item.get('requirements_zip_file_id', None)
         function_handler = item['handler']
+        use_traceback = item.get('use_traceback', False)
+        use_logging = item.get('use_logging', False)
         sdk_config = item.get('sdk_config', {})
         function_package = '.'.join(function_handler.split('.')[:-1])
         function_method = function_handler.split('.')[-1]
+        function_name_as_random = 'fn{}'.format(uuid.uuid4()).replace('-', '')
 
         zip_temp_dir = get_cache(zip_file_id, 'zip_temp_dir')
         extracted_dir = get_cache(zip_file_id, 'extracted_dir')
@@ -126,18 +129,19 @@ def do(data, resource):
                   "    with redirect_stdout(std_str):\n" + \
                   "        resp, error = None, None\n" + \
                   "        try:\n" + \
-                  "            from {} import {}".format(function_package, function_method) + '\n' + \
-                  "            resp = {}({}, {})\n".format(function_method, payload, json.loads(json.dumps(user))) +\
+                  "            from {} import {} as {}".format(function_package, function_method, function_name_as_random) + '\n' + \
+                  "            resp = {}({}, {})\n".format(function_name_as_random, payload, json.loads(json.dumps(user))) +\
                   "        except Exception as e:\n" +\
                   "            error = traceback.format_exc()\n" +\
                   '    print(json.dumps({\"response\": resp, \"stdout\": std_str.getvalue(), \"error\": error}, default=lambda o: \"<not serializable>\"))\n'
-
         with open(virtual_handler_path, 'w+') as vh:
             vh.write(vh_code)
 
         return_value = {}
         try:
+
             return_value = run_subprocess(virtual_handler_path)
+
             if return_value:
                 return_value = json.loads(return_value)
             else:
@@ -147,12 +151,13 @@ def do(data, resource):
             body['stdout'] = return_value.get('stdout', None)
             err = return_value.get('error', None)
             if err:
-                body['error'] = err
+                if use_traceback:
+                    body['traceback'] = err
                 r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
                 print('slack response:', r)
 
         except Exception as ex:
-            error_traceback = traceback.format_exc()
+            error_traceback = None  # traceback.format_exc()
             body['error'] = error.FUNCTION_ERROR
             body['error']['message'] = body['error']['message'].format('{}, {}, {}'.format(ex, error_traceback, return_value))
             r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
@@ -165,7 +170,7 @@ def do(data, resource):
         put_cache(zip_file_id, 'extracted_dir', extracted_dir)
 
         # Logging
-        if logging:
+        if use_logging:
             content = json.dumps({
                 'params': params,
                 'body': body,
@@ -174,4 +179,3 @@ def do(data, resource):
             create_event(resource, user, 'run_function:{}'.format(function_name), content, 'logic')
 
         return body
-
