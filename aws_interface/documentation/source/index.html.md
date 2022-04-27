@@ -512,11 +512,13 @@ session_id | str
 curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.auth.delete_sessions",
 "session_ids": ["str"],
+"max_workers": "int?",
 "session_id?": "str"}'
 ```
 
 ```python
 response = client.call_api("cloud.auth.delete_sessions", {
+ "max_workers": "int?",
  "session_id?": "str",
  "session_ids": [
   "str"
@@ -527,6 +529,7 @@ print(response)
 
 ```javascript
 client.callAPI("cloud.auth.delete_sessions", {
+ "max_workers": "int?",
  "session_id?": "str",
  "session_ids": [
   "str"
@@ -542,6 +545,7 @@ client.callAPI("cloud.auth.delete_sessions", {
 ```java
 HashMap<String, Object> data = new HashMap<>();
 data.put("session_ids", ["str"]);
+data.put("max_workers", "int?");
 data.put("session_id?", "str");
 
 client.callAPI("cloud.auth.delete_sessions", data, (response, hasError)->{
@@ -552,6 +556,7 @@ client.callAPI("cloud.auth.delete_sessions", data, (response, hasError)->{
 ```swift
 client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_ids": ["str"],
+"max_workers": "int?",
 "session_id?": "str",
 ]) { (response) in
   print(response)
@@ -582,6 +587,7 @@ Parameter | Type | Value
 --------- | ----------- | -----
 module_name | str | "cloud.auth.delete_sessions"
 session_ids | [&#39;str&#39;]
+max_workers | int?
 session_id? | str
 
 
@@ -2898,6 +2904,84 @@ value? | str
 
 
 
+## cloud.auth.set_my_email
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.auth.set_my_email",
+"session_id": "str",
+"email": "str"}'
+```
+
+```python
+response = client.call_api("cloud.auth.set_my_email", {
+ "email": "str",
+ "session_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.auth.set_my_email", {
+ "email": "str",
+ "session_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id", "str");
+data.put("email", "str");
+
+client.callAPI("cloud.auth.set_my_email", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id": "str",
+"email": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "user_id?": "str"
+}
+```
+
+Change my email
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.auth.set_my_email"
+session_id | str
+email | str
+
+
+
 ## cloud.auth.set_user
 
 > The question mark after the parameter means that the parameter is not required
@@ -2985,6 +3069,168 @@ session_id | str
 user_id | str
 field | str
 value? | str
+
+
+
+## cloud.auth.set_user_email
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.auth.set_user_email",
+"session_id": "str",
+"email": "str"}'
+```
+
+```python
+response = client.call_api("cloud.auth.set_user_email", {
+ "email": "str",
+ "session_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.auth.set_user_email", {
+ "email": "str",
+ "session_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id", "str");
+data.put("email", "str");
+
+client.callAPI("cloud.auth.set_user_email", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id": "str",
+"email": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "user_id?": "str"
+}
+```
+
+Change user email
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.auth.set_user_email"
+session_id | str
+email | str
+
+
+
+## cloud.auth.update_me
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.auth.update_me",
+"session_id": "str",
+"item": "dict",
+"ignore_error": "bool?=False"}'
+```
+
+```python
+response = client.call_api("cloud.auth.update_me", {
+ "ignore_error": "bool?=False",
+ "item": "dict",
+ "session_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.auth.update_me", {
+ "ignore_error": "bool?=False",
+ "item": "dict",
+ "session_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id", "str");
+data.put("item", "dict");
+data.put("ignore_error", "bool?=False");
+
+client.callAPI("cloud.auth.update_me", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id": "str",
+"item": "dict",
+"ignore_error": "bool?=False",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "user_id?": "str"
+}
+```
+
+Update my information
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.auth.update_me"
+session_id | str
+item | dict
+ignore_error | bool?=False
 
 
 
@@ -3085,12 +3331,14 @@ curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.database.batch_get_items",
 "session_id": "str",
 "item_ids": "[str]",
-"max_workers": "int?"}'
+"max_workers": "int?",
+"join": "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}"}'
 ```
 
 ```python
 response = client.call_api("cloud.database.batch_get_items", {
  "item_ids": "[str]",
+ "join": "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}",
  "max_workers": "int?",
  "session_id": "str"
 })
@@ -3100,6 +3348,7 @@ print(response)
 ```javascript
 client.callAPI("cloud.database.batch_get_items", {
  "item_ids": "[str]",
+ "join": "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}",
  "max_workers": "int?",
  "session_id": "str"
 }).then(function(response){
@@ -3115,6 +3364,7 @@ HashMap<String, Object> data = new HashMap<>();
 data.put("session_id", "str");
 data.put("item_ids", "[str]");
 data.put("max_workers", "int?");
+data.put("join", "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}");
 
 client.callAPI("cloud.database.batch_get_items", data, (response, hasError)->{
   System.out.println(response);
@@ -3126,6 +3376,7 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_id": "str",
 "item_ids": "[str]",
 "max_workers": "int?",
+"join": "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}",
 ]) { (response) in
   print(response)
 }
@@ -3158,6 +3409,7 @@ module_name | str | "cloud.database.batch_get_items"
 session_id | str
 item_ids | [str]
 max_workers | int?
+join | {&#34;user_id&#34;: &#34;user&#34;,  &#34;info.user_id&#34;: &#34;info.user&#34;, &#34;info_user_id&#34;: &#34;user&#34;, ...}
 
 
 
@@ -4199,7 +4451,8 @@ curl "https://your_rest_api_url" -d '{
 "limit": "int=100",
 "reverse": "bool=False",
 "sort_key": "str=\"creation_date\"",
-"join": "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}"}'
+"join": "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}",
+"projection_keys": "list"}'
 ```
 
 ```python
@@ -4207,6 +4460,7 @@ response = client.call_api("cloud.database.query_items", {
  "join": "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}",
  "limit": "int=100",
  "partition": "str",
+ "projection_keys": "list",
  "query": "[{\"condition\": \"eq\" | \"neq\" | \"in\" | \"nin\" | \"gt\" | \"ge\" | \"ls\" | \"le\",                     \"option\": \"or\" | \"and\" | None,                     \"field\": \"str\",                     \"value\": \"object\"}, ...]",
  "reverse": "bool=False",
  "session_id": "str",
@@ -4221,6 +4475,7 @@ client.callAPI("cloud.database.query_items", {
  "join": "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}",
  "limit": "int=100",
  "partition": "str",
+ "projection_keys": "list",
  "query": "[{\"condition\": \"eq\" | \"neq\" | \"in\" | \"nin\" | \"gt\" | \"ge\" | \"ls\" | \"le\",                     \"option\": \"or\" | \"and\" | None,                     \"field\": \"str\",                     \"value\": \"object\"}, ...]",
  "reverse": "bool=False",
  "session_id": "str",
@@ -4244,6 +4499,7 @@ data.put("limit", "int=100");
 data.put("reverse", "bool=False");
 data.put("sort_key", "str=\"creation_date\"");
 data.put("join", "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}");
+data.put("projection_keys", "list");
 
 client.callAPI("cloud.database.query_items", data, (response, hasError)->{
   System.out.println(response);
@@ -4260,6 +4516,7 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
 "reverse": "bool=False",
 "sort_key": "str=\"creation_date\"",
 "join": "{\"user_id\": \"user\",  \"info.user_id\": \"info.user\", \"info_user_id\": \"user\", ...}",
+"projection_keys": "list",
 ]) { (response) in
   print(response)
 }
@@ -4303,6 +4560,7 @@ limit | int=100
 reverse | bool=False
 sort_key | str=&#34;creation_date&#34;
 join | {&#34;user_id&#34;: &#34;user&#34;,  &#34;info.user_id&#34;: &#34;info.user&#34;, &#34;info_user_id&#34;: &#34;user&#34;, ...}
+projection_keys | list
 
 
 
@@ -4399,14 +4657,16 @@ curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.database.update_item_v2",
 "session_id": "str",
 "item_id": "str",
-"item": "map"}'
+"item": "map",
+"use_simplify": "bool?=True"}'
 ```
 
 ```python
 response = client.call_api("cloud.database.update_item_v2", {
  "item": "map",
  "item_id": "str",
- "session_id": "str"
+ "session_id": "str",
+ "use_simplify": "bool?=True"
 })
 print(response)
 ```
@@ -4415,7 +4675,8 @@ print(response)
 client.callAPI("cloud.database.update_item_v2", {
  "item": "map",
  "item_id": "str",
- "session_id": "str"
+ "session_id": "str",
+ "use_simplify": "bool?=True"
 }).then(function(response){
   console.log(JSON.stringify(response));
 }).catch(function(error){
@@ -4429,6 +4690,7 @@ HashMap<String, Object> data = new HashMap<>();
 data.put("session_id", "str");
 data.put("item_id", "str");
 data.put("item", "map");
+data.put("use_simplify", "bool?=True");
 
 client.callAPI("cloud.database.update_item_v2", data, (response, hasError)->{
   System.out.println(response);
@@ -4440,6 +4702,7 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_id": "str",
 "item_id": "str",
 "item": "map",
+"use_simplify": "bool?=True",
 ]) { (response) in
   print(response)
 }
@@ -4457,7 +4720,7 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
 }
 ```
 
-Update item version 2.0, Low update WCU consumed
+Update item version 2.0, Low update WCU consumed, You can do re-indexing by putting &lt;use_simplify&gt; as False
 
 ### HTTP Request
 
@@ -4471,6 +4734,7 @@ module_name | str | "cloud.database.update_item_v2"
 session_id | str
 item_id | str
 item | map
+use_simplify | bool?=True
 
 
 
@@ -4568,14 +4832,16 @@ curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.database.update_items_v2",
 "session_id": "str",
 "pairs": "[item_id: item]",
-"max_workers": "int?"}'
+"max_workers": "int?",
+"use_simplify": "bool?=True"}'
 ```
 
 ```python
 response = client.call_api("cloud.database.update_items_v2", {
  "max_workers": "int?",
  "pairs": "[item_id: item]",
- "session_id": "str"
+ "session_id": "str",
+ "use_simplify": "bool?=True"
 })
 print(response)
 ```
@@ -4584,7 +4850,8 @@ print(response)
 client.callAPI("cloud.database.update_items_v2", {
  "max_workers": "int?",
  "pairs": "[item_id: item]",
- "session_id": "str"
+ "session_id": "str",
+ "use_simplify": "bool?=True"
 }).then(function(response){
   console.log(JSON.stringify(response));
 }).catch(function(error){
@@ -4598,6 +4865,7 @@ HashMap<String, Object> data = new HashMap<>();
 data.put("session_id", "str");
 data.put("pairs", "[item_id: item]");
 data.put("max_workers", "int?");
+data.put("use_simplify", "bool?=True");
 
 client.callAPI("cloud.database.update_items_v2", data, (response, hasError)->{
   System.out.println(response);
@@ -4609,6 +4877,7 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_id": "str",
 "pairs": "[item_id: item]",
 "max_workers": "int?",
+"use_simplify": "bool?=True",
 ]) { (response) in
   print(response)
 }
@@ -4627,7 +4896,7 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
 }
 ```
 
-Update items
+Update items, You can do re-indexing by putting &lt;use_simplify&gt; as False
 
 ### HTTP Request
 
@@ -4641,6 +4910,7 @@ module_name | str | "cloud.database.update_items_v2"
 session_id | str
 pairs | [item_id: item]
 max_workers | int?
+use_simplify | bool?=True
 
 
 
@@ -5985,14 +6255,12 @@ curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.logic.run_function",
 "function_name": "str",
 "payload": {"...": "..."},
-"logging": "bool?=False",
 "session_id?": "str"}'
 ```
 
 ```python
 response = client.call_api("cloud.logic.run_function", {
  "function_name": "str",
- "logging": "bool?=False",
  "payload": {
   "...": "..."
  },
@@ -6004,7 +6272,6 @@ print(response)
 ```javascript
 client.callAPI("cloud.logic.run_function", {
  "function_name": "str",
- "logging": "bool?=False",
  "payload": {
   "...": "..."
  },
@@ -6021,7 +6288,6 @@ client.callAPI("cloud.logic.run_function", {
 HashMap<String, Object> data = new HashMap<>();
 data.put("function_name", "str");
 data.put("payload", {"...": "..."});
-data.put("logging", "bool?=False");
 data.put("session_id?", "str");
 
 client.callAPI("cloud.logic.run_function", data, (response, hasError)->{
@@ -6033,7 +6299,6 @@ client.callAPI("cloud.logic.run_function", data, (response, hasError)->{
 client.callAPI(module_name: "cloud.auth.guest", data: [
 "function_name": "str",
 "payload": {"...": "..."},
-"logging": "bool?=False",
 "session_id?": "str",
 ]) { (response) in
   print(response)
@@ -6051,7 +6316,8 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
  "response": {
   "...": "..."
  },
- "stdout?": "str"
+ "stdout?": "str",
+ "traceback?": "str"
 }
 ```
 
@@ -6068,7 +6334,84 @@ Parameter | Type | Value
 module_name | str | "cloud.logic.run_function"
 function_name | str
 payload | {&#39;...&#39;: &#39;...&#39;}
-logging | bool?=False
+session_id? | str
+
+
+
+## cloud.logic.set_function_metadata
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.logic.set_function_metadata",
+"memory_size": "int",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.logic.set_function_metadata", {
+ "memory_size": "int",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.logic.set_function_metadata", {
+ "memory_size": "int",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("memory_size", "int");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.logic.set_function_metadata", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"memory_size": "int",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "success": "bool"
+}
+```
+
+Set function global meta data [EX: memory, ...]
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.logic.set_function_metadata"
+memory_size | int
 session_id? | str
 
 
@@ -6985,7 +7328,7 @@ curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.notification.send_email2",
 "email_from": "str",
 "name_from": "str",
-"email_to": "list",
+"email_to_list": "list",
 "title": "str",
 "content": "str",
 "host": "str",
@@ -7000,7 +7343,7 @@ curl "https://your_rest_api_url" -d '{
 response = client.call_api("cloud.notification.send_email2", {
  "content": "str",
  "email_from": "str",
- "email_to": "list",
+ "email_to_list": "list",
  "host": "str",
  "max_sending_amount_per_second": "int=14",
  "name_from": "str",
@@ -7017,7 +7360,7 @@ print(response)
 client.callAPI("cloud.notification.send_email2", {
  "content": "str",
  "email_from": "str",
- "email_to": "list",
+ "email_to_list": "list",
  "host": "str",
  "max_sending_amount_per_second": "int=14",
  "name_from": "str",
@@ -7038,7 +7381,7 @@ client.callAPI("cloud.notification.send_email2", {
 HashMap<String, Object> data = new HashMap<>();
 data.put("email_from", "str");
 data.put("name_from", "str");
-data.put("email_to", "list");
+data.put("email_to_list", "list");
 data.put("title", "str");
 data.put("content", "str");
 data.put("host", "str");
@@ -7057,7 +7400,7 @@ client.callAPI("cloud.notification.send_email2", data, (response, hasError)->{
 client.callAPI(module_name: "cloud.auth.guest", data: [
 "email_from": "str",
 "name_from": "str",
-"email_to": "list",
+"email_to_list": "list",
 "title": "str",
 "content": "str",
 "host": "str",
@@ -7100,7 +7443,7 @@ Parameter | Type | Value
 module_name | str | "cloud.notification.send_email2"
 email_from | str
 name_from | str
-email_to | list
+email_to_list | list
 title | str
 content | str
 host | str

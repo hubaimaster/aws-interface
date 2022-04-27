@@ -5,7 +5,8 @@ from .utils import lambda_method, make_data
 class LogicAPI(API):
     @lambda_method
     def create_function(self, function_name, description, runtime, handler, sdk_config, zip_file=None, runnable=True,
-                        use_logging=False, use_traceback=False):
+                        use_logging=False, use_traceback=False, requirements_zip_file_id=None,
+                        use_standalone=False):
         import cloud.logic.create_function as method
         params = {
             'function_name': function_name,
@@ -16,7 +17,19 @@ class LogicAPI(API):
             'runnable': runnable,
             'sdk_config': sdk_config,
             'use_logging': use_logging,
-            'use_traceback': use_traceback
+            'use_traceback': use_traceback,
+            'requirements_zip_file_id': requirements_zip_file_id,
+            'use_standalone': use_standalone
+        }
+        data = make_data(self.app_id, params)
+        return method.do(data, self.resource)
+
+    @lambda_method
+    def create_packages_zip(self, package_text, runtime='python'):
+        import cloud.logic.create_packages_zip as method
+        params = {
+            'package_text': package_text,
+            'runtime': runtime
         }
         data = make_data(self.app_id, params)
         return method.do(data, self.resource)

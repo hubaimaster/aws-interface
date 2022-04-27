@@ -37,6 +37,7 @@ def do(data, resource):
 
     partitions = resource.db_get_partitions()
     partition_names = [partition['name'] for partition in partitions]
+    sort_keys = util.get_sort_keys(resource)
 
     def update_work(idx, item_id):
         new_item = pairs[item_id]
@@ -64,17 +65,25 @@ def do(data, resource):
         new_item = {key: value for key, value in new_item.items() if value != '' and value != {} and value != []}
         new_item = util.simplify_item(item, new_item)
         new_item['partition'] = item.get('partition', None)
+        new_item['creation_date'] = item.get('creation_date', None)
 
         if match_policy(policy_code, user, item, new_item=new_item):
             index_keys = util.get_index_keys_to_index(resource, user, item['partition'], 'w')
-            success = resource.db_update_item_v2(item_id, new_item, index_keys=index_keys)
+
+            # 소트키는 무조건 업데이트시 포함해야함.
+            for sort_key in sort_keys:
+                s_key = sort_key.get('sort_key', None)
+                if s_key and s_key not in new_item and item.get(s_key, None) is not None:
+                    new_item[s_key] = item.get(s_key, None)
+
+            success = resource.db_update_item_v2(item_id, new_item, index_keys=index_keys, sort_keys=sort_keys)
             success_list[idx] = success
         else:
             error_list[idx] = error.UPDATE_POLICY_VIOLATION
     if not max_workers:
         max_workers = len(pairs)
-    max_workers = int(max_workers)
-    max_workers = max(1, max_workers)
+    max_workers = int(max_workers) + 1
+    max_workers = min(32, max_workers)
     with ThreadPoolExecutor(max_workers=max_workers) as exc:
         for _idx, _item_id in enumerate(pairs):
             exc.submit(update_work, _idx, _item_id)

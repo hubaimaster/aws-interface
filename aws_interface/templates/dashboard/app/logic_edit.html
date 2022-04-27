@@ -84,18 +84,25 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="form-group">
                                         <label class="form-control-label" for="function-use-logging">{{ _('Use logging') }}</label>
                                         <input id="function-use-logging" name="use_logging" type="checkbox" class="form-control form-control-alternative"
                                                placeholder="{{ _('Use logging') }}" {% if function.use_logging %} checked {% endif %}>
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-lg-4">
                                     <div class="form-group">
                                         <label class="form-control-label" for="function-use-traceback">{{ _('Use traceback') }}</label>
                                         <input id="function-use-traceback" name="use_traceback" type="checkbox" class="form-control form-control-alternative"
                                                placeholder="{{ _('Use traceback') }}" {% if function.use_traceback %} checked {% endif %}>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="function-use-standalone">{{ _('Use standalone') }}</label>
+                                        <input disabled id="function-use-standalone" name="use_standalone" type="checkbox" class="form-control form-control-alternative"
+                                               placeholder="{{ _('Use standalone') }}" {% if function.use_standalone %} checked {% endif %}>
                                     </div>
                                 </div>
                             </div>

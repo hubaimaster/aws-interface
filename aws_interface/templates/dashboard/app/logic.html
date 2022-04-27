@@ -25,6 +25,46 @@
         </div>
         <!-- Page content -->
         <div class="container-fluid mt--7">
+
+            <div class="modal fade" id="modal-function-creation-result" tabindex="-1" role="dialog" aria-labelledby="modal-function-creation-result" aria-hidden="true">
+                <div class="modal-dialog modal modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="modal-title-default">{{ _("Function creation result") }}</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="pl-lg-12">
+                                <div class="row">
+                                    <div class="col-lg-12">
+
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="file-bin">{{ _("Creation result") }}</label>
+                                            <textarea readonly id="function-creation-result" name="function_creation_result"
+                                                      rows="10" type="text" class="form-control form-control-alternative"></textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="file-bin">{{ _("Package Install result") }}</label>
+                                            <textarea readonly id="function-package-install-result" name="function_package_install_result"
+                                                      rows="10" type="text" class="form-control form-control-alternative"></textarea>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" data-dismiss="modal" onclick="window.location.reload()">{{ _("Confirm") }}</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-xl-12">
                     <div class="card shadow">
@@ -356,6 +396,11 @@
                                                                 <input name="use_traceback" type="checkbox" id="function-use-traceback" class="form-control form-control-alternative">
                                                             </div>
 
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="function-use-standalone">{{ _("Use standalone") }} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ _("Use standalone") }}"></i></label>
+                                                                <input name="use_standalone" type="checkbox" id="function-use-standalone" class="form-control form-control-alternative">
+                                                            </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -408,12 +453,13 @@
                                         </td>
 
                                         <td>
-                                            <form method="post">{% csrf_token %}
-                                                <input name="cmd" value="delete_function" hidden>
-                                                <input name="function_name" value="{{ function.function_name }}" hidden>
-                                                <input name="function_version" value="{{ function.function_version }}" hidden>
-                                                <button type="submit" class="btn btn-danger btn-sm">{{ _("Remove") }}</button>
-                                            </form>
+{#                                            <form method="post">{% csrf_token %}#}
+{#                                                <input name="cmd" value="delete_function" hidden>#}
+{#                                                <input name="function_name" value="{{ function.function_name }}" hidden>#}
+{#                                                <input name="function_version" value="{{ function.function_version }}" hidden>#}
+{#                                                #}
+{#                                            </form>#}
+                                            <button onclick="deleteFunction('{{ function.function_name }}', '{{ function.function_version }}')" class="btn btn-danger btn-sm">{{ _("Remove") }}</button>
                                         </td>
 
                                     </tr>
@@ -446,7 +492,7 @@
     <script>
 
 
-        function create_function(function_name, description, handler, runtime, zip_file, use_logging, use_traceback) {
+        function create_function(function_name, description, handler, runtime, zip_file, use_logging, use_traceback, use_standalone) {
             var formData = new FormData();
             formData.append('cmd', 'create_function');
             formData.append('function_name', function_name);
@@ -456,6 +502,7 @@
             formData.append('zip_file', zip_file);
             formData.append('use_logging', use_logging);
             formData.append('use_traceback', use_traceback);
+            formData.append('use_standalone', use_standalone);
             $.LoadingOverlay('show', {
                 text:'Creating function...',
             });
@@ -466,8 +513,28 @@
                 processData: false,  // tell jQuery not to process the data
                 contentType: false,  // tell jQuery not to set contentType
                 success : function(data) {
-                    window.location.reload();
+                    var response_function_creation = data.response_function_creation;
+                    var package_install_response_stdout = data.package_install_response_stdout;
+
+                    $("#function-creation-result").val(JSON.stringify(response_function_creation, null, 4));
+                    $("#function-package-install-result").val(package_install_response_stdout);
+                    $("#modal-function-creation-result").modal('show');
+                    $.LoadingOverlay('hide');
+                    console.log(data); // TODO 이부분 고도화
                 }
+            });
+        }
+
+        function deleteFunction(function_name, function_version){
+            if (!window.confirm("Do you want to DELETE [" + function_name + "] Version:[" + function_version + "] ?")){
+                return;
+            }
+            $.post("", {
+                cmd: "delete_function",
+                function_name: function_name,
+                function_version: function_version,
+            }, function (data) {
+                window.location.reload();
             });
         }
 
@@ -495,6 +562,7 @@
                 const zip_file = $('#function-zipfile')[0].files[0];
                 const use_logging = $("#function-use-logging").is(":checked");
                 const use_traceback = $("#function-use-traceback").is(":checked");
+                const use_standalone = $("#function-use-standalone").is(":checked");
                 if (function_name == null || function_name.length == 0) {
                     alert("{{ _("Please enter the function name") }}");
                     return;
@@ -503,7 +571,7 @@
                     alert("{{ _("Please specify the zipfile") }}");
                     return;
                 }
-                create_function(function_name, description, handler, runtime, zip_file, use_logging, use_traceback);
+                create_function(function_name, description, handler, runtime, zip_file, use_logging, use_traceback, use_standalone);
                 $("#modal-create-function").modal('hide');
             });
 

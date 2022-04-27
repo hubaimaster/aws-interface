@@ -1,3 +1,4 @@
+import shutil
 
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -59,35 +60,61 @@ def do(data, resource):
         zip_file_id = item['zip_file_id']
         zip_file_bin = resource.file_download_bin(zip_file_id)
         zip_temp_dir = tempfile.mktemp()
+
+        requirements_zip_file_id = item.get('requirements_zip_file_id', None)
+
+        requirements_zip_file_bin = None
+        requirements_temp_dir = None
+        if requirements_zip_file_id:
+            requirements_zip_file_bin = resource.file_download_bin(requirements_zip_file_id)
+            requirements_temp_dir = tempfile.mktemp()
+
         extracted_dir = tempfile.mkdtemp()
+        use_standalone = item.get('use_standalone', False)
 
         with open(zip_temp_dir, 'wb') as zip_temp:
             zip_temp.write(zip_file_bin)
         with ZipFile(zip_temp_dir) as zip_file:
             zip_file.extractall(extracted_dir)
+
+        # Standalone 의 경우 따로 requirements 패키지 다운받아서 재압축
+        if use_standalone and requirements_zip_file_id:
+            with open(requirements_temp_dir, 'wb') as zip_temp:
+                zip_temp.write(requirements_zip_file_bin)
+            with ZipFile(requirements_temp_dir) as zip_file:
+                zip_file.extractall(extracted_dir)
+
         with open(os.path.join(extracted_dir, file_path), 'w+', encoding='utf-8') as fp:
             fp.write(file_content)
-        with ZipFile(zip_temp_dir, 'a') as zip_file:
+
+        new_zip_path = tempfile.mktemp()
+        shutil.make_archive(new_zip_path, 'zip', extracted_dir)
+        new_zip_path_ext = f'{new_zip_path}.zip'
+        with ZipFile(new_zip_path_ext, 'a') as zip_file:
             file_name = os.path.join(extracted_dir, file_path)
             zip_file.write(file_name, file_path)
 
         zip_file_id = uuid()
 
-        with open(zip_temp_dir, 'rb') as zip_file:
+        with open(new_zip_path_ext, 'rb') as zip_file:
             zip_file_bin = zip_file.read()
             resource.file_upload_bin(zip_file_id, zip_file_bin)
+
             if 'zip_file_id' in item:
                 resource.file_delete_bin(item['zip_file_id'])  # Remove previous zip file
             item['zip_file_id'] = zip_file_id  # Set new file's id
             success = resource.db_update_item(item['id'], item)
+            if use_standalone:
+                resource.function_update_stand_alone_function(f'{function_name}_{function_version}', zip_file_bin)
             body['success'] = success
 
-        # if 'requirements.txt' in file_path:
-        #     requirements_zipfile_id = uuid()
-        #     requirements_zipfile_bin = generate_requirements_zipfile(zip_file_bin)
-        #     resource.file_upload_bin(requirements_zipfile_id, requirements_zipfile_bin)
-        #     if 'requirements_zipfile_id' in item:
-        #         resource.file_delete_bin(item['requirements_zipfile_id'])
-        #     item['requirements_zipfile_id'] = requirements_zipfile_id
+        try:
+            os.remove(new_zip_path_ext)
+            os.remove(zip_temp_dir)
+            if requirements_temp_dir:
+                os.remove(requirements_temp_dir)
+            shutil.rmtree(extracted_dir)
+        except Exception as ex:
+            print(ex)
 
         return body

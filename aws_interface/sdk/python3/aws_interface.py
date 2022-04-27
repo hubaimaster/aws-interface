@@ -266,6 +266,12 @@ class Client(object):
         })
         return response
 
+    def logic_create_packages_zip(self, package_text):
+        response = self._logic('create_packages_zip', {
+            'package_text': package_text
+        })
+        return response
+
     def log_create_log(self, event_source, event_name, event_param):
         response = self._log('create_log', {
             'event_source': event_source,

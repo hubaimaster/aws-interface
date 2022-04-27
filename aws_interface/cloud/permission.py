@@ -125,6 +125,7 @@ class Permission:
         class Logic:
             create_function = 'run:cloud.logic.create_function'
             create_function_test = 'run:cloud.logic.create_function_test'
+            create_packages_zip = 'run:cloud.logic.create_packages_zip'
             create_trigger = 'run:cloud.logic.create_trigger'
             delete_function = 'run:cloud.logic.delete_function'
             delete_trigger = 'run:cloud.logic.delete_trigger'
@@ -138,6 +139,7 @@ class Permission:
             get_triggers = 'run:cloud.logic.get_triggers'
             put_function_file = 'run:cloud.logic.put_function_file'
             run_function = 'run:cloud.logic.run_function'
+            set_function_metadata = 'run:cloud.logic.set_function_metadata'
             update_function = 'run:cloud.logic.update_function'
             update_trigger = 'run:cloud.logic.update_trigger'
             delete_function_test = 'run:cloud.logic.delete_function_test'
@@ -152,6 +154,7 @@ class Permission:
             delete_b64 = 'run:cloud.storage.delete_b64'
             download_b64 = 'run:cloud.storage.download_b64'
             get_b64_info_items = 'run:cloud.storage.get_b64_info_items'
+            get_image = 'run:cloud.storage.get_image'
             upload_b64 = 'run:cloud.storage.upload_b64'
             get_policy_code = 'run:cloud.storage.get_policy_code'
             put_policy = 'run:cloud.storage.put_policy'

@@ -108,13 +108,22 @@ def do(data, resource):
     #         new_item.pop(key)
 
     # Put the value in the previous item that is not in the new field
+
     new_item = {key: value for key, value in new_item.items() if value != '' and value != {} and value != []}
     new_item = util.simplify_item(item, new_item)
-    new_item['partition'] = item['partition']
+    new_item['partition'] = item.get('partition', None)
+    new_item['creation_date'] = item.get('creation_date', None)
 
     if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item, new_item=new_item):
         index_keys = util.get_index_keys_to_index(resource, user, item['partition'], 'w')
-        success = resource.db_update_item_v2(item_id, new_item, index_keys=index_keys)
+
+        # 소트키는 무조건 업데이트시 포함해야함.
+        sort_keys = util.get_sort_keys(resource)
+        for sort_key in sort_keys:
+            s_key = sort_key.get('sort_key', None)
+            if s_key and s_key not in new_item and item.get(s_key, None) is not None:
+                new_item[s_key] = item.get(s_key, None)
+        success = resource.db_update_item_v2(item_id, new_item, index_keys=index_keys, sort_keys=sort_keys)
         body['success'] = success
     else:
         body['error'] = error.UPDATE_POLICY_VIOLATION

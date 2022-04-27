@@ -123,14 +123,14 @@ class Resource(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    def db_put_item(self, partition, item, item_id=None, creation_date=None, index_keys=None):
+    def db_put_item(self, partition, item, item_id=None, creation_date=None, index_keys=None, sort_keys=None):
         """It connects with db_get_count"""
         raise NotImplementedError
 
-    def db_update_item(self, item_id, item, index_keys=None):
+    def db_update_item(self, item_id, item, index_keys=None, sort_keys=None):
         raise NotImplementedError
 
-    def db_update_item_v2(self, item_id, item, index_keys=None):
+    def db_update_item_v2(self, item_id, item, index_keys=None, sort_keys=None):
         raise NotImplementedError
 
     def db_get_count(self, partition, field=None, value=None):
@@ -269,9 +269,9 @@ class Resource(metaclass=ABCMeta):
             start_key_list = None
             start_item_id = None
 
-        sub_limit = 500
         if not limit:
             limit = 100
+        sub_limit = min(limit * 1, 500)
 
         ct = time.time()
 
@@ -281,16 +281,17 @@ class Resource(metaclass=ABCMeta):
             # 탐색
             items, end_key_list = get_items(start_key_list, sub_limit)
 
+            # 아이템 추가
+            all_items.extend(items)
+
             # 첫번째 아이템 인덱스 구하기
             if start_item_id:
-                for idx_item, item in enumerate(items):
+                for idx_item, item in enumerate(all_items):
                     item_id = item['id']
                     if item_id == start_item_id:
                         start_index = idx_item + 1
                         break
 
-            # 아이템 추가
-            all_items.extend(items)
             no_more_end_key = all([(end_key is None) or (end_key is False) for end_key in end_key_list])
             if no_more_end_key:
                 break
@@ -364,7 +365,7 @@ class Resource(metaclass=ABCMeta):
     def _db_get_fake_item(self, item, order_by):
         return IDDict({
             'id': item['item_id'],
-            order_by: item[order_by],
+            order_by: item.get(order_by, None),
             '_is_fake': True
         })
 
@@ -489,4 +490,34 @@ class Resource(metaclass=ABCMeta):
         raise NotImplementedError
 
     def sms_send_message(self, phone_number, message):
+        raise NotImplementedError
+
+    def function_update_memory_size(self, memory_size):
+        raise NotImplementedError
+
+    def function_create_stand_alone_function(self, function_name, zipfile):
+        """
+        ExecuteStandAlone 로 실행 가능한 스탠드얼론 함수 생성.
+        :param function_name:
+        :param zipfile:
+        :return:
+        """
+        raise NotImplementedError
+
+    def function_update_stand_alone_function(self, function_name, zipfile):
+        """
+        ExecuteStandAlone 로 실행 가능한 스탠드얼론 함수 수정.
+        :param function_name:
+        :param zipfile:
+        :return:
+        """
+        raise NotImplementedError
+
+    def function_execute_stand_alone_function(self, function_name, request_body):
+        """
+        Lambda SDK 로 함수를 실행하고 응답을 반환합니다.
+        :param function_name:
+        :param request_body:
+        :return:
+        """
         raise NotImplementedError

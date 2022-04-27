@@ -59,7 +59,8 @@ def do(data, resource):
             success_list[idx] = success
     if not max_workers:
         max_workers = len(item_ids)
-    max_workers = int(max_workers)
+    max_workers = int(max_workers) + 1
+    max_workers = min(32, max_workers)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for _idx, _item_id in enumerate(item_ids):
             executor.submit(delete_item, _idx, _item_id)

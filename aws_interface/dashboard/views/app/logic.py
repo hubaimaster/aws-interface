@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+
+import traceback
 
 from core.adapter.django import DjangoAdapter
 from django.shortcuts import render, redirect
@@ -5,11 +10,15 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from dashboard.views.utils import Util, page_manage
+from zipfile import ZipFile
 from dashboard.views.app.overview import allocate_resource_in_background
 
 import json
 import base64
 import time
+import tempfile
+import subprocess
+import os
 
 
 def get_sdk_config(adapter, use_localhost=False):
@@ -22,6 +31,22 @@ def get_sdk_config(adapter, use_localhost=False):
         sdk_config['rest_api_url'] = 'http://localhost:20131'
     # print('sdk_config', sdk_config)
     return sdk_config
+
+
+def get_requirements_text_from_zipfile(zipfile_bin):
+    target_file = tempfile.mktemp()
+    with open(target_file, 'wb+') as fp:
+        fp.write(zipfile_bin)
+    extracted_path = tempfile.mkdtemp()
+    with ZipFile(target_file) as zf:
+        zf.extractall(extracted_path)
+    requirement_file_path = os.path.join(extracted_path, 'requirements.txt')
+    try:
+        with open(requirement_file_path, 'r') as fp:
+            return fp.read()
+    except Exception as ex:
+        print(ex)
+        return None
 
 
 class Logic(LoginRequiredMixin, View):
@@ -55,16 +80,45 @@ class Logic(LoginRequiredMixin, View):
                 handler = request.POST['handler']
                 use_logging = request.POST['use_logging'] == 'true'
                 use_traceback = request.POST['use_traceback'] == 'true'
+                use_standalone = request.POST['use_standalone'] == 'true'
                 sdk_config = get_sdk_config(adapter, use_localhost=False)
 
                 zip_file.seek(0)
                 zip_file_bin = zip_file.read()
+                zip_file_bytes = zip_file_bin
                 zip_file_bin = base64.b64encode(zip_file_bin)
                 zip_file_bin = zip_file_bin.decode('utf-8')
                 if not description:
                     description = None
-                logic_api.create_function(function_name, description, runtime, handler, sdk_config, zip_file_bin, True,
-                                          use_logging, use_traceback)
+
+                try:
+                    requirements_text = get_requirements_text_from_zipfile(zip_file_bytes)
+                except Exception as ex:
+                    requirements_text = None
+                    print(ex)
+                    print(traceback.format_exc())
+
+                requirements_zip_file_id = None
+                response_stdout = None
+                if requirements_text:
+                    print('requirements_text:', requirements_text)
+                    with adapter.open_sdk() as sdk_client:
+                        response = sdk_client.logic_create_packages_zip(requirements_text)
+                        print('logic_create_packages_zip:', response)
+                        requirements_zip_file_id = response.get('zip_file_id', None)
+                        response_stdout = response.get('response_stdout', None)
+                        if not requirements_zip_file_id:
+                            raise RuntimeError('Requirements.txt error! retry or check this.')
+                # response = logic_api.create_packages_zip(requirements_text)
+                # print('logic_create_packages_zip:', response)
+                # requirements_zip_file_id = response.get('zip_file_id', None)
+
+                response_function_creation = logic_api.create_function(function_name, description, runtime, handler, sdk_config, zip_file_bin, True,
+                                          use_logging, use_traceback, requirements_zip_file_id, use_standalone)
+                return JsonResponse({
+                    'package_install_response_stdout': response_stdout,
+                    'response_function_creation': response_function_creation
+                })
             elif cmd == 'create_function_test':
                 test_name = request.POST.get('test_name')
                 function_name = request.POST.get('function_name')
@@ -107,13 +161,16 @@ class LogicEdit(LoginRequiredMixin, View):
     def get(self, request, app_id, function_name, function_version=None):
         context = Util.get_context(request)
         context['app_id'] = app_id
-
+        s = time.time()
         adapter = DjangoAdapter(app_id, request)
         with adapter.open_api_logic() as logic_api:
+            print('s:', time.time() - s)
             function = logic_api.get_function(function_name, function_version)
+            print('s:', time.time() - s)
             function = function['item']
             file_paths = logic_api.get_function_file_paths(function_name, function_version).get('file_paths', [])
             handler_prefix = '/'.join(function['handler'].split('.')[:-1])
+            print('s:', time.time() - s)
             current_path = None
             for file_path in file_paths:
                 if file_path.startswith(handler_prefix):
@@ -123,6 +180,7 @@ class LogicEdit(LoginRequiredMixin, View):
             context['file_paths'] = file_paths
             context['current_path'] = current_path
             context['current_file'] = logic_api.get_function_file(function_name, current_path, function_version).get('item')
+            print('s:', time.time() - s)
         return render(request, 'dashboard/app/logic_edit.html', context=context)
 
     def post(self, request, app_id, function_name, function_version=None):

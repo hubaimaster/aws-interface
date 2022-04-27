@@ -86,6 +86,7 @@ def do(data, resource):
     if not max_workers:
         max_workers = len(item_ids)
     max_workers = int(max_workers)
+    max_workers = max(max_workers, 1)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for _idx, _item_id in enumerate(item_ids):
             executor.submit(get_item, _idx, _item_id)

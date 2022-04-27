@@ -52,6 +52,7 @@ def do(data, resource):
     item_ids = [None] * len(items)
 
     index_keys = util.get_index_keys_to_index(resource, user, partition, 'w')
+    sort_keys = util.get_sort_keys(resource)
     policy_code = get_policy_code(resource, partition, 'create')
 
     def try_put_item(idx, item):
@@ -60,14 +61,15 @@ def do(data, resource):
             item['owner'] = user_id
         item = {key: value for key, value in item.items() if value != '' and value != {} and value != []}
         if match_policy(policy_code, user, item):
-            resource.db_put_item(partition, item, item_id=item['id'], index_keys=index_keys)
+            resource.db_put_item(partition, item, item_id=item['id'], index_keys=index_keys, sort_keys=sort_keys)
             item_ids[idx] = item.get('id', None)
         else:
             error_list[idx] = error.PERMISSION_DENIED
 
     if not max_workers:
         max_workers = len(items)
-    max_workers = int(max_workers)
+    max_workers = int(max_workers) + 1
+    max_workers = min(32, max_workers)
     with ThreadPoolExecutor(max_workers=max_workers) as exc:
         for _idx, _item in enumerate(items):
             exc.submit(try_put_item, _idx, _item)

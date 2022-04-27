@@ -28,6 +28,8 @@ def simplify_item(item, new_item):
     :param new_item:
     :return:
     """
-    simple_items = {key: value for key, value in new_item.items() if value != item.get(key, None)}
+    must_have_keys = ['id', 'partition', 'creation_date']
+    simple_items = {key: value for key, value in new_item.items()
+                    if value != item.get(key, None) or key in must_have_keys}
     return simple_items
 

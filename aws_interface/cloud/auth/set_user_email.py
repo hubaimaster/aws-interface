@@ -2,6 +2,7 @@
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 from cloud.auth import get_policy_code
+from cloud.database import util
 import time
 
 # Define the input output format of the function.
@@ -9,6 +10,7 @@ import time
 info = {
     'input_format': {
         'session_id': 'str',
+        'user_id': 'str',
         'email': 'str',
     },
     'output_format': {
@@ -39,11 +41,20 @@ def do(data, resource):
     if not get_policy_code.match_policy_after_get_policy_code(resource, 'update', 'user', user, {'email': email}):
         body['error'] = error.UPDATE_POLICY_VIOLATION
         return body
+    creation_date = user.get('creation_date', time.time())
     user_to_update = {
         'partition': 'user',
+        'creation_date': creation_date,
         'updated_date': float(time.time()),
         'email': email
     }
+    # 소트키 존재시 무조건 포함
+    sort_keys = util.get_sort_keys(resource)
+    for sort_key_item in sort_keys:
+        s_key = sort_key_item.get('sort_key', None)
+        if s_key and s_key not in user_to_update and user.get(s_key, None) is not None:
+            user_to_update[s_key] = user.get(s_key, None)
+
     resource.db_update_item_v2(user_id, user_to_update)
     body['user_id'] = user_id
     return body

@@ -232,3 +232,13 @@ LOGIN_IS_REQUIRED = {
     'code': 56,
     'message': 'Login is required'
 }
+
+CANNOT_RUN_ON_NON_SERVERLESS = {
+    'code': 57,
+    'message': 'You can run this function on serverless service only'
+}
+
+REQUIRED_PARAMS_NOT_EXIST = {
+    'code': 58,
+    'message': 'You should input all required parameters. See https://docs.aws-interface.com'
+}

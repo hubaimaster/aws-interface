@@ -48,7 +48,8 @@ def do(data, resource):
     if resource.db_has_partition(partition):
         if match_policy_after_get_policy_code(resource, 'create', partition, user, item):
             index_keys = util.get_index_keys_to_index(resource, user, partition, 'w')
-            resource.db_put_item(partition, item, item_id=item['id'], index_keys=index_keys)
+            sort_keys = util.get_sort_keys(resource)
+            resource.db_put_item(partition, item, item_id=item['id'], index_keys=index_keys, sort_keys=sort_keys)
             body['item_id'] = item.get('id', None)
             return body
         else:

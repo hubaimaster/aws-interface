@@ -23,3 +23,12 @@ class AWSResponse(dict):
         else:
             self['body'] = body
         self['isBase64Encoded'] = False
+
+
+class AWSImageResponse(dict):
+    def __init__(self, image_base_64_string, content_type='image/gif', charset='UTF-8'):
+        headers = _get_headers(content_type, charset=charset)
+        self['statusCode'] = 200
+        self['headers'] = headers
+        self['body'] = image_base_64_string
+        self['isBase64Encoded'] = True

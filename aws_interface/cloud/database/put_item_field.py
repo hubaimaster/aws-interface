@@ -42,12 +42,21 @@ def do(data, resource):
     new_item = {
         'id': item_id,
         field_name: field_value,
-        'partition': item['partition']
+        'partition': item['partition'],
+        'creation_date': item.get('creation_date', 0)
     }
 
     if match_policy_after_get_policy_code(resource, 'update', item['partition'], user, item, new_item=new_item):
         index_keys = util.get_index_keys_to_index(resource, user, item['partition'], 'w')
-        success = resource.db_update_item_v2(item_id, new_item, index_keys=index_keys)
+
+        # 소트키는 무조건 업데이트시 포함해야함.
+        sort_keys = util.get_sort_keys(resource)
+        for sort_key in sort_keys:
+            s_key = sort_key.get('sort_key', None)
+            if s_key and s_key not in new_item and item.get(s_key, None) is not None:
+                new_item[s_key] = item.get(s_key, None)
+
+        success = resource.db_update_item_v2(item_id, new_item, index_keys=index_keys, sort_keys=sort_keys)
         body['success'] = success
     else:
         body['error'] = error.PERMISSION_DENIED

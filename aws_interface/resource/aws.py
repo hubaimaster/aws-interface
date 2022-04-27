@@ -8,6 +8,7 @@ from decimal import Decimal
 from numbers import Number
 from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3, Events, SNS
 from resource.base import ResourceAllocator, Resource
+from zipfile import ZipFile
 
 
 def encode_dict(dict_obj):
@@ -247,20 +248,20 @@ class AWSResource(Resource):
             else:
                 return it
 
-    def db_put_item(self, partition, item, item_id=None, creation_date=None, index_keys=None):
+    def db_put_item(self, partition, item, item_id=None, creation_date=None, index_keys=None, sort_keys=None):
         item = decode_dict(item)
         item = self._remove_blanks(item)
-        result = self.dynamo.put_item(self.app_id, partition, item, item_id, creation_date, index_keys=index_keys)
+        result = self.dynamo.put_item(self.app_id, partition, item, item_id, creation_date, index_keys=index_keys, sort_keys=sort_keys)
         return bool(result)
 
-    def db_update_item(self, item_id, item, index_keys=None):
+    def db_update_item(self, item_id, item, index_keys=None, sort_keys=None):
         item = decode_dict(item)
-        result = self.dynamo.update_item(self.app_id, item_id, item, index_keys=index_keys)
+        result = self.dynamo.update_item(self.app_id, item_id, item, index_keys=index_keys, sort_keys=sort_keys)
         return bool(result)
 
-    def db_update_item_v2(self, item_id, item, index_keys=None):
+    def db_update_item_v2(self, item_id, item, index_keys=None, sort_keys=None):
         item = decode_dict(item)
-        result = self.dynamo.update_item_v2(self.app_id, item_id, item, index_keys=index_keys)
+        result = self.dynamo.update_item_v2(self.app_id, item_id, item, index_keys=index_keys, sort_keys=sort_keys)
         return bool(result)
 
     def db_get_count(self, partition, field=None, value=None):
@@ -472,9 +473,123 @@ class AWSResource(Resource):
 
         resp = events.delete_targets(schedule_name, target_ids)
         resp = events.delete_rule(schedule_name)
+
+        lambda_client = Lambda(self.boto3_session)
+        lambda_function = lambda_client.get_function(self.app_id)
+        lambda_function_config = lambda_function.get('Configuration')
+        lambda_function_name = lambda_function_config.get("FunctionName")
+        for target_id in target_ids:
+            remove_response = lambda_client.remove_permission(lambda_function_name, target_id)
+            print('remove_response:', remove_response)
         return resp
 
     def sms_send_message(self, phone_number, message, region='us-east-1'):
         sns = SNS(self.boto3_session, region)
         resp = sns.send_message(phone_number, message)
         return resp
+
+    def function_update_memory_size(self, memory_size=3000):
+        lam = Lambda(self.boto3_session)
+        resp = lam.update_function_memory_size(self.app_id, memory_size)
+        return resp
+
+    def function_create_stand_alone_function(self, function_name, zipfile_bin):
+        """
+        ExecuteStandAlone 로 실행 가능한 스탠드얼론 함수 생성.
+        :param function_name:
+        :param zipfile_bin:
+        :return:
+        """
+        role_name = '{}'.format(self.app_id)
+        lambda_client = Lambda(self.boto3_session)
+        iam = IAM(self.boto3_session)
+
+        role_arn = iam.create_role_and_attach_policies(role_name)
+
+        name = '{}_{}'.format(self.app_id, function_name)
+        desc = f'stand-alone-function-of-{self.app_id}'
+        runtime = 'python3.6'
+        handler = '__aws_interface_stand_alone_physical_handler.main'
+
+        handler_method_name = '__aws_interface_stand_alone_physical_handler'
+        handler_module_name = f'resource.standalone.{handler_method_name}'
+        handler_module = importlib.import_module(handler_module_name)
+
+        with open(handler_module.__file__, 'r') as fp:
+            handler_module_content = fp.read()
+
+        temp_extract_path = tempfile.mkdtemp()
+        temp_zip_file = tempfile.mktemp()
+        with open(temp_zip_file, 'wb+') as fp:
+            fp.write(zipfile_bin)
+
+        with ZipFile(temp_zip_file) as fp:
+            fp.extractall(temp_extract_path)
+
+        with open(os.path.join(temp_extract_path, f'{handler_method_name}.py'), 'w+') as fp:
+            fp.write(handler_module_content)
+
+        output_filename = tempfile.mktemp()
+        shutil.make_archive(output_filename, 'zip', temp_extract_path)
+        output_zip_file_name = '{}.zip'.format(output_filename)
+        with open(output_zip_file_name, 'rb') as fp:
+            zipfile_bin = fp.read()
+        shutil.rmtree(temp_extract_path)
+        os.remove(temp_zip_file)
+        os.remove(output_zip_file_name)
+        return lambda_client.create_function(name, desc, runtime, role_arn, handler, zipfile_bin)
+
+    def function_update_stand_alone_function(self, function_name, zipfile_bin):
+        """
+        함수 수정.
+        :param function_name:
+        :param zipfile_bin:
+        :return:
+        """
+        lambda_client = Lambda(self.boto3_session)
+
+        name = '{}_{}'.format(self.app_id, function_name)
+
+        handler_method_name = '__aws_interface_stand_alone_physical_handler'
+        handler_module_name = f'resource.standalone.{handler_method_name}'
+        handler_module = importlib.import_module(handler_module_name)
+
+        with open(handler_module.__file__, 'r') as fp:
+            handler_module_content = fp.read()
+
+        temp_extract_path = tempfile.mkdtemp()
+        temp_zip_file = tempfile.mktemp()
+        with open(temp_zip_file, 'wb+') as fp:
+            fp.write(zipfile_bin)
+
+        with ZipFile(temp_zip_file) as fp:
+            fp.extractall(temp_extract_path)
+
+        with open(os.path.join(temp_extract_path, f'{handler_method_name}.py'), 'w+') as fp:
+            fp.write(handler_module_content)
+
+        output_filename = tempfile.mktemp()
+        shutil.make_archive(output_filename, 'zip', temp_extract_path)
+        output_zip_file_name = '{}.zip'.format(output_filename)
+        with open(output_zip_file_name, 'rb') as fp:
+            zipfile_bin = fp.read()
+        shutil.rmtree(temp_extract_path)
+        os.remove(temp_zip_file)
+        os.remove(output_zip_file_name)
+        return lambda_client.update_function_code(name, zipfile_bin)
+
+    def function_execute_stand_alone_function(self, function_name, request_body):
+        """
+        Lambda SDK 로 함수를 실행하고 응답을 반환합니다.
+        :param function_name:
+        :param request_body:
+        :return:
+        """
+        lambda_client = Lambda(self.boto3_session)
+        name = '{}_{}'.format(self.app_id, function_name)
+        json_body = json.dumps(encode_dict(request_body))
+        json_body_byte = json_body.encode('utf-8')
+        response = lambda_client.invoke_function(name, json_body_byte)
+        response_body = response['Payload'].read().decode()
+        response_body_json = json.loads(response_body)
+        return response_body_json

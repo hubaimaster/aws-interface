@@ -1,3 +1,4 @@
+import time
 
 from cloud.permission import Permission, NeedPermission
 from zipfile import ZipFile
@@ -48,15 +49,17 @@ def do(data, resource):
                                    'condition': 'eq'}])
 
     items = list(filter(lambda x: int(x.get('function_version', 0)) == int(function_version), items))
-
+    start = time.time()
     if len(items) == 0:
         body['message'] = 'function_name: {} did not exist'.format(function_name)
         return body
     else:
         item = items[0]
         zip_file_id = item['zip_file_id']
+        print('start0:', time.time() - start)
+        print('zip_file_id:', zip_file_id)
         zip_file_bin = resource.file_download_bin(zip_file_id)
-
+        print('start1:', time.time() - start)
         zip_temp_dir = tempfile.mktemp()
         with open(zip_temp_dir, 'wb') as zip_temp:
             zip_temp.write(zip_file_bin)
@@ -64,4 +67,5 @@ def do(data, resource):
             file_paths = zip_file.namelist()
             file_paths = [file_path for file_path in file_paths if not os.path.isdir(file_path)]
             body['file_paths'] = list(set(file_paths))
+        print('start2:', time.time() - start)
         return body

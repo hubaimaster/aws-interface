@@ -59,3 +59,5 @@ Error Code | Message
 52 | Unregistered partition
 53 | This is a group that has session security hardened. Session access was rejected because it was different from the region you accessed when logging in.
 54 | Session security hardened. Session access was rejected because it was different from the region you accessed when logging in.
+55 | Invalid item_id
+56 | Login is required

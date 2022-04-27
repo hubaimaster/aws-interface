@@ -25,3 +25,20 @@ def generate_requirements_zipfile(zipfile_bin):
     # os.remove(output_filename)
     return zipfile_bin
 
+
+def get_requirements_text_from_zipfile(zipfile_bin):
+    output_filename = tempfile.mktemp()
+    with open(output_filename, 'wb+') as fp:
+        fp.write(zipfile_bin)
+    extracted_path = tempfile.mkdtemp()
+    with ZipFile(output_filename) as zf:
+        zf.extractall(extracted_path)
+    requirement_file_path = os.path.join(extracted_path, 'requirements.txt')
+    text = ''
+    with open(requirement_file_path, 'r') as fp:
+        chunk = fp.read()
+        while chunk:
+            text += chunk
+            chunk = fp.read()
+    return text
+

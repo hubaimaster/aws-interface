@@ -68,6 +68,8 @@ def do(data, resource):
     limit = params.get('limit', 100)
     reverse = params.get('reverse', False)
     sort_key = params.get('sort_key', DEFAULT_SORT_KEY)
+    if not sort_key:
+        sort_key = DEFAULT_SORT_KEY
     join = params.get('join', {})
     projection_keys = params.get('projection_keys', None)
 
@@ -96,6 +98,7 @@ def do(data, resource):
                                            reverse, order_by=sort_key, index_keys=index_keys)
         policy_code = get_policy_code(resource, partition, 'read')
         filtered = []
+        items = [item for item in items if item.get('id', None) and item.get('partition', None) == partition]
         for item in items:
             if match_policy(policy_code, user, item):
                 filtered.append(item)

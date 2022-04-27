@@ -5,7 +5,7 @@ import cloud.message.error as error
 import sys
 import time
 import traceback
-from cloud.response import AWSResponse
+from cloud.response import AWSResponse, AWSImageResponse
 import cloud.libs.simplejson as json
 import cloud.logic.run_function as run_function
 import cloud.notification.send_slack_message_as_system_notification as slack
@@ -13,7 +13,7 @@ import cloud.notification.send_slack_message_as_system_notification as slack
 # Localhost server, Internal gate to make logic call fast
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
-from socketserver import ThreadingMixIn
+from socketserver import ThreadingMixIn, ForkingMixIn
 from cloud import env
 
 
@@ -161,6 +161,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     # logic
     'cloud.logic.create_function',
     'cloud.logic.create_function_test',
+    'cloud.logic.create_packages_zip',
     'cloud.logic.create_trigger',
     'cloud.logic.delete_function',
     'cloud.logic.delete_function_test',
@@ -173,6 +174,7 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.logic.get_trigger',
     'cloud.logic.get_triggers',
     'cloud.logic.run_function',
+    'cloud.logic.set_function_metadata',
     'cloud.logic.update_function',
     'cloud.logic.update_trigger',
     # storage
@@ -234,6 +236,12 @@ def aws_handler(event, context):
         response = AWSResponse(html_response, content_type='text/html')
         print_log(event, response)
         return response
+    elif '__image__' in body:
+        image_base_64 = body['__image__']
+        content_type = body.get('content_type', 'image/gif')
+        response = AWSImageResponse(image_base_64, content_type)
+        print_log(event, response)
+        return response
     else:
         response = AWSResponse(body)
         print_log(event, response)
@@ -253,9 +261,10 @@ def abstracted_gateway(params, query_params, resource, client_ip):
         print('Exception: [{}]'.format(ex))
         print('error_traceback: [{}]'.format(error_traceback))
         body = {
-            'error': error.PERMISSION_DENIED,
-            # 'traceback': '{}'.format(error_traceback)
+            'error': error.PERMISSION_DENIED
         }
+        if params and params.get('show_traceback', False):
+            body['traceback'] = '{}'.format(error_traceback)
         slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
         return body
     except Exception as ex:
@@ -263,9 +272,10 @@ def abstracted_gateway(params, query_params, resource, client_ip):
         print('Exception: [{}]'.format(ex))
         print('error_traceback: [{}]'.format(error_traceback))
         body = {
-            'error': error.INVALID_REQUEST,
-            # 'traceback': '{}'.format(error_traceback)
+            'error': error.INVALID_REQUEST
         }
+        if params and params.get('show_traceback', False):
+            body['traceback'] = '{}'.format(error_traceback)
         slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
         return body
 

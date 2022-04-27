@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
 import cloud.notification.send_slack_message_as_system_notification as slack
@@ -70,6 +73,7 @@ def do(data, resource):
 
     function_name = params.get('function_name')
     payload = params.get('payload')
+    show_traceback = params.get('show_traceback', False)
     # logging = params.get('logging', False)
 
     items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}], reverse=True)
@@ -86,12 +90,25 @@ def do(data, resource):
         use_traceback = item.get('use_traceback', False)
         use_logging = item.get('use_logging', False)
         sdk_config = item.get('sdk_config', {})
+        use_standalone = item.get('use_standalone', False)
+        function_version = item.get('function_version', False)
+
         function_package = '.'.join(function_handler.split('.')[:-1])
         function_method = function_handler.split('.')[-1]
         function_name_as_random = 'fn{}'.format(uuid.uuid4()).replace('-', '')
 
         zip_temp_dir = get_cache(zip_file_id, 'zip_temp_dir')
         extracted_dir = get_cache(zip_file_id, 'extracted_dir')
+
+        if use_standalone:
+            request_body = {
+                'payload': payload,
+                'user': user,
+                'handler': function_handler,
+                'show_traceback': show_traceback and use_traceback
+            }
+            response = resource.function_execute_stand_alone_function(f'{function_name}_{function_version}', request_body)
+            return response  # TODO
 
         if (zip_temp_dir is None) or (extracted_dir is None):
             zip_file_bin = resource.file_download_bin(zip_file_id)
@@ -120,7 +137,9 @@ def do(data, resource):
 
         virtual_handler = 'virtual_handler{}.py'.format(uuid.uuid4())
         virtual_handler_path = os.path.join(extracted_dir, virtual_handler)
-        vh_code = "import io\n" + \
+        vh_code = "#!/usr/bin/python\n" + \
+                  "# -*- coding: utf-8 -*-\n" + \
+                  "import io\n" + \
                   "import json\n" + \
                   "import traceback\n" + \
                   "from contextlib import redirect_stdout\n" +\
@@ -139,7 +158,6 @@ def do(data, resource):
 
         return_value = {}
         try:
-
             return_value = run_subprocess(virtual_handler_path)
 
             if return_value:
@@ -151,7 +169,7 @@ def do(data, resource):
             body['stdout'] = return_value.get('stdout', None)
             err = return_value.get('error', None)
             if err:
-                if use_traceback:
+                if use_traceback and show_traceback:
                     body['traceback'] = err
                 r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
                 print('slack response:', r)

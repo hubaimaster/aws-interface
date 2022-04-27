@@ -71,8 +71,8 @@ def verify_session_time(session, params):
         return False
     now = time.time()
     now = int(now)
-    # Time window -4~4초
-    for offset in range(-4, 5):
+    # Time window -30~30초
+    for offset in range(-29, 30):
         target_plain = now + offset + timestamp_offset
         target_plain = str(target_plain)
         server_est = Hash.sha3_512(target_plain + spk)
@@ -122,9 +122,10 @@ def do(data, resource, system_call=False):  # Do not check policy when system_ca
     else:
         user_id = None
 
-    if session and session.get('use_secure', False):
-        if not verify_session_time(session, params):
-            return error.SESSION_NOT_VERIFICATION
+    # 세션 timestamp 보안, 일단 끔.
+    # if session and session.get('use_secure', False):
+    #     if not verify_session_time(session, params):
+    #         return error.SESSION_NOT_VERIFICATION
 
     if user_id:
         # 데이터 전송량 및 읽기용량, 시간을 줄이기 위해 프로젝션된 내용만 끌어서 사용

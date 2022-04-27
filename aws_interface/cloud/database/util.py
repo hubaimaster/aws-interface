@@ -1,5 +1,24 @@
 from concurrent.futures import ThreadPoolExecutor
 from cloud.database.get_policy_code import get_policy_code, match_policy
+import time
+
+cache = {}
+
+
+def get_sort_keys(resource):
+    """
+    sort_keys 를 가져옵니다.
+    인덱스 생성에 함께 이용됩니다.
+    :param resource:
+    :param item:
+    :return:
+    """
+    cache_key = f'sort_key_{int(time.time() / 10)}'
+    if cache_key in cache:
+        return cache[cache_key]
+    sort_keys, _ = resource.db_query('sort_key', [], limit=10000)
+    cache[cache_key] = sort_keys
+    return sort_keys
 
 
 def get_index_keys_to_index(resource, user, partition, mode):
