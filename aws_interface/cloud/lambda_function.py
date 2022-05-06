@@ -55,7 +55,7 @@ class S(BaseHTTPRequestHandler):
         self.wfile.write(json_response)
 
 
-class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
+class ThreadingSimpleServer(ForkingMixIn, HTTPServer):
     pass
 
 
@@ -206,15 +206,15 @@ CALLABLE_MODULE_WHITE_LIST = {
 
 
 def print_log(event, response):
-    # try:
-    #     print({
-    #         'event': event,
-    #         'response': response
-    #     })
-    # except Exception as e:
-    #     print({
-    #         'Exception': str(e)
-    #     })
+    try:
+        print({
+            'event': event,
+            # 'response': response
+        })
+    except Exception as e:
+        print({
+            'Exception': str(e)
+        })
     pass
 
 
