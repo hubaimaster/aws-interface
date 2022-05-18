@@ -33,6 +33,12 @@ def do(data, resource):
     use_simplify = params.get('use_simplify', True)
 
     item = resource.db_get_item(item_id)
+    # 아이템 없는 경우
+    if not item:
+        body['item'] = None
+        body['error'] = error.NO_SUCH_ITEM
+        return body
+
     # 시스템 파티션 접근 제한
     if database_can_not_access_to_item(item['partition']):
         body['error'] = error.PERMISSION_DENIED

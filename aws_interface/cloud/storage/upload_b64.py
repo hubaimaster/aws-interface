@@ -30,8 +30,10 @@ def do(data, resource):
     body = {}
     params = data['params']
     user = data['user']
-
-    user_id = user.get('id', None)
+    if user:
+        user_id = user.get('id', None)
+    else:
+        user_id = None
 
     parent_file_id = params.get('parent_file_id', None)
     file_name = params.get('file_name', uuid())

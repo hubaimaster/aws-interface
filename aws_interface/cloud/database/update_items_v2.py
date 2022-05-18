@@ -45,6 +45,10 @@ def do(data, resource):
     def update_work(idx, item_id):
         new_item = pairs[item_id]
         item = resource.db_get_item(item_id)
+        # 아이템 없는 경우
+        if not item:
+            error_list[idx] = error.NO_SUCH_ITEM
+            return
         # 시스템 파티션 접근 제한
         if database_can_not_access_to_item(item['partition']):
             error_list[idx] = error.PERMISSION_DENIED
