@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import time
+import copy
 
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -9,11 +11,10 @@ import uuid
 import os
 import tempfile
 import cloud.libs.simplejson as json
-import traceback
 import subprocess
 from zipfile import ZipFile
 from cloud.log.create_log import create_event
-import importlib.util
+from concurrent.futures import ThreadPoolExecutor
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
@@ -197,3 +198,76 @@ def do(data, resource):
             create_event(resource, user, 'run_function:{}'.format(function_name), content, 'logic')
 
         return body
+
+
+class SubprocessPool:
+    # subprocess 풀을 만들어 빠르게 실행할 수 있도록 한다 (오버헤드 제거)
+    pool = []
+
+    def __init__(self, python_file_path, size=2):
+        self.python_file_path = python_file_path
+        self.size = size
+        self.proc = subprocess.Popen(['python', self.python_file_path],
+                                     stdout=subprocess.PIPE,
+                                     stdin=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT)
+        for _ in range(size):
+            self.__inc_process_to_pool()
+
+    def __inc_process_to_pool(self):
+        self.pool.append(copy.deepcopy(self.proc))
+
+    def communication(self, input_string):
+        process = self.pool.pop(0)
+        with ThreadPoolExecutor(max_workers=2) as worker:
+            result_future = worker.submit(process.communicate, input_string.encode('utf-8'))
+            void_future = worker.submit(self.__inc_process_to_pool)
+        result = result_future.result()
+        _ = void_future.result()
+        return result
+
+
+if __name__ == '__main__':
+    import pickle
+
+    start = time.time()
+    python_file = 'temp.py'
+
+    content = 'import io\n' \
+              'import requests\n' \
+              'import sys\n'\
+              'import traceback\n' \
+              'from contextlib import redirect_stdout\n' \
+              'import random\n' \
+              'v = input()\n'\
+              'print("OK", v)\n'
+
+    with open(python_file, 'w+') as fp:
+        fp.write(content)
+
+    print('time1:', time.time() - start)
+
+    pp = SubprocessPool(python_file, 2)
+
+    print('time2:', time.time() - start)
+
+    out, err = pp.communication('one')
+    print('out:', out.decode('utf-8'))
+    print('err:', err)
+    print('time3:', time.time() - start)
+    print('------')
+
+    out, err = pp.communication('two')
+    print('out:', out.decode('utf-8'))
+    print('err:', err)
+    print('time4:', time.time() - start)
+
+    out, err = pp.communication('three')
+    print('out:', out.decode('utf-8'))
+    print('err:', err)
+    print('time5:', time.time() - start)
+
+    out, err = pp.communication('four')
+    print('out:', out.decode('utf-8'))
+    print('err:', err)
+    print('time6:', time.time() - start)
