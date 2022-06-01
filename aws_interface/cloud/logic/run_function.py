@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import time
-import copy
 
 from cloud.permission import Permission, NeedPermission
 from cloud.message import error
@@ -200,36 +199,43 @@ def do(data, resource):
         return body
 
 
+from concurrent.futures import ThreadPoolExecutor
+
+
 class SubprocessPool:
     # subprocess 풀을 만들어 빠르게 실행할 수 있도록 한다 (오버헤드 제거)
     pool = []
+    thread_pool = ThreadPoolExecutor(max_workers=32)
 
-    def __init__(self, python_file_path, size=2):
+    def __init__(self, python_file_path, size=10):
         self.python_file_path = python_file_path
         self.size = size
-        self.proc = subprocess.Popen(['python', self.python_file_path],
-                                     stdout=subprocess.PIPE,
-                                     stdin=subprocess.PIPE,
-                                     stderr=subprocess.STDOUT)
-        for _ in range(size):
-            self.__inc_process_to_pool()
+        self.__inc_process_to_pool()
 
     def __inc_process_to_pool(self):
-        self.pool.append(copy.deepcopy(self.proc))
+        self.pool.append(subprocess.Popen(['python', self.python_file_path],
+                                          stdout=subprocess.PIPE,
+                                          stdin=subprocess.PIPE,
+                                          stderr=subprocess.STDOUT))
+
+    def __add_processes(self):
+        if len(self.pool) < self.size / 3 + 1:
+            for idx in range(self.size // 2):
+                self.thread_pool.submit(self.__inc_process_to_pool)
 
     def communication(self, input_string):
+        if len(self.pool) == 0:
+            # 없으면 즉시 바로 생성
+            self.__inc_process_to_pool()
+        else:
+            self.thread_pool.submit(self.__add_processes)
         process = self.pool.pop(0)
-        with ThreadPoolExecutor(max_workers=2) as worker:
-            result_future = worker.submit(process.communicate, input_string.encode('utf-8'))
-            void_future = worker.submit(self.__inc_process_to_pool)
-        result = result_future.result()
-        _ = void_future.result()
+        result = process.communicate(input_string.encode('utf-8'))
+
         return result
 
 
 if __name__ == '__main__':
-    import pickle
-
     start = time.time()
     python_file = 'temp.py'
 
@@ -245,29 +251,11 @@ if __name__ == '__main__':
     with open(python_file, 'w+') as fp:
         fp.write(content)
 
-    print('time1:', time.time() - start)
+    pp = SubprocessPool(python_file, 6)
 
-    pp = SubprocessPool(python_file, 2)
-
-    print('time2:', time.time() - start)
-
-    out, err = pp.communication('one')
-    print('out:', out.decode('utf-8'))
-    print('err:', err)
-    print('time3:', time.time() - start)
-    print('------')
-
-    out, err = pp.communication('two')
-    print('out:', out.decode('utf-8'))
-    print('err:', err)
-    print('time4:', time.time() - start)
-
-    out, err = pp.communication('three')
-    print('out:', out.decode('utf-8'))
-    print('err:', err)
-    print('time5:', time.time() - start)
-
-    out, err = pp.communication('four')
-    print('out:', out.decode('utf-8'))
-    print('err:', err)
-    print('time6:', time.time() - start)
+    for i in range(0, 30):
+        # start = time.time()
+        out, err = pp.communication(f'num:{i}')
+        print('out:', out.decode('utf-8'))
+        print(f'TTT:{i}:', time.time() - start)
+        print('------')

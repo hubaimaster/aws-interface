@@ -1,5 +1,5 @@
 import io
-import requests
+import PyCurl
 import sys
 import traceback
 from contextlib import redirect_stdout
