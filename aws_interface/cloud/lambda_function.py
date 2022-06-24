@@ -15,6 +15,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
 from socketserver import ThreadingMixIn, ForkingMixIn
 from cloud import env
+from cloud.message import errorlist
 
 
 # Imports AWS related resources
@@ -267,6 +268,19 @@ def abstracted_gateway(params, query_params, resource, client_ip):
             body['traceback'] = '{}'.format(error_traceback)
         slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
         return body
+    except errorlist.CloudLogicError as ex:
+        error_traceback = traceback.format_exc()
+        print('Exception: [{}]'.format(ex))
+        print('error_traceback: [{}]'.format(error_traceback))
+        body = {
+            'error': {
+                'code': ex.code,
+                'message': ex.message
+            }
+        }
+        if params and params.get('show_traceback', False):
+            body['traceback'] = '{}'.format(error_traceback)
+        slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
     except Exception as ex:
         error_traceback = traceback.format_exc()
         print('Exception: [{}]'.format(ex))

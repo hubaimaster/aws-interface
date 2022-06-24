@@ -3,12 +3,16 @@ import os
 import shutil
 import tempfile
 import json
+import time
 import uuid
 from decimal import Decimal
 from numbers import Number
 from resource.wrapper.boto3_wrapper import get_boto3_session, Lambda, APIGateway, IAM, DynamoDB, CostExplorer, S3, Events, SNS
+from resource.wrapper.boto3_wrapper import DynamoFDB
 from resource.base import ResourceAllocator, Resource
+from resource import config, util
 from zipfile import ZipFile
+import base64
 
 
 def encode_dict(dict_obj):
@@ -86,12 +90,14 @@ class AWSResourceAllocator(ResourceAllocator):
         self._create_dynamo_db_table()
         self._create_lambda_function()
         self._create_rest_api_connection()
+        self._create_dynamo_fdb_table()
 
     def terminate(self):
         self._remove_bucket()
         self._remove_dynamo_db_table()
         self._remove_lambda_function()
         self._remove_rest_api_connection()
+        self._remove_dynamo_fdb_table()
 
     def get_rest_api_url(self):
         api_gateway = APIGateway(self.boto3_session)
@@ -100,6 +106,10 @@ class AWSResourceAllocator(ResourceAllocator):
     def _create_dynamo_db_table(self):
         dynamo = DynamoDB(self.boto3_session)
         dynamo.init_table(self.app_id)
+
+    def _create_dynamo_fdb_table(self):
+        dynamo = DynamoFDB(self.boto3_session, self.app_id)
+        dynamo.init_fdb_table()
 
     def _create_lambda_function(self):
         """
@@ -165,6 +175,10 @@ class AWSResourceAllocator(ResourceAllocator):
         s3 = S3(self.boto3_session)
         s3.delete_bucket(self.app_id)
 
+    def _remove_dynamo_fdb_table(self):
+        dynamo = DynamoFDB(self.boto3_session, self.app_id)
+        dynamo.delete_fdb_table()
+
 
 class AWSResource(Resource):
     def __init__(self, credential, app_id, boto3_session=None):
@@ -174,7 +188,9 @@ class AWSResource(Resource):
         elif credential:
             self.boto3_session = get_boto3_session(credential)
         self.dynamo = DynamoDB(self.boto3_session)
+        self.dynamoFDB = DynamoFDB(self.boto3_session, app_id)
         self.s3 = S3(self.boto3_session)
+        self.cache = {}
 
     def get_rest_api_url(self):
         api_gateway = APIGateway(self.boto3_session)
@@ -593,3 +609,332 @@ class AWSResource(Resource):
         response_body = response['Payload'].read().decode()
         response_body_json = json.loads(response_body)
         return response_body_json
+
+    # 신규기능 FDB
+    # 새로 추가된 FastDatabase, Fully NoSQL
+    @classmethod
+    def _fdb_item_id_to_pk_sk_pair(cls, item_id):
+        """
+        내부적으로 pk와 sk 조합을 item_id 로 부터 복호화합니다.
+        :param item_id:
+        :return:
+        """
+        try:
+            return json.loads(item_id)
+        except:
+            return None
+
+    @classmethod
+    def _fdb_pk_sk_to_item_id(cls, pk, sk):
+        """
+        pk 와 sk 를 item_id 로 암호화합니다.
+        :param pk:
+        :param sk:
+        :return:
+        """
+        return json.dumps({
+            '_pk': pk,
+            '_sk': sk
+        })
+
+    def fdb_create_partition(self, partition, pk_group, pk_field, sk_group, sk_field=None,
+                             post_sk_fields=None, use_random_sk_postfix=True):
+        """
+        Fast DB 내부에 파티션을 생성합니다. 사실 생성의 개념보다는 파티션을 선언합니다.
+        파티션 삭제시에, 내부 데이터는 삭제 되지 않기 때문에 유의해야합니다.
+        :param partition: order 등 파티션 이름
+        :param pk_group: app, system 등 파티션 필드 앞에 구분자를 붙일 때 사용합니다. 한번 지정되면 바꿀 수 없습니다.
+        같은 user_id 를 가진 엔티티여도 시스템에서 사용하느냐, 앱에서 사용하느냐에 따라 구분할 수 있습니다.
+        일례로 로그 데이터 등은 system 에 보관하는것이 안전하고, 속도 측면에서도 유리합니다.
+        :param pk_field: user_id 등을 pk_field 로 지정하는것이 유리합니다. 병렬 처리와 관련 있으며, 디버깅을 위해
+        실제 DB의 pk 필드 (인덱스) 에는 <pk_group>#<pk_field>#<pk.value> 의 값이 들어갑니다.
+        :param sk_group: sort key 앞에 붙는 그룹 구분입니다. sk = <sk_group>#<partition>#<sk_field>#<sk.value> 가 들어갑니다.
+        이 값을 이용하여 같이 조인되어야 하는 값들을 효과적으로 조인할 수 있습니다. 예를 들면
+        그룹 order 으로 묶이는 경우, order 으로 order_plan 이나 order 등 같이 묶여서 반환시 성능이 극대화 시킬 수 있습니다.
+        :param sk_field: created_at 등.. 날짜로 구성하면 날짜별 정렬이 가능합니다.
+        :param post_sk_fields: 소트키 뒤에 붙는 field 입니다. 임의로 데이터 중복 생성 방지 기능을 만드는데 유용합니다.
+        :param use_random_sk_postfix: pk 와 sk 가 같으면 중복 생성이 불능하기 때문에, 랜덤 문자열을 붙여 다른 아이템으로
+        생성할 수 있습니다.
+        :return:
+        """
+        self._fdb_remove_partition_cache()
+
+        response = self.dynamoFDB.put_item({
+            '_pk': config.STR_META_INFO_PARTITION,
+            '_sk': partition,
+            '_partition_name': partition,
+            '_pk_group': pk_group,
+            '_pk_field': pk_field,
+            '_sk_group': sk_group,
+            '_sk_field': sk_field,
+            '_post_sk_fields': post_sk_fields,
+            '_use_random_sk_postfix': use_random_sk_postfix,
+            '_created_at': int(time.time()),
+        })
+        result_item = response.get('Attributes', {})
+        return result_item
+
+    def fdb_append_index(self, partition, index_name, pk_group, pk_field, sk_group, sk_field):
+        """
+        DB partition 에 인덱스를 추가합니다.
+        TODO 일단 기본 기능 먼저 구현하고, 필요시에 인덱스 부분을 개발하도록 한다.
+        :param partition:
+        :param index_name:
+        :param pk_group:
+        :param pk_field:
+        :param sk_group:
+        :param sk_field:
+        :return:
+        """
+
+    def _fdb_remove_partition_cache(self):
+        """
+        캐시 삭제, 새로운 파티션 추가시 필요!
+        :return:
+        """
+        if 'partitions' in self.cache:
+            self.cache.pop('partitions')
+
+    def fdb_get_partitions(self, use_cache=False):
+        """
+        파티션 목록을 가져옵니다.
+        :return:
+        """
+        if use_cache and 'partitions' in self.cache:
+            return self.cache['partitions']
+        response = self.dynamoFDB.query_items('_pk', config.STR_META_INFO_PARTITION, 'gte', '_sk', ' ',
+                                              consistent_read=True)
+        items = response.get('Items', [])
+        self.cache['partitions'] = items
+        return items
+
+    def fdb_delete_partition(self, partition):
+        """
+        파티션을 삭제, 내부 데이터는 별도로 삭제해야합니다.
+        :param partition:
+        :return:
+        """
+        self._fdb_remove_partition_cache()
+        response = self.dynamoFDB.delete_item(config.STR_META_INFO_PARTITION, partition)
+        return response
+
+    def fdb_has_pk_sk_by_item(self, partition, item):
+        """
+        item 의 pk-sk 조합이 이미 DB에 존재하는지 확인, create 확인용으로 주로 사용
+        :param partition:
+        :param item:
+        :return:
+        """
+        item = self._fdb_process_item_with_partition(item, partition)
+        item_id = item.get('_id', None)
+        if item_id:
+            items = self.fdb_get_items([item_id])
+            for it in items:
+                if it:
+                    return True
+        return False
+
+    def _fdb_process_item_with_partition(self, item, partition):
+        """
+        item 을 DB에 넣기 전에 partition 에서 정하는 형태와 동일하게 매핑합니다.
+        :param item:
+        :param partition:
+        :return:
+        """
+        partitions = self.fdb_get_partitions(use_cache=True)
+        partitions_by_name = {
+            p.get('_partition_name', None): p for p in partitions
+        }
+        partition_obj = partitions_by_name.get(partition, None)
+        if not partition_obj:
+            raise Exception('No such partition')
+
+        pk_group = partition_obj['_pk_group']
+        pk_field = partition_obj['_pk_field']
+        sk_group = partition_obj['_sk_group']
+        sk_field = partition_obj['_sk_field']
+        post_sk_fields = partition_obj['_post_sk_fields']
+        use_random_sk_postfix = partition_obj['_use_random_sk_postfix']
+
+        item['_created_at'] = int(time.time())
+        item = decode_dict(item)
+
+        if pk_field not in item:
+            raise Exception(f'pk_field:[{pk_field}] should in item')
+        if sk_field and sk_field not in item:
+            raise Exception(f'sk_field:[{sk_field}] should in item')
+
+        pk_value = item[pk_field]
+        if sk_field:
+            sk_value = item[sk_field]
+        else:
+            sk_value = ''
+
+        sk_digit_fit = int(config.SK_DIGIT_FIT)
+        # 자리수를 맞춥니다. 숫자는 오른쪽부터 채우고 문자는 왼쪽부터 채웁니다.
+        # sk_digit_fit: 1234 인데 sk_digit_fit=8 이면, '____1234' 처럼 sorting 을 위해 자리를 채웁니다.
+        #         소숫점이 들어오면 '____1234.43' 이런식으로 . 이하는 무시합니다.
+        #         0이면 그대로 둡니다.
+        try:
+            sk_value = Decimal(sk_value) * pow(10, config.SK_FLOAT_FIT)
+            sk_value = int(sk_value)
+            sk_value = util.convert_int_to_custom_base64(sk_value)
+            sk_value = sk_value.rjust(sk_digit_fit)
+        except:
+            sk_value = str(sk_value)
+            sk_value = sk_value.ljust(sk_digit_fit)
+
+        if sk_field is None:
+            # None 이 그대로 삽입되는걸 방지
+            sk_field = ''
+        pk = f'{pk_group}#{pk_field}#{pk_value}'
+        sk = f'{sk_group}#{partition}#{sk_field}#{sk_value}'
+
+        if post_sk_fields:
+            for post_sk_field in post_sk_fields:
+                post_sk_value = item.get(post_sk_field, '')
+                sk += f'#{post_sk_field}#{post_sk_value}'
+
+        if use_random_sk_postfix:
+            sk += '#' + str(uuid.uuid4()).replace('-', '')
+
+        item['_pk'] = pk
+        item['_sk'] = sk
+        item['_partition'] = partition
+        item['_id'] = self._fdb_pk_sk_to_item_id(pk, sk)
+        return item
+
+    def fdb_put_items(self, partition, items):
+        """
+        배치 생성.
+        item 삽입 전에 파티션을 불러와서 매칭을 잘 확인해야합니다.
+        :param partition:
+        :param items:
+        :return:
+        """
+        items = [self._fdb_process_item_with_partition(item, partition) for item in items]
+        _ids = [item['_id'] for item in items]
+        response = self.dynamoFDB.batch_put(items)
+        return _ids
+
+    def fdb_put_item(self, partition, item):
+        """
+        생성
+        :param partition:
+        :param item:
+        :return:
+        """
+        item = self._fdb_process_item_with_partition(item, partition)
+        response = self.dynamoFDB.put_item(item)
+        _id = item.get('_id', None)
+        return _id
+
+    def fdb_get_items(self, item_ids, consistent_read=False):
+        """
+        item_ids 를 배치로 쿼리하여 가져옵니다.
+        :param item_ids:
+        :param consistent_read:
+        :return:
+        """
+        response = self.dynamoFDB.get_items(
+            [self._fdb_item_id_to_pk_sk_pair(item_id) for item_id in item_ids],
+            consistent_read=consistent_read
+        )
+        return response
+
+    def _convert_number_to_custom64(self):
+        pass
+
+    def fdb_query_items(self, pk_group, pk_field, pk_value, sort_condition=None,
+                        sk_group='', partition=None, sk_field='', sk_value='', sk_second_value=None, filters=None,
+                        start_key=None, limit=100, reverse=False, consistent_read=False, index_name=None):
+        """
+        DB 를 쿼리하고, 이는 NoSQL 최적화 되어 있습니다.
+        단계별로 pk 관련 키들은 쿼리에 필수이며,
+        sk 관련 키들은 단계별로 아이템 쿼리를 진행할 수 있도록 도와줍니다.
+        partition 을 넘겨야, sk_value 를 입력할 수 있기 때문에,
+        sk_field 를 파티션을 통해 구할 수 있습니다.
+        TODO: 인덱스 기능이 추가될 경우, 마지막 파라메터 index 를 받아 처리해야합니다.
+        :param pk_group:
+        :param pk_field:
+        :param pk_value:
+        :param sort_condition:
+        :param sk_group:
+        :param partition:
+        :param sk_field:
+        :param sk_value:
+        :param sk_second_value:
+        :param filters:
+        :param start_key:
+        :param limit:
+        :param reverse:
+        :param consistent_read:
+        :param index_name: 없을시 기본 파라메터로 쿼리
+        :return:
+        """
+        if partition is not None:
+            partitions = self.fdb_get_partitions(use_cache=True)
+            partitions_by_name = {
+                p.get('_partition_name', None): p for p in partitions
+            }
+            partition_obj = partitions_by_name.get(partition, None)
+            if not partition_obj:
+                raise Exception('No such partition')
+
+            p_pk_field = partition_obj['_pk_field']
+
+            if p_pk_field != pk_field:
+                raise Exception(f'pk_field must be a [{p_pk_field}]')
+
+        sk_digit_fit = int(config.SK_DIGIT_FIT)
+        # 자리수를 맞춥니다. 숫자는 오른쪽부터 채우고 문자는 왼쪽부터 채웁니다.
+        if sk_value:
+            try:
+                sk_value = Decimal(sk_value) * pow(10, config.SK_FLOAT_FIT)
+                sk_value = int(sk_value)
+                sk_value = util.convert_int_to_custom_base64(sk_value)
+                sk_value = sk_value.rjust(sk_digit_fit)
+            except:
+                sk_value = str(sk_value)
+                sk_value = sk_value.ljust(sk_digit_fit)
+        else:
+            sk_value = ''
+
+        pk = f'{pk_group}#{pk_field}#{pk_value}'
+
+        if not sk_group:
+            # sort key 의 맨 처음 부분이기 때문에 문자 하나는 있어야 함, 공백 문자 삽입
+            sk_group = ' '
+
+        sk = f'{sk_group}'
+        if partition:
+            sk += f'#{partition}'
+        if sk_field:
+            sk += f'#{sk_field}'
+
+        sk_high = ''
+        if sk_second_value:
+            sk_high = sk + f'#{sk_second_value}'
+        if sk_value:
+            sk += f'#{sk_value}'
+
+        response = self.dynamoFDB.query_items('_pk', pk,
+                                              sort_condition, '_sk', sk,
+                                              sort_key_second_value=sk_high, filters=filters,
+                                              start_key=start_key, reverse=reverse, limit=limit,
+                                              consistent_read=consistent_read, index_name=index_name)
+        end_key = response.get('LastEvaluatedKey', None)
+        items = response.get('Items', [])
+        return items, end_key
+
+    def fdb_delete_items(self, item_ids):
+        """
+        배치 삭제, 여러개를 한번에 삭제
+        :param item_ids:
+        :return:
+        """
+        self.dynamoFDB.batch_delete([self._fdb_item_id_to_pk_sk_pair(item_id) for item_id in item_ids])
+
+
+if __name__ == '__main__':
+    pass

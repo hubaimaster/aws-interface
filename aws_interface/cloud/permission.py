@@ -188,6 +188,23 @@ class Permission:
             delete_trigger = 'run:cloud.trigger.delete_trigger'
             get_triggers = 'run:cloud.trigger.get_triggers'
 
+        class FastDatabase:
+            create_partition = 'run:cloud.fast_database.create_partition'
+            delete_partition = 'run:cloud.fast_database.delete_partition'
+
+            create_item = 'run:cloud.fast_database.create_item'
+            create_items = 'run:cloud.fast_database.create_items'
+
+            get_item = 'run:cloud.fast_database.get_item'
+            get_items = 'run:cloud.fast_database.get_items'
+            query_items = 'run:cloud.fast_database.query_items'
+
+            update_item = 'run:cloud.fast_database.update_item'
+            update_items = 'run:cloud.fast_database.update_items'
+
+            delete_item = 'run:cloud.fast_database.delete_item'
+            delete_items = 'run:cloud.fast_database.delete_items'
+
     default_user_permissions = [
         Run.Auth.get_me,
         Run.Auth.get_session,
@@ -227,6 +244,15 @@ class Permission:
         Run.Storage.delete_b64,
         Run.Storage.download_b64,
         Run.Storage.upload_b64,
+
+        Run.FastDatabase.get_item,
+        Run.FastDatabase.update_item,
+        Run.FastDatabase.update_items,
+        Run.FastDatabase.create_item,
+        Run.FastDatabase.create_items,
+        Run.FastDatabase.delete_item,
+        Run.FastDatabase.delete_items,
+        Run.FastDatabase.query_items
     ]
 
     unknown_user_permissions = [
@@ -265,6 +291,15 @@ class Permission:
         Run.Storage.delete_b64,
         Run.Storage.download_b64,
         Run.Storage.upload_b64,
+
+        Run.FastDatabase.get_item,
+        Run.FastDatabase.update_item,
+        Run.FastDatabase.update_items,
+        Run.FastDatabase.create_item,
+        Run.FastDatabase.create_items,
+        Run.FastDatabase.delete_item,
+        Run.FastDatabase.delete_items,
+        Run.FastDatabase.query_items
     ]
 
     def __init__(self, data, resource):

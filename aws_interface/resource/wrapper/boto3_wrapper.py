@@ -3,13 +3,15 @@ import time
 import tempfile
 import botocore
 import botocore.client
-from boto3.dynamodb.conditions import Key, GreaterThanEquals, LessThanEquals
-from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
+from boto3.dynamodb.conditions import Key, Attr
 
 from sys import maxsize
 from decimal import Decimal
 import cloud.shortuuid as shortuuid
 from resource.config import MAX_N_GRAM
+from resource.util import divide_chunks
+from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
+from concurrent.futures import ThreadPoolExecutor
 
 type_deserializer = TypeDeserializer()
 type_serializer = TypeSerializer()
@@ -339,6 +341,9 @@ class DynamoDB:
     def init_table(self, table_name):
         self.create_table(table_name)
 
+    def init_fdb_table(self, table_name):
+        self.create_fdb_table(table_name)
+
     def create_table(self, table_name, sort_key='creation_date', sort_key_type='N'):
         try:
             response = self.client.create_table(
@@ -419,6 +424,46 @@ class DynamoDB:
 
             return True
 
+    def create_fdb_table(self, table_name):
+        """
+        fdb 용 테이블 생성문입니다.
+        :param table_name:
+        :return:
+        """
+        try:
+            response = self.client.create_table(
+                AttributeDefinitions=[
+                    {
+                        'AttributeName': '_pk',
+                        'AttributeType': 'S'
+                    }, {
+                        'AttributeName': '_sk',
+                        'AttributeType': 'S'
+                    }
+                ],
+                TableName=table_name,
+                KeySchema=[
+                    {
+                        'AttributeName': '_pk',
+                        'KeyType': 'HASH'
+                    }, {
+                        'AttributeName': 'sk',
+                        'KeyType': 'SORT'
+                    },
+                ],
+                BillingMode='PAY_PER_REQUEST',
+                StreamSpecification={
+                    'StreamEnabled': True,
+                    'StreamViewType': 'NEW_AND_OLD_IMAGES'
+                },
+            )
+            print('CREATING FDB TABLE...')
+            self.client.get_waiter('table_exists').wait(TableName=table_name)
+            return response
+        except Exception as ex:
+            print(ex)
+            return True
+
     def update_table(self, table_name, index):
         attr_updates = []
         index_updates = []
@@ -480,6 +525,16 @@ class DynamoDB:
                 return e
 
     def delete_table(self, name):
+        try:
+            response = self.client.delete_table(
+                TableName=name
+            )
+            return response
+        except BaseException as ex:
+            print(ex)
+            return None
+
+    def delete_fdb_table(self, name):
         try:
             response = self.client.delete_table(
                 TableName=name
@@ -622,7 +677,6 @@ class DynamoDB:
             for key, value in item.items():
                 value = type_deserializer.deserialize(value)
                 item[key] = value
-
         return {'Items': items}
 
     def get_items_in_partition(self, table_name, partition, start_key=None, limit=100, reverse=False):
@@ -1001,6 +1055,288 @@ class DynamoDB:
         return min_creation_date
 
 
+class DynamoFDB:
+    def __init__(self, boto3_session, app_id):
+        # TODO 작동안될수도 있으니 조심
+        dynamo_config = botocore.client.Config(max_pool_connections=100)
+        self.client = boto3_session.client('dynamodb', config=dynamo_config)
+        self.resource = boto3_session.resource('dynamodb', config=dynamo_config)
+        self.table_cache = {}
+        self.app_id = app_id
+        self.table_name = f'FDB_{app_id}'
+
+    def init_fdb_table(self):
+        self.create_fdb_table(self.table_name)
+
+    def create_fdb_table(self, table_name):
+        """
+        fdb 용 테이블 생성문입니다.
+        :param table_name:
+        :return:
+        """
+        try:
+            response = self.client.create_table(
+                AttributeDefinitions=[
+                    {
+                        'AttributeName': '_pk',
+                        'AttributeType': 'S'
+                    }, {
+                        'AttributeName': '_sk',
+                        'AttributeType': 'S'
+                    }
+                ],
+                TableName=table_name,
+                KeySchema=[
+                    {
+                        'AttributeName': '_pk',
+                        'KeyType': 'HASH'
+                    }, {
+                        'AttributeName': '_sk',
+                        'KeyType': 'RANGE'
+                    },
+                ],
+                BillingMode='PAY_PER_REQUEST',
+                StreamSpecification={
+                    'StreamEnabled': True,
+                    'StreamViewType': 'NEW_AND_OLD_IMAGES'
+                },
+            )
+            print('CREATING FDB TABLE...')
+            self.client.get_waiter('table_exists').wait(TableName=table_name)
+            return response
+        except Exception as ex:
+            print(ex)
+            return True
+
+    def delete_fdb_table(self):
+        try:
+            response = self.client.delete_table(
+                TableName=self.table_name
+            )
+            return response
+        except BaseException as ex:
+            print(ex)
+            return None
+
+    def delete_item(self, pk, sk):
+        key = Key('_pk').eq(pk) & Key('_sk').eq(sk)
+        response = self.get_table(self.table_name).delete_item(
+            Key=key
+        )
+        return response
+
+    def get_table(self, table_name):
+        # 캐싱된 테이블 객체 반환
+        if table_name in self.table_cache:
+            table = self.table_cache[table_name]
+        else:
+            table = self.resource.Table(table_name)
+            self.table_cache[table_name] = table
+        return table
+
+    def get_item(self, pk, sk):
+        table = self.get_table(self.table_name)
+        item = table.get_item(Key=Key('_pk').eq(pk) & Key('_sk').eq(sk))
+        return item
+
+    def put_item(self, item):
+        table = self.get_table(self.table_name)
+        # 디비에 넣기전에 인덱스 타입을 고려하여 데이터를 변경한다.
+        response = table.put_item(
+            TableName=self.table_name,
+            Item=item,
+        )
+        return response
+
+    def batch_put(self, items):
+        table = self.get_table(self.table_name)
+        with table.batch_writer() as batch:
+            for item in items:
+                batch.put_item(Item=item)
+        return True
+
+    def batch_delete(self, pk_sk_pairs):
+        """
+        :param pk_sk_pairs: [
+            {
+                'pk': '...',
+                'sk': '...'
+            }, ...
+        ]
+        :return:
+        """
+        table = self.get_table(self.table_name)
+        with table.batch_writer() as batch:
+            for pk_sk_pair in pk_sk_pairs:
+                key = {
+                    '_pk': pk_sk_pair['_pk'],
+                    '_sk': pk_sk_pair['_sk']
+                }
+                batch.delete_item(Key=key)
+        return True
+
+    def _get_items(self, pk_sk_pairs, consistent_read=False, retry_attempt=0):
+        keys = list([{
+            '_pk': {'S': pk_sk_pair['_pk']},
+            '_sk': {'S': pk_sk_pair['_sk']}
+        } for pk_sk_pair in pk_sk_pairs if pk_sk_pair])
+        if keys:
+            response = self.client.batch_get_item(
+                RequestItems={
+                    self.table_name: {
+                        'Keys': keys,
+                        'ConsistentRead': consistent_read
+                    }
+                }
+            )
+
+            items_succeed = response['Responses'][self.table_name]
+
+            # response 제대로 안왔을때 재시도 로직
+            unprocessed_keys = response.get('UnprocessedKeys', {}).get(self.table_name, {}).get('Keys', [])
+            if unprocessed_keys:
+                # Backoff al.
+                time.sleep(pow(retry_attempt + 1, 2))
+                items_to_extend = self._get_items(unprocessed_keys, consistent_read, retry_attempt + 1)
+                items_succeed.extend(items_to_extend)
+        else:  # Keys 가 없을시 성공 내역 없음
+            items_succeed = []
+
+        for item in items_succeed:
+            for key, value in item.items():
+                value = type_deserializer.deserialize(value)
+                item[key] = value
+
+        return items_succeed
+
+    def get_items(self, pk_sk_pairs, consistent_read=False):
+        chunks = list(divide_chunks(pk_sk_pairs, 100))
+        items_succeed = []
+        futures = []
+        # 배치 + 멀티스레드로 가져옵니다.
+        with ThreadPoolExecutor(max_workers=len(chunks)) as worker:
+            for chunk in chunks:
+                futures.append(worker.submit(self._get_items, chunk, consistent_read))
+        for future in futures:
+            items_succeed.extend(future.result())
+
+        # 요청한 순서대로 정렬합니다.
+        items_by_key = {(item.get('_pk', ''), item.get('_sk', '')): item for item in items_succeed}
+        sorted_items = []
+        for pk_sk in pk_sk_pairs:
+            if pk_sk:
+                item = items_by_key.get((pk_sk['_pk'], pk_sk['_sk']), None)
+                sorted_items.append(item)
+            else:
+                sorted_items.append(None)
+        return sorted_items
+
+    def query_items(self, partition_key_name, partition_key_value,
+                    sort_condition, sort_key_name, sort_key_value, sort_key_second_value=None, filters=None,
+                    start_key=None, reverse=False, limit=100, consistent_read=False, index_name=None):
+        """
+        AWS BOTO3 전용으로 쿼리 메서드 랩핑
+        :param partition_key_name: 파티션키 속성의 이름
+        :param partition_key_value: 파티션키 속성의 값
+        :param sort_condition: 소트키 조건
+        :param sort_key_name:
+        :param sort_key_value:
+        :param sort_key_second_value:
+        :param filters: [
+            {
+                'field': '<FIELD>',
+                'type': 'string' | 'number' | 'binary' | 'bool',
+                'value': '<VALUE>',
+                'cond': 'eq' | 'neq' | 'lte' | 'lt' | 'gte' | 'gt' | 'btw' | 'stw' |
+                        'is_in' | 'contains' | 'exist' | 'not_exist'
+            }
+        ]
+        :param start_key:
+        :param reverse:
+        :param limit:
+        :param consistent_read:
+        :param index_name:
+        :return:
+        """
+        table = self.get_table(self.table_name)
+        key_expression = Key(partition_key_name).eq(partition_key_value)
+        if sort_condition == 'eq':
+            key_expression &= Key(sort_key_name).eq(sort_key_value)
+        elif sort_condition == 'lte':
+            key_expression &= Key(sort_key_name).lte(sort_key_value)
+        elif sort_condition == 'lt':
+            key_expression &= Key(sort_key_name).lt(sort_key_value)
+        elif sort_condition == 'gte':
+            key_expression &= Key(sort_key_name).gte(sort_key_value)
+        elif sort_condition == 'gt':
+            key_expression &= Key(sort_key_name).gt(sort_key_value)
+        elif sort_condition == 'btw':
+            key_expression &= Key(sort_key_name).between(sort_key_value, sort_key_second_value)
+        elif sort_condition == 'stw':
+            key_expression &= Key(sort_key_name).begins_with(sort_key_value)
+        elif sort_condition is None:
+            pass
+        else:
+            raise Exception('sort_type must be one of [eq, lte, lt, gte, gt, btw, stw]')
+
+        filter_expression = None
+        if filters:
+            for ft in filters:
+                field = ft['field']
+                value = ft.get('value', None)
+                high_value = ft.get('high_value', None)
+                cond = ft['cond']
+
+                attr_to_add = Attr(field)
+                if cond == 'eq':
+                    attr_to_add = attr_to_add.eq(value)
+                elif cond == 'neq':
+                    attr_to_add = attr_to_add.ne(value)
+                elif cond == 'lte':
+                    attr_to_add = attr_to_add.lte(value)
+                elif cond == 'lt':
+                    attr_to_add = attr_to_add.lt(value)
+                elif cond == 'gte':
+                    attr_to_add = attr_to_add.gte(value)
+                elif cond == 'gt':
+                    attr_to_add = attr_to_add.gt(value)
+                elif cond == 'btw':
+                    attr_to_add = attr_to_add.between(value, high_value)
+                elif cond == 'stw':
+                    attr_to_add = attr_to_add.begins_with(value)
+                elif cond == 'is_in':
+                    attr_to_add = attr_to_add.is_in(value)
+                elif cond == 'contains':
+                    attr_to_add = attr_to_add.contains(value)
+                elif cond == 'exist':
+                    attr_to_add = attr_to_add.exists()
+                elif cond == 'not_exist':
+                    attr_to_add = attr_to_add.not_exists()
+                else:
+                    raise Exception('<cond> parameter must be one of ['
+                                    'eq, neq, lte, lt, gte, gt, btw, stw, is_in, contains, exist, not_exist'
+                                    ']')
+                if filter_expression:
+                    filter_expression &= attr_to_add
+                else:
+                    filter_expression = attr_to_add
+        args = {
+            'Limit': limit,
+            'ConsistentRead': consistent_read,
+            'KeyConditionExpression': key_expression,
+            'ScanIndexForward': not reverse,
+        }
+        if index_name:
+            args['IndexName'] = index_name
+        if filter_expression:
+            args['FilterExpression'] = filter_expression
+        if start_key:
+            args['ExclusiveStartKey'] = start_key
+
+        response = table.query(**args)
+        return response
+
+
 class Lambda:
     def __init__(self, boto3_session):
         self.client = boto3_session.client('lambda')
@@ -1357,3 +1693,7 @@ class SNS:
 
     def send_message(self, phone_number, message):
         return self.client.publish(PhoneNumber=phone_number, Message=message)
+
+
+if __name__ == '__main__':
+    pass

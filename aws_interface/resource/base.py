@@ -521,3 +521,127 @@ class Resource(metaclass=ABCMeta):
         :return:
         """
         raise NotImplementedError
+
+    # 새로 추가된 FastDatabase, Fully NoSQL
+    def fdb_create_partition(self, partition, pk_group, pk_field, sk_group, sk_field=None,
+                             post_sk_fields=None, use_random_sk_postfix=True):
+        """
+        Fast DB 내부에 파티션을 생성합니다. 사실 생성의 개념보다는 파티션을 선언합니다.
+        파티션 삭제시에, 내부 데이터는 삭제 되지 않기 때문에 유의해야합니다.
+        :param partition: order 등 파티션 이름
+        :param pk_group: app, system 등 파티션 필드 앞에 구분자를 붙일 때 사용합니다. 한번 지정되면 바꿀 수 없습니다.
+        같은 user_id 를 가진 엔티티여도 시스템에서 사용하느냐, 앱에서 사용하느냐에 따라 구분할 수 있습니다.
+        일례로 로그 데이터 등은 system 에 보관하는것이 안전하고, 속도 측면에서도 유리합니다.
+        :param pk_field: user_id 등을 pk_field 로 지정하는것이 유리합니다. 병렬 처리와 관련 있으며, 디버깅을 위해
+        실제 DB의 pk 필드 (인덱스) 에는 <pk_group>#<pk_field>#<pk.value> 의 값이 들어갑니다.
+        :param sk_group: sort key 앞에 붙는 그룹 구분입니다. sk = <sk_group>#<partition>#<sk_field>#<sk.value> 가 들어갑니다.
+        이 값을 이용하여 같이 조인되어야 하는 값들을 효과적으로 조인할 수 있습니다. 예를 들면
+        그룹 order 으로 묶이는 경우, order 으로 order_plan 이나 order 등 같이 묶여서 반환시 성능이 극대화 시킬 수 있습니다.
+        :param sk_field: created_at 등.. 날짜로 구성하면 날짜별 정렬이 가능합니다.
+        :param post_sk_fields: 소트키 뒤에 붙는 field 입니다. 임의로 데이터 중복 생성 방지 기능을 만드는데 유용합니다.
+        :param use_random_sk_postfix: pk 와 sk 가 같으면 중복 생성이 불능하기 때문에, 랜덤 문자열을 붙여 다른 아이템으로
+        생성할 수 있습니다.
+        :return:
+        """
+        raise NotImplementedError
+
+    def fdb_append_index(self, partition, index_name, pk_group, pk_field, sk_group, sk_field):
+        """
+        DB partition 에 인덱스를 추가합니다.
+        TODO 일단 기본 기능 먼저 구현하고, 필요시에 인덱스 부분을 개발하도록 한다.
+        :param partition:
+        :param index_name:
+        :param pk_group:
+        :param pk_field:
+        :param sk_group:
+        :param sk_field:
+        :return:
+        """
+
+    def fdb_get_partitions(self, use_cache=False):
+        """
+        파티션 목록을 가져옵니다.
+        :return:
+        """
+        raise NotImplementedError
+
+    def fdb_delete_partition(self, partition):
+        """
+        파티션을 삭제, 내부 데이터는 별도로 삭제해야합니다.
+        :param partition:
+        :return:
+        """
+        raise NotImplementedError
+
+    def fdb_put_items(self, partition, items):
+        """
+        배치 생성, 단건 생성도 이 API 를 통해 진행합니다.
+        :param partition:
+        :param items:
+        :return:
+        """
+        raise NotImplementedError
+
+    def fdb_put_item(self, partition, item):
+        """
+        생성
+        :param partition:
+        :param item:
+        :return:
+        """
+        raise NotImplementedError
+
+    def fdb_get_items(self, item_ids, consistent_read=False):
+        """
+        item_ids 를 배치로 쿼리하여 가져옵니다.
+        :param item_ids:
+        :param consistent_read:
+        :return:
+        """
+        raise NotImplementedError
+
+    def fdb_query_items(self, pk_group, pk_field, pk_value, sort_condition=None,
+                        sk_group='', partition='', sk_field='', sk_value=' ', sk_second_value=None, filters=None,
+                        start_key=None, limit=100, reverse=False, consistent_read=False, index_name=None):
+        """
+        DB 를 쿼리하고, 이는 NoSQL 최적화 되어 있습니다.
+        단계별로 pk 관련 키들은 쿼리에 필수이며,
+        sk 관련 키들은 단계별로 아이템 쿼리를 진행할 수 있도록 도와줍니다.
+        partition 을 넘겨야, sk_value 를 입력할 수 있기 때문에,
+        sk_field 를 파티션을 통해 구할 수 있습니다.
+        TODO: 인덱스 기능이 추가될 경우, 마지막 파라메터 index 를 받아 처리해야합니다.
+        :param pk_group:
+        :param pk_field:
+        :param pk_value:
+        :param sort_condition:
+        :param sk_group:
+        :param partition:
+        :param sk_field:
+        :param sk_value:
+        :param sk_second_value:
+        :param filters:
+        :param start_key:
+        :param limit:
+        :param reverse:
+        :param consistent_read:
+        :param index_name: 없을시 기본 파라메터로 쿼리
+        :return:
+        """
+        raise NotImplementedError
+
+    def fdb_delete_items(self, item_ids):
+        """
+        배치 삭제, 여러개를 한번에 삭제하고, 단건 삭제도 이 API 를 통해 진행합니다.
+        :param item_ids:
+        :return:
+        """
+        raise NotImplementedError
+
+    def fdb_has_pk_sk_by_item(self, partition, item):
+        """
+        item 의 pk-sk 조합이 이미 DB에 존재하는지 확인, create 확인용으로 주로 사용
+        :param partition:
+        :param item:
+        :return:
+        """
+        raise NotImplementedError
