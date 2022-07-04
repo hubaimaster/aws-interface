@@ -8,6 +8,7 @@ from .log import LogAPI
 from .schedule import ScheduleAPI
 from .notification import NotificationAPI
 from .trigger import TriggerAPI
+from .fast_database import FastDatabaseAPI
 
 api_list = [
     BillAPI,
@@ -19,4 +20,5 @@ api_list = [
     ScheduleAPI,
     NotificationAPI,
     TriggerAPI,
+    FastDatabaseAPI
 ]

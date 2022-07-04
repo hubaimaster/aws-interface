@@ -8,7 +8,7 @@ import traceback
 from cloud.response import AWSResponse, AWSImageResponse
 import cloud.libs.simplejson as json
 import cloud.logic.run_function as run_function
-import cloud.notification.send_slack_message_as_system_notification as slack
+# import cloud.notification.send_slack_message_as_system_notification as slack
 
 # Localhost server, Internal gate to make logic call fast
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -203,6 +203,28 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.trigger.create_trigger',
     'cloud.trigger.delete_trigger',
     'cloud.trigger.get_triggers',
+
+    # fast database
+    'cloud.fast_database.create_item',
+    'cloud.fast_database.create_items',
+
+    'cloud.fast_database.create_partition',
+    'cloud.fast_database.delete_partition',
+    'cloud.fast_database.get_partitions',
+
+    'cloud.fast_database.delete_item',
+    'cloud.fast_database.delete_items',
+
+    'cloud.fast_database.get_item',
+    'cloud.fast_database.get_items',
+
+    'cloud.fast_database.get_policy_code',
+    'cloud.fast_database.put_policy',
+
+    'cloud.fast_database.query_items',
+
+    'cloud.fast_database.update_item',
+    'cloud.fast_database.update_items',
 }
 
 
@@ -266,7 +288,7 @@ def abstracted_gateway(params, query_params, resource, client_ip):
         }
         if params and params.get('show_traceback', False):
             body['traceback'] = '{}'.format(error_traceback)
-        slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
+        # slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
         return body
     except errorlist.CloudLogicError as ex:
         error_traceback = traceback.format_exc()
@@ -280,7 +302,7 @@ def abstracted_gateway(params, query_params, resource, client_ip):
         }
         if params and params.get('show_traceback', False):
             body['traceback'] = '{}'.format(error_traceback)
-        slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
+        return body
     except Exception as ex:
         error_traceback = traceback.format_exc()
         print('Exception: [{}]'.format(ex))
@@ -290,7 +312,7 @@ def abstracted_gateway(params, query_params, resource, client_ip):
         }
         if params and params.get('show_traceback', False):
             body['traceback'] = '{}'.format(error_traceback)
-        slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
+        # slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
         return body
 
 

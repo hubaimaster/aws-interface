@@ -1,0 +1,1057 @@
+{% extends 'dashboard/app/base.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="main-content">
+        <!-- Top navbar -->
+        {% include 'dashboard/app/top-navbar.html' %}
+        <!-- Header -->
+        <input id="view-tag" value="database" hidden>
+        <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+            <div class="container-fluid">
+                <div class="header-body">
+                    <!-- Card stats -->
+                    <div class="alert alert-primary" role="alert">
+                        <strong>AWS DynamoDB, AWS Lambda, AWS APIGateway</strong> {{ _("are used") }}
+                    </div>
+                    <div class="alert alert-default" role="alert">
+                        <strong>Auth </strong> {{ _("dependency") }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Page content -->
+        <div class="container-fluid mt--8">
+            {% if partitions|length > 0 %}
+                <div class="row mt-4">
+                    <div class="col-xl-12 mb-5 mb-xl-0">
+                        <div class="card shadow">
+                            <div class="card-header border-1">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <h4 class="mb-0">
+
+                                            {{ _("Policy") }} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="{{ _("If the value of the has_permission function is True, each Create, Read, Update, and Delete operations are allowed") }}"></i>
+
+                                            <select id="policy-partition-to-apply" class="form-control-alternative" onchange="set_policy_mode(policy_mode);">
+                                                {% for partition in partitions %}
+                                                    <option value="{{ partition.name }}">{{ partition.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            {{ _("Mode") }}:
+                                            <select id="policy-mode" class="form-control-alternative" onchange="set_policy_mode(this.value);">
+                                                <option value="create"><span>Create</span></option>
+                                                <option value="read"><span>Read</span></option>
+                                                <option value="update"><span>Update</span></option>
+                                                <option value="delete"><span>Delete</span></option>
+                                            </select>
+
+                                        </h4>
+                                    </div>
+                                    <div class="text-right">
+                                        <button class="btn btn-sm btn-primary" onclick="save_policy();">Save</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div>
+                                <div id="code-editor" style="height: 250px;">
+                                    <!-- CODE EDITOR -->
+                                    <style type="text/css" media="screen">
+                                        #editor {
+                                            margin: 0;
+                                            margin-top: 69px;
+                                            position: absolute;
+                                            top: 0;
+                                            bottom: 0;
+                                            left: 0;
+                                            right: 0;
+                                        }
+                                    </style>
+                                    <pre id="editor"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+
+            <div class="row mt-4">
+
+                <div class="col-xl-12 mb-5 mb-xl-0">
+                    <div class="card shadow">
+                        <div class="card-body" style="padding-top: 0px; padding-left: 15px; padding-right: 15px; padding-bottom: 0px;">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding: 0;">
+                                    <!-- Projects table -->
+                                    <table class="table table-sm table-hover table-borderless">
+                                        <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col">
+                                                <button id="create-partition-button" scope="row" data-toggle="modal" data-target="#modal-add-partition" class="btn btn-sm btn-default">
+                                                    Partition +
+                                                </button>
+                                                <div style="text-align: right; float: right;">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-default btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <i class="fas fa-ellipsis-v"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                                            <a class="dropdown-item" onclick="delete_checked_partitions();"><i class="fas fa-trash"></i><span>{{ _("Delete selected") }}</span></a>
+                                                            <div class="dropdown-divider"></div>
+
+                                                            <a class="dropdown-item" aria-disabled="true">
+                                                                <div class="custom-control custom-checkbox mt--1">
+                                                                    <input class="custom-control-input" type="checkbox" name="checkbox-partition" id="partition-check-all">
+                                                                    <label class="custom-control-label" for="partition-check-all" style="width:100%;">{{ _("Select all") }}</label>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody style="display: block; min-height: 500px; max-height: 500px; overflow-y: auto;">
+                                        {% for partition in partitions %}
+                                            <tr>
+                                                <th id="{{ partition.name }}" name="partition" scope="row" onclick="set_partition('{{ partition.name }}');">
+                                                    <a href="#!" onmouseover="style='text-decoration:underline'" onmouseout="style='text-decoration:none'">{{ partition.name }}</a>
+                                                    <div style="text-align: right; float: right;">
+                                                        <div class="custom-control custom-checkbox mt--3">
+                                                            <input class="custom-control-input" type="checkbox" name="checkbox-partition" id="partition-{{ partition.name }}" value="{{ partition.name }}">
+                                                            <label class="custom-control-label" for="partition-{{ partition.name }}"></label>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="modal fade" id="modal-add-partition" tabindex="-1" role="dialog" aria-labelledby="modal-add-partition" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Create partition") }}</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="pl-lg-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="partition-name">{{ _("*Name") }}</label>
+                                                                <input id="partition-name" type="text" class="form-control form-control-alternative" placeholder="{{ _("Partition name") }}">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="pk_group">{{ _("*pk_group") }}</label>
+                                                                <input id="pk_group" type="text" class="form-control form-control-alternative" placeholder="{{ _("pk_group") }}">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="pk_field">{{ _("*pk_field") }}</label>
+                                                                <input id="pk_field" type="text" class="form-control form-control-alternative" placeholder="{{ _("pk_field") }}">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="sk_group">{{ _("*sk_group") }}</label>
+                                                                <input id="sk_group" type="text" class="form-control form-control-alternative" placeholder="{{ _("sk_group") }}">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="sk_field">{{ _("sk_field") }}</label>
+                                                                <input id="sk_field" type="text" class="form-control form-control-alternative" placeholder="{{ _("sk_field") }}">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="post_sk_fields">{{ _("post_sk_fields (split by comma ',')") }}</label>
+                                                                <textarea id="post_sk_fields" class="form-control form-control-alternative" placeholder="{{ _("post_sk_fields") }}"></textarea>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label" for="use_random_sk_postfix">{{ _("*use_random_sk_postfix") }}</label>
+                                                                <input id="use_random_sk_postfix" type="checkbox" class="form-control form-control-alternative" placeholder="{{ _("use_random_sk_postfix") }}">
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <p>
+                                                    {{ _("Click confirm button to create partition") }} </br>
+                                                    {{ _("A partition is a concept similar to a table in a RDB") }}
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                <button id="add-partition-btn" class="btn btn-primary">{{ _("Confirm") }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding: 0;">
+                                    <!-- Projects table -->
+                                    <table style="display:table; width:100%; table-layout:fixed;" id="item-table" class="table table-sm table-hover table-borderless">
+                                        <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col">
+                                                <button id="open-add-item-modal" scope="row" class="btn btn-sm btn-default">
+                                                    Item +
+                                                </button>
+                                                <text id="item_count"></text>
+                                                <div style="text-align: right; float: right;">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-default btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <i class="fas fa-ellipsis-v"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                                            <a class="dropdown-item" id="query-item-modal"><i class="fas fa-search"></i><span>{{ _("Search items") }}</span></a>
+                                                            <a class="dropdown-item" onclick="delete_checked_items();"><i class="fas fa-trash"></i><span>{{ _("Remove selected") }}</span></a>
+                                                            <div class="dropdown-divider"></div>
+
+                                                            <a class="dropdown-item" aria-disabled="true">
+                                                                <div class="custom-control custom-checkbox mt--1">
+                                                                    <input class="custom-control-input" type="checkbox" name="checkbox-item" id="item-check-all">
+                                                                    <label class="custom-control-label" for="item-check-all" style="width:100%;">{{ _("Select all") }}</label>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal fade" id="modal-query-item" tabindex="-1" role="dialog" aria-labelledby="modal-query-item" aria-hidden="true">
+                                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title" id="modal-title-default">{{ _("Search items") }}</h4>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="pl-lg-12">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <div class="form-group">
+                                                                                <label class="form-control-label">{{ _("Add query") }}</label>
+
+                                                                                <div class="row">
+                                                                                    <div class="col-4">
+                                                                                        <input id="query-field-name" class="form-control form-control-alternative" type="text" placeholder="{{ _("Field name") }}"/>
+                                                                                    </div>
+                                                                                    <div class="col-4">
+                                                                                        <select id="query-operation" class="form-control">
+                                                                                            <option value="eq">==</option>
+                                                                                            <option value="neq">!=</option>
+                                                                                            <option value="in">contains</option>
+                                                                                            <option value="ins">contains-index</option>
+                                                                                            <option value="nin">not contains</option>
+                                                                                            <option value="gt"> > </option>
+                                                                                            <option value="ls"> < </option>
+                                                                                            <option value="ge"> >= </option>
+                                                                                            <option value="le"> <= </option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-4">
+                                                                                        <input id="query-field-value" class="form-control form-control-alternative" type="text" placeholder="{{ _("Field value") }}"/>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row mt-3">
+                                                                                    <div class="col-6">
+                                                                                        <select id="logic-operation" class="form-control" disabled>
+                                                                                            <option value="or">OR</option>
+                                                                                            <option value="and">AND</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    <div class="col-6">
+                                                                                        <input onclick="put_query();" type="button" class="form-control btn btn-success" value="+">
+                                                                                    </div>
+
+                                                                                </div>
+
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label class="form-control-label">{{ _("Query") }}</label>
+                                                                                <div class="table-responsive">
+                                                                                    <table id="query-list" class="table table-sm table-hover scroll-content">
+                                                                                        <thead class="thead-light">
+                                                                                        <tr>
+                                                                                            <th>
+                                                                                                {{ _("option") }}
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                {{ _("field") }}
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                {{ _("condition") }}
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                {{ _("value") }}
+                                                                                            </th>
+                                                                                            <th>
+
+                                                                                            </th>
+                                                                                        </tr>
+                                                                                        </thead>
+                                                                                        <tbody style="background: white;">
+
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label class="form-control-label">{{ _("Generated Query") }}</label>
+                                                                                <textarea id="query-text" class="form-control form-control-alternative" disabled></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                                <button id="query-item-btn" class="btn btn-primary">{{ _("Search") }}</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                        </thead>
+
+                                        <tbody style="display: block; min-height: 500px; max-height: 500px; overflow-y: auto;">
+
+                                        </tbody>
+
+                                    </table>
+                                </div>
+
+                                <div class="modal fade" id="modal-add-item" tabindex="-1" role="dialog" aria-labelledby="modal-add-item" aria-hidden="true">
+                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="modal-title-default">{{ _("Create item") }}</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="pl-lg-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <label class="form-control-label">{{ _("ID") }}</label>
+                                                                <input type="text" class="form-control form-control-alternative" placeholder="{{ _("Auto generation") }}" disabled>
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p>
+                                                    {{ _("Click confirm button to create item") }} <br>
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                <button id="add-item-btn" class="btn btn-primary">{{ _("Confirm") }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 col-xl-4" style="padding: 0;">
+                                    <!-- Projects table -->
+                                    <table id="field-table" class="table table-sm table-hover table-borderless">
+                                        <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col">
+                                                <button id="open-add-field-modal" scope="row" class="btn btn-sm btn-default">
+                                                    Field +
+                                                </button>
+                                                <div style="text-align: right; float: right;">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-default btn-icon-only text-light" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <i class="fas fa-ellipsis-v"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                                            <a class="dropdown-item" onclick="delete_checked_fields();"><i class="fas fa-trash"></i><span>{{ _("Delete selected") }}</span></a>
+                                                            <div class="dropdown-divider"></div>
+
+                                                            <a class="dropdown-item left" aria-disabled="true">
+                                                                <div class="custom-control custom-checkbox mt--1">
+                                                                    <input class="custom-control-input" type="checkbox" name="checkbox-field" id="field-check-all">
+                                                                    <label class="custom-control-label" for="field-check-all" style="width:100%;">{{ _("Select all") }}</label>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal fade" id="modal-add-field" tabindex="-1" role="dialog" aria-labelledby="modal-add-field" aria-hidden="true">
+                                                    <div class="modal-dialog modal- modal-dialog-centered modal-" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title" id="modal-title-default">{{ _("Put field") }}</h4>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">×</span>
+                                                                </button>
+                                                            </div>
+                                                            <input name="cmd" value="put_group" hidden>
+                                                            <div class="modal-body">
+                                                                <div class="pl-lg-12">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <div class="form-group">
+                                                                                <label class="form-control-label" for="field-name">{{ _("Name") }}</label>
+                                                                                <input id="field-name" type="text" class="form-control form-control-alternative" placeholder="{{ _("Field name") }}">
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label class="form-control-label" for="field-type">{{ _("Type") }}</label>
+                                                                                <select id="field-type" class="form-control">
+                                                                                    <option value="S">{{ _("String") }}</option>
+                                                                                    <option value="N">{{ _("Number") }}</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label class="form-control-label" for="field-value">{{ _("Value") }}</label>
+                                                                                <textarea rows="5" id="field-value" type="text" class="form-control form-control-alternative" placeholder="{{ _("Field value") }}">
+                                            </textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <p>
+                                                                    {{ _("Click confirm button to put field") }} </br>
+                                                                    {{ _("A field is a concept like a column, and is dependent on an item") }}
+                                                                </p>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                                                <button id="add-field-btn" class="btn btn-primary">{{ _("Confirm") }}</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody style="display: block; min-height: 500px; max-height: 500px; overflow-y: auto;">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="row align-items-center justify-content-xl-between">
+                    <div class="col-xl-6">
+                        <div style="height: 50px;"></div>
+                        <div class="copyright text-center text-xl-left text-muted">
+                            &copy; 2018 <a href="https://aws-interface.com" class="font-weight-bold ml-1" target="_blank">AWS Interface</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="{% static 'ace/src-noconflict/ace.js' %}" type="text/javascript" charset="utf-8"></script>
+
+    <script>
+        var partition = null;
+        var item_id = null;
+        var start_key = null;
+
+        var query_instructions = [];
+
+
+        var item_ids = [];
+        var item_fields = [];
+        function set_partition(p) {
+            $("#field-table>tbody").empty();
+            item_ids = [];
+            item_id = null;
+            partition = p;
+            $("th[name='partition']").css({backgroundColor: 'white'});
+            $("#" + partition).css({backgroundColor: '#BBB'});
+            $.post("", {
+                cmd: "get_items",
+                partition: partition,
+            }, function (data) {
+                var items = data['items'];
+                var end_key = data['end_key'];
+                start_key = end_key;
+                $("#item-table>tbody").empty();
+                append_items(items);
+                append_more_button();
+                get_item_count(p, function (data) {
+                    var ment = items.length + " / " + data['item']["count"];
+                    $("#item_count").html(ment);
+                });
+            });
+        }
+        function append_items(items) {
+            for (var i = 0; i < items.length; i++){
+                if (item_ids.includes(items[i]["id"]) == false) {
+                    item_ids.push(items[i]["id"]);
+                    var iid = items[i]["id"];
+                    var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\">" +
+                        "<th style='vertical-align:middle;' onclick=\"set_item('" + iid + "');\" name=\"item\" id=\"" + iid + "\" scope=\"row\">" +
+                        "<text><a href=\"#!\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">"  + iid + "</a></text>" +
+                        "<div style=\"text-align: right; float: right;\">" +
+                        "<div class=\"custom-control custom-checkbox mt--3\">" +
+                        "<input class=\"custom-control-input\" type=\"checkbox\" name=\"checkbox-item\" id=\"item-" + iid + "\" value=\"" + iid + "\">" +
+                        "<label class=\"custom-control-label\" for=\"item-" + iid + "\"></label>\n" +
+                        "</div>" +
+                        "</div>" +
+                        "</th></tr>";
+                    $("#item-table").append(row);
+                }
+            }
+            $("[name='more-item']").remove();
+        }
+        function append_more_button() {
+            var more = "<tr name='more-item' style=\"display:table; width:100%; table-layout:fixed;\">" +
+                "<th style='vertical-align:middle;' onclick=\"append_more_items();\" scope=\"row\"><a href=\"#!\" onmouseover=\"style='text-decoration:underline'\" onmouseout=\"style='text-decoration:none'\">{{ _('More items') }} + </a>" +
+                "</th></tr>";
+            $("#item-table").append(more);
+        }
+        function append_more_items() {
+            $("th[name='partition']").css({backgroundColor: 'white'});
+            $("#" + partition).css({backgroundColor: '#BBB'});
+            $.post("", {
+                cmd: "get_items",
+                partition: partition,
+                start_key: JSON.stringify(start_key),
+            }, function (data) {
+                var _items = data['items'];
+                var end_key = data['end_key'];
+                start_key = end_key;
+                append_items(_items);
+                append_more_button();
+                get_item_count(partition, function (data) {
+                    var ment = item_ids.length + " / " + data['item']["count"];
+                    $("#item_count").html(ment);
+                });
+            });
+        }
+        function set_item(_item_id) {
+            item_fields = [];
+            item_id = _item_id;
+            $("th[name='item']").css({backgroundColor: 'white'});
+            $("#" + _item_id).css({backgroundColor: '#BBB'});
+            $.post("", {
+                cmd: "get_item",
+                item_id: item_id,
+            }, function (data) {
+                var item = data['item'];
+                set_fields(item);
+            });
+        }
+
+        function replaceAll(str, searchStr, replaceStr) {
+            return str.split(searchStr).join(replaceStr);
+        }
+
+        function set_fields(_item) {
+            $("#field-table>tbody").empty();
+            var item = _item;
+            Object.entries(item).forEach(([key, value]) => {
+                var value_type = '';
+                if (typeof value == 'string'){
+                    value_type = 'S';
+                    value = String(value);
+                }else if (typeof value == 'number') {
+                    value_type = 'N';
+                    value = parseFloat(value);
+                }else if (typeof value == 'object'){
+                    value_type = 'L';
+                    value = JSON.stringify(value);
+                }
+                const value_escaped = replaceAll(String(value), '\n', '\\n');
+
+                var row = "<tr style=\"display:table; width:100%; table-layout:fixed;\"><th name=\"field\" id=\"" +
+                    key + "\" scope=\"row\">" +
+                    "<div class=\"row\">" +
+                    "<div class=\"col-10\">" +
+                    "<a style='color:cornflowerblue; cursor:pointer;' onclick=\"set_field('" + key + "', '" + value_escaped + "','" + value_type + "');\">" +
+                    "<label>" + key + "</label>&nbsp" +
+                    "<button class=\"btn btn-sm\">{{ _("Modify") }}</button>" +
+                    "</a>" +
+                    "<textarea readonly class=\"form-control form-control-alternative\" style='width:100%;'>" + value + "</textarea>" +
+                    "</div>" +
+                    "<div class=\"col-2\">" +
+                    "<div style=\"text-align: right; float: right;\">" +
+                    "<div class=\"custom-control custom-checkbox mt--3\">\n" +
+                    "<input class=\"custom-control-input\" type=\"checkbox\" name=\"checkbox-field\" id=\"field-" + key + "\" value=\"" + key + "\">\n" +
+                    "<label class=\"custom-control-label\" for=\"field-" + key + "\"></label>\n" +
+                    "</div>" +
+                    "</div>" +
+                    "</div>" +
+                    "</div>" +
+                    "</th></tr>";
+                $("#field-table").append(row);
+            });
+        }
+
+        function set_field(key, value, type) {
+            $("#field-name").val(key);
+            $("#field-value").val(value);
+            $("#field-type").val(type);
+            $("#modal-add-field").modal('show');
+        }
+
+        function add_partition(){
+            var partition_name = $("#partition-name").val();
+            var pk_group = $("#pk_group").val();
+            var pk_field = $("#pk_field").val();
+            var sk_group = $("#sk_group").val();
+            var sk_field = $("#sk_field").val();
+            var post_sk_fields_text = $("#post_sk_fields").val();
+            var use_random_sk_postfix = $("#use_random_sk_postfix").is(":checked");
+
+            console.log('pk_group:', pk_group);
+            console.log('pk_field:', pk_field);
+            console.log('sk_group:', sk_group);
+            console.log('sk_field:', sk_field);
+            console.log('post_sk_fields_text:', post_sk_fields_text);
+            console.log('use_random_sk_postfix:', use_random_sk_postfix);
+
+            if (pk_group == null || pk_group.length == 0){
+                alert("{{ _('Please enter the pk_group') }}");
+                return;
+            }
+            if (pk_field == null || pk_field.length == 0){
+                alert("{{ _('Please enter the pk_field') }}");
+                return;
+            }
+            if (sk_group == null || sk_group.length == 0){
+                alert("{{ _('Please enter the sk_group') }}");
+                return;
+            }
+            if (sk_field == null || sk_field.length == 0){
+                alert("{{ _('Please enter the sk_field') }}");
+                return;
+            }
+
+            if (use_random_sk_postfix == null || use_random_sk_postfix.length == 0){
+                alert("{{ _('Please enter the use_random_sk_postfix') }}");
+                return;
+            }
+
+            if (partition_name == null || partition_name.length == 0){
+                alert("{{ _('Please enter the partition name') }}");
+                return;
+            }
+            var post_sk_fields = null;
+            if (post_sk_fields_text.includes(",")){
+                post_sk_fields = post_sk_fields_text.split(",");
+            }else{
+                post_sk_fields = post_sk_fields_text;
+            }
+
+            $.post("", {
+                cmd: "add_partition",
+                partition_name: partition_name,
+                'post_sk_fields[]': post_sk_fields,
+                pk_group: pk_group,
+                pk_field: pk_field,
+                sk_group: sk_group,
+                sk_field: sk_field,
+                use_random_sk_postfix: use_random_sk_postfix
+            }, function (data) {
+                console.log(data);
+                location.reload();
+            });
+            $("#partition-name").val(null);
+            $("#modal-add-partition").modal('hide');
+        }
+        function add_item(){
+            if (partition == null || partition.length == 0){
+                alert("{{ _('Please specify partition') }}");
+                return;
+            }
+
+            $.post("", {
+                cmd: "add_item",
+                partition: partition,
+            }, function (data) {
+                set_partition(partition);
+            });
+            $("#modal-add-item").modal('hide');
+        }
+        function add_field(){
+            if (partition == null || item_id == null || partition.length == 0 || item_id.length == 0){
+                alert("{{ _('Please specify partitions and items') }}");
+                return;
+            }
+            var field_name = $("#field-name").val();
+            var field_value = $("#field-value").val();
+            var field_type = $("#field-type").val();
+
+            $.post("", {
+                cmd: "add_field",
+                item_id: item_id,
+                field_name: field_name,
+                field_value: field_value,
+                field_type: field_type,
+            }, function (data) {
+                set_item(item_id);
+            });
+            $("#modal-add-field").modal('hide');
+        }
+        function delete_partition(partition_name){
+            $.post("", {
+                cmd: "delete_partition",
+                partition_name: partition_name,
+            }, function (data) {
+                location.reload();
+            });
+        }
+        function delete_item(item_id){
+            $.post("", {
+                cmd: "delete_item",
+                item_id: item_id,
+            }, function (data) {
+                set_partition(partition);
+            });
+        }
+        function delete_field(field_name){
+            $.post("", {
+                cmd: "delete_field",
+                item_id: item_id,
+                field_name: field_name,
+            }, function (data) {
+                set_item(item_id);
+            });
+        }
+        function get_item_count(partition, callback){
+            $.post("", {
+                cmd: "get_item_count",
+                partition: partition,
+            }, function (data) {
+                callback(data);
+            });
+        }
+        function reindex_partition(partition, callback){
+            $.post("", {
+                cmd: "reindex_partition",
+                partition: partition,
+            }, function (data) {
+                callback(data);
+            });
+        }
+    </script>
+
+    <script>
+        var policy_mode = 'read';
+
+        function render_query_list() {
+            $("#query-list>tbody").empty();
+            if (query_instructions.length > 0){
+                $("#logic-operation").prop("disabled", false);
+            }else{
+                $("#logic-operation").prop("disabled", true);
+                $("#logic-operation").val('or');
+            }
+            $("#query-text").val(query_instructions);
+            for (var i = 0; i < query_instructions.length; i++){
+                var query = query_instructions[i];
+                query = JSON.parse(query);
+                if (i == 0){
+                    query['option'] = '';
+                }
+                var tag = "" +
+                    "<tr>\n" +
+                    "<td>\n" +
+                    query['option'] +
+                    "</td>\n" +
+                    "<td>\n" +
+                    query['field'] +
+                    "</td>\n" +
+                    "<td>\n" +
+                    query['condition'] +
+                    "</td>\n" +
+                    "<td>\n" +
+                    query['value'] +
+                    "</td>\n" +
+                    "<td>\n" +
+                    "<a class=\"btn btn-danger btn-sm text text-white\" style=\"padding-top:0; padding-bottom:0;\" onclick=\"remove_query(" + i + ");\"><i class=\"fas fa-trash\"></i></a>" +
+                    "</td>\n" +
+                    "</tr>";
+                $("#query-list").append(tag);
+            }
+        }
+
+        function make_query(logic_operation, field_name, query_operation, field_value) {
+            _query = {
+                'option': logic_operation,
+                'field': field_name,
+                'condition': query_operation,
+                'value': field_value,
+            };
+            _query = String(JSON.stringify(_query));
+            return _query;
+        }
+        function put_query() {
+            var logic_operation = $("#logic-operation").val();
+            var field_name = $("#query-field-name").val();
+            var query_operation = $("#query-operation").val();
+            var field_value = $("#query-field-value").val();
+            query = make_query(logic_operation, field_name, query_operation, field_value);
+            query_instructions.push(query);
+            render_query_list();
+        }
+
+        function remove_query(_query_idx) {
+            query_instructions.splice(_query_idx, 1);
+            render_query_list();
+        }
+        function delete_partitions(partitions) {
+            $.LoadingOverlay('show', {
+                text:'Deleting partitions...'
+            });
+            $.post("", {
+                cmd: "delete_partitions",
+                'partitions[]': partitions,
+            }, function (data) {
+                $.LoadingOverlay('hide');
+                window.location.reload();
+            });
+        }
+        function delete_items(item_ids) {
+            $.LoadingOverlay('show', {
+                text:'Deleting items...'
+            });
+            $.post("", {
+                cmd: "delete_items",
+                'item_ids[]': item_ids,
+            }, function (data) {
+                set_partition(partition);
+                $.LoadingOverlay('hide');
+            });
+        }
+        function delete_fields(item_id, field_names) {
+            $.LoadingOverlay('show', {
+                text:'Deleting items...'
+            });
+            $.post("", {
+                cmd: "delete_fields",
+                item_id: item_id,
+                'field_names[]': field_names,
+            }, function (data) {
+                set_item(item_id);
+                $.LoadingOverlay('hide');
+            });
+        }
+        function query_items(partition, instructions) {
+            query = {
+                'instructions': instructions
+            };
+            query = JSON.stringify(query);
+            $.post("", {
+                cmd: "query_items",
+                partition: partition,
+                'query': query,
+            }, function (data) {
+                var items = data['items'];
+                item_ids = [];
+                $("#item-table>tbody").empty();
+                $("#field-table>tbody").empty();
+                append_items(items);
+                //append_more_query_button(); TODO
+                $("#modal-query-item").modal('hide');
+            });
+        }
+        function delete_checked_partitions() {
+            var partitions = [];
+            var checkboxs = $("input[name='checkbox-partition']");
+            for (var i = 0; i < checkboxs.length; i++){
+                if (checkboxs[i].checked){
+                    partitions.push(checkboxs[i].value);
+                }
+            }
+            delete_partitions(partitions);
+        }
+        function reindex_checked_partition() {
+            if (!confirm("선택된 파티션이 재-인덱싱 되며 인덱싱 도중 DB삽입 오류가 발생할 수 있습니다. 그래도 하시겠습니까?")){
+                return;
+            }
+            alert("현재 재 인덱싱 기능을 일시적으로 이용할 수 없습니다.");
+            return;
+            var partitions = [];
+            var checkboxs = $("input[name='checkbox-partition']");
+            for (var i = 0; i < checkboxs.length; i++){
+                if (checkboxs[i].checked){
+                    partitions.push(checkboxs[i].value);
+                }
+            }
+            if (partitions.length === 1){
+                reindex_partition(partitions[0], function (data) {
+                    alert(JSON.stringify(data));
+                });
+            }else{
+                alert("System cannot re-index multiple partitions.");
+            }
+        }
+        function delete_checked_items() {
+            var item_ids = [];
+            var checkboxs = $("input[name='checkbox-item']");
+            for (var i = 0; i < checkboxs.length; i++){
+                if (checkboxs[i].checked){
+                    item_ids.push(checkboxs[i].value);
+                }
+            }
+            delete_items(item_ids);
+        }
+        function delete_checked_fields() {
+            var item_ids = [];
+            var checkboxs = $("input[name='checkbox-field']");
+            for (var i = 0; i < checkboxs.length; i++) {
+                if (checkboxs[i].checked) {
+                    item_ids.push(checkboxs[i].value);
+                }
+            }
+            delete_fields(item_id, item_ids);
+        }
+        function create_sort_index() {
+            $.LoadingOverlay('show', {
+                text:'Creation...'
+            });
+            var sort_key = $("#sort_key").val();
+            var sort_key_type = $("#sort_key_type").val();
+            $.post("", {
+                'cmd': 'create_sort_index',
+                'sort_key': sort_key,
+                'sort_key_type': sort_key_type
+            }, function (data) {
+                $.LoadingOverlay('hide');
+                window.location.reload();
+            });
+        }
+
+    </script>
+
+    <script>
+        const editor = ace.edit("editor");
+        editor.session.setMode("ace/mode/python");
+
+        function set_policy_mode(mode) {
+            const partition_to_apply = $("#policy-partition-to-apply").val();
+            policy_mode = mode;
+            $("#set-policy-btn").html(mode);
+            $.post("", {
+                'cmd': 'get_policy_code',
+                'mode': mode,
+                'partition_to_apply': partition_to_apply,
+            }, function (data) {
+                editor.setValue(data.code, -1);
+            });
+        }
+
+        function save_policy() {
+            const partition_to_apply = $("#policy-partition-to-apply").val();
+            const code = editor.getValue();
+            $.post("", {
+                'cmd': 'put_policy',
+                'mode': policy_mode,
+                'partition_to_apply': partition_to_apply,
+                'code': code,
+            }, function (data) {
+                if ('error' in data){
+                    alert(data.error.message);
+                }else{
+                    alert('Your policy code has been saved');
+                }
+            });
+        }
+
+    </script>
+
+    <script>
+        window.onload = function(){
+            $("#add-partition-btn").click(function () {
+                add_partition();
+            });
+            $("#add-item-btn").click(function () {
+                add_item();
+            });
+            $("#add-field-btn").click(function () {
+                add_field();
+            });
+            $("#open-add-item-modal").click(function () {
+                if (partition == null){
+                    alert("파티션을 지정해주세요");
+                    return;
+                }
+                $("#modal-add-item").modal('show');
+            });
+            $("#query-item-modal").click(function () {
+                if (partition == null){
+                    alert("파티션을 지정해주세요");
+                    return;
+                }
+                $("#modal-query-item").modal('show');
+            });
+
+            $("#open-add-field-modal").click(function () {
+                if (partition == null || item_id == null){
+                    alert("{{ _('Please specify item') }}");
+                    return;
+                }
+                $("#field-name").val(null);
+                $("#field-value").val(null);
+                $("#field-type").val('S');
+                $("#modal-add-field").modal('show');
+            });
+            $("#partition-check-all").click(function () {
+                $("input[name='checkbox-partition']").prop('checked', this.checked);
+            });
+            $("#item-check-all").click(function () {
+                $("input[name='checkbox-item']").prop('checked', this.checked);
+            });
+            $("#field-check-all").click(function () {
+                $("input[name='checkbox-field']").prop('checked', this.checked);
+            });
+            $("#query-item-btn").click(function () {
+                var query_json_instructions = [];
+                for (var i = 0; i < query_instructions.length; i++){
+                    query_json_instructions.push(JSON.parse(query_instructions[i]));
+                }
+                query_items(partition, query_json_instructions);
+            });
+            $(document).ready(function () {
+                set_policy_mode('create');
+            });
+            $("#create-sort-index-btn").click(function () {
+                create_sort_index();
+            });
+        }
+    </script>
+
+{% endblock %}

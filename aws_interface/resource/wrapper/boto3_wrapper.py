@@ -1136,15 +1136,50 @@ class DynamoFDB:
 
     def get_item(self, pk, sk):
         table = self.get_table(self.table_name)
-        item = table.get_item(Key=Key('_pk').eq(pk) & Key('_sk').eq(sk))
+        key = {
+            '_pk': pk,
+            '_sk': sk
+        }
+        response = table.get_item(Key=key)
+        item = response.get('Item', None)
         return item
 
     def put_item(self, item):
         table = self.get_table(self.table_name)
         # 디비에 넣기전에 인덱스 타입을 고려하여 데이터를 변경한다.
         response = table.put_item(
-            TableName=self.table_name,
             Item=item,
+        )
+        return response
+
+    def get_update_expression_attrs_pair(self, item):
+        """
+        item 에서 업데이트 표현식과 속성을 튜플로 반환합니다.
+        :param item:
+        :return: (UpdateExpression, ExpressionAttributeValues)
+        """
+        expression = 'set'
+        attr_names = {}
+        attr_values = {}
+        for idx, (key, value) in enumerate(item.items()):
+            attr_key = '#key{}'.format(idx)
+            attr_value = ':val{}'.format(idx)
+            expression += ' {}={}'.format(attr_key, attr_value)
+
+            attr_names['{}'.format(attr_key)] = key
+            attr_values['{}'.format(attr_value)] = value
+            if idx != len(item) - 1:
+                expression += ','
+        return expression, attr_names, attr_values
+
+    def update_item(self, pk, sk, item):
+        expression, attr_names, attr_values = self.get_update_expression_attrs_pair(item)
+        response = self.get_table(self.table_name).update_item(
+            Key={'_pk': pk, '_sk': sk},
+            UpdateExpression=expression,
+            ExpressionAttributeValues=attr_values,
+            ExpressionAttributeNames=attr_names,
+            ReturnValues="ALL_NEW",
         )
         return response
 
@@ -1152,7 +1187,9 @@ class DynamoFDB:
         table = self.get_table(self.table_name)
         with table.batch_writer() as batch:
             for item in items:
-                batch.put_item(Item=item)
+                batch.put_item(
+                    Item=item,
+                )
         return True
 
     def batch_delete(self, pk_sk_pairs):
@@ -1245,9 +1282,8 @@ class DynamoFDB:
         :param filters: [
             {
                 'field': '<FIELD>',
-                'type': 'string' | 'number' | 'binary' | 'bool',
                 'value': '<VALUE>',
-                'cond': 'eq' | 'neq' | 'lte' | 'lt' | 'gte' | 'gt' | 'btw' | 'stw' |
+                'condition': 'eq' | 'neq' | 'lte' | 'lt' | 'gte' | 'gt' | 'btw' | 'stw' |
                         'is_in' | 'contains' | 'exist' | 'not_exist'
             }
         ]
@@ -1284,8 +1320,8 @@ class DynamoFDB:
             for ft in filters:
                 field = ft['field']
                 value = ft.get('value', None)
-                high_value = ft.get('high_value', None)
-                cond = ft['cond']
+                high_value = ft.get('second_value', None)
+                cond = ft['condition']
 
                 attr_to_add = Attr(field)
                 if cond == 'eq':
@@ -1313,7 +1349,7 @@ class DynamoFDB:
                 elif cond == 'not_exist':
                     attr_to_add = attr_to_add.not_exists()
                 else:
-                    raise Exception('<cond> parameter must be one of ['
+                    raise Exception('<condition> parameter must be one of ['
                                     'eq, neq, lte, lt, gte, gt, btw, stw, is_in, contains, exist, not_exist'
                                     ']')
                 if filter_expression:

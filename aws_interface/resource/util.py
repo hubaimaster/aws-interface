@@ -1,4 +1,8 @@
-from resource.config import MAX_N_GRAM, BASE64_LETTERS
+import time
+
+from resource.config import MAX_N_GRAM, BASE64_LETTERS, SK_FLOAT_DEC_FIT, MAX_REP_NUMBER_B64, HALF_REP_NUMBER_B64
+import base64
+import zlib
 
 
 def has_sub_tuple(tuple_list, sub_tuple):
@@ -100,6 +104,75 @@ def convert_custom_base64_to_int(custom_base64):
     return number
 
 
+def str_to_base64_str(plain):
+    """
+    일반 문자열을 base64 형태로 변환
+    :param plain:
+    :return:
+    """
+    plain_b = plain.encode('utf-8')
+    b64_b = base64.urlsafe_b64encode(plain_b)
+    return b64_b.decode('utf-8')
+
+
+def base64_str_to_str(b64_string):
+    """
+    str_to_base64_str 의 역함수
+    :param b64_string:
+    :return:
+    """
+    b64_b = b64_string.encode('utf-8')
+    str_b = base64.urlsafe_b64decode(b64_b)
+    return str_b.decode('utf-8')
+
+
+def unsigned_number(number):
+    """
+    base64 로 진법변환을 위해, -범위를 밀어냅니다.
+    총 표현 가능한 숫자 범위는
+    -8.834235323891921e+55 ~
+    +8.834235323891921e+55
+    :param number:
+    :return:
+    """
+    number *= pow(10, SK_FLOAT_DEC_FIT)
+    number = int(number)
+    # base64 40자리로 표현할 수 있는 최대 값 나누기 2 한 수를 더합니다.
+    number += HALF_REP_NUMBER_B64
+    if 0 <= number < MAX_REP_NUMBER_B64:
+        return int(number)
+    raise Exception('number must have range of -8.834235323891921e+55 ~ +8.834235323891921e+55')
+
+
+def merge_pk_sk(pk, sk):
+    """
+    pk 와 sk 를 병합하여 반환, 구분자열은 & 이며 이스케이프 처리 필수
+    :param pk:
+    :param sk:
+    :return:
+    """
+    return pk.replace('&', '-&') + '&' + sk.replace('&', '-&')
+
+
+def split_pk_sk(merged_id):
+    keys = []
+    p_c = None
+    buffer = ''
+    for c in merged_id:
+        if c == '&' and p_c != '-':
+            keys.append(buffer.replace('-&', '&'))
+            buffer = ''
+        else:
+            buffer += c
+        p_c = c
+
+    # 마지막 남은 버퍼
+    if buffer:
+        keys.append(buffer.replace('-&', '&'))
+    # pk, sk
+    return keys[0], keys[1]
+
+
 if __name__ == '__main__':
-    n = convert_custom_base64_to_int('ciCW6QfdKjPwA')
-    print(n)
+    s = time.time()
+    print(time.time() - s)

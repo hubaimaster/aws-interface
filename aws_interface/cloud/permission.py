@@ -191,6 +191,7 @@ class Permission:
         class FastDatabase:
             create_partition = 'run:cloud.fast_database.create_partition'
             delete_partition = 'run:cloud.fast_database.delete_partition'
+            get_partitions = 'run:cloud.fast_database.get_partitions'
 
             create_item = 'run:cloud.fast_database.create_item'
             create_items = 'run:cloud.fast_database.create_items'
@@ -204,6 +205,9 @@ class Permission:
 
             delete_item = 'run:cloud.fast_database.delete_item'
             delete_items = 'run:cloud.fast_database.delete_items'
+
+            put_policy = 'run:cloud.fast_database.put_policy'
+            get_policy_code = 'run:cloud.fast_database.get_policy_code'
 
     default_user_permissions = [
         Run.Auth.get_me,
@@ -246,13 +250,14 @@ class Permission:
         Run.Storage.upload_b64,
 
         Run.FastDatabase.get_item,
+        Run.FastDatabase.get_items,
         Run.FastDatabase.update_item,
         Run.FastDatabase.update_items,
         Run.FastDatabase.create_item,
         Run.FastDatabase.create_items,
         Run.FastDatabase.delete_item,
         Run.FastDatabase.delete_items,
-        Run.FastDatabase.query_items
+        Run.FastDatabase.query_items,
     ]
 
     unknown_user_permissions = [
@@ -293,6 +298,7 @@ class Permission:
         Run.Storage.upload_b64,
 
         Run.FastDatabase.get_item,
+        Run.FastDatabase.get_items,
         Run.FastDatabase.update_item,
         Run.FastDatabase.update_items,
         Run.FastDatabase.create_item,

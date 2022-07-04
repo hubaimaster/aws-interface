@@ -613,29 +613,30 @@ class AWSResource(Resource):
     # 신규기능 FDB
     # 새로 추가된 FastDatabase, Fully NoSQL
     @classmethod
-    def _fdb_item_id_to_pk_sk_pair(cls, item_id):
+    def fdb_item_id_to_pk_sk_pair(cls, item_id):
         """
         내부적으로 pk와 sk 조합을 item_id 로 부터 복호화합니다.
         :param item_id:
         :return:
         """
         try:
-            return json.loads(item_id)
+            pk, sk = util.split_pk_sk(item_id)
+            return {
+                '_pk': pk,
+                '_sk': sk
+            }
         except:
             return None
 
     @classmethod
-    def _fdb_pk_sk_to_item_id(cls, pk, sk):
+    def fdb_pk_sk_to_item_id(cls, pk, sk):
         """
         pk 와 sk 를 item_id 로 암호화합니다.
         :param pk:
         :param sk:
         :return:
         """
-        return json.dumps({
-            '_pk': pk,
-            '_sk': sk
-        })
+        return util.merge_pk_sk(pk, sk)
 
     def fdb_create_partition(self, partition, pk_group, pk_field, sk_group, sk_field=None,
                              post_sk_fields=None, use_random_sk_postfix=True):
@@ -775,14 +776,14 @@ class AWSResource(Resource):
         # sk_digit_fit: 1234 인데 sk_digit_fit=8 이면, '____1234' 처럼 sorting 을 위해 자리를 채웁니다.
         #         소숫점이 들어오면 '____1234.43' 이런식으로 . 이하는 무시합니다.
         #         0이면 그대로 둡니다.
-        try:
-            sk_value = Decimal(sk_value) * pow(10, config.SK_FLOAT_FIT)
-            sk_value = int(sk_value)
-            sk_value = util.convert_int_to_custom_base64(sk_value)
-            sk_value = sk_value.rjust(sk_digit_fit)
-        except:
+        # 문자열과 숫자 정렬 차이를 주기 위해 첫번째 문자로 차이를 만든다.
+        if isinstance(sk_value, (int, float, Decimal)):
+            sk_value = util.convert_int_to_custom_base64(util.unsigned_number(sk_value))
+            sk_value = 'D' + sk_value.rjust(sk_digit_fit)
+        else:
+            # 삽입시에는 무조건 자릿수 맞춤을 하지만, 쿼리시에는 eq 일때만 자릿수 맞춤을 해준다.
             sk_value = str(sk_value)
-            sk_value = sk_value.ljust(sk_digit_fit)
+            sk_value = 'S' + sk_value.ljust(sk_digit_fit)
 
         if sk_field is None:
             # None 이 그대로 삽입되는걸 방지
@@ -798,10 +799,10 @@ class AWSResource(Resource):
         if use_random_sk_postfix:
             sk += '#' + str(uuid.uuid4()).replace('-', '')
 
+        item['_partition'] = partition
         item['_pk'] = pk
         item['_sk'] = sk
-        item['_partition'] = partition
-        item['_id'] = self._fdb_pk_sk_to_item_id(pk, sk)
+        item['_id'] = self.fdb_pk_sk_to_item_id(pk, sk)
         return item
 
     def fdb_put_items(self, partition, items):
@@ -814,6 +815,11 @@ class AWSResource(Resource):
         """
         items = [self._fdb_process_item_with_partition(item, partition) for item in items]
         _ids = [item['_id'] for item in items]
+
+        # ID 는 _pk, _sk 와 1:1 대응 하기 때문에 저장하지 않습니다.
+        for item in items:
+            if '_id' in item:
+                item.pop('_id')
         response = self.dynamoFDB.batch_put(items)
         return _ids
 
@@ -825,9 +831,39 @@ class AWSResource(Resource):
         :return:
         """
         item = self._fdb_process_item_with_partition(item, partition)
-        response = self.dynamoFDB.put_item(item)
         _id = item.get('_id', None)
+        # ID 는 _pk, _sk 와 1:1 대응 하기 때문에 저장하지 않습니다.
+        if '_id' in item:
+            item.pop('_id')
+        response = self.dynamoFDB.put_item(item)
         return _id
+
+    def _fdb_put_item_low_level(self, _pk, _sk, item):
+        """
+        로우레벨단에서 DB Item 생성, 시스템에서 이용합니다.
+        pk, sk 가 서비스단과 겹치면 곤란함.
+        :param _pk:
+        :param _sk:
+        :param item:
+        :return:
+        """
+        item['_pk'] = _pk
+        item['_sk'] = _sk
+        response = self.dynamoFDB.put_item(item)
+        return response
+
+    def _fdb_get_item_low_level(self, _pk, _sk):
+        """
+        로우레벨단에서 DB Item get, 시스템에서 이용합니다.
+        pk, sk 가 서비스단과 겹치면 안됨.
+        :param _pk:
+        :param _sk:
+        :return:
+        """
+        item = self.dynamoFDB.get_item(_pk, _sk)
+        if item:
+            item['_id'] = util.merge_pk_sk(_pk, _sk)
+        return item
 
     def fdb_get_items(self, item_ids, consistent_read=False):
         """
@@ -836,17 +872,20 @@ class AWSResource(Resource):
         :param consistent_read:
         :return:
         """
-        response = self.dynamoFDB.get_items(
-            [self._fdb_item_id_to_pk_sk_pair(item_id) for item_id in item_ids],
+        items = self.dynamoFDB.get_items(
+            [self.fdb_item_id_to_pk_sk_pair(item_id) for item_id in item_ids],
             consistent_read=consistent_read
         )
-        return response
+        for item in items:
+            if item:
+                item['_id'] = util.merge_pk_sk(item['_pk'], item['_sk'])
+        return items
 
     def _convert_number_to_custom64(self):
         pass
 
     def fdb_query_items(self, pk_group, pk_field, pk_value, sort_condition=None,
-                        sk_group='', partition=None, sk_field='', sk_value='', sk_second_value=None, filters=None,
+                        sk_group='', partition=None, sk_field='', sk_value=None, sk_second_value=None, filters=None,
                         start_key=None, limit=100, reverse=False, consistent_read=False, index_name=None):
         """
         DB 를 쿼리하고, 이는 NoSQL 최적화 되어 있습니다.
@@ -864,7 +903,15 @@ class AWSResource(Resource):
         :param sk_field:
         :param sk_value:
         :param sk_second_value:
-        :param filters:
+        :param filters: [
+            {
+                'field': '<FIELD>',
+                'value': '<VALUE>',
+                'second_value': '<SECOND_VALUE>' | None, # btw 연산자 사용시 사용
+                'condition': 'eq' | 'neq' | 'lte' | 'lt' | 'gte' | 'gt' | 'btw' | 'stw' |
+                        'is_in' | 'contains' | 'exist' | 'not_exist'
+            }
+        ]
         :param start_key:
         :param limit:
         :param reverse:
@@ -888,17 +935,32 @@ class AWSResource(Resource):
 
         sk_digit_fit = int(config.SK_DIGIT_FIT)
         # 자리수를 맞춥니다. 숫자는 오른쪽부터 채우고 문자는 왼쪽부터 채웁니다.
-        if sk_value:
-            try:
-                sk_value = Decimal(sk_value) * pow(10, config.SK_FLOAT_FIT)
-                sk_value = int(sk_value)
-                sk_value = util.convert_int_to_custom_base64(sk_value)
-                sk_value = sk_value.rjust(sk_digit_fit)
-            except:
+        if sk_value is not None:
+            if isinstance(sk_value, (int, float, Decimal)):
+                sk_value = util.convert_int_to_custom_base64(util.unsigned_number(sk_value))
+                sk_value = 'D' + sk_value.rjust(sk_digit_fit)
+                if sort_condition == 'eq':
+                    sort_condition = 'stw'
+            else:
                 sk_value = str(sk_value)
-                sk_value = sk_value.ljust(sk_digit_fit)
+                if sort_condition == 'eq':
+                    sk_value = sk_value.ljust(sk_digit_fit)
+                    # 자리수를 맞췄기 때문에 stw 이 eq 와 동일한 효과를 낸다.
+                    # eq 는 쓰면 뒤에 있는 것들 때문에 쿼리가 안됨.
+                    sort_condition = 'stw'
+                sk_value = 'S' + sk_value
         else:
             sk_value = ''
+
+        if sk_second_value is not None:
+            if isinstance(sk_second_value, (int, float, Decimal)):
+                sk_second_value = util.convert_int_to_custom_base64(util.unsigned_number(sk_second_value))
+                sk_second_value = 'D' + sk_second_value.rjust(sk_digit_fit)
+            else:
+                sk_second_value = str(sk_second_value)
+                sk_second_value = 'S' + sk_second_value
+        else:
+            sk_second_value = ''
 
         pk = f'{pk_group}#{pk_field}#{pk_value}'
 
@@ -912,6 +974,7 @@ class AWSResource(Resource):
         if sk_field:
             sk += f'#{sk_field}'
 
+        # sk_second_value 가 있을 경우 sk_high 비교 변수 생성
         sk_high = ''
         if sk_second_value:
             sk_high = sk + f'#{sk_second_value}'
@@ -925,6 +988,12 @@ class AWSResource(Resource):
                                               consistent_read=consistent_read, index_name=index_name)
         end_key = response.get('LastEvaluatedKey', None)
         items = response.get('Items', [])
+
+        # ID 매겨줌
+        for item in items:
+            if item:
+                item['_id'] = util.merge_pk_sk(item["_pk"], item['_sk'])
+
         return items, end_key
 
     def fdb_delete_items(self, item_ids):
@@ -933,7 +1002,44 @@ class AWSResource(Resource):
         :param item_ids:
         :return:
         """
-        self.dynamoFDB.batch_delete([self._fdb_item_id_to_pk_sk_pair(item_id) for item_id in item_ids])
+        self.dynamoFDB.batch_delete([self.fdb_item_id_to_pk_sk_pair(item_id) for item_id in item_ids])
+
+    def fdb_update_item(self, partition, item_id, item):
+        """
+        업데이트, pk 와 sk 는 업데이트할 수 없음.
+        :param partition:
+        :param item_id:
+        :param item:
+        :return:
+        """
+        pk_sk_pair = self.fdb_item_id_to_pk_sk_pair(item_id)
+        item_to_insert = self._fdb_process_item_with_partition(item, partition)
+        # _pk, _sk 가 수정되면 안됨.
+        origin_pk = pk_sk_pair['_pk']
+        item_pk = item_to_insert['_pk']
+
+        origin_sk = pk_sk_pair['_sk']
+        item_sk = item_to_insert['_sk']
+
+        if origin_pk != item_pk:
+            raise Exception(f'Try to update <_pk>: [{origin_pk} => {item_pk}] <_pk> cannot be modified.')
+        if origin_sk != item_sk:
+            raise Exception(f'Try to update <_sk>: [{origin_sk} => {item_sk}] <_sk> cannot be modified.')
+
+        # 레퍼런스가 되는 상황 방지를 위해 copy 사용
+        item_to_insert = item_to_insert.copy()
+        # pk, sk 는 업데이트할 수 없음. 따라서 대상에서 제외, 어차피 위에서 걸림.
+        item_to_insert.pop('_pk')
+        item_to_insert.pop('_sk')
+
+        # 실제 넣을 필요가 없음, pk, sk 와 중복
+        _id = item_to_insert.pop('_id')
+        response = self.dynamoFDB.update_item(pk_sk_pair['_pk'], pk_sk_pair['_sk'], item_to_insert)
+        attributes = response.get('Attributes', {})  # 업데이트 결과
+        # 성공한 경우, _id 도 함께 반환해줌.
+        if attributes:
+            attributes['_id'] = _id
+        return attributes
 
 
 if __name__ == '__main__':

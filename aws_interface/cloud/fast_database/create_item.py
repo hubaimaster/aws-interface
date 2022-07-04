@@ -2,17 +2,19 @@
 from cloud.permission import Permission, NeedPermission
 from cloud.message import errorlist
 from cloud.fast_database.util import has_partition, valid_keys
+from cloud.fast_database.get_policy_code import match_policy_after_get_policy_code
 
 
 # Define the input output format of the function.
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'session_id': 'str',
         'partition': 'str',
+        'item': 'dict',
+        'can_overwrite': 'bool'
     },
     'output_format': {
-        'partition': 'str',
+        'item_id': 'str',
     },
     'description': 'Create item and return result'
 }
@@ -22,9 +24,17 @@ info = {
 def do(data, resource):
     body = {}
     params = data['params']
+    user = data.get('user', None)
 
-    partition = params['partition']
-    item = params['item']
+    partition = params.get('partition', None)
+    item = params.get('item', None)
+    can_overwrite = params.get('can_overwrite', False)
+
+    # 필수 파라메터 체크
+    if not partition:
+        raise errorlist.NEED_PARTITION
+    if not item:
+        raise errorlist.NEED_ITEM
 
     # 아이템이 딕셔너리 형태가 아닌 경우
     if item is None or not isinstance(item, dict):
@@ -35,18 +45,24 @@ def do(data, resource):
         raise errorlist.KEY_CANNOT_START_WITH_UNDER_BAR
 
     # 파티션이 없는 경우
-    if partition is None or not has_partition(resource, partition, use_cache=False):
+    if partition is None or not has_partition(resource, partition, use_cache=True):
         raise errorlist.NO_SUCH_PARTITION
 
-    # 생성될 키가 이미 있을 경우
-    if resource.fdb_has_pk_sk_by_item(item):
-        raise errorlist.ITEM_PK_SK_PAIR_ALREADY_EXIST
-
     # 생성 정책 위반한 경우
+    if not match_policy_after_get_policy_code(resource, 'create', partition, user, item):
+        raise errorlist.CREATE_POLICY_VIOLATION
 
+    # 생성될 키가 이미 있을 경우
+    if not can_overwrite:
+        if resource.fdb_has_pk_sk_by_item(partition, item):
+            raise errorlist.ITEM_PK_SK_PAIR_ALREADY_EXIST
 
     _id = resource.fdb_put_item(partition, item)
 
     body['partition'] = partition
-    body['_id'] = _id
+    body['item_id'] = _id
     return body
+
+
+if __name__ == '__main__':
+    pass

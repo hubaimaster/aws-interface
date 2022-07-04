@@ -82,6 +82,11 @@ class Adapter(metaclass=ABCMeta):
         api = TriggerAPI(self._get_vendor(), self._get_credential(), self._get_app_id())
         yield api
 
+    @contextmanager
+    def open_api_fast_database(self):
+        api = FastDatabaseAPI(self._get_vendor(), self._get_credential(), self._get_app_id())
+        yield api
+
     def generate_sdk(self, platform):
         allocator = get_resource_allocator(self._get_vendor(), self._get_credential(), self._get_app_id())
         return allocator.generate_sdk(platform)

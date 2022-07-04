@@ -522,6 +522,25 @@ class Resource(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
+    @classmethod
+    def fdb_item_id_to_pk_sk_pair(cls, item_id):
+        """
+        내부적으로 pk와 sk 조합을 item_id 로 부터 복호화합니다.
+        :param item_id:
+        :return:
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def fdb_pk_sk_to_item_id(cls, pk, sk):
+        """
+        pk 와 sk 를 item_id 로 암호화합니다.
+        :param pk:
+        :param sk:
+        :return:
+        """
+        raise NotImplementedError
+
     # 새로 추가된 FastDatabase, Fully NoSQL
     def fdb_create_partition(self, partition, pk_group, pk_field, sk_group, sk_field=None,
                              post_sk_fields=None, use_random_sk_postfix=True):
@@ -591,6 +610,27 @@ class Resource(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
+    def _fdb_put_item_low_level(self, _pk, _sk, item):
+        """
+        로우레벨단에서 DB Item 생성, 시스템에서 이용합니다.
+        pk, sk 가 서비스단과 겹치면 곤란함.
+        :param _pk:
+        :param _sk:
+        :param item:
+        :return:
+        """
+        raise NotImplementedError
+
+    def _fdb_get_item_low_level(self, _pk, _sk):
+        """
+        로우레벨단에서 DB Item get, 시스템에서 이용합니다.
+        pk, sk 가 서비스단과 겹치면 안됨.
+        :param _pk:
+        :param _sk:
+        :return:
+        """
+        raise NotImplementedError
+
     def fdb_get_items(self, item_ids, consistent_read=False):
         """
         item_ids 를 배치로 쿼리하여 가져옵니다.
@@ -641,6 +681,16 @@ class Resource(metaclass=ABCMeta):
         """
         item 의 pk-sk 조합이 이미 DB에 존재하는지 확인, create 확인용으로 주로 사용
         :param partition:
+        :param item:
+        :return:
+        """
+        raise NotImplementedError
+
+    def fdb_update_item(self, partition, item_id, item):
+        """
+        업데이트
+        :param partition:
+        :param item_id:
         :param item:
         :return:
         """

@@ -38,6 +38,8 @@ from dashboard.views.app.notification import Notification
 from dashboard.views.app.schedule import Schedule
 from dashboard.views.app.marketplace import Marketplace, MarketplaceCreate, MarketplaceDetail, MarketplaceEdit
 from dashboard.views.app.guide import Guide
+from dashboard.views.app.fast_database import FastDatabase
+
 from django_otp.admin import OTPAdminSite
 
 admin.site.__class__ = OTPAdminSite
@@ -69,6 +71,7 @@ urlpatterns = [
     path('<app_id>/log', Log.as_view(), name='log'),
     path('<app_id>/notification', Notification.as_view(), name='notification'),
     path('<app_id>/schedule', Schedule.as_view(), name='schedule'),
+    path('<app_id>/fast_database', FastDatabase.as_view(), name='fast_database'),
 ]
 
 # Allow MEDIA_URL to checkout media file in local when only DEBUG is True

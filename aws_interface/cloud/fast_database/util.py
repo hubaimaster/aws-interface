@@ -33,3 +33,46 @@ def valid_keys(item):
         if key.startswith('_'):
             return False
     return True
+
+
+def valid_pk_group(pk_group):
+    """
+    쿼리하는 pk_group 이 유효한지 확인
+    :param pk_group:
+    :return:
+    """
+    ban_list = [
+        'meta-info'
+    ]
+    pk_group = str(pk_group)
+    for ban in ban_list:
+        if pk_group.startswith(ban):
+            return False
+    return True
+
+
+def pop_ban_keys(item):
+    """
+    item 에서 _pk, _sk 등 시스템에서 보여줄 필요가 없는 것들을 pop
+    :param item:
+    :return:
+    """
+    if not item or not isinstance(item, dict):
+        return item
+    ban_keys = ['_pk', '_sk']
+    item = item.copy()
+    for ban_key in ban_keys:
+        if ban_key in item:
+            item.pop(ban_key)
+    return item
+
+
+if __name__ == '__main__':
+    it = {
+        'id': 'ooo',
+        '_pk': 'ok',
+        '_sk': 'ssa',
+        'sid': 'aa'
+    }
+    it = pop_ban_keys(it)
+    print(it)

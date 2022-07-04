@@ -1,8 +1,7 @@
 
 from cloud.permission import Permission, NeedPermission
-from cloud.message import error
+from cloud.message import errorlist
 import inspect
-import os
 import time
 from cloud.env import safe_to_run_code
 
@@ -10,17 +9,22 @@ from cloud.env import safe_to_run_code
 # This information is used when creating the *SDK*.
 info = {
     'input_format': {
-        'partition_to_apply': 'str',
-        'mode': '"create" | "read" | "update" | "delete" | "query" | "join" | "index"',
+        'partition': 'str',
+        'mode': '"create" | "read" | "update" | "delete"',
     },
     'output_format': {
-        'policy_code?': 'str',
+        'code': 'str',
     },
     'description': 'Get policy code about mode (CRUD)'
 }
 
-SERVICE = 'database'
+SERVICE = 'meta-info#database_policy'
 cache = {}
+
+
+def remove_cache():
+    global cache
+    cache = {}
 
 
 def match_policy_after_get_policy_code(resource, mode, partition, user, item, new_item={}):
@@ -45,25 +49,16 @@ def match_policy(policy_code, user, item, new_item={}):
 
 def get_default_policy_code(mode):
     if mode == 'create':
-        import cloud.database.policy.create as source
+        import cloud.fast_database.policy.create as source
         policy_code = inspect.getsource(source)
     elif mode == 'read':
-        import cloud.database.policy.read as source
+        import cloud.fast_database.policy.read as source
         policy_code = inspect.getsource(source)
     elif mode == 'update':
-        import cloud.database.policy.update as source
+        import cloud.fast_database.policy.update as source
         policy_code = inspect.getsource(source)
     elif mode == 'delete':
-        import cloud.database.policy.delete as source
-        policy_code = inspect.getsource(source)
-    elif mode == 'query':
-        import cloud.database.policy.query as source
-        policy_code = inspect.getsource(source)
-    elif mode == 'join':
-        import cloud.database.policy.join as source
-        policy_code = inspect.getsource(source)
-    elif mode == 'index':
-        import cloud.database.policy.index as source
+        import cloud.fast_database.policy.delete as source
         policy_code = inspect.getsource(source)
     else:
         policy_code = None
@@ -71,17 +66,19 @@ def get_default_policy_code(mode):
 
 
 def get_policy_code(resource, partition, mode, use_cache=True):
-    item_id = '{}-policy-{}-{}'.format(SERVICE, partition, mode)
+    global cache
+    pk = f'{SERVICE}@{partition}'
+    sk = f'{mode}'
 
-    # 캐싱, 안전한 곳에서 실행될때만 공유 리소스 허용
+    # 독자 환경에서만 캐싱 허용, 글로벌이라
     if safe_to_run_code():
-        key = '{}-{}'.format(item_id, int(time.time() / 100))
+        key = f'{pk}{sk}{int(time.time() / 100)}'
         if key in cache and use_cache:
             return cache[key]
     else:
         key = None
 
-    item = resource.db_get_item(item_id)
+    item = resource._fdb_get_item_low_level(pk, sk)
     if item:
         policy_code = item.get('code')
     else:
@@ -93,17 +90,24 @@ def get_policy_code(resource, partition, mode, use_cache=True):
     return policy_code
 
 
-@NeedPermission(Permission.Run.Database.get_policy_code)
+@NeedPermission(Permission.Run.FastDatabase.get_policy_code)
 def do(data, resource):
     body = {}
     params = data['params']
 
-    partition_to_apply = params.get('partition_to_apply')
-    mode = params.get('mode')
+    partition_to_apply = params.get('partition', None)
+    mode = params.get('mode', None)
+
+    # 필수 파라메터 체크
+    if not partition_to_apply:
+        raise errorlist.NEED_PARTITION
+
+    if not mode:
+        raise errorlist.NEED_MODE
 
     policy_code = get_policy_code(resource, partition_to_apply, mode, use_cache=False)
     if policy_code:
         body['code'] = policy_code
     else:
-        body['error'] = error.NO_SUCH_POLICY_MODE
+        raise errorlist.NO_SUCH_POLICY_MODE
     return body

@@ -334,3 +334,69 @@ KEY_CANNOT_START_WITH_UNDER_BAR = CloudLogicError(
 ITEM_PK_SK_PAIR_ALREADY_EXIST = CloudLogicError(
     62, 'A combination of <item._pk & item._sk> must be unique'
 )
+
+ITEM_ID_PAIRS_MUST_BE_DICTIONARY = CloudLogicError(
+    63, 'ITEM_ID_PAIRS_MUST_BE_DICTIONARY'
+)
+
+ITEM_PARTITION_NOT_MATCH = CloudLogicError(
+    64, 'ITEM_PARTITION_NOT_MATCH'
+)
+
+INVALID_PK_GROUP = CloudLogicError(
+    65, 'INVALID_PK_GROUP'
+)
+
+NEED_SORT_CONDITION = CloudLogicError(
+    66, 'NEED <sort_condition> param'
+)
+
+NEED_SK_GROUP = CloudLogicError(
+    67, 'NEED <sk_group> param'
+)
+
+NEED_PARTITION = CloudLogicError(
+    68, 'NEED <partition> param'
+)
+NEED_SK_FIELD = CloudLogicError(
+    69, 'NEED <sk_field> param'
+)
+NEED_SK_VALUE = CloudLogicError(
+    70, 'NEED <sk_value> param'
+)
+NEED_ITEM_ID = CloudLogicError(
+    71, 'Need <item_id> param'
+)
+NEED_ITEM = CloudLogicError(
+    72, 'Need <item> param'
+)
+ITEM_ID_PAIRS = CloudLogicError(
+    73, 'Need <item_id_pairs> param'
+)
+NEED_PK_GROUP = CloudLogicError(
+    74, 'Need <pk_group> param'
+)
+NEED_PK_FIELD = CloudLogicError(
+    75, 'Need <pk_field> param'
+)
+NEED_PK_VALUE = CloudLogicError(
+    76, 'Need <pk_value> param'
+)
+
+NEED_MODE = CloudLogicError(
+    77, 'Need <mode> param'
+)
+
+NEED_CODE = CloudLogicError(
+    78, 'Need <code> param'
+)
+
+NEED_ITEM_IDS = CloudLogicError(
+    79, 'Need <item_ids> param'
+)
+NEED_ITEMS = CloudLogicError(
+    80, 'Need <items> param'
+)
+ITEM_ID_MUST_BE_STRING = CloudLogicError(
+    81, '<item_id> must be string type'
+)
