@@ -48,7 +48,7 @@ def do(data, resource):
         raise errorlist.ITEM_ID_PAIRS_MUST_BE_DICTIONARY
 
     # 아이템 일단 다 가져오기
-    old_items = resource.fdb_get_items([it_id for it_id, _ in item_id_pairs.items()], consistent_read=False)
+    old_items = resource.fdb_get_items([it_id for it_id, _ in item_id_pairs.items()], consistent_read=True)
     if not old_items:
         raise errorlist.NO_SUCH_ITEM
 
@@ -66,8 +66,12 @@ def do(data, resource):
                 raise errorlist.ITEM_MUST_BE_DICTIONARY
 
             # 유효한 키가 아닌 경우
-            if not valid_keys(item):
-                raise errorlist.KEY_CANNOT_START_WITH_UNDER_BAR
+            # if not valid_keys(item):
+            #     raise errorlist.KEY_CANNOT_START_WITH_UNDER_BAR
+            # key 가 _ 로 시작하지 않는것만 허용
+            item = {
+                key: value for key, value in item.items() if isinstance(key, str) and not key.startswith('_')
+            }
 
             old_item = old_items_by_id.get(item_id, None)
             if not old_item:
@@ -83,7 +87,7 @@ def do(data, resource):
                 new_item[key] = value
 
             # 생성 정책 위반한 경우
-            if not match_policy(policy_code, user, old_item, new_item=new_item):
+            if not match_policy(policy_code, user, old_item, new_item=item):
                 raise errorlist.UPDATE_POLICY_VIOLATION
 
             # 생성할 목록에 추가

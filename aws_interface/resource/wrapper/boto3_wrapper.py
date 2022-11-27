@@ -341,9 +341,6 @@ class DynamoDB:
     def init_table(self, table_name):
         self.create_table(table_name)
 
-    def init_fdb_table(self, table_name):
-        self.create_fdb_table(table_name)
-
     def create_table(self, table_name, sort_key='creation_date', sort_key_type='N'):
         try:
             response = self.client.create_table(
@@ -422,46 +419,6 @@ class DynamoDB:
             except Exception as ex:
                 pass
 
-            return True
-
-    def create_fdb_table(self, table_name):
-        """
-        fdb 용 테이블 생성문입니다.
-        :param table_name:
-        :return:
-        """
-        try:
-            response = self.client.create_table(
-                AttributeDefinitions=[
-                    {
-                        'AttributeName': '_pk',
-                        'AttributeType': 'S'
-                    }, {
-                        'AttributeName': '_sk',
-                        'AttributeType': 'S'
-                    }
-                ],
-                TableName=table_name,
-                KeySchema=[
-                    {
-                        'AttributeName': '_pk',
-                        'KeyType': 'HASH'
-                    }, {
-                        'AttributeName': 'sk',
-                        'KeyType': 'SORT'
-                    },
-                ],
-                BillingMode='PAY_PER_REQUEST',
-                StreamSpecification={
-                    'StreamEnabled': True,
-                    'StreamViewType': 'NEW_AND_OLD_IMAGES'
-                },
-            )
-            print('CREATING FDB TABLE...')
-            self.client.get_waiter('table_exists').wait(TableName=table_name)
-            return response
-        except Exception as ex:
-            print(ex)
             return True
 
     def update_table(self, table_name, index):
@@ -1067,6 +1024,7 @@ class DynamoFDB:
 
     def init_fdb_table(self):
         self.create_fdb_table(self.table_name)
+        # self.create_fdb_partition_index(self.table_name)
 
     def create_fdb_table(self, table_name):
         """
@@ -1108,6 +1066,50 @@ class DynamoFDB:
             print(ex)
             return True
 
+    def create_fdb_partition_index(self, table_name, index_name, pk_name, sk_name):
+        """
+        fdb 용 파티션 쿼리 전용 인덱스 생성문입니다.
+        :param table_name:
+        :return:
+        """
+        try:
+            response = self.client.update_table(
+                AttributeDefinitions=[
+                    {
+                        'AttributeName': pk_name,
+                        'AttributeType': 'S'
+                    }, {
+                        'AttributeName': sk_name,
+                        'AttributeType': 'S'
+                    }
+                ],
+                TableName=table_name,
+                GlobalSecondaryIndexUpdates=[
+                    {
+                        'Create': {
+                            'IndexName': index_name,
+                            'KeySchema': [
+                                {
+                                    'AttributeName': pk_name,
+                                    'KeyType': 'HASH'
+                                }, {
+                                    'AttributeName': sk_name,
+                                    'KeyType': 'RANGE'
+                                },
+                            ],
+                            'Projection': {
+                                'ProjectionType': 'ALL',
+                            },
+                        },
+                    }
+                ]
+            )
+            print('UPDATE FDB TABLE INDEX...')
+            return response
+        except Exception as ex:
+            print(ex)
+            return True
+
     def delete_fdb_table(self):
         try:
             response = self.client.delete_table(
@@ -1119,9 +1121,11 @@ class DynamoFDB:
             return None
 
     def delete_item(self, pk, sk):
-        key = Key('_pk').eq(pk) & Key('_sk').eq(sk)
         response = self.get_table(self.table_name).delete_item(
-            Key=key
+            Key={
+                '_pk': pk,
+                '_sk': sk
+            }
         )
         return response
 
@@ -1364,6 +1368,7 @@ class DynamoFDB:
         }
         if index_name:
             args['IndexName'] = index_name
+            args['ConsistentRead'] = False  # index 사용시 일관된 읽기는 사용 불가
         if filter_expression:
             args['FilterExpression'] = filter_expression
         if start_key:

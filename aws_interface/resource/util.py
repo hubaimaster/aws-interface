@@ -173,6 +173,14 @@ def split_pk_sk(merged_id):
     return keys[0], keys[1]
 
 
+class FDBIDDict(dict):
+    def __hash__(self):
+        return hash(self['_id'])
+
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
+
 if __name__ == '__main__':
     s = time.time()
     print(time.time() - s)

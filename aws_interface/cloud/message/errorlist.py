@@ -5,6 +5,9 @@ error.py 보다 진보된 에러처리
 
 
 class CloudLogicError(Exception):
+    code = None
+    message = None
+
     @classmethod
     def from_dict(cls, code_message_pair):
         code = code_message_pair.get('code', -1)
@@ -16,6 +19,12 @@ class CloudLogicError(Exception):
         self.message = message
 
     def __getattr__(self, item):
+        return {
+            'code': self.code,
+            'message': self.message
+        }
+
+    def to_dict(self):
         return {
             'code': self.code,
             'message': self.message
@@ -332,7 +341,7 @@ KEY_CANNOT_START_WITH_UNDER_BAR = CloudLogicError(
 )
 
 ITEM_PK_SK_PAIR_ALREADY_EXIST = CloudLogicError(
-    62, 'A combination of <item._pk & item._sk> must be unique'
+    62, 'A combination of <item._pk & item._sk> already exist'
 )
 
 ITEM_ID_PAIRS_MUST_BE_DICTIONARY = CloudLogicError(
@@ -399,4 +408,16 @@ NEED_ITEMS = CloudLogicError(
 )
 ITEM_ID_MUST_BE_STRING = CloudLogicError(
     81, '<item_id> must be string type'
+)
+
+PART_OF_ITEMS_READ_POLICY_VIOLATION = CloudLogicError(
+    82, 'Part of the list of items have read policy violation'
+)
+
+NEED_INDEX_NAME = CloudLogicError(
+    83, 'Need <index_name> param'
+)
+
+NEED_SK_CONDITION = CloudLogicError(
+    84, 'Need <sk_condition> param'
 )

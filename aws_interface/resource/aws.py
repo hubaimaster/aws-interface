@@ -125,7 +125,7 @@ class AWSResourceAllocator(ResourceAllocator):
 
         name = '{}'.format(self.app_id)
         desc = 'aws-interface cloud API'
-        runtime = 'python3.6'
+        runtime = 'python3.9'
         handler = 'cloud.lambda_function.aws_handler'
 
         cloud_module_name = 'cloud'
@@ -524,7 +524,7 @@ class AWSResource(Resource):
 
         name = '{}_{}'.format(self.app_id, function_name)
         desc = f'stand-alone-function-of-{self.app_id}'
-        runtime = 'python3.6'
+        runtime = 'python3.9'
         handler = '__aws_interface_stand_alone_physical_handler.main'
 
         handler_method_name = '__aws_interface_stand_alone_physical_handler'
@@ -658,6 +658,7 @@ class AWSResource(Resource):
         생성할 수 있습니다.
         :return:
         """
+
         self._fdb_remove_partition_cache()
 
         response = self.dynamoFDB.put_item({
@@ -675,18 +676,70 @@ class AWSResource(Resource):
         result_item = response.get('Attributes', {})
         return result_item
 
-    def fdb_append_index(self, partition, index_name, pk_group, pk_field, sk_group, sk_field):
+    def fdb_append_index(self, partition_name, pk_field, sk_field):
         """
         DB partition 에 인덱스를 추가합니다.
-        TODO 일단 기본 기능 먼저 구현하고, 필요시에 인덱스 부분을 개발하도록 한다.
-        :param partition:
-        :param index_name:
-        :param pk_group:
+        indexes 보고 순서에 따라 결정.
+        :param partition_name:
         :param pk_field:
-        :param sk_group:
         :param sk_field:
         :return:
         """
+        partitions = self.fdb_get_partitions()
+        partitions = [p for p in partitions if p.get('_partition_name', '') == partition_name]
+        if not partitions:
+            raise Exception('No such partition')
+        partition = partitions[0]
+        indexes = partition.get('indexes', [])
+        # 사용가능한 최소 인덱스 넘버 찾기
+        index_number = None
+        for idx_num in range(1, 6):
+            has_number = False
+            for index in indexes:
+                if index['index_number'] == idx_num:
+                    has_number = True
+            if not has_number:
+                index_number = idx_num
+                break
+        if index_number is None:
+            raise Exception('허용 가능한 인덱스 수량 초과')
+        pk_name = f"_pk{index_number}"
+        sk_name = f"_sk{index_number}"
+        index_name = f'{pk_name}-{sk_name}'
+        for index in indexes:
+            if index['_pk_field'] == pk_field and index['_sk_field'] == sk_field:
+                raise Exception('<_pk_field> & <_sk_field>  already exist in index')
+        index_item = {
+            '_pk_field': pk_field,
+            '_sk_field': sk_field,
+            'pk_name': pk_name,
+            'sk_name': sk_name,
+            'index_number': index_number,
+            'index_name': index_name
+        }
+        try:
+            # 실제 FDB 에 인덱스가 없으면 생성 있으면 Pass
+            self.dynamoFDB.create_fdb_partition_index(self.dynamoFDB.table_name, index_name, pk_name, sk_name)
+        except Exception as ex:
+            print(ex)
+            pass
+        indexes.append(index_item)
+        partition['indexes'] = indexes
+        return self.dynamoFDB.update_item(config.STR_META_INFO_PARTITION, partition_name, {
+            'indexes': indexes
+        })
+
+    def fdb_detach_index(self, partition_name, index_name):
+        partitions = self.fdb_get_partitions()
+        partitions = [p for p in partitions if p.get('_partition_name', '') == partition_name]
+        if not partitions:
+            raise Exception('No such partition')
+        partition = partitions[0]
+        indexes = partition.get('indexes', [])
+        # index_name 를 제거
+        indexes = [index for index in indexes if index.get('index_name', '') != index_name]
+        partition['indexes'] = indexes
+        return self.dynamoFDB.update_item(config.STR_META_INFO_PARTITION, partition_name, partition)
 
     def _fdb_remove_partition_cache(self):
         """
@@ -701,12 +754,13 @@ class AWSResource(Resource):
         파티션 목록을 가져옵니다.
         :return:
         """
-        if use_cache and 'partitions' in self.cache:
-            return self.cache['partitions']
+        cache_key = 'partitions' + str(int(time.time() // 100))
+        if use_cache and cache_key in self.cache:
+            return self.cache[cache_key]
         response = self.dynamoFDB.query_items('_pk', config.STR_META_INFO_PARTITION, 'gte', '_sk', ' ',
                                               consistent_read=True)
         items = response.get('Items', [])
-        self.cache['partitions'] = items
+        self.cache[cache_key] = items
         return items
 
     def fdb_delete_partition(self, partition):
@@ -735,11 +789,12 @@ class AWSResource(Resource):
                     return True
         return False
 
-    def _fdb_process_item_with_partition(self, item, partition):
+    def _fdb_process_item_with_partition(self, item, partition, set_created_at=True):
         """
         item 을 DB에 넣기 전에 partition 에서 정하는 형태와 동일하게 매핑합니다.
         :param item:
         :param partition:
+        :param set_created_at: update 시에는 False 로 해야 키 중첩이 안됨.
         :return:
         """
         partitions = self.fdb_get_partitions(use_cache=True)
@@ -750,14 +805,20 @@ class AWSResource(Resource):
         if not partition_obj:
             raise Exception('No such partition')
 
-        pk_group = partition_obj['_pk_group']
+        # pk_group = partition_obj['_pk_group']
         pk_field = partition_obj['_pk_field']
-        sk_group = partition_obj['_sk_group']
+        # sk_group = partition_obj['_sk_group']
         sk_field = partition_obj['_sk_field']
-        post_sk_fields = partition_obj['_post_sk_fields']
-        use_random_sk_postfix = partition_obj['_use_random_sk_postfix']
+        post_sk_fields = partition_obj.get('_post_sk_fields', [])
+        use_random_sk_postfix = partition_obj.get('_use_random_sk_postfix', True)
 
-        item['_created_at'] = int(time.time())
+        # 인덱스 정보 받기.
+        indexes = partition_obj.get('indexes', [])
+
+        if set_created_at:
+            item['_created_at'] = int(time.time())
+        if partition:
+            item['_partition'] = partition
         item = decode_dict(item)
 
         if pk_field not in item:
@@ -766,6 +827,8 @@ class AWSResource(Resource):
             raise Exception(f'sk_field:[{sk_field}] should in item')
 
         pk_value = item[pk_field]
+
+        # sk 관련 변수 생성
         if sk_field:
             sk_value = item[sk_field]
         else:
@@ -788,20 +851,63 @@ class AWSResource(Resource):
         if sk_field is None:
             # None 이 그대로 삽입되는걸 방지
             sk_field = ''
-        pk = f'{pk_group}#{pk_field}#{pk_value}'
-        sk = f'{sk_group}#{partition}#{sk_field}#{sk_value}'
+        # pk = f'{pk_group}#{pk_field}#{pk_value}'
+        # sk = f'{sk_group}#{partition}#{sk_field}#{sk_value}'
+        pk = f'{partition}#{pk_field}#{pk_value}'
+        sk = f'{sk_field}#{sk_value}'
 
         if post_sk_fields:
             for post_sk_field in post_sk_fields:
                 post_sk_value = item.get(post_sk_field, '')
                 sk += f'#{post_sk_field}#{post_sk_value}'
 
+        # 이 문장은 꼭 마지막에 위치해야 쿼리할 수 있음.
         if use_random_sk_postfix:
             sk += '#' + str(uuid.uuid4()).replace('-', '')
 
-        item['_partition'] = partition
         item['_pk'] = pk
         item['_sk'] = sk
+
+        # 인덱스에 넣을 것들 맵핑
+        for index in indexes:
+            pk_name = index['pk_name']  # _pk2 ... 같은것들
+            sk_name = index['sk_name']  # _sk2 ... 같은것들
+            pk_field = index['_pk_field']
+            sk_field = index['_sk_field']
+            pk_value = item.get(pk_field, None)
+
+            if sk_field:
+                sk_value = item.get(sk_field, '')
+            else:
+                sk_value = ''
+
+            sk_digit_fit = int(config.SK_DIGIT_FIT)
+            # 자리수를 맞춥니다. 숫자는 오른쪽부터 채우고 문자는 왼쪽부터 채웁니다.
+            # sk_digit_fit: 1234 인데 sk_digit_fit=8 이면, '____1234' 처럼 sorting 을 위해 자리를 채웁니다.
+            #         소숫점이 들어오면 '____1234.43' 이런식으로 . 이하는 무시합니다.
+            #         0이면 그대로 둡니다.
+            # 문자열과 숫자 정렬 차이를 주기 위해 첫번째 문자로 차이를 만든다.
+            if isinstance(sk_value, (int, float, Decimal)):
+                sk_value = util.convert_int_to_custom_base64(util.unsigned_number(sk_value))
+                sk_value = 'D' + sk_value.rjust(sk_digit_fit)
+            else:
+                # 삽입시에는 무조건 자릿수 맞춤을 하지만, 쿼리시에는 eq 일때만 자릿수 맞춤을 해준다.
+                sk_value = str(sk_value)
+                sk_value = 'S' + sk_value.ljust(sk_digit_fit)
+
+            if sk_field is None:
+                # None 이 그대로 삽입되는걸 방지
+                sk_field = ''
+
+            # 인덱스용으로 생성되는 pk_n
+            # _pk_v = f'{pk_group}#{pk_field}#{pk_value}'
+            # _sk_v = f'{sk_group}#{partition}#{sk_field}#{sk_value}'
+            _pk_v = f'{partition}#{pk_field}#{pk_value}'
+            _sk_v = f'{sk_field}#{sk_value}'
+
+            item[pk_name] = _pk_v
+            item[sk_name] = _sk_v
+
         item['_id'] = self.fdb_pk_sk_to_item_id(pk, sk)
         return item
 
@@ -814,6 +920,7 @@ class AWSResource(Resource):
         :return:
         """
         items = [self._fdb_process_item_with_partition(item, partition) for item in items]
+        items = list(set([util.FDBIDDict(item) for item in items]))
         _ids = [item['_id'] for item in items]
 
         # ID 는 _pk, _sk 와 1:1 대응 하기 때문에 저장하지 않습니다.
@@ -821,7 +928,9 @@ class AWSResource(Resource):
             if '_id' in item:
                 item.pop('_id')
         response = self.dynamoFDB.batch_put(items)
-        return _ids
+        for idx, item in enumerate(items):
+            item['_id'] = _ids[idx]
+        return items
 
     def fdb_put_item(self, partition, item):
         """
@@ -836,7 +945,8 @@ class AWSResource(Resource):
         if '_id' in item:
             item.pop('_id')
         response = self.dynamoFDB.put_item(item)
-        return _id
+        item['_id'] = _id
+        return item
 
     def _fdb_put_item_low_level(self, _pk, _sk, item):
         """
@@ -884,21 +994,19 @@ class AWSResource(Resource):
     def _convert_number_to_custom64(self):
         pass
 
-    def fdb_query_items(self, pk_group, pk_field, pk_value, sort_condition=None,
-                        sk_group='', partition=None, sk_field='', sk_value=None, sk_second_value=None, filters=None,
-                        start_key=None, limit=100, reverse=False, consistent_read=False, index_name=None):
+    def fdb_query_items(self, pk_field, pk_value, sort_condition=None,
+                        partition='', sk_field='', sk_value=None, sk_second_value=None, filters=None,
+                        start_key=None, limit=100, reverse=False, consistent_read=False, index_name=None,
+                        pk_name='_pk', sk_name='_sk'):
         """
         DB 를 쿼리하고, 이는 NoSQL 최적화 되어 있습니다.
         단계별로 pk 관련 키들은 쿼리에 필수이며,
         sk 관련 키들은 단계별로 아이템 쿼리를 진행할 수 있도록 도와줍니다.
         partition 을 넘겨야, sk_value 를 입력할 수 있기 때문에,
         sk_field 를 파티션을 통해 구할 수 있습니다.
-        TODO: 인덱스 기능이 추가될 경우, 마지막 파라메터 index 를 받아 처리해야합니다.
-        :param pk_group:
         :param pk_field:
         :param pk_value:
         :param sort_condition:
-        :param sk_group:
         :param partition:
         :param sk_field:
         :param sk_value:
@@ -917,6 +1025,8 @@ class AWSResource(Resource):
         :param reverse:
         :param consistent_read:
         :param index_name: 없을시 기본 파라메터로 쿼리
+        :param pk_name:
+        :param sk_name:
         :return:
         """
         if partition is not None:
@@ -928,10 +1038,10 @@ class AWSResource(Resource):
             if not partition_obj:
                 raise Exception('No such partition')
 
-            p_pk_field = partition_obj['_pk_field']
-
-            if p_pk_field != pk_field:
-                raise Exception(f'pk_field must be a [{p_pk_field}]')
+            # p_pk_field = partition_obj['_pk_field']
+            #
+            # if p_pk_field != pk_field:
+            #     raise Exception(f'pk_field must be a [{p_pk_field}]')
 
         sk_digit_fit = int(config.SK_DIGIT_FIT)
         # 자리수를 맞춥니다. 숫자는 오른쪽부터 채우고 문자는 왼쪽부터 채웁니다.
@@ -962,17 +1072,15 @@ class AWSResource(Resource):
         else:
             sk_second_value = ''
 
-        pk = f'{pk_group}#{pk_field}#{pk_value}'
+        pk = f'{partition}#{pk_field}#{pk_value}'
 
-        if not sk_group:
+        if not sk_field:
             # sort key 의 맨 처음 부분이기 때문에 문자 하나는 있어야 함, 공백 문자 삽입
-            sk_group = ' '
+            sk_field = ' '
 
-        sk = f'{sk_group}'
-        if partition:
-            sk += f'#{partition}'
-        if sk_field:
-            sk += f'#{sk_field}'
+        sk = f'{sk_field}'
+        # if partition:  삭제함 pk 그룹에 포함시킴
+        #     sk += f'#{partition}'
 
         # sk_second_value 가 있을 경우 sk_high 비교 변수 생성
         sk_high = ''
@@ -981,8 +1089,8 @@ class AWSResource(Resource):
         if sk_value:
             sk += f'#{sk_value}'
 
-        response = self.dynamoFDB.query_items('_pk', pk,
-                                              sort_condition, '_sk', sk,
+        response = self.dynamoFDB.query_items(pk_name, pk,
+                                              sort_condition, sk_name, sk,
                                               sort_key_second_value=sk_high, filters=filters,
                                               start_key=start_key, reverse=reverse, limit=limit,
                                               consistent_read=consistent_read, index_name=index_name)
@@ -992,7 +1100,8 @@ class AWSResource(Resource):
         # ID 매겨줌
         for item in items:
             if item:
-                item['_id'] = util.merge_pk_sk(item["_pk"], item['_sk'])
+                # 여기서 pkn, skn 을 쓰지 않는 이유는... ID 용이기 때문이다.
+                item['_id'] = util.merge_pk_sk(item['_pk'], item['_sk'])
 
         return items, end_key
 
@@ -1004,6 +1113,27 @@ class AWSResource(Resource):
         """
         self.dynamoFDB.batch_delete([self.fdb_item_id_to_pk_sk_pair(item_id) for item_id in item_ids])
 
+    def _fdb_check_sk_safe(self, partition, origin_sk, new_sk):
+        """
+        sk 가 업데이트했을시 소트키에 영향이 없는지 판단합니다.
+        :param partition:
+        :param origin_sk: 원래 sk
+        :param new_sk:
+        :return:
+        """
+        partitions = self.fdb_get_partitions(use_cache=True)
+        partitions_by_name = {
+            p.get('_partition_name', None): p for p in partitions
+        }
+        partition_obj = partitions_by_name.get(partition, None)
+        if not partition_obj:
+            raise Exception('No such partition')
+        _use_random_sk_postfix = partition_obj.get('_use_random_sk_postfix', False)
+        if _use_random_sk_postfix:  # 랜덤 후위 사용시 uuid 부분 제거
+            return new_sk[:-32] == origin_sk[:-32]
+        else:
+            return new_sk == origin_sk
+
     def fdb_update_item(self, partition, item_id, item):
         """
         업데이트, pk 와 sk 는 업데이트할 수 없음.
@@ -1013,7 +1143,7 @@ class AWSResource(Resource):
         :return:
         """
         pk_sk_pair = self.fdb_item_id_to_pk_sk_pair(item_id)
-        item_to_insert = self._fdb_process_item_with_partition(item, partition)
+        item_to_insert = self._fdb_process_item_with_partition(item, partition, set_created_at=False)
         # _pk, _sk 가 수정되면 안됨.
         origin_pk = pk_sk_pair['_pk']
         item_pk = item_to_insert['_pk']
@@ -1023,7 +1153,7 @@ class AWSResource(Resource):
 
         if origin_pk != item_pk:
             raise Exception(f'Try to update <_pk>: [{origin_pk} => {item_pk}] <_pk> cannot be modified.')
-        if origin_sk != item_sk:
+        if not self._fdb_check_sk_safe(partition, origin_sk, item_sk):
             raise Exception(f'Try to update <_sk>: [{origin_sk} => {item_sk}] <_sk> cannot be modified.')
 
         # 레퍼런스가 되는 상황 방지를 위해 copy 사용

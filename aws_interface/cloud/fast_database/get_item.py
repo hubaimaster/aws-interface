@@ -30,7 +30,7 @@ def do(data, resource):
     user = data['user']
 
     item_id = params.get('item_id', None)
-    consistent_read = params.get('consistent_read', False)
+    consistent_read = params.get('consistent_read', True)
 
     # 필수 파라메터 체크
     if not item_id:

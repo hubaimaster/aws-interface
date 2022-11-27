@@ -7,7 +7,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.template import loader
 from dashboard.views.utils import Util, page_manage
-from dashboard.views.app.overview import allocate_resource_in_background
 from core.adapter.django import DjangoAdapter
 from concurrent.futures import ThreadPoolExecutor
 import json
@@ -21,8 +20,6 @@ class Auth(LoginRequiredMixin, View):
         context = Util.get_context(request)
         context['app_id'] = app_id
         adapter = DjangoAdapter(app_id, request)
-
-        # allocate_resource_in_background(adapter)
 
         with adapter.open_api_auth() as api:
             user_groups = api.get_user_groups()['groups']

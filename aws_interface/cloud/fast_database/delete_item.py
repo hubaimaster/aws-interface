@@ -25,7 +25,7 @@ def do(data, resource):
     user = data['user']
 
     item_id = params.get('item_id', None)
-    consistent_read = params.get('consistent_read', False)
+    consistent_read = params.get('consistent_read', True)
 
     # 필수 파라메터 체크
     if not item_id:
@@ -42,6 +42,8 @@ def do(data, resource):
         raise errorlist.NO_SUCH_ITEM
 
     item = items[0]
+    if not item:
+        raise errorlist.NO_SUCH_ITEM
     partition = item['_partition']
     # 등록된 파티션이 아닌경우
     if not partition or not util.has_partition(resource, partition, use_cache=True):

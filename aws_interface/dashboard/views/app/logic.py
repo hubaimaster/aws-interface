@@ -11,7 +11,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from dashboard.views.utils import Util, page_manage
 from zipfile import ZipFile
-from dashboard.views.app.overview import allocate_resource_in_background
 
 import json
 import base64
@@ -202,7 +201,7 @@ class LogicEdit(LoginRequiredMixin, View):
                 file_content = request.POST.get('file_content')
                 file_type = request.POST.get('file_type', 'text')
                 result = logic_api.put_function_file(function_name, file_path, file_content, file_type, function_version)
-                # allocate_resource_in_background(adapter)
+
                 return JsonResponse(result)
             elif cmd == 'update_function':
                 function_name = request.POST.get('function_name', None)

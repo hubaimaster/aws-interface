@@ -72,7 +72,7 @@ def get_policy_code(resource, partition, mode, use_cache=True):
 
     # 독자 환경에서만 캐싱 허용, 글로벌이라
     if safe_to_run_code():
-        key = f'{pk}{sk}{int(time.time() / 100)}'
+        key = f'{pk}{sk}{int(time.time() // 100)}'
         if key in cache and use_cache:
             return cache[key]
     else:

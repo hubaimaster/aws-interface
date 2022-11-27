@@ -220,7 +220,7 @@ SESSION_NOT_VERIFICATION = {
     'code': 54,
     'message': 'Session security hardened. '
                'Session access was rejected because '
-               'it was different from the region you accessed when logging in.',
+               'security params are invalid.',
 }
 
 INVALID_ITEM_ID = {

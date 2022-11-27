@@ -564,18 +564,25 @@ class Resource(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    def fdb_append_index(self, partition, index_name, pk_group, pk_field, sk_group, sk_field):
+    def fdb_append_index(self, partition_name, pk_field, sk_field):
         """
         DB partition 에 인덱스를 추가합니다.
         TODO 일단 기본 기능 먼저 구현하고, 필요시에 인덱스 부분을 개발하도록 한다.
-        :param partition:
-        :param index_name:
-        :param pk_group:
+        :param partition_name:
         :param pk_field:
-        :param sk_group:
         :param sk_field:
         :return:
         """
+        raise NotImplementedError
+
+    def fdb_detach_index(self, partition_name, index_name):
+        """
+        DB partition 에 인덱스 제거
+        :param partition_name:
+        :param index_name:
+        :return:
+        """
+        raise NotImplementedError
 
     def fdb_get_partitions(self, use_cache=False):
         """
@@ -640,21 +647,19 @@ class Resource(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
-    def fdb_query_items(self, pk_group, pk_field, pk_value, sort_condition=None,
-                        sk_group='', partition='', sk_field='', sk_value=' ', sk_second_value=None, filters=None,
-                        start_key=None, limit=100, reverse=False, consistent_read=False, index_name=None):
+    def fdb_query_items(self, pk_field, pk_value, sort_condition=None,
+                        partition='', sk_field='', sk_value=' ', sk_second_value=None, filters=None,
+                        start_key=None, limit=100, reverse=False, consistent_read=False, index_name=None,
+                        pk_name='_pk', sk_name='_sk'):
         """
         DB 를 쿼리하고, 이는 NoSQL 최적화 되어 있습니다.
         단계별로 pk 관련 키들은 쿼리에 필수이며,
         sk 관련 키들은 단계별로 아이템 쿼리를 진행할 수 있도록 도와줍니다.
         partition 을 넘겨야, sk_value 를 입력할 수 있기 때문에,
         sk_field 를 파티션을 통해 구할 수 있습니다.
-        TODO: 인덱스 기능이 추가될 경우, 마지막 파라메터 index 를 받아 처리해야합니다.
-        :param pk_group:
         :param pk_field:
         :param pk_value:
         :param sort_condition:
-        :param sk_group:
         :param partition:
         :param sk_field:
         :param sk_value:
@@ -665,6 +670,8 @@ class Resource(metaclass=ABCMeta):
         :param reverse:
         :param consistent_read:
         :param index_name: 없을시 기본 파라메터로 쿼리
+        :param pk_name:
+        :param sk_name:
         :return:
         """
         raise NotImplementedError

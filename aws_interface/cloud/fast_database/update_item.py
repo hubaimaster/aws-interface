@@ -47,8 +47,12 @@ def do(data, resource):
         raise errorlist.ITEM_MUST_BE_DICTIONARY
 
     # 유효한 키가 아닌 경우
-    if not valid_keys(item):
-        raise errorlist.KEY_CANNOT_START_WITH_UNDER_BAR
+    # if not valid_keys(item):
+    #     raise errorlist.KEY_CANNOT_START_WITH_UNDER_BAR
+    # 아이템에 있는 값 중 key 가 언더바로 시작하는건 제외
+    item = {
+        key: value for key, value in item.items() if isinstance(key, str) and not key.startswith('_')
+    }
 
     # 파티션이 없는 경우
     if partition is None or not has_partition(resource, partition, use_cache=True):
@@ -71,7 +75,7 @@ def do(data, resource):
         new_item[key] = value
 
     # 생성 정책 위반한 경우
-    if not match_policy_after_get_policy_code(resource, 'update', partition, user, old_item, new_item=new_item):
+    if not match_policy_after_get_policy_code(resource, 'update', partition, user, old_item, new_item=item):
         raise errorlist.UPDATE_POLICY_VIOLATION
 
     # 업데이트 진행, pk, sk 겹치는 경우 에러 발생함

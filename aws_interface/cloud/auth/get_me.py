@@ -122,7 +122,7 @@ def do(data, resource, system_call=False):  # Do not check policy when system_ca
     else:
         user_id = None
 
-    # 세션 timestamp 보안, 일단 끔.
+    # 세션 timestamp 보안
     if session and session.get('use_secure', False):
         if not verify_session_time(session, params):
             return error.SESSION_NOT_VERIFICATION

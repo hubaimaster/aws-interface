@@ -70,11 +70,16 @@ def do(data, resource):
     body = {}
     params = data['params']
     user = data.get('user', None)
+    client_ip = data.get('client_ip', None)
 
     function_name = params.get('function_name')
     payload = params.get('payload')
     show_traceback = params.get('show_traceback', False)
+    # show_traceback = False
     # logging = params.get('logging', False)
+
+    if payload and isinstance(payload, dict):
+        payload['__client_ip'] = client_ip
 
     items, _ = resource.db_query(partition, [{'option': None, 'field': 'function_name', 'value': function_name, 'condition': 'eq'}], reverse=True)
 
@@ -166,20 +171,16 @@ def do(data, resource):
                 return_value = {}
 
             body['response'] = return_value.get('response', None)
-            body['stdout'] = return_value.get('stdout', None)
+            # body['stdout'] = return_value.get('stdout', None)
             err = return_value.get('error', None)
             if err:
                 if use_traceback and show_traceback:
                     body['traceback'] = err
-                r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
-                print('slack response:', r)
 
         except Exception as ex:
             error_traceback = None  # traceback.format_exc()
             body['error'] = error.FUNCTION_ERROR
             body['error']['message'] = body['error']['message'].format('{}, {}, {}'.format(ex, error_traceback, return_value))
-            r = slack.send_system_slack_message(resource, str(body).replace('\\', ''))
-            print('slack response:', r)
 
         # os.remove(zip_temp_dir)
         # shutil.rmtree(extracted_dir, ignore_errors=True)

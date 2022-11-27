@@ -60,6 +60,9 @@ def pop_ban_keys(item):
     if not item or not isinstance(item, dict):
         return item
     ban_keys = ['_pk', '_sk']
+    for idx in range(1, 6):  # 최대 글로벌 인덱스 선언 개수가 5개
+        ban_keys.append(f'_pk{idx}')
+        ban_keys.append(f'_sk{idx}')
     item = item.copy()
     for ban_key in ban_keys:
         if ban_key in item:

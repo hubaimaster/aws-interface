@@ -3080,13 +3080,15 @@ value? | str
 curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.auth.set_user_email",
 "session_id": "str",
+"user_id": "str",
 "email": "str"}'
 ```
 
 ```python
 response = client.call_api("cloud.auth.set_user_email", {
  "email": "str",
- "session_id": "str"
+ "session_id": "str",
+ "user_id": "str"
 })
 print(response)
 ```
@@ -3094,7 +3096,8 @@ print(response)
 ```javascript
 client.callAPI("cloud.auth.set_user_email", {
  "email": "str",
- "session_id": "str"
+ "session_id": "str",
+ "user_id": "str"
 }).then(function(response){
   console.log(JSON.stringify(response));
 }).catch(function(error){
@@ -3106,6 +3109,7 @@ client.callAPI("cloud.auth.set_user_email", {
 ```java
 HashMap<String, Object> data = new HashMap<>();
 data.put("session_id", "str");
+data.put("user_id", "str");
 data.put("email", "str");
 
 client.callAPI("cloud.auth.set_user_email", data, (response, hasError)->{
@@ -3116,6 +3120,7 @@ client.callAPI("cloud.auth.set_user_email", data, (response, hasError)->{
 ```swift
 client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_id": "str",
+"user_id": "str",
 "email": "str",
 ]) { (response) in
   print(response)
@@ -3146,6 +3151,7 @@ Parameter | Type | Value
 --------- | ----------- | -----
 module_name | str | "cloud.auth.set_user_email"
 session_id | str
+user_id | str
 email | str
 
 
@@ -4915,6 +4921,1646 @@ use_simplify | bool?=True
 
 
 
+# fast_database
+Manage database operation
+
+## cloud.fast_database.add_index_to_partition
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.add_index_to_partition",
+"partition": "str",
+"pk_field": "str",
+"sk_field": "str",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.add_index_to_partition", {
+ "partition": "str",
+ "pk_field": "str",
+ "session_id?": "str",
+ "sk_field": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.add_index_to_partition", {
+ "partition": "str",
+ "pk_field": "str",
+ "session_id?": "str",
+ "sk_field": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("pk_field", "str");
+data.put("sk_field", "str");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.add_index_to_partition", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"pk_field": "str",
+"sk_field": "str",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "partition": "str",
+ "result": "dict"
+}
+```
+
+Add index to partition and return partition name
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.add_index_to_partition"
+partition | str
+pk_field | str
+sk_field | str
+session_id? | str
+
+
+
+## cloud.fast_database.create_item
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.create_item",
+"partition": "str",
+"item": "dict",
+"can_overwrite": "bool",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.create_item", {
+ "can_overwrite": "bool",
+ "item": "dict",
+ "partition": "str",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.create_item", {
+ "can_overwrite": "bool",
+ "item": "dict",
+ "partition": "str",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("item", "dict");
+data.put("can_overwrite", "bool");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.create_item", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"item": "dict",
+"can_overwrite": "bool",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "item_id": "str"
+}
+```
+
+Create item and return result
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.create_item"
+partition | str
+item | dict
+can_overwrite | bool
+session_id? | str
+
+
+
+## cloud.fast_database.create_items
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.create_items",
+"partition": "str",
+"items": "list(dict)",
+"can_overwrite": "bool",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.create_items", {
+ "can_overwrite": "bool",
+ "items": "list(dict)",
+ "partition": "str",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.create_items", {
+ "can_overwrite": "bool",
+ "items": "list(dict)",
+ "partition": "str",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("items", "list(dict)");
+data.put("can_overwrite", "bool");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.create_items", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"items": "list(dict)",
+"can_overwrite": "bool",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "failed_items": "[{item, error: {code, message}}]",
+ "item_ids": "list(str)"
+}
+```
+
+Create items and return item ids
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.create_items"
+partition | str
+items | list(dict)
+can_overwrite | bool
+session_id? | str
+
+
+
+## cloud.fast_database.create_partition
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.create_partition",
+"partition": "str",
+"pk_field": "str",
+"sk_field": "str",
+"post_sk_fields": "list",
+"use_random_sk_postfix": "bool",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.create_partition", {
+ "partition": "str",
+ "pk_field": "str",
+ "post_sk_fields": "list",
+ "session_id?": "str",
+ "sk_field": "str",
+ "use_random_sk_postfix": "bool"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.create_partition", {
+ "partition": "str",
+ "pk_field": "str",
+ "post_sk_fields": "list",
+ "session_id?": "str",
+ "sk_field": "str",
+ "use_random_sk_postfix": "bool"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("pk_field", "str");
+data.put("sk_field", "str");
+data.put("post_sk_fields", "list");
+data.put("use_random_sk_postfix", "bool");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.create_partition", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"pk_field": "str",
+"sk_field": "str",
+"post_sk_fields": "list",
+"use_random_sk_postfix": "bool",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "partition": "str",
+ "result": "dict"
+}
+```
+
+Create partition and return partition name
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.create_partition"
+partition | str
+pk_field | str
+sk_field | str
+post_sk_fields | list
+use_random_sk_postfix | bool
+session_id? | str
+
+
+
+## cloud.fast_database.delete_item
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.delete_item",
+"item_id": "str",
+"consistent_read": "bool",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.delete_item", {
+ "consistent_read": "bool",
+ "item_id": "str",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.delete_item", {
+ "consistent_read": "bool",
+ "item_id": "str",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("item_id", "str");
+data.put("consistent_read", "bool");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.delete_item", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"item_id": "str",
+"consistent_read": "bool",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "success": "bool"
+}
+```
+
+Delete item
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.delete_item"
+item_id | str
+consistent_read | bool
+session_id? | str
+
+
+
+## cloud.fast_database.delete_items
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.delete_items",
+"item_ids": "[str]",
+"consistent_read": "bool",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.delete_items", {
+ "consistent_read": "bool",
+ "item_ids": "[str]",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.delete_items", {
+ "consistent_read": "bool",
+ "item_ids": "[str]",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("item_ids", "[str]");
+data.put("consistent_read", "bool");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.delete_items", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"item_ids": "[str]",
+"consistent_read": "bool",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "item_ids_deleted": "[str]"
+}
+```
+
+Delete items
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.delete_items"
+item_ids | [str]
+consistent_read | bool
+session_id? | str
+
+
+
+## cloud.fast_database.delete_partition
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.delete_partition",
+"partition": "str",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.delete_partition", {
+ "partition": "str",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.delete_partition", {
+ "partition": "str",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.delete_partition", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "partition": "str",
+ "result": "dict"
+}
+```
+
+Delete partition and return partition name
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.delete_partition"
+partition | str
+session_id? | str
+
+
+
+## cloud.fast_database.get_item
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.get_item",
+"item_id": "str",
+"consistent_read": "bool",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.get_item", {
+ "consistent_read": "bool",
+ "item_id": "str",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.get_item", {
+ "consistent_read": "bool",
+ "item_id": "str",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("item_id", "str");
+data.put("consistent_read", "bool");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.get_item", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"item_id": "str",
+"consistent_read": "bool",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "item": {
+  "...": "...",
+  "_created_at": "int",
+  "_id": "str",
+  "_partition": "str"
+ }
+}
+```
+
+Get item
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.get_item"
+item_id | str
+consistent_read | bool
+session_id? | str
+
+
+
+## cloud.fast_database.get_items
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.get_items",
+"session_id": "str",
+"item_ids": "[str]",
+"consistent_read": "bool"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.get_items", {
+ "consistent_read": "bool",
+ "item_ids": "[str]",
+ "session_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.get_items", {
+ "consistent_read": "bool",
+ "item_ids": "[str]",
+ "session_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id", "str");
+data.put("item_ids", "[str]");
+data.put("consistent_read", "bool");
+
+client.callAPI("cloud.fast_database.get_items", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id": "str",
+"item_ids": "[str]",
+"consistent_read": "bool",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "items": [
+  {
+   "...": "...",
+   "_created_at": "int",
+   "_id": "str",
+   "_partition": "str"
+  }
+ ]
+}
+```
+
+Get items, If more than one items have policy violation, None type objects will return.
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.get_items"
+session_id | str
+item_ids | [str]
+consistent_read | bool
+
+
+
+## cloud.fast_database.get_partitions
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.get_partitions",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.get_partitions", {
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.get_partitions", {
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.get_partitions", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "partitions": "list"
+}
+```
+
+List partitions
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.get_partitions"
+session_id? | str
+
+
+
+## cloud.fast_database.get_policy_code
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.get_policy_code",
+"partition": "str",
+"mode": "\"create\" | \"read\" | \"update\" | \"delete\"",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.get_policy_code", {
+ "mode": "\"create\" | \"read\" | \"update\" | \"delete\"",
+ "partition": "str",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.get_policy_code", {
+ "mode": "\"create\" | \"read\" | \"update\" | \"delete\"",
+ "partition": "str",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("mode", "\"create\" | \"read\" | \"update\" | \"delete\"");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.get_policy_code", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"mode": "\"create\" | \"read\" | \"update\" | \"delete\"",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "code": "str",
+ "error?": {
+  "code": "int",
+  "message": "str"
+ }
+}
+```
+
+Get policy code about mode (CRUD)
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.get_policy_code"
+partition | str
+mode | &#34;create&#34; | &#34;read&#34; | &#34;update&#34; | &#34;delete&#34;
+session_id? | str
+
+
+
+## cloud.fast_database.put_policy
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.put_policy",
+"partition": "str",
+"mode": "\"create\" | \"read\" | \"update\" | \"delete\"",
+"code": "str",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.put_policy", {
+ "code": "str",
+ "mode": "\"create\" | \"read\" | \"update\" | \"delete\"",
+ "partition": "str",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.put_policy", {
+ "code": "str",
+ "mode": "\"create\" | \"read\" | \"update\" | \"delete\"",
+ "partition": "str",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("mode", "\"create\" | \"read\" | \"update\" | \"delete\"");
+data.put("code", "str");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.put_policy", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"mode": "\"create\" | \"read\" | \"update\" | \"delete\"",
+"code": "str",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "result": "Creation result"
+}
+```
+
+Put policy in the partition
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.put_policy"
+partition | str
+mode | &#34;create&#34; | &#34;read&#34; | &#34;update&#34; | &#34;delete&#34;
+code | str
+session_id? | str
+
+
+
+## cloud.fast_database.query_items
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.query_items",
+"partition": "str",
+"pk_field": "str",
+"pk_value": "str",
+"sk_condition": "str?",
+"sk_field": "str?",
+"sk_value": "str?",
+"sk_second_value": "str?",
+"filters": "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]",
+"max_scan_rep": "int?",
+"start_key": "str?",
+"limit": "int",
+"reverse": "bool",
+"consistent_read": "bool",
+"projection_keys": "[str]",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.query_items", {
+ "consistent_read": "bool",
+ "filters": "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]",
+ "limit": "int",
+ "max_scan_rep": "int?",
+ "partition": "str",
+ "pk_field": "str",
+ "pk_value": "str",
+ "projection_keys": "[str]",
+ "reverse": "bool",
+ "session_id?": "str",
+ "sk_condition": "str?",
+ "sk_field": "str?",
+ "sk_second_value": "str?",
+ "sk_value": "str?",
+ "start_key": "str?"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.query_items", {
+ "consistent_read": "bool",
+ "filters": "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]",
+ "limit": "int",
+ "max_scan_rep": "int?",
+ "partition": "str",
+ "pk_field": "str",
+ "pk_value": "str",
+ "projection_keys": "[str]",
+ "reverse": "bool",
+ "session_id?": "str",
+ "sk_condition": "str?",
+ "sk_field": "str?",
+ "sk_second_value": "str?",
+ "sk_value": "str?",
+ "start_key": "str?"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("pk_field", "str");
+data.put("pk_value", "str");
+data.put("sk_condition", "str?");
+data.put("sk_field", "str?");
+data.put("sk_value", "str?");
+data.put("sk_second_value", "str?");
+data.put("filters", "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]");
+data.put("max_scan_rep", "int?");
+data.put("start_key", "str?");
+data.put("limit", "int");
+data.put("reverse", "bool");
+data.put("consistent_read", "bool");
+data.put("projection_keys", "[str]");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.query_items", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"pk_field": "str",
+"pk_value": "str",
+"sk_condition": "str?",
+"sk_field": "str?",
+"sk_value": "str?",
+"sk_second_value": "str?",
+"filters": "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]",
+"max_scan_rep": "int?",
+"start_key": "str?",
+"limit": "int",
+"reverse": "bool",
+"consistent_read": "bool",
+"projection_keys": "[str]",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "end_key?": "str",
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "items?": [
+  {
+   "...": "...",
+   "_created_at": "float",
+   "_id": "str",
+   "_partition": "str"
+  }
+ ]
+}
+```
+
+Query items
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.query_items"
+partition | str
+pk_field | str
+pk_value | str
+sk_condition | str?
+sk_field | str?
+sk_value | str?
+sk_second_value | str?
+filters | [                             {                                 &#39;field&#39;: &#39;str&#39;,                                 &#39;value&#39;: &#39;str&#39;,                                 &#39;second_value&#39;: &#39;str?&#39;,                                 &#39;condition&#39;: &#39;eq&#39; | &#39;neq&#39; | &#39;lte&#39; | &#39;lt&#39; | &#39;gte&#39; | &#39;gt&#39; | &#39;btw&#39; | &#39;stw&#39; |                                              &#39;is_in&#39; | &#39;contains&#39; | &#39;exist&#39; | &#39;not_exist&#39;                             }                     ]
+max_scan_rep | int?
+start_key | str?
+limit | int
+reverse | bool
+consistent_read | bool
+projection_keys | [str]
+session_id? | str
+
+
+
+## cloud.fast_database.query_items_by_partition
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.query_items_by_partition",
+"partition": "str",
+"pk_field": "str",
+"pk_value": "str",
+"sk_condition": "str?",
+"sk_field": "str?",
+"sk_value": "str?",
+"sk_second_value": "str?",
+"filters": "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]",
+"max_scan_rep": "int?",
+"start_key": "str?",
+"limit": "int",
+"reverse": "bool",
+"consistent_read": "bool",
+"projection_keys": "[str]",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.query_items_by_partition", {
+ "consistent_read": "bool",
+ "filters": "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]",
+ "limit": "int",
+ "max_scan_rep": "int?",
+ "partition": "str",
+ "pk_field": "str",
+ "pk_value": "str",
+ "projection_keys": "[str]",
+ "reverse": "bool",
+ "session_id?": "str",
+ "sk_condition": "str?",
+ "sk_field": "str?",
+ "sk_second_value": "str?",
+ "sk_value": "str?",
+ "start_key": "str?"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.query_items_by_partition", {
+ "consistent_read": "bool",
+ "filters": "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]",
+ "limit": "int",
+ "max_scan_rep": "int?",
+ "partition": "str",
+ "pk_field": "str",
+ "pk_value": "str",
+ "projection_keys": "[str]",
+ "reverse": "bool",
+ "session_id?": "str",
+ "sk_condition": "str?",
+ "sk_field": "str?",
+ "sk_second_value": "str?",
+ "sk_value": "str?",
+ "start_key": "str?"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("pk_field", "str");
+data.put("pk_value", "str");
+data.put("sk_condition", "str?");
+data.put("sk_field", "str?");
+data.put("sk_value", "str?");
+data.put("sk_second_value", "str?");
+data.put("filters", "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]");
+data.put("max_scan_rep", "int?");
+data.put("start_key", "str?");
+data.put("limit", "int");
+data.put("reverse", "bool");
+data.put("consistent_read", "bool");
+data.put("projection_keys", "[str]");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.query_items_by_partition", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"pk_field": "str",
+"pk_value": "str",
+"sk_condition": "str?",
+"sk_field": "str?",
+"sk_value": "str?",
+"sk_second_value": "str?",
+"filters": "[                             {                                 \u0027field\u0027: \u0027str\u0027,                                 \u0027value\u0027: \u0027str\u0027,                                 \u0027second_value\u0027: \u0027str?\u0027,                                 \u0027condition\u0027: \u0027eq\u0027 | \u0027neq\u0027 | \u0027lte\u0027 | \u0027lt\u0027 | \u0027gte\u0027 | \u0027gt\u0027 | \u0027btw\u0027 | \u0027stw\u0027 |                                              \u0027is_in\u0027 | \u0027contains\u0027 | \u0027exist\u0027 | \u0027not_exist\u0027                             }                     ]",
+"max_scan_rep": "int?",
+"start_key": "str?",
+"limit": "int",
+"reverse": "bool",
+"consistent_read": "bool",
+"projection_keys": "[str]",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "end_key?": "str",
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "items?": [
+  {
+   "...": "...",
+   "_created_at": "float",
+   "_id": "str",
+   "_partition": "str"
+  }
+ ]
+}
+```
+
+Query items
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.query_items_by_partition"
+partition | str
+pk_field | str
+pk_value | str
+sk_condition | str?
+sk_field | str?
+sk_value | str?
+sk_second_value | str?
+filters | [                             {                                 &#39;field&#39;: &#39;str&#39;,                                 &#39;value&#39;: &#39;str&#39;,                                 &#39;second_value&#39;: &#39;str?&#39;,                                 &#39;condition&#39;: &#39;eq&#39; | &#39;neq&#39; | &#39;lte&#39; | &#39;lt&#39; | &#39;gte&#39; | &#39;gt&#39; | &#39;btw&#39; | &#39;stw&#39; |                                              &#39;is_in&#39; | &#39;contains&#39; | &#39;exist&#39; | &#39;not_exist&#39;                             }                     ]
+max_scan_rep | int?
+start_key | str?
+limit | int
+reverse | bool
+consistent_read | bool
+projection_keys | [str]
+session_id? | str
+
+
+
+## cloud.fast_database.remove_index_to_partition
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.remove_index_to_partition",
+"partition": "str",
+"index_name": "str",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.remove_index_to_partition", {
+ "index_name": "str",
+ "partition": "str",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.remove_index_to_partition", {
+ "index_name": "str",
+ "partition": "str",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("partition", "str");
+data.put("index_name", "str");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.fast_database.remove_index_to_partition", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"partition": "str",
+"index_name": "str",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "partition": "str",
+ "result": "dict"
+}
+```
+
+Remove index to partition and return partition name
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.remove_index_to_partition"
+partition | str
+index_name | str
+session_id? | str
+
+
+
+## cloud.fast_database.update_item
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.update_item",
+"session_id": "str",
+"partition": "str",
+"item_id": "str",
+"item": "dict"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.update_item", {
+ "item": "dict",
+ "item_id": "str",
+ "partition": "str",
+ "session_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.update_item", {
+ "item": "dict",
+ "item_id": "str",
+ "partition": "str",
+ "session_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id", "str");
+data.put("partition", "str");
+data.put("item_id", "str");
+data.put("item", "dict");
+
+client.callAPI("cloud.fast_database.update_item", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id": "str",
+"partition": "str",
+"item_id": "str",
+"item": "dict",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "item": "dict"
+}
+```
+
+Update item and return result
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.update_item"
+session_id | str
+partition | str
+item_id | str
+item | dict
+
+
+
+## cloud.fast_database.update_items
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.fast_database.update_items",
+"session_id": "str",
+"partition": "str",
+"item_id_pairs": "{item_id: item}"}'
+```
+
+```python
+response = client.call_api("cloud.fast_database.update_items", {
+ "item_id_pairs": "{item_id: item}",
+ "partition": "str",
+ "session_id": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.fast_database.update_items", {
+ "item_id_pairs": "{item_id: item}",
+ "partition": "str",
+ "session_id": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("session_id", "str");
+data.put("partition", "str");
+data.put("item_id_pairs", "{item_id: item}");
+
+client.callAPI("cloud.fast_database.update_items", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"session_id": "str",
+"partition": "str",
+"item_id_pairs": "{item_id: item}",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "error_pairs": "dict",
+ "success_pairs": "dict"
+}
+```
+
+Update items and return result
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.fast_database.update_items"
+session_id | str
+partition | str
+item_id_pairs | {item_id: item}
+
+
+
+
 # storage
 File management
 
@@ -5005,13 +6651,15 @@ curl "https://your_rest_api_url" -d '{
 "module_name": "cloud.storage.download_b64",
 "session_id": "str",
 "file_id": "str",
-"use_plain?": "bool=false"}'
+"use_plain?": "bool=false",
+"use_cache?": "bool=false"}'
 ```
 
 ```python
 response = client.call_api("cloud.storage.download_b64", {
  "file_id": "str",
  "session_id": "str",
+ "use_cache?": "bool=false",
  "use_plain?": "bool=false"
 })
 print(response)
@@ -5021,6 +6669,7 @@ print(response)
 client.callAPI("cloud.storage.download_b64", {
  "file_id": "str",
  "session_id": "str",
+ "use_cache?": "bool=false",
  "use_plain?": "bool=false"
 }).then(function(response){
   console.log(JSON.stringify(response));
@@ -5035,6 +6684,7 @@ HashMap<String, Object> data = new HashMap<>();
 data.put("session_id", "str");
 data.put("file_id", "str");
 data.put("use_plain?", "bool=false");
+data.put("use_cache?", "bool=false");
 
 client.callAPI("cloud.storage.download_b64", data, (response, hasError)->{
   System.out.println(response);
@@ -5046,6 +6696,7 @@ client.callAPI(module_name: "cloud.auth.guest", data: [
 "session_id": "str",
 "file_id": "str",
 "use_plain?": "bool=false",
+"use_cache?": "bool=false",
 ]) { (response) in
   print(response)
 }
@@ -5082,6 +6733,7 @@ module_name | str | "cloud.storage.download_b64"
 session_id | str
 file_id | str
 use_plain? | bool=false
+use_cache? | bool=false
 
 
 
@@ -5683,6 +7335,90 @@ test_name | str
 function_name | str
 function_version? | str
 test_input | dict
+session_id? | str
+
+
+
+## cloud.logic.create_packages_zip
+
+> The question mark after the parameter means that the parameter is not required
+
+```shell
+curl "https://your_rest_api_url" -d '{
+"module_name": "cloud.logic.create_packages_zip",
+"package_text": "str, requirements.txt or package.json ...",
+"runtime": "str=\"python | node\"",
+"session_id?": "str"}'
+```
+
+```python
+response = client.call_api("cloud.logic.create_packages_zip", {
+ "package_text": "str, requirements.txt or package.json ...",
+ "runtime": "str=\"python | node\"",
+ "session_id?": "str"
+})
+print(response)
+```
+
+```javascript
+client.callAPI("cloud.logic.create_packages_zip", {
+ "package_text": "str, requirements.txt or package.json ...",
+ "runtime": "str=\"python | node\"",
+ "session_id?": "str"
+}).then(function(response){
+  console.log(JSON.stringify(response));
+}).catch(function(error){
+    console.log(error.error);
+});
+```
+
+
+```java
+HashMap<String, Object> data = new HashMap<>();
+data.put("package_text", "str, requirements.txt or package.json ...");
+data.put("runtime", "str=\"python | node\"");
+data.put("session_id?", "str");
+
+client.callAPI("cloud.logic.create_packages_zip", data, (response, hasError)->{
+  System.out.println(response);
+});
+```
+
+```swift
+client.callAPI(module_name: "cloud.auth.guest", data: [
+"package_text": "str, requirements.txt or package.json ...",
+"runtime": "str=\"python | node\"",
+"session_id?": "str",
+]) { (response) in
+  print(response)
+}
+```
+
+> Expect output:
+
+```json
+{
+ "error?": {
+  "code": "int",
+  "message": "str"
+ },
+ "zip_file_id": "str"
+}
+```
+
+Install packages via package management program and return its internal file idATTENTION! DO NOT ALLOW permission that have invoked this function for NON-ADMIN users.
+
+### HTTP Request
+
+`POST https://you_rest_api_url/`
+
+### Parameters
+ 
+Parameter | Type | Value
+--------- | ----------- | -----
+module_name | str | "cloud.logic.create_packages_zip"
+package_text | str, requirements.txt or package.json ...
+runtime | str=&#34;python | node&#34;
 session_id? | str
 
 

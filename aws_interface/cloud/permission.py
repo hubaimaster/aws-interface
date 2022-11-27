@@ -30,6 +30,7 @@ class Permission:
         permission_cls_list = [
             cls.Run.Auth,
             cls.Run.Database,
+            cls.Run.FastDatabase,
             cls.Run.Storage,
             cls.Run.Logic,
             cls.Run.Log,
@@ -199,6 +200,7 @@ class Permission:
             get_item = 'run:cloud.fast_database.get_item'
             get_items = 'run:cloud.fast_database.get_items'
             query_items = 'run:cloud.fast_database.query_items'
+            query_items_by_partition = 'run:cloud.fast_database.query_items_by_partition'
 
             update_item = 'run:cloud.fast_database.update_item'
             update_items = 'run:cloud.fast_database.update_items'
@@ -208,6 +210,9 @@ class Permission:
 
             put_policy = 'run:cloud.fast_database.put_policy'
             get_policy_code = 'run:cloud.fast_database.get_policy_code'
+
+            add_index_to_partition = 'run:cloud.fast_database.add_index_to_partition'
+            remove_index_to_partition = 'run:cloud.fast_database.remove_index_to_partition'
 
     default_user_permissions = [
         Run.Auth.get_me,
@@ -258,6 +263,7 @@ class Permission:
         Run.FastDatabase.delete_item,
         Run.FastDatabase.delete_items,
         Run.FastDatabase.query_items,
+        Run.FastDatabase.query_items_by_partition,
     ]
 
     unknown_user_permissions = [
@@ -305,7 +311,8 @@ class Permission:
         Run.FastDatabase.create_items,
         Run.FastDatabase.delete_item,
         Run.FastDatabase.delete_items,
-        Run.FastDatabase.query_items
+        Run.FastDatabase.query_items,
+        Run.FastDatabase.query_items_by_partition,
     ]
 
     def __init__(self, data, resource):

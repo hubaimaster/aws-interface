@@ -17,10 +17,10 @@ def allocate_resource_in_background(adapter):
         except Exception as ex:
             print(ex)
             delay = 15
-            print('System will reallocate resources after {} seconds'.format(delay))
-            time.sleep(delay)
-            if retry_count < 4:
-                do_allocation(retry_count + 1)
+            # print('System will reallocate resources after {} seconds'.format(delay))
+            # time.sleep(delay)
+            # if retry_count < 4:
+            #     do_allocation(retry_count + 1)
 
     background_thread = threading.Thread(target=do_allocation)
     background_thread.start()
@@ -32,7 +32,6 @@ class Overview(LoginRequiredMixin, View):
         cmd = request.GET.get('cmd', None)
         platform = request.GET.get('platform', 'python3')
         adapter = DjangoAdapter(app_id, request)
-        # allocate_resource_in_background(adapter)
         if cmd == 'download_sdk':
             Util.log('app-overview', request.user, 'download-sdk-{}'.format(platform))
             sdk_bin = adapter.generate_sdk(platform)
@@ -54,10 +53,10 @@ class Overview(LoginRequiredMixin, View):
     def post(self, request, app_id):
         context = Util.get_context(request)
         context['app_id'] = app_id
-
         adapter = DjangoAdapter(app_id, request)
         cmd = request.POST['cmd']
 
+        print('cmd:', cmd, 'app_id:', app_id)
         if cmd == 'redeploy':
             allocate_resource_in_background(adapter)
             return JsonResponse({

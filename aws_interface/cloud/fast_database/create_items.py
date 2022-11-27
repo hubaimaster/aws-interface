@@ -1,7 +1,7 @@
 
 from cloud.permission import Permission, NeedPermission
 from cloud.message import errorlist
-from cloud.fast_database.util import has_partition, valid_keys
+from cloud.fast_database.util import has_partition, valid_keys, pop_ban_keys
 from cloud.fast_database.get_policy_code import match_policy, get_policy_code
 from concurrent.futures import ThreadPoolExecutor
 
@@ -30,6 +30,7 @@ def do(data, resource):
     partition = params.get('partition', None)
     items = params.get('items', [])
     can_overwrite = params.get('can_overwrite', False)
+    return_item = params.get('return_item', False)
 
     # 필수 파라메터 체크
     if not partition:
@@ -50,8 +51,11 @@ def do(data, resource):
             return errorlist.ITEM_MUST_BE_DICTIONARY, _item
 
         # 유효한 키가 아닌 경우
-        if not valid_keys(_item):
-            return errorlist.KEY_CANNOT_START_WITH_UNDER_BAR, _item
+        # if not valid_keys(_item):
+        #     return errorlist.KEY_CANNOT_START_WITH_UNDER_BAR, _item
+        _item = {
+            key: value for key, value in _item.items() if isinstance(key, str) and not key.startswith('_')
+        }
 
         # 생성 정책 위반한 경우
         if not match_policy(policy_code, user, _item):
@@ -84,8 +88,11 @@ def do(data, resource):
                 }
             })
 
-    _ids = resource.fdb_put_items(partition, items_to_create)
+    items = resource.fdb_put_items(partition, items_to_create)
 
-    body['item_ids'] = _ids
+    body['item_ids'] = [item['_id'] for item in items]
+    if return_item:
+        items = [pop_ban_keys(item) for item in items]
+        body['items'] = items
     body['failed_items'] = fail_list
     return body

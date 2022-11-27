@@ -35,7 +35,7 @@ def generate_api_info():
     from cloud.lambda_function import CALLABLE_MODULE_WHITE_LIST
     context = {}
     services = []
-    target_services = ['auth', 'database', 'storage', 'log', 'logic', 'schedule', 'notification']
+    target_services = ['auth', 'database', 'fast_database', 'storage', 'log', 'logic', 'schedule', 'notification']
     for target_service in target_services:
         cloud_service_name = 'cloud.{}'.format(target_service)
         module = importlib.import_module(cloud_service_name)
@@ -65,10 +65,11 @@ def generate_api_info():
 
 def generate_error_info():
     context = {}
-    import cloud.message.error as error
+    import cloud.message.errorlist as error
     error_vars = [item for item in dir(error) if not item.startswith("__")]
     errors = [getattr(error, error_var) for error_var in error_vars]
-    errors = sorted(errors, key=lambda x: x['code'])
+    errors = [{'code': error.code, 'message': error.message} for error in errors if error.code is not None]
+    errors = sorted(errors, key=lambda x: x.get('code', 0))
     context['errors'] = errors
     return context
 

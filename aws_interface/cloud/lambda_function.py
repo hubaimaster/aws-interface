@@ -222,9 +222,13 @@ CALLABLE_MODULE_WHITE_LIST = {
     'cloud.fast_database.put_policy',
 
     'cloud.fast_database.query_items',
+    'cloud.fast_database.query_items_by_partition',
 
     'cloud.fast_database.update_item',
     'cloud.fast_database.update_items',
+
+    'cloud.fast_database.add_index_to_partition',
+    'cloud.fast_database.remove_index_to_partition',
 }
 
 
@@ -250,16 +254,16 @@ def aws_handler(event, context):
     try:
         params = json.loads('{}'.format(event.get('body', '{}')))
     except Exception as ex:
-        print(ex)
+        # print(ex)
         params = event.get('body', {})
 
     body = abstracted_gateway(params, query_params, resource, client_ip)
-    if '__html__' in body:
+    if isinstance(body, dict) and '__html__' in body:
         html_response = body['__html__']
         response = AWSResponse(html_response, content_type='text/html')
         print_log(event, response)
         return response
-    elif '__image__' in body:
+    elif isinstance(body, dict) and '__image__' in body:
         image_base_64 = body['__image__']
         content_type = body.get('content_type', 'image/gif')
         response = AWSImageResponse(image_base_64, content_type)
@@ -272,6 +276,10 @@ def aws_handler(event, context):
 
 
 def abstracted_gateway(params, query_params, resource, client_ip):
+    show_traceback = False
+    if params and isinstance(params, dict):
+        show_traceback = params.get('show_traceback', False)
+    # show_traceback = False
     try:
         if 'webhook' in query_params:
             webhook_name = query_params['webhook']
@@ -281,36 +289,33 @@ def abstracted_gateway(params, query_params, resource, client_ip):
 
     except PermissionError as ex:
         error_traceback = traceback.format_exc()
-        print('Exception: [{}]'.format(ex))
-        print('error_traceback: [{}]'.format(error_traceback))
         body = {
             'error': error.PERMISSION_DENIED
         }
-        if params and params.get('show_traceback', False):
+        if show_traceback:
             body['traceback'] = '{}'.format(error_traceback)
         # slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
         return body
     except errorlist.CloudLogicError as ex:
         error_traceback = traceback.format_exc()
-        print('Exception: [{}]'.format(ex))
-        print('error_traceback: [{}]'.format(error_traceback))
         body = {
             'error': {
                 'code': ex.code,
                 'message': ex.message
             }
         }
-        if params and params.get('show_traceback', False):
+        if show_traceback:
             body['traceback'] = '{}'.format(error_traceback)
         return body
     except Exception as ex:
         error_traceback = traceback.format_exc()
-        print('Exception: [{}]'.format(ex))
-        print('error_traceback: [{}]'.format(error_traceback))
         body = {
-            'error': error.INVALID_REQUEST
+            'error': {
+                'code': -1,
+                'message': str(ex)
+            }
         }
-        if params and params.get('show_traceback', False):
+        if show_traceback:
             body['traceback'] = '{}'.format(error_traceback)
         # slack.send_system_slack_message(resource, str(error_traceback).replace('\\', ''))
         return body
@@ -337,7 +342,11 @@ def abstracted_webhook(params, query_params, resource, webhook_name, client_ip):
             'client_ip': client_ip
         }
         body = run_function.do(data, resource)
-        return body.get('response', None)
+        if 'error' in body:
+            return body
+        else:
+            response = body.get('response', {})
+            return response
     else:
         body['error'] = error.NO_SUCH_WEBHOOK
         return body

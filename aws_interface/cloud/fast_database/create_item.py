@@ -1,7 +1,7 @@
 
 from cloud.permission import Permission, NeedPermission
 from cloud.message import errorlist
-from cloud.fast_database.util import has_partition, valid_keys
+from cloud.fast_database.util import has_partition, valid_keys, pop_ban_keys
 from cloud.fast_database.get_policy_code import match_policy_after_get_policy_code
 
 
@@ -29,6 +29,7 @@ def do(data, resource):
     partition = params.get('partition', None)
     item = params.get('item', None)
     can_overwrite = params.get('can_overwrite', False)
+    return_item = params.get('return_item', False)
 
     # 필수 파라메터 체크
     if not partition:
@@ -41,8 +42,11 @@ def do(data, resource):
         raise errorlist.ITEM_MUST_BE_DICTIONARY
 
     # 유효한 키가 아닌 경우
-    if not valid_keys(item):
-        raise errorlist.KEY_CANNOT_START_WITH_UNDER_BAR
+    # if not valid_keys(item):
+    #     raise errorlist.KEY_CANNOT_START_WITH_UNDER_BAR
+    item = {
+        key: value for key, value in item.items() if isinstance(key, str) and not key.startswith('_')
+    }
 
     # 파티션이 없는 경우
     if partition is None or not has_partition(resource, partition, use_cache=True):
@@ -57,10 +61,13 @@ def do(data, resource):
         if resource.fdb_has_pk_sk_by_item(partition, item):
             raise errorlist.ITEM_PK_SK_PAIR_ALREADY_EXIST
 
-    _id = resource.fdb_put_item(partition, item)
+    item = resource.fdb_put_item(partition, item)
 
     body['partition'] = partition
-    body['item_id'] = _id
+    body['item_id'] = item['_id']
+    if return_item:
+        item = pop_ban_keys(item)
+        body['item'] = item
     return body
 
 

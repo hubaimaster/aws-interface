@@ -148,49 +148,49 @@
                                                     <div class="row">
                                                         <div class="col-lg-12">
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="partition-name">{{ _("*Name") }}</label>
+                                                                <label class="form-control-label" for="partition-name">{{ _("*Partition Name") }}</label>
                                                                 <input id="partition-name" type="text" class="form-control form-control-alternative" placeholder="{{ _("Partition name") }}">
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-lg-12">
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="pk_group">{{ _("*pk_group") }}</label>
-                                                                <input id="pk_group" type="text" class="form-control form-control-alternative" placeholder="{{ _("pk_group") }}">
-                                                            </div>
-                                                        </div>
+{#                                                        <div class="col-lg-12">#}
+{#                                                            <div class="form-group">#}
+{#                                                                <label class="form-control-label" for="pk_group">{{ _("*pk_group") }}</label>#}
+{#                                                                <input id="pk_group" type="text" class="form-control form-control-alternative" placeholder="{{ _("pk_group") }}">#}
+{#                                                            </div>#}
+{#                                                        </div>#}
 
                                                         <div class="col-lg-12">
                                                             <div class="form-group">
                                                                 <label class="form-control-label" for="pk_field">{{ _("*pk_field") }}</label>
-                                                                <input id="pk_field" type="text" class="form-control form-control-alternative" placeholder="{{ _("pk_field") }}">
+                                                                <input id="pk_field" type="text" class="form-control form-control-alternative" placeholder="{{ _("EX) user_id") }}">
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-lg-12">
-                                                            <div class="form-group">
-                                                                <label class="form-control-label" for="sk_group">{{ _("*sk_group") }}</label>
-                                                                <input id="sk_group" type="text" class="form-control form-control-alternative" placeholder="{{ _("sk_group") }}">
-                                                            </div>
-                                                        </div>
+{#                                                        <div class="col-lg-12">#}
+{#                                                            <div class="form-group">#}
+{#                                                                <label class="form-control-label" for="sk_group">{{ _("*sk_group") }}</label>#}
+{#                                                                <input id="sk_group" type="text" class="form-control form-control-alternative" placeholder="{{ _("sk_group") }}">#}
+{#                                                            </div>#}
+{#                                                        </div>#}
 
                                                         <div class="col-lg-12">
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="sk_field">{{ _("sk_field") }}</label>
-                                                                <input id="sk_field" type="text" class="form-control form-control-alternative" placeholder="{{ _("sk_field") }}">
+                                                                <label class="form-control-label" for="sk_field">{{ _("*sk_field") }}</label>
+                                                                <input id="sk_field" type="text" class="form-control form-control-alternative" placeholder="{{ _("EX) _created_at") }}">
                                                             </div>
                                                         </div>
 
                                                         <div class="col-lg-12">
                                                             <div class="form-group">
                                                                 <label class="form-control-label" for="post_sk_fields">{{ _("post_sk_fields (split by comma ',')") }}</label>
-                                                                <textarea id="post_sk_fields" class="form-control form-control-alternative" placeholder="{{ _("post_sk_fields") }}"></textarea>
+                                                                <textarea id="post_sk_fields" class="form-control form-control-alternative" placeholder="{{ _("EX) _created_at,hash_value") }}"></textarea>
                                                             </div>
                                                         </div>
 
                                                         <div class="col-lg-12">
                                                             <div class="form-group">
-                                                                <label class="form-control-label" for="use_random_sk_postfix">{{ _("*use_random_sk_postfix") }}</label>
+                                                                <label class="form-control-label" for="use_random_sk_postfix">{{ _("use_random_sk_postfix") }}</label>
                                                                 <input id="use_random_sk_postfix" type="checkbox" class="form-control form-control-alternative" placeholder="{{ _("use_random_sk_postfix") }}">
                                                             </div>
                                                         </div>
@@ -628,30 +628,18 @@
 
         function add_partition(){
             var partition_name = $("#partition-name").val();
-            var pk_group = $("#pk_group").val();
             var pk_field = $("#pk_field").val();
-            var sk_group = $("#sk_group").val();
             var sk_field = $("#sk_field").val();
             var post_sk_fields_text = $("#post_sk_fields").val();
             var use_random_sk_postfix = $("#use_random_sk_postfix").is(":checked");
 
-            console.log('pk_group:', pk_group);
             console.log('pk_field:', pk_field);
-            console.log('sk_group:', sk_group);
             console.log('sk_field:', sk_field);
             console.log('post_sk_fields_text:', post_sk_fields_text);
             console.log('use_random_sk_postfix:', use_random_sk_postfix);
 
-            if (pk_group == null || pk_group.length == 0){
-                alert("{{ _('Please enter the pk_group') }}");
-                return;
-            }
             if (pk_field == null || pk_field.length == 0){
                 alert("{{ _('Please enter the pk_field') }}");
-                return;
-            }
-            if (sk_group == null || sk_group.length == 0){
-                alert("{{ _('Please enter the sk_group') }}");
                 return;
             }
             if (sk_field == null || sk_field.length == 0){
@@ -679,9 +667,7 @@
                 cmd: "add_partition",
                 partition_name: partition_name,
                 'post_sk_fields[]': post_sk_fields,
-                pk_group: pk_group,
                 pk_field: pk_field,
-                sk_group: sk_group,
                 sk_field: sk_field,
                 use_random_sk_postfix: use_random_sk_postfix
             }, function (data) {

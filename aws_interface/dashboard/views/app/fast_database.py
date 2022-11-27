@@ -35,10 +35,10 @@ class FastDatabase(LoginRequiredMixin, View):
             cmd = request.POST['cmd']
             if cmd == 'add_partition':
                 partition_name = request.POST['partition_name']
-                pk_group = request.POST['pk_group']
+                pk_group = None  # request.POST['pk_group']
                 pk_field = request.POST['pk_field']
 
-                sk_group = request.POST['sk_group']
+                sk_group = None  # request.POST['sk_group']
                 sk_field = request.POST['sk_field']
 
                 post_sk_fields = request.POST.getlist('post_sk_fields[]')
@@ -78,7 +78,9 @@ class FastDatabase(LoginRequiredMixin, View):
                 _ = database_api.delete_partition(partition_name)
             elif cmd == 'delete_partitions':
                 partitions = request.POST.getlist('partitions[]')
-                _ = database_api.delete_partitions(partitions)
+                # _ = database_api.delete_partitions(partitions)
+                for partition in partitions:
+                    _ = database_api.delete_partition(partition)
             elif cmd == 'get_item':
                 item_id = request.POST['item_id']
                 result = database_api.get_item(item_id)
