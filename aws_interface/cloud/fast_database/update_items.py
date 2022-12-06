@@ -14,6 +14,7 @@ info = {
         'session_id': 'str',
         'partition': 'str',
         'item_id_pairs': '{item_id: item}',
+        'prevent_loss': 'bool // True일 경우 업데이트가 필요 없으면 하지 않음.',
     },
     'output_format': {
         'success_pairs': 'dict',
@@ -31,6 +32,7 @@ def do(data, resource):
 
     partition = params.get('partition', None)
     item_id_pairs = params.get('item_id_pairs', None)
+    prevent_loss = params.get('prevent_loss', True)  # 필요 없는 업데이트 방지
 
     # 필수 파라메터 체크
     if not partition:
@@ -83,8 +85,24 @@ def do(data, resource):
 
             # 새로 생성할 것
             new_item = old_item.copy()
+            # 만약 이미 같은 필드로, 업데이트가 필요 없는 경우 에러 레이즈
+            update_field_count = 0
             for key, value in item.items():
-                new_item[key] = value
+                if key in new_item:
+                    if new_item[key] == value:
+                        # 이미 있기 때문에 update_field_count++ 하지 않음.
+                        new_item[key] = value
+                        pass
+                    else:
+                        new_item[key] = value
+                        update_field_count += 1
+                else:
+                    # 키가 없으면 삽입
+                    new_item[key] = value
+                    update_field_count += 1
+            if update_field_count == 0 and prevent_loss:
+                # 업데이트할 필요가 없는 경우
+                raise errorlist.ITEM_ALREADY_HAS_KEY_VALUE
 
             # 생성 정책 위반한 경우
             if not match_policy(policy_code, user, old_item, new_item=item):
@@ -122,7 +140,7 @@ def do(data, resource):
             }
 
     # 실제 업데이트 진행, 병렬로 작업해야 함.
-    with ThreadPoolExecutor(max_workers=min(100, max(1, len(new_items_to_update)))) as worker:
+    with ThreadPoolExecutor(max_workers=min(32, max(1, len(new_items_to_update)))) as worker:
         for __item_id, __new_item in new_items_to_update.items():
             # 업데이트 진행, pk, sk 겹치는 경우 에러 발생함
             worker.submit(_update, __item_id, __new_item)

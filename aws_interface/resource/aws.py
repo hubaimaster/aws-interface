@@ -509,6 +509,11 @@ class AWSResource(Resource):
         resp = lam.update_function_memory_size(self.app_id, memory_size)
         return resp
 
+    def function_delete_stand_alone_function(self, function_name):
+        lambda_client = Lambda(self.boto3_session)
+        name = '{}_{}'.format(self.app_id, function_name)
+        return lambda_client.delete_function(name)
+
     def function_create_stand_alone_function(self, function_name, zipfile_bin):
         """
         ExecuteStandAlone 로 실행 가능한 스탠드얼론 함수 생성.

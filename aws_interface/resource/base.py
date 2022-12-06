@@ -495,6 +495,9 @@ class Resource(metaclass=ABCMeta):
     def function_update_memory_size(self, memory_size):
         raise NotImplementedError
 
+    def function_delete_stand_alone_function(self, function_name):
+        raise NotImplementedError
+
     def function_create_stand_alone_function(self, function_name, zipfile):
         """
         ExecuteStandAlone 로 실행 가능한 스탠드얼론 함수 생성.

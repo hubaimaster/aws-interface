@@ -421,3 +421,7 @@ NEED_INDEX_NAME = CloudLogicError(
 NEED_SK_CONDITION = CloudLogicError(
     84, 'Need <sk_condition> param'
 )
+
+ITEM_ALREADY_HAS_KEY_VALUE = CloudLogicError(
+    85, '업데이트 하려는 항목이 이미 키-값을 가지고 있습니다.'
+)

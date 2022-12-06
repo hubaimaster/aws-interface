@@ -13,7 +13,8 @@ info = {
         'session_id': 'str',
         'partition': 'str',
         'item_id': 'str',
-        'item': 'dict'
+        'item': 'dict',
+        'prevent_loss': 'bool // True일 경우 업데이트가 필요 없으면 하지 않음.'
     },
     'output_format': {
         'item': 'dict',
@@ -31,6 +32,7 @@ def do(data, resource):
     partition = params.get('partition', None)
     item_id = params.get('item_id', None)
     item = params.get('item', None)
+    prevent_loss = params.get('prevent_loss', True)  # 필요 없는 업데이트 방지
 
     # 파라메터 체크 필수
     if not partition:
@@ -71,17 +73,37 @@ def do(data, resource):
 
     # 새로 생성할 것
     new_item = old_item.copy()
+    update_field_count = 0
     for key, value in item.items():
-        new_item[key] = value
+        if key in new_item:
+            if new_item[key] == value:
+                # 이미 있기 때문에 update_field_count++ 하지 않음.
+                new_item[key] = value
+                pass
+            else:
+                new_item[key] = value
+                update_field_count += 1
+        else:
+            # 키가 없으면 삽입
+            new_item[key] = value
+            update_field_count += 1
 
     # 생성 정책 위반한 경우
     if not match_policy_after_get_policy_code(resource, 'update', partition, user, old_item, new_item=item):
         raise errorlist.UPDATE_POLICY_VIOLATION
 
+    if update_field_count == 0 and prevent_loss:
+        # 업데이트할 필요가 없는 경우
+        # TODO 나중에 이부분을 통해 Read 하지 않아도 업데이트로 읽을 수 있는 문제가 발생할 수 있음.
+        new_item = util.pop_ban_keys(new_item)
+        body['item'] = new_item
+        return body
+
     # 업데이트 진행, pk, sk 겹치는 경우 에러 발생함
     result = resource.fdb_update_item(partition, item_id, new_item)
 
     # 노출 필요 없는 키 제거
+    # TODO 나중에 이부분을 통해 Read 하지 않아도 업데이트로 읽을 수 있는 문제가 발생할 수 있음.
     result = util.pop_ban_keys(result)
     body['item'] = result
     return body
