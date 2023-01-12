@@ -116,3 +116,4 @@ aws_interface/.idea/workspace.xml
 !.aws_interface/elasticbeanstalk/*.global.yml
 aws_interface/media/*
 aws_interface/.elasticbeanstalk/config.yml
+requirements-snap.txt
