@@ -88,9 +88,9 @@ class AWSResourceAllocator(ResourceAllocator):
     def create(self):
         self._create_bucket()
         self._create_dynamo_db_table()
+        self._create_dynamo_fdb_table()
         self._create_lambda_function()
         self._create_rest_api_connection()
-        self._create_dynamo_fdb_table()
 
     def terminate(self):
         self._remove_bucket()
@@ -142,7 +142,10 @@ class AWSResourceAllocator(ResourceAllocator):
             lambda_client.create_function(name, desc, runtime, role_arn, handler, zip_file)
         except BaseException as ex:
             print(ex)
-            lambda_client.update_function_code(name, zip_file)
+            try:
+                lambda_client.update_function_code(name, zip_file)
+            except Exception as ex:
+                print(ex)
 
     def _create_rest_api_connection(self):
         api_name = '{}'.format(self.app_id)

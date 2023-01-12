@@ -121,6 +121,7 @@ class App(models.Model):
     name = models.CharField(max_length=255, blank=False, unique=False)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     vendor = models.CharField(max_length=255, default='aws')
+    region = models.CharField(max_length=100, default='ap-northeast-2')  # 230102 신규추가, 앱별 리전 설정 기능
 
     def __str__(self):
         return self.name

@@ -117,6 +117,18 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="pl-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label class="form-control-label" for="input-region">{{ _('Region') }}</label>
+                                                    <input name="region" type="text" id="input-region" class="form-control form-control-alternative" placeholder="{{ _('Region name') }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <p>
                                         {{ _('By clicking the Confirm button, you agree to share your analytics data with the AWS Interface to improve the AWS Interface service.') }}
                                     </p>
@@ -163,6 +175,7 @@
                                             <h1>{{ app.name }}</h1>
                                         </div>
                                         <h5 class="text-gray">{{ app.id }}</h5>
+                                        <h6>{{ app.region }}</h6>
                                     </div>
                                     <h5 class="text-gray">{{ app.creation_date }}</h5>
                                 </form>

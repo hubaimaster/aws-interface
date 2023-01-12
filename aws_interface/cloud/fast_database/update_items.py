@@ -140,7 +140,7 @@ def do(data, resource):
             }
 
     # 실제 업데이트 진행, 병렬로 작업해야 함.
-    with ThreadPoolExecutor(max_workers=min(32, max(1, len(new_items_to_update)))) as worker:
+    with ThreadPoolExecutor(max_workers=min(16, max(1, len(new_items_to_update)))) as worker:
         for __item_id, __new_item in new_items_to_update.items():
             # 업데이트 진행, pk, sk 겹치는 경우 에러 발생함
             worker.submit(_update, __item_id, __new_item)

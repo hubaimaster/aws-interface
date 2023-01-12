@@ -1392,8 +1392,8 @@ class Lambda:
                 'ZipFile': zip_file
             },
             Description=description,
-            Timeout=899,
-            MemorySize=5120,
+            Timeout=900,
+            MemorySize=3008,
             Publish=True,
             TracingConfig={
                 'Mode': 'Active'

@@ -16,7 +16,8 @@ class Apps(LoginRequiredMixin, View):
         context = Util.get_context(request)
         try:
             apps = App.objects.filter(user=request.user)
-            apps = [{'id': app.id, 'creation_date': app.creation_date, 'name': app.name} for app in apps]
+            apps = [{'id': app.id, 'creation_date': app.creation_date, 'name': app.name, 'region': app.region}
+                    for app in apps]
             context['apps'] = apps
         except ObjectDoesNotExist:
             context['apps'] = []
@@ -45,6 +46,8 @@ class Apps(LoginRequiredMixin, View):
     @classmethod
     def create_app(cls, request):
         name = request.POST['name']
+        region = request.POST['region']
+
         if not name or len(name) < 3:
             Util.add_alert(request, '이름은 3글자 이상입니다')
             return redirect('apps')
@@ -55,6 +58,8 @@ class Apps(LoginRequiredMixin, View):
             return redirect('apps')
         app = App()
         app.name = name
+        print('region:', region)
+        app.region = region
         app.user = user
         app.save()
         Util.add_alert(request, '새로운 어플리케이션이 생성되었습니다')

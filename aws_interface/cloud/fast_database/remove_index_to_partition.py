@@ -33,8 +33,8 @@ def do(data, resource):
     if not index_name:
         raise errorlist.NEED_INDEX_NAME
 
-    if has_partition(resource, partition, use_cache=False):
-        raise errorlist.EXISTING_PARTITION
+    if not has_partition(resource, partition, use_cache=False):
+        raise errorlist.NO_SUCH_PARTITION
 
     result = resource.fdb_detach_index(partition, index_name)
     body['partition'] = partition
